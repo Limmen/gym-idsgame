@@ -1,0 +1,1 @@
+from gym_idsgame.envs.idsgame_env import IdsGameEnv
