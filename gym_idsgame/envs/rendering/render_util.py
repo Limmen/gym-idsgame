@@ -4,8 +4,69 @@ Some OpenGL utility functions for drawing various shapes using the OpenGL primit
 
 import pyglet.gl as gl
 import pyglet
+import math
 
-def batch_label(text, x, y, font_size, color, batch, group, font_name='Times New Roman'):
+def create_circle(x, y, radius, batch, group, color):
+    circle, indices = create_indexed_vertices(x, y, radius)
+    vertex_count = len(circle) // 2
+    batch.add_indexed(vertex_count, pyglet.gl.GL_TRIANGLES, group,
+                      indices,
+                      ('v2f', circle),
+                      ('c3B', color * vertex_count))
+
+def create_indexed_vertices(x, y, radius, sides=24):
+    vertices = [x, y]
+    for side in range(sides):
+        angle = side * 2.0 * math.pi / sides
+        vertices.append(x + math.cos(angle) * radius)
+        vertices.append(y + math.sin(angle) * radius)
+    # Add a degenerated vertex
+    vertices.append(x + math.cos(0) * radius)
+    vertices.append(y + math.sin(0) * radius)
+
+    indices = []
+    for side in range(1, sides+1):
+        indices.append(0)
+        indices.append(side)
+        indices.append(side + 1)
+    return vertices, indices
+
+def circle(x, y, radius):
+    pass
+    #iterations = int(2*radius*pi)
+    # s = sin(2*pi / iterations)
+    # c = cos(2*pi / iterations)
+    #
+    # dx, dy = radius, 0
+    #
+    # glBegin(GL_TRIANGLE_FAN)
+    # glVertex2f(x, y)
+    # for i in range(iterations+1):
+    #     glVertex2f(x+dx, y+dy)
+    #     dx, dy = (dx*c - dy*s), (dy*c + dx*s)
+    # glEnd()
+def batch_circle(numPoints, batch, group, color):
+    verts = []
+    color_list = []
+    for i in range(numPoints):
+        angle = math.radians(float(i) / numPoints * 360.0)
+        x = 100 * math.cos(angle) + 300
+        y = 100 * math.sin(angle) + 200
+        verts += [x, y]
+        color_list.append(list(color))
+    #global circle
+    batch.add(numPoints, pyglet.gl.GL_POINTS, group, ('v2f', verts), ('c3B', tuple(color_list)))
+    #circle = pyglet.graphics.vertex_list(numPoints, )
+
+def batch_line(x1, y1, x2, y2, color, batch, group, line_width):
+    color_list = list(color) + list(color)
+    pyglet.gl.glLineWidth(line_width)
+    batch.add(2, pyglet.gl.GL_LINES, group,
+        ('v2f', (x1, y1, x2, y2)),
+        ('c3B', tuple(color_list))
+    )
+
+def batch_label(text, x, y, font_size, color, batch, group, font_name='Times New Roman', multiline=False, width= None):
     """
     Creates a text-label that can be rendered in OpenGL batch mode
 
@@ -17,6 +78,8 @@ def batch_label(text, x, y, font_size, color, batch, group, font_name='Times New
     :param batch: the batch to render the label in
     :param group: the batch group (e.g. foreground or background)
     :param font_name: the font type
+    :param multiline: whether it is a multiline label or not
+    :param width: width of the layout
     :return: a reference to the label object (in case the label has to be updated later on)
     """
     label = pyglet.text.Label(text,
@@ -26,7 +89,9 @@ def batch_label(text, x, y, font_size, color, batch, group, font_name='Times New
                           anchor_x='center', anchor_y='center',
                           color=color,
                           batch=batch,
-                          group=group)
+                          group=group,
+                          multiline=multiline,
+                          width=width)
     return label
 
 def batch_rect_fill(x, y, width, height, color, batch, group):
@@ -77,7 +142,7 @@ def batch_rect_border(x, y, width, height, color, batch, group):
 
     # Draw vertical lines (x,y)-->(x,y+height) and (x+width, y)-->(x+width, y+height)
     batch.add(4, pyglet.gl.GL_LINES, group,
-        ('v2i', (x, y, x, y+height, x+width, y+height, x+width, y)),
+        ('v2f', (x, y, x, y+height, x+width, y+height, x+width, y)),
         ('c3B', tuple(color_list)))
 
     # Draw Horizontal lines (x,y)-->(x+width,y) and (x, y+height)-->(x+width, y+height)

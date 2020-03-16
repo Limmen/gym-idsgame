@@ -8,7 +8,7 @@ class IdsGameEnv(gym.Env):
     TODO
     """
 
-    def __init__(self):
+    def __init__(self, width, height):
         """
         Initializes the environment
 
@@ -146,9 +146,9 @@ class IdsGameEnv(gym.Env):
         """
         from gym_idsgame.envs.rendering.viewer import Viewer
         script_dir = os.path.dirname(__file__)
-        resource_path = os.path.join(script_dir, './rendering/', constants.GRIDWORLD.RESOURCES_DIR)
+        resource_path = os.path.join(script_dir, './rendering/', constants.IDSGAME.RESOURCES_DIR)
         self.viewer = Viewer(width=self.width*self.rect_size,
-                             height=(self.height*self.rect_size) + constants.GRIDWORLD.PANEL_HEIGHT,
+                             height=(self.height*self.rect_size) + constants.IDSGAME.PANEL_HEIGHT,
                              rect_size=self.rect_size,
                              resources_dir=resource_path)
         self.viewer.agent_start()

@@ -18,18 +18,18 @@ except ImportError as e:
     'xvfb-run -s \"-screen 0 1400x900x24\" python <your_script.py>'
     ''')
 
-from gym_idsgame.envs.rendering.grid_frame import GridFrame
+from gym_idsgame.envs.rendering.game_frame import GameFrame
 from gym_idsgame.envs.rendering import constants
 import numpy as np
 
 class Viewer():
-    def __init__(self, height=1000, width=800, rect_size=constants.GRIDWORLD.RECT_SIZE,
-              bg_color=constants.GRIDWORLD.WHITE, border_color=constants.GRIDWORLD.BLACK,
-              avatar_filename=constants.GRIDWORLD.AVATAR_FILENAME,
-              resources_dir=constants.GRIDWORLD.RESOURCES_DIR, agent_start_x=None, agent_start_y=None,
-              agent_scale=0.2, caption="GridWorld", manual=True):
+    def __init__(self, height=1000, width=900, rect_size=constants.IDSGAME.RECT_SIZE,
+                 bg_color=constants.IDSGAME.WHITE, border_color=constants.IDSGAME.BLACK,
+                 avatar_filename=constants.IDSGAME.HACKER_AVATAR_FILENAME,
+                 resources_dir=constants.IDSGAME.RESOURCES_DIR,
+                 caption="IDS Game", manual=True):
         """
-        Creates the a viewer for the grid world
+        Creates the a viewer for the IDS Game
 
         :param height: height of the window
         :param width: width of the window
@@ -38,9 +38,6 @@ class Viewer():
         :param border_color: the color of the border of the grid
         :param avatar_filename: name of the file-avatar to use for the agent
         :param resources_dir: the directory where resources are put (e.g. images)
-        :param agent_start_x: the agent starting position (column index)
-        :param agent_start_y: the agent starting position (row index)
-        :param agent_scale: the scale of the agent avatar
         :param caption: caption of the frame
         :param manual: whether to setup the grid for manual play with keyboard
         """
@@ -52,9 +49,6 @@ class Viewer():
         self.border_color = border_color
         self.avatar_filename = avatar_filename
         self.resources_dir = resources_dir
-        self.agent_start_x = agent_start_x
-        self.agent_start_y = agent_start_y
-        self.agent_scale = agent_scale
         self.caption = caption
         self.manual = manual
         self.isopen = True
@@ -65,11 +59,10 @@ class Viewer():
 
         :return: None
         """
-        self.gridframe = GridFrame(width=self.width, height=self.height, rect_size=self.rect_size, bg_color=self.bg_color,
-                              border_color=self.border_color,
-                              avatar_filename=self.avatar_filename, resources_dir=self.resources_dir,
-                              agent_start_x=self.agent_start_x, agent_start_y=self.agent_start_y,
-                              agent_scale=self.agent_scale, caption=self.caption, manual=self.manual)
+        self.gridframe = GameFrame(width=self.width, height=self.height, rect_size=self.rect_size, bg_color=self.bg_color,
+                                   border_color=self.border_color,
+                                   hacker_avatar_filename=self.avatar_filename, resources_dir=self.resources_dir,
+                                   caption=self.caption, manual=self.manual)
         self.gridframe.on_close = self.window_closed_by_user
         self.isopen = True
         pyglet.clock.schedule_interval(self.gridframe.update, 1 / 60.)
@@ -80,12 +73,11 @@ class Viewer():
         Creates the frame in a agent-mode, where actions are taken programmatically rather than through
         moving arrow-keys.
         """
-        self.gridframe = GridFrame(width=self.width, height=self.height, rect_size=self.rect_size,
+        self.gridframe = GameFrame(width=self.width, height=self.height, rect_size=self.rect_size,
                                    bg_color=self.bg_color,
                                    border_color=self.border_color,
-                                   avatar_filename=self.avatar_filename, resources_dir=self.resources_dir,
-                                   agent_start_x=self.agent_start_x, agent_start_y=self.agent_start_y,
-                                   agent_scale=self.agent_scale, caption=self.caption, manual=self.manual)
+                                   hacker_avatar_filename=self.avatar_filename, resources_dir=self.resources_dir,
+                                   caption=self.caption, manual=self.manual)
         self.gridframe.on_close = self.window_closed_by_user
         self.isopen = True
 
