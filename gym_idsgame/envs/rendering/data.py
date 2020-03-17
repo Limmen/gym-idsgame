@@ -13,22 +13,11 @@ class Data(pyglet.sprite.Sprite):
     and define state of the sprite
     """
     def __init__(self, avatar_path, col, row, batch, background, foreground, size, scale=0.25,
-                 policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC):
-        """
-        Class constructor, initializes the resource sprite
-
-        :param avatar_path: path to the avatar file to use for the agent
-        :param col: the starting x column in the grid
-        :param row: the starting y row in the grid
-        :param scale: the scale of the avatar
-        :param batch: the batch to add this element to
-        :param foreground: the batch foreground group
-        :param background: the batch foreground group
-        :param size: size of the cell in the grid
-        """
+                 policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC, max_value = 10):
         self.avatar = pyglet.resource.image(avatar_path)
         self.background = background
         self.foreground = foreground
+        self.max_value = max_value
         super(Data, self).__init__(self.avatar, batch=batch, group=background)
         self.col = col
         self.row = row
@@ -45,19 +34,19 @@ class Data(pyglet.sprite.Sprite):
         self.policy = policy
 
     def create_labels(self):
-        lbl_color = constants.IDSGAME.BLACK_ALPHA
+        lbl_color = constants.GAMEFRAME.BLACK_ALPHA
         lbl = self.get_attack_text()
         self.attack_label = batch_label(lbl, self.col * self.size + self.size / 2, self.row * int((self.size) / 1.5) + self.size / 4,
-                    constants.IDSGAME.NODE_STATE_FONT_SIZE, lbl_color, self.batch, self.background, multiline=False,
-                    width=self.size)
+                                        constants.GAMEFRAME.NODE_STATE_FONT_SIZE, lbl_color, self.batch, self.background, multiline=False,
+                                        width=self.size)
         lbl = self.get_defense_text()
         self.defense_label = batch_label(lbl, self.col * self.size + self.size / 2, self.row * int((self.size) / 1.5) + self.size / 7,
-                    constants.IDSGAME.NODE_STATE_FONT_SIZE, lbl_color, self.batch, self.background, multiline=False,
-                    width=self.size)
+                                         constants.GAMEFRAME.NODE_STATE_FONT_SIZE, lbl_color, self.batch, self.background, multiline=False,
+                                         width=self.size)
         lbl = self.get_det_text()
         self.det_label = batch_label(lbl, self.col * self.size + self.size / 3, self.row * int((self.size) / 1.5) + self.size / 3,
-                    constants.IDSGAME.NODE_STATE_FONT_SIZE, lbl_color, self.batch, self.background, multiline=False,
-                    width=self.size)
+                                     constants.GAMEFRAME.NODE_STATE_FONT_SIZE, lbl_color, self.batch, self.background, multiline=False,
+                                     width=self.size)
 
     def set_labels(self):
         self.attack_label.text = self.get_attack_text()
@@ -79,12 +68,12 @@ class Data(pyglet.sprite.Sprite):
         self.det = 0.2
 
     def simulate_attack(self, attack_type, edges_list):
-        for i in range(0, constants.IDSGAME.NUM_BLINKS):
+        for i in range(0, constants.GAMEFRAME.NUM_BLINKS):
             if i % 2 == 0:
-                clock.schedule_once(self.attack_red, constants.IDSGAME.BLINK_INTERVAL * i, edges_list)
+                clock.schedule_once(self.attack_red, constants.GAMEFRAME.BLINK_INTERVAL * i, edges_list)
             else:
-                clock.schedule_once(self.attack_black, constants.IDSGAME.BLINK_INTERVAL * i, edges_list)
-        if self.attack_values[attack_type] < 10:
+                clock.schedule_once(self.attack_black, constants.GAMEFRAME.BLINK_INTERVAL * i, edges_list)
+        if self.attack_values[attack_type] < self.max_value-1:
             self.attack_values[attack_type] += 1
         self.attack_label.text = self.get_attack_text()
         if self.attack_values[attack_type] > self.defense_values[attack_type]:
@@ -99,24 +88,24 @@ class Data(pyglet.sprite.Sprite):
             return False
 
     def attack_red(self, dt, edges_list):
-        color = constants.IDSGAME.RED
+        color = constants.GAMEFRAME.RED
         color_list = list(color) + list(color)
         for edges in edges_list:
             for e1 in edges:
                 e1.colors = color_list
-        lbl_color = constants.IDSGAME.RED_ALPHA
+        lbl_color = constants.GAMEFRAME.RED_ALPHA
         self.attack_label.color = lbl_color
-        self.color = constants.IDSGAME.RED
+        self.color = constants.GAMEFRAME.RED
 
     def attack_black(self, dt, edges_list):
-        color = constants.IDSGAME.BLACK
+        color = constants.GAMEFRAME.BLACK
         color_list = list(color) + list(color)
         for edges in edges_list:
             for e1 in edges:
                 e1.colors = color_list
-        lbl_color = constants.IDSGAME.BLACK_ALPHA
+        lbl_color = constants.GAMEFRAME.BLACK_ALPHA
         self.attack_label.color = lbl_color
-        self.color = constants.IDSGAME.WHITE
+        self.color = constants.GAMEFRAME.WHITE
 
     def __center_avatar(self):
         """
@@ -160,24 +149,24 @@ class Data(pyglet.sprite.Sprite):
 
 
     def defend(self, defend_type):
-        if self.defense_values[defend_type] < 10:
+        if self.defense_values[defend_type] < self.max_value-1:
             self.defense_values[defend_type] += 1
         self.defense_label.text = self.get_defense_text()
-        for i in range(0, constants.IDSGAME.NUM_BLINKS):
+        for i in range(0, constants.GAMEFRAME.NUM_BLINKS):
             if i % 2 == 0:
-                clock.schedule_once(self.defense_green, constants.IDSGAME.BLINK_INTERVAL * i)
+                clock.schedule_once(self.defense_green, constants.GAMEFRAME.BLINK_INTERVAL * i)
             else:
-                clock.schedule_once(self.defense_black, constants.IDSGAME.BLINK_INTERVAL * i)
+                clock.schedule_once(self.defense_black, constants.GAMEFRAME.BLINK_INTERVAL * i)
 
     def defense_green(self, dt):
-        color = constants.IDSGAME.GREEN_ALPHA
+        color = constants.GAMEFRAME.GREEN_ALPHA
         self.defense_label.color = color
-        self.color = constants.IDSGAME.GREEN
+        self.color = constants.GAMEFRAME.GREEN
 
     def defense_black(self, dt):
-        color = constants.IDSGAME.BLACK_ALPHA
+        color = constants.GAMEFRAME.BLACK_ALPHA
         self.defense_label.color = color
-        self.color = constants.IDSGAME.WHITE
+        self.color = constants.GAMEFRAME.WHITE
 
     def unschedule(self):
         clock.unschedule(self.defense_green)

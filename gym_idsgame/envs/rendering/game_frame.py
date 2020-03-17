@@ -15,9 +15,13 @@ class GameFrame(pyglet.window.Window):
     event handler for on_draw is defined by overriding the on_draw function.
     """
 
-    def __init__(self, adjacency_matrix= None, graph_layout = None, manual = True, num_layers = 1, num_servers_per_layer = 2, num_attack_types = 10, max_value = 10,
+    def __init__(self, adjacency_matrix= None, graph_layout = None, manual = True, num_layers = 1,
+                 num_servers_per_layer = 2, num_attack_types = 10, max_value = 10,
                  defense_policy=constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC,
-                 resources_dir=constants.IDSGAME.RESOURCES_DIR):
+                 resources_dir=constants.GAMEFRAME.RESOURCES_DIR,
+                 initial_state = None
+                 ):
+        self.minimum_width = constants.GAMEFRAME.MIN_WIDTH
         self.num_layers = num_layers
         self.num_servers_per_layer = num_servers_per_layer
         self.num_attack_types = num_attack_types
@@ -26,28 +30,30 @@ class GameFrame(pyglet.window.Window):
         self.max_value = max_value
         self.defense_policy = defense_policy
         self.resources_dir = resources_dir
-        self.rect_size = constants.IDSGAME.RECT_SIZE
-        self.bg_color = constants.IDSGAME.WHITE
-        self.border_color = constants.IDSGAME.BLACK
-        self.avatar_filename = constants.IDSGAME.HACKER_AVATAR_FILENAME
-        self.server_filename = constants.IDSGAME.SERVER_AVATAR_FILENAME
-        self.data_filename = constants.IDSGAME.DATA_AVATAR_FILENAME
-        self.resources_dir = constants.IDSGAME.RESOURCES_DIR
+        self.rect_size = constants.GAMEFRAME.RECT_SIZE
+        self.bg_color = constants.GAMEFRAME.WHITE
+        self.border_color = constants.GAMEFRAME.BLACK
+        self.avatar_filename = constants.GAMEFRAME.HACKER_AVATAR_FILENAME
+        self.server_filename = constants.GAMEFRAME.SERVER_AVATAR_FILENAME
+        self.data_filename = constants.GAMEFRAME.DATA_AVATAR_FILENAME
+        self.resources_dir = constants.GAMEFRAME.RESOURCES_DIR
         self.agent_scale = 0.3
         self.resource_scale = 0.2
         self.data_scale = 0.2
         self.manual = manual
-        self.line_width = constants.IDSGAME.LINE_WIDTH
-        height = constants.IDSGAME.PANEL_HEIGHT + int((self.rect_size / 1.5)) * self.num_rows
-        width = self.rect_size * self.num_cols
-        caption = constants.IDSGAME.CAPTION
+        self.line_width = constants.GAMEFRAME.LINE_WIDTH
+        height = constants.GAMEFRAME.PANEL_HEIGHT + int((self.rect_size / 1.5)) * self.num_rows
+        width = max(self.minimum_width, self.rect_size * self.num_cols)
+        print(width)
+        caption = constants.GAMEFRAME.CAPTION
         super(GameFrame, self).__init__(height=height, width=width, caption=caption) # call constructor of parent class
-        self.num_rows = (self.height - constants.IDSGAME.PANEL_HEIGHT) // int((self.rect_size/1.5))
+        self.num_rows = (self.height - constants.GAMEFRAME.PANEL_HEIGHT) // int((self.rect_size / 1.5))
         self.num_cols = self.width//self.rect_size
         self.num_cells = self.num_rows*self.num_cols
         self.resource_network = ResourceNetwork(self.rect_size, self.num_rows, self.num_cols)
         self.setup_resources_path()
         self.game_step = 0
+        self.num_games = 0
         self.attack_type = 1
         self.create_batch()
         if adjacency_matrix is None or graph_layout is None:
@@ -56,6 +62,11 @@ class GameFrame(pyglet.window.Window):
             self.adjacency_matrix = adjacency_matrix
             self.graph_layout = graph_layout
         self.done = False
+        if initial_state is None:
+            self.init_state = self.initial_state(self.graph_layout, self.num_rows, self.num_cols, self.num_attack_types)
+        else:
+            self.init_state = initial_state
+        self.set_state(self.init_state)
 
     def initialize_graph_config(self):
         self.graph_layout = np.zeros((self.num_rows, self.num_cols))
@@ -107,8 +118,6 @@ class GameFrame(pyglet.window.Window):
         self.first_foreground = pyglet.graphics.OrderedGroup(1)
         self.second_foreground = pyglet.graphics.OrderedGroup(2)
 
-        # ---- Background ----
-
         # Sets the background color
         batch_rect_fill(0, 0, self.width, self.height, self.bg_color, self.batch, self.background)
 
@@ -120,20 +129,23 @@ class GameFrame(pyglet.window.Window):
                     self.resource_network.grid[i][j].draw(i, j, self.border_color, self.batch, self.background,
                                                           self.second_foreground,
                                                           self.data_filename, self.data_scale,
-                                                          data=(j == (self.num_cols // 2)))
+                                                          data=(j == (self.num_cols // 2)), max_value=self.max_value)
                     if j == (self.num_cols // 2):
                         self.data_node = self.resource_network.grid[i][j].get_node()
                 # Server node
                 if i > 0 and i < self.resource_network.num_rows-1:
                     self.resource_network.grid[i][j].draw(i, j, self.border_color, self.batch, self.background,
                                                           self.second_foreground,
-                                                          self.server_filename, self.resource_scale, server=True)
+                                                          self.server_filename, self.resource_scale, server=True,
+                                                          max_value=self.max_value)
                 # Start node
                 if i == self.resource_network.num_rows-1:
                     self.resource_network.grid[i][j].draw(i, j, self.border_color, self.batch, self.background,
                                                           self.second_foreground,
                                                           self.avatar_filename, self.agent_scale,
-                                                          start=(j == (self.num_cols//2)))
+                                                          start=(j == (self.num_cols//2)),
+                                                          max_value=self.max_value
+                                                          )
         # Hacker starts at the start node
         self.hacker = Hacker(self.avatar_filename, self.num_cols // 2,
                              self.resource_network.num_rows - 1, self.batch, self.first_foreground, self.second_foreground,
@@ -143,13 +155,13 @@ class GameFrame(pyglet.window.Window):
         root_edge = self.resource_network.root_edge(
             self.resource_network.grid[self.resource_network.num_rows-1][self.num_cols//2],
             self.resource_network.grid[self.resource_network.num_rows - 2][self.num_cols // 2],
-            constants.IDSGAME.BLACK, self.batch, self.background, self.line_width
+            constants.GAMEFRAME.BLACK, self.batch, self.background, self.line_width
         )
         for i in range(self.num_cols):
             edges = self.resource_network.connect_start_and_server_nodes(
                 self.resource_network.grid[self.resource_network.num_rows-1][self.num_cols//2],
                 self.resource_network.grid[self.resource_network.num_rows - 2][i],
-                constants.IDSGAME.BLACK, self.batch, self.background, self.line_width)
+                constants.GAMEFRAME.BLACK, self.batch, self.background, self.line_width)
             edges.append(root_edge)
             self.resource_network.grid[self.resource_network.num_rows - 1][self.num_cols // 2].add_out_edge(edges)
             self.resource_network.grid[self.resource_network.num_rows - 2][i].add_in_edge(edges)
@@ -160,7 +172,7 @@ class GameFrame(pyglet.window.Window):
                 edges = self.resource_network.connect_server_and_server_nodes(
                     self.resource_network.grid[i][j],
                     self.resource_network.grid[i+1][j],
-                    constants.IDSGAME.BLACK, self.batch, self.background, self.line_width
+                    constants.GAMEFRAME.BLACK, self.batch, self.background, self.line_width
                 )
                 self.resource_network.grid[i+1][j].add_out_edge(edges)
                 self.resource_network.grid[i][j].add_in_edge(edges)
@@ -170,44 +182,53 @@ class GameFrame(pyglet.window.Window):
             edges = self.resource_network.connect_server_and_data_nodes(
                 self.resource_network.grid[1][j],
                 self.resource_network.grid[0][self.num_cols//2],
-                constants.IDSGAME.BLACK, self.batch, self.background, self.line_width
+                constants.GAMEFRAME.BLACK, self.batch, self.background, self.line_width
             )
             self.resource_network.grid[1][j].add_out_edge(edges)
             self.resource_network.grid[0][self.num_cols // 2].add_in_edge(edges)
 
         # Panel Labels
-        batch_label("Attack Reward: ", constants.IDSGAME.PANEL_LEFT_MARGIN, self.height - constants.IDSGAME.PANEL_TOP_MARGIN,
-                    constants.IDSGAME.PANEL_FONT_SIZE, constants.IDSGAME.BLACK_ALPHA, self.batch,
+        batch_label("Attack Reward: ", constants.GAMEFRAME.PANEL_LEFT_MARGIN, self.height - constants.GAMEFRAME.PANEL_TOP_MARGIN,
+                    constants.GAMEFRAME.PANEL_FONT_SIZE, constants.GAMEFRAME.BLACK_ALPHA, self.batch,
                     self.second_foreground)
-        batch_label("Time-step: ", constants.IDSGAME.PANEL_LEFT_MARGIN,
-                    self.height - constants.IDSGAME.PANEL_TOP_MARGIN * 2,
-                    constants.IDSGAME.PANEL_FONT_SIZE, constants.IDSGAME.BLACK_ALPHA,
+        batch_label("Time-step: ", constants.GAMEFRAME.PANEL_LEFT_MARGIN,
+                    self.height - constants.GAMEFRAME.PANEL_TOP_MARGIN * 2,
+                    constants.GAMEFRAME.PANEL_FONT_SIZE, constants.GAMEFRAME.BLACK_ALPHA,
                     self.batch, self.second_foreground)
 
-        batch_label("Attack Type: ", constants.IDSGAME.PANEL_LEFT_MARGIN * 4,
-                    self.height - constants.IDSGAME.PANEL_TOP_MARGIN * 2,
-                    constants.IDSGAME.PANEL_FONT_SIZE, constants.IDSGAME.BLACK_ALPHA,
+        batch_label("Attack Type: ", constants.GAMEFRAME.PANEL_LEFT_MARGIN * 4,
+                    self.height - constants.GAMEFRAME.PANEL_TOP_MARGIN * 2,
+                    constants.GAMEFRAME.PANEL_FONT_SIZE, constants.GAMEFRAME.BLACK_ALPHA,
                     self.batch, self.second_foreground)
-        batch_label("Defense Reward: ", constants.IDSGAME.PANEL_LEFT_MARGIN * 4,
-                    self.height - constants.IDSGAME.PANEL_TOP_MARGIN,
-                    constants.IDSGAME.PANEL_FONT_SIZE, constants.IDSGAME.BLACK_ALPHA,
+        batch_label("Defense Reward: ", constants.GAMEFRAME.PANEL_LEFT_MARGIN * 4,
+                    self.height - constants.GAMEFRAME.PANEL_TOP_MARGIN,
+                    constants.GAMEFRAME.PANEL_FONT_SIZE, constants.GAMEFRAME.BLACK_ALPHA,
                     self.batch, self.second_foreground)
-        self.attack_type_label = batch_label(str(self.attack_type), constants.IDSGAME.PANEL_LEFT_MARGIN * 5.2,
-                                             self.height - constants.IDSGAME.PANEL_TOP_MARGIN * 2,
-                                             constants.IDSGAME.PANEL_FONT_SIZE, constants.IDSGAME.BLACK_ALPHA,
+        batch_label("Num Games: ", constants.GAMEFRAME.PANEL_LEFT_MARGIN * 6.5,
+                    self.height - constants.GAMEFRAME.PANEL_TOP_MARGIN,
+                    constants.GAMEFRAME.PANEL_FONT_SIZE, constants.GAMEFRAME.BLACK_ALPHA,
+                    self.batch, self.second_foreground)
+        self.attack_type_label = batch_label(str(self.attack_type), constants.GAMEFRAME.PANEL_LEFT_MARGIN * 5.2,
+                                             self.height - constants.GAMEFRAME.PANEL_TOP_MARGIN * 2,
+                                             constants.GAMEFRAME.PANEL_FONT_SIZE, constants.GAMEFRAME.BLACK_ALPHA,
                                              self.batch, self.second_foreground)
-        self.a_reward_label = batch_label(str(self.hacker.cumulative_reward), constants.IDSGAME.PANEL_LEFT_MARGIN * 2.2,
-                                          self.height - constants.IDSGAME.PANEL_TOP_MARGIN,
-                                          constants.IDSGAME.PANEL_FONT_SIZE, constants.IDSGAME.BLACK_ALPHA, self.batch,
+        self.a_reward_label = batch_label(str(self.hacker.cumulative_reward), constants.GAMEFRAME.PANEL_LEFT_MARGIN * 2.2,
+                                          self.height - constants.GAMEFRAME.PANEL_TOP_MARGIN,
+                                          constants.GAMEFRAME.PANEL_FONT_SIZE, constants.GAMEFRAME.BLACK_ALPHA, self.batch,
                                           self.second_foreground)
-        self.d_reward_label = batch_label(str(self.data_node.cumulative_reward), constants.IDSGAME.PANEL_LEFT_MARGIN * 5.2,
-                                          self.height - constants.IDSGAME.PANEL_TOP_MARGIN,
-                                          constants.IDSGAME.PANEL_FONT_SIZE, constants.IDSGAME.BLACK_ALPHA, self.batch,
+        self.d_reward_label = batch_label(str(self.data_node.cumulative_reward), constants.GAMEFRAME.PANEL_LEFT_MARGIN * 5.2,
+                                          self.height - constants.GAMEFRAME.PANEL_TOP_MARGIN,
+                                          constants.GAMEFRAME.PANEL_FONT_SIZE, constants.GAMEFRAME.BLACK_ALPHA, self.batch,
                                           self.second_foreground)
-        self.step_label = batch_label(str(self.game_step), constants.IDSGAME.PANEL_LEFT_MARGIN * 2.2,
-                                      self.height - constants.IDSGAME.PANEL_TOP_MARGIN * 2,
-                                      constants.IDSGAME.PANEL_FONT_SIZE, constants.IDSGAME.BLACK_ALPHA, self.batch,
+        self.step_label = batch_label(str(self.game_step), constants.GAMEFRAME.PANEL_LEFT_MARGIN * 2.2,
+                                      self.height - constants.GAMEFRAME.PANEL_TOP_MARGIN * 2,
+                                      constants.GAMEFRAME.PANEL_FONT_SIZE, constants.GAMEFRAME.BLACK_ALPHA, self.batch,
                                       self.second_foreground)
+        self.num_games_label = batch_label(str(self.num_games),
+                                           constants.GAMEFRAME.PANEL_LEFT_MARGIN * 7.5,
+                                           self.height - constants.GAMEFRAME.PANEL_TOP_MARGIN,
+                                           constants.GAMEFRAME.PANEL_FONT_SIZE, constants.GAMEFRAME.BLACK_ALPHA, self.batch,
+                                           self.second_foreground)
 
     def setup_resources_path(self):
         """
@@ -219,7 +240,7 @@ class GameFrame(pyglet.window.Window):
             pyglet.resource.path = [self.resources_dir]
         else:
             script_dir = os.path.dirname(__file__)
-            resource_path = os.path.join(script_dir, './', constants.IDSGAME.RESOURCES_DIR)
+            resource_path = os.path.join(script_dir, './', constants.GAMEFRAME.RESOURCES_DIR)
             pyglet.resource.path = [resource_path]
         pyglet.resource.reindex()
 
@@ -267,16 +288,15 @@ class GameFrame(pyglet.window.Window):
                                     self.hacker.move_to(node.x, node.y, node.col, node.row)
                                     if isinstance(node, Data):
                                         self.done = True
-                                        self.hacker.add_reward(constants.IDSGAME.POSITIVE_REWARD)
-                                        node.add_reward(constants.IDSGAME.NEGATIVE_REWARD)
+                                        self.hacker.add_reward(constants.GAMEFRAME.POSITIVE_REWARD)
+                                        node.add_reward(constants.GAMEFRAME.NEGATIVE_REWARD)
                                 else:
                                     detected = node.simulate_detection()
                                     if detected:
-                                        self.hacker.add_reward(constants.IDSGAME.NEGATIVE_REWARD)
+                                        self.hacker.add_reward(constants.GAMEFRAME.NEGATIVE_REWARD)
                                         self.hacker.detected()
-                                        self.data_node.add_reward(constants.IDSGAME.POSITIVE_REWARD)
+                                        self.data_node.add_reward(constants.GAMEFRAME.POSITIVE_REWARD)
                                         self.done = True
-
                             return
 
 
@@ -326,6 +346,7 @@ class GameFrame(pyglet.window.Window):
         self.a_reward_label.text = str(self.hacker.cumulative_reward)
         self.d_reward_label.text = str(self.data_node.cumulative_reward)
         self.attack_type_label.text = str(self.attack_type)
+        self.num_games_label.text = str(self.num_games)
         self.hacker.update()
 
     def set_state(self, render_state):
@@ -349,6 +370,8 @@ class GameFrame(pyglet.window.Window):
         self.data_node.set_reward(render_state[constants.RENDER_STATE.DEFENDER_CUMULATIVE_REWARD])
         self.game_step = render_state[constants.RENDER_STATE.GAME_STEP]
         self.step_label.text = str(self.game_step)
+        self.num_games = render_state[constants.RENDER_STATE.NUM_GAMES]
+        self.num_games_label.text = str(render_state[constants.RENDER_STATE.NUM_GAMES])
         self.a_reward_label.text = str(self.hacker.cumulative_reward)
         self.d_reward_label.text = str(self.data_node.cumulative_reward)
         self.hacker.update()
@@ -369,3 +392,28 @@ class GameFrame(pyglet.window.Window):
         for i in range(self.resource_network.num_rows):
             for j in range(self.resource_network.num_cols):
                 self.resource_network.grid[i][j].reset()
+        self.num_games += 1
+        self.game_step = 0
+
+
+    def initial_state(self, graph_layout, num_rows, num_cols, num_attack_types):
+        attack_values = np.zeros((num_rows, num_cols, num_attack_types))
+        defense_values = np.zeros((num_rows, num_cols, num_attack_types))
+        det_values = np.zeros((num_rows, num_cols))
+        for i in range(num_rows):
+            for j in range(num_cols):
+                if graph_layout[i][j] == constants.NODE_TYPES.DATA or graph_layout[i][
+                    j] == constants.NODE_TYPES.RESOURCE:
+                    defense_values[i][j] = [2] * num_attack_types
+                    defense_values[i][j][0] = 0  # vulnerability
+                    det_values[i][j] = 0.2
+        render_state = {}
+        render_state[constants.RENDER_STATE.ATTACK_VALUES] = attack_values.astype(np.int32)
+        render_state[constants.RENDER_STATE.DEFENSE_VALUES] = defense_values.astype(np.int32)
+        render_state[constants.RENDER_STATE.DEFENSE_DET] = det_values.astype(np.int32)
+        render_state[constants.RENDER_STATE.ATTACKER_POS] = (num_rows - 1, num_cols // 2)
+        render_state[constants.RENDER_STATE.GAME_STEP] = 0
+        render_state[constants.RENDER_STATE.ATTACKER_CUMULATIVE_REWARD] = 0
+        render_state[constants.RENDER_STATE.DEFENDER_CUMULATIVE_REWARD] = 0
+        render_state[constants.RENDER_STATE.NUM_GAMES] = 0
+        return render_state

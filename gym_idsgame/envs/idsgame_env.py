@@ -10,7 +10,9 @@ class IdsGameEnv(gym.Env):
     """
 
     def __init__(self, num_layers = 2, num_servers_per_layer = 3, num_attack_types = 10, max_value = 10,
-                 defense_policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC):
+                 defense_policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC,
+                 adjacency_matrix=None, graph_layout=None, initial_state = None
+                 ):
         """
         TODO
         """
@@ -29,8 +31,16 @@ class IdsGameEnv(gym.Env):
         self.defense_policy = defense_policy
         self.num_nodes = self.num_layers * self.num_servers_per_layer + 2 #+2 for Start and Data Nodes
         self.num_states = math.pow(self.max_value, self.num_attack_types*2* self.num_nodes)*math.pow(10,self.max_value)
-        self.state = self.initial_state()
-        self.__initialize_graph_config()
+        if initial_state is None:
+            self.init_state = self.initial_state()
+        else:
+            self.init_state = initial_state
+        self.state = np.copy(self.init_state)
+        if adjacency_matrix is None or graph_layout is None:
+            self.__initialize_graph_config()
+        else:
+            self.adjacency_matrix = adjacency_matrix
+            self.graph_layout = graph_layout
         self.action_descriptors = ["Injection", "Authentication", "CrossSite", "References", "Misssconfiguration",
                                    "Exposure", "Access", "Forgery", "Vulnerabilities", "Redirects"]
         self.num_actions = self.num_attack_types*self.num_nodes
@@ -45,18 +55,19 @@ class IdsGameEnv(gym.Env):
          'render.modes': ['human', 'rgb_array'],
          'video.frames_per_second' : 50 # Video rendering speed
         }
-        self.reward_range = (float(constants.IDSGAME.NEGATIVE_REWARD), float(constants.IDSGAME.POSITIVE_REWARD))
+        self.reward_range = (float(constants.GAMEFRAME.NEGATIVE_REWARD), float(constants.GAMEFRAME.POSITIVE_REWARD))
         self.attacker_total_reward = 0
         self.defender_total_reward = 0
         self.game_step = 0
+        self.num_games = 0
 
     def initial_state(self):
         attack_states = np.zeros((self.num_nodes, self.num_attack_types+1)) # Plus 1 to indicate whether the agent is currently at this node or not
         defense_states = np.zeros((self.num_nodes, self.num_attack_types+1)) # Plus 1 to indicate detection value
         for i in range(self.num_nodes):
-            attack_states[i] = np.array([0]*(self.max_value+1))
+            attack_states[i] = np.array([0]*(self.num_attack_types+1))
         for i in range(self.num_nodes):
-            defense_states[i] = np.array([2] * (self.max_value + 1))
+            defense_states[i] = np.array([2] * (self.num_attack_types + 1))
             defense_states[i][1] = 0 # innate vulnerability
             defense_states[i][-1] = 2 # detection value
         attack_states[0][-1] = 1 # The agent starts at the "START" node
@@ -146,12 +157,12 @@ class IdsGameEnv(gym.Env):
             if attack_successful:
                 self.__move_attacker(attacker_node, target_node)
                 if self.__is_data_node(target_node):
-                    reward = constants.IDSGAME.POSITIVE_REWARD
+                    reward = constants.GAMEFRAME.POSITIVE_REWARD
                     done = True
             else:
                 detected = self.__simulate_detection(target_node)
                 if detected:
-                    reward = constants.IDSGAME.NEGATIVE_REWARD
+                    reward = constants.GAMEFRAME.NEGATIVE_REWARD
                     done = True
         observation = self.state[0]
         if done:
@@ -177,6 +188,8 @@ class IdsGameEnv(gym.Env):
         if self.viewer is not None:
             self.viewer.gameframe.reset()
         observation = self.state[0]
+        self.game_step = 0
+        self.num_games += 1
         return observation
 
     def convert_state_to_render_state(self):
@@ -200,6 +213,7 @@ class IdsGameEnv(gym.Env):
         render_state[constants.RENDER_STATE.GAME_STEP] = self.game_step
         render_state[constants.RENDER_STATE.ATTACKER_CUMULATIVE_REWARD] = self.attacker_total_reward
         render_state[constants.RENDER_STATE.DEFENDER_CUMULATIVE_REWARD] = self.defender_total_reward
+        render_state[constants.RENDER_STATE.NUM_GAMES] = self.num_games
         return render_state
 
     def render(self, mode='human'):
@@ -230,7 +244,7 @@ class IdsGameEnv(gym.Env):
         """
         from gym_idsgame.envs.rendering.viewer import Viewer
         script_dir = os.path.dirname(__file__)
-        resource_path = os.path.join(script_dir, './rendering/', constants.IDSGAME.RESOURCES_DIR)
+        resource_path = os.path.join(script_dir, './rendering/', constants.GAMEFRAME.RESOURCES_DIR)
         self.viewer = Viewer(num_layers=self.num_layers, num_servers_per_layer=self.num_servers_per_layer,
                              num_attack_types=self.num_attack_types, max_value=self.max_value,
                         adjacency_matrix=self.adjacency_matrix, graph_layout=self.graph_layout)

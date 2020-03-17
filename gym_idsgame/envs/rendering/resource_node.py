@@ -63,10 +63,10 @@ class ResourceNode:
 
 
     def draw(self, y, x, color, batch, background, foreground, avatar, scale, server = False, data = False,
-             start= False):
-        #batch_rect_border(x * self.size, y * int((self.size/1.5)), self.size, int(self.size/1.5), color, batch, background)
+             start= False, max_value = 10):
         if server:
-            self.resource = Resource(avatar, x, y, batch, background, foreground, self.size, scale=scale)
+            self.resource = Resource(avatar, x, y, batch, background, foreground, self.size, scale=scale,
+                                     max_value=max_value)
         elif start:
             create_circle(x * self.size + self.size / 2, y * int(self.size / 1.5) + (self.size / 1.5)/2, self.size / 7,
                           batch, background, color)
@@ -74,7 +74,7 @@ class ResourceNode:
             self.col = x
             self.row = y
         elif data:
-            self.data = Data(avatar, x, y, batch, background, foreground, self.size, scale=scale)
+            self.data = Data(avatar, x, y, batch, background, foreground, self.size, scale=scale, max_value=max_value)
 
     def get_link_coords(self, upper=True, lower=False):
         if self.resource is not None:

@@ -1,4 +1,4 @@
-class IDSGAME:
+class GAMEFRAME:
     """
     IDSGame constants
     """
@@ -30,6 +30,7 @@ class IDSGAME:
     NUM_BLINKS = 14
     BLINK_INTERVAL = 0.2
     CAPTION = "IDS Game"
+    MIN_WIDTH = 470
 
 class NODE_TYPES:
     """
@@ -52,3 +53,4 @@ class RENDER_STATE:
     GAME_STEP = "game_step"
     ATTACKER_CUMULATIVE_REWARD = "attacker_cumulative_reward"
     DEFENDER_CUMULATIVE_REWARD = "attacker_cumulative_reward"
+    NUM_GAMES = "num_games"

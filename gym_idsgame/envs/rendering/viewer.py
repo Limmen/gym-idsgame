@@ -25,7 +25,7 @@ import numpy as np
 class Viewer():
     def __init__(self, num_layers = 1, num_servers_per_layer = 2, num_attack_types = 10, max_value = 10,
                  defense_policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC,
-                 resources_dir = constants.IDSGAME.RESOURCES_DIR, adjacency_matrix = None, graph_layout = None):
+                 resources_dir = constants.GAMEFRAME.RESOURCES_DIR, adjacency_matrix = None, graph_layout = None):
 
         self.num_layers = num_layers
         self.num_servers_per_layer = num_servers_per_layer
