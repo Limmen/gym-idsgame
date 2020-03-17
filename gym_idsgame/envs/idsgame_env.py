@@ -10,33 +10,9 @@ class IdsGameEnv(gym.Env):
 
     def __init__(self, width, height):
         """
-        Initializes the environment
-
-        Observation:
-            Type: Box(2)
-            Num	Observation                 Min         Max
-            0	column                      0           width-1
-            1	row                         0           height-1
-
-        Actions:
-            Type: Discrete(4)
-            Num	Action
-            0	Left
-            1	Right
-            2   Up
-            3   Down
-
-        Reward:
-            Reward is -1 for every step except when the agent moves to the goal state, where the reward is +1
-
-        Starting State:
-            (0, 0)
-
-        Episode Termination:
-            When agent reaches goal state
-
-        :param width: the width of the grid
-        :param height: the height of the grid
+        TODO
+        :param width:
+        :param height:
         """
         self.width = width
         self.height = height

@@ -28,24 +28,36 @@ class ResourceNetwork:
         """
         return self.grid[row][col]
 
+    def root_edge(self, n1, n2, color, batch, group, line_width):
+        x1, y1, col1, row1 = n1.get_link_coords(lower=True, upper=False)
+        x2, y2, col2, row2 = n2.get_link_coords(upper=True, lower=False)
+        return batch_line(x1, y1 + self.cell_size / 6, x2, y2, color, batch, group, line_width)
 
     def connect_start_and_server_nodes(self, n1, n2, color, batch, group, line_width):
         x1, y1, col1, row1 = n1.get_link_coords(lower=True, upper=False)
         x2, y2, col2, row2 = n2.get_link_coords(upper=True, lower=False)
-        batch_line(x1, y1, x2, y1, color, batch, group, line_width)
-        batch_line(x2, y1, x2, y2, color, batch, group, line_width)
-        if row1 == self.num_rows-1 and col1 == col2:
-            batch_line(x1, y1+self.cell_size/6, x2, y2, color, batch, group, line_width)
+        edges = []
+        e1 = batch_line(x1, y1, x2, y1, color, batch, group, line_width)
+        e2 = batch_line(x2, y1, x2, y2, color, batch, group, line_width)
+        edges.append(e1)
+        edges.append(e2)
+        return edges
 
     def connect_server_and_server_nodes(self, n1, n2, color, batch, group, line_width):
         x1, y1, col1, row1 = n2.get_link_coords(lower=True, upper=False)
         x2, y2, col2, row2 = n1.get_link_coords(upper=True, lower=False)
-        batch_line(x2, y1, x2, y2, color, batch, group, line_width)
+        e1 = batch_line(x2, y1, x2, y2, color, batch, group, line_width)
+        return [e1]
 
     def connect_server_and_data_nodes(self, n1, n2, color, batch, group, line_width):
         x1, y1, col1, row1 = n2.get_link_coords()
         x2, y2, col2, row2 = n1.get_link_coords(upper=False, lower=True)
-        batch_line(x1, y1, x2, y1, color, batch, group, line_width)
-        batch_line(x2, y1, x2, y2, color, batch, group, line_width)
+        edges = []
+        e1 = batch_line(x1, y1, x2, y1, color, batch, group, line_width)
+        e2 = batch_line(x2, y1, x2, y2, color, batch, group, line_width)
+        edges.append(e1)
+        edges.append(e2)
         if row1 == 0 and col1 == col2:
-            batch_line(x2, y2, x2, y2-self.cell_size/3, color, batch, group, line_width)
+            e3 = batch_line(x2, y2, x2, y2-self.cell_size/3, color, batch, group, line_width)
+            edges.append(e3)
+        return edges

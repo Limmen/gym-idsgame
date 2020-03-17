@@ -31,20 +31,6 @@ def create_indexed_vertices(x, y, radius, sides=24):
         indices.append(side + 1)
     return vertices, indices
 
-def circle(x, y, radius):
-    pass
-    #iterations = int(2*radius*pi)
-    # s = sin(2*pi / iterations)
-    # c = cos(2*pi / iterations)
-    #
-    # dx, dy = radius, 0
-    #
-    # glBegin(GL_TRIANGLE_FAN)
-    # glVertex2f(x, y)
-    # for i in range(iterations+1):
-    #     glVertex2f(x+dx, y+dy)
-    #     dx, dy = (dx*c - dy*s), (dy*c + dx*s)
-    # glEnd()
 def batch_circle(numPoints, batch, group, color):
     verts = []
     color_list = []
@@ -61,7 +47,7 @@ def batch_circle(numPoints, batch, group, color):
 def batch_line(x1, y1, x2, y2, color, batch, group, line_width):
     color_list = list(color) + list(color)
     pyglet.gl.glLineWidth(line_width)
-    batch.add(2, pyglet.gl.GL_LINES, group,
+    return batch.add(2, pyglet.gl.GL_LINES, group,
         ('v2f', (x1, y1, x2, y2)),
         ('c3B', tuple(color_list))
     )
