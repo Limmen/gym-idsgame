@@ -58,7 +58,7 @@ class ResourceNode:
              start= False):
         #batch_rect_border(x * self.size, y * int((self.size/1.5)), self.size, int(self.size/1.5), color, batch, background)
         if server:
-            self.resource = Resource(avatar, x, y, batch, background, foreground, self.size, scale=scale)
+            self.resource = Resource("hacker.png", x, y, batch, background, foreground, self.size, scale=scale)
         elif start:
             create_circle(x * self.size + self.size / 2, y * int(self.size / 1.5) + (self.size / 1.5)/2, self.size / 7,
                           batch, background, color)
@@ -66,7 +66,7 @@ class ResourceNode:
             self.col = x
             self.row = y
         elif data:
-            self.data = Data(avatar, x, y, batch, background, foreground, self.size, scale=scale)
+            self.data = Data("hacker.png", x, y, batch, background, foreground, self.size, scale=scale)
 
     def get_link_coords(self, upper=True, lower=False):
         if self.resource is not None:

@@ -2,84 +2,163 @@ import gym
 import numpy as np
 from gym_idsgame.envs.rendering import constants
 import os
+import math
 
 class IdsGameEnv(gym.Env):
     """
     TODO
     """
 
-    def __init__(self, width, height):
+    def __init__(self, num_layers = 1, num_servers_per_layer = 2, num_attack_types = 10, max_value = 10,
+                 defense_policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC):
         """
         TODO
-        :param width:
-        :param height:
         """
-        self.width = width
-        self.height = height
-        self.num_states = self.width * self.height
-        self.x = 0
-        self.y = 0
-        self.action_descriptors = ["Left", "Right", "Up", "Down"]
-        self.num_actions = len(self.action_descriptors)
-        self.goal_state = [width - 1, height - 1]
-        # Observation is a true Markov state of the form: [x,y] where x in [0, width) and y in [0, height)
-        self.observation_space = gym.spaces.Box(low=np.array([0.0,0.0]),
-                                                high=np.array([float(width-1), float(height-1)]), dtype=np.float32)
-        # Action space is an integer in [0,4)
-        self.action_space = gym.spaces.Discrete(4)
+        if self.num_layers < 1:
+            raise AssertionError("The number of layers cannot be less than 1")
+        if self.num_attack_types < 1:
+            raise AssertionError("The number of attack types cannot be less than 1")
+        if self.max_value < 3:
+            raise AssertionError("The max attack/defense value cannot be less than 3")
+        self.max_value = max_value
+        self.num_layers = num_layers
+        self.num_servers_per_layer = num_servers_per_layer
+        self.num_rows = self.num_layers + 2
+        self.num_cols = self.num_servers_per_layer
+        self.num_attack_types = num_attack_types
+        self.defense_policy = defense_policy
+        self.num_nodes = self.num_layers * self.num_servers_per_layer + 2 #+2 for Start and Data Nodes
+        self.num_states = math.pow(self.max_value, self.num_attack_types*2* self.num_nodes)*math.pow(10,self.max_value)
+        self.state = self.initial_state()
+        self.__initialize_graph_config()
+        self.action_descriptors = ["Injection", "Authentication", "CrossSite", "References", "Misssconfiguration",
+                                   "Exposure", "Access", "Forgery", "Vulnerabilities", "Redirects"]
+        self.num_actions = self.num_attack_types*self.num_nodes
+        self.observation_space = gym.spaces.Box(low=[0,0], high=[self.num_nodes, self.max_value],
+                                                shape=(self.num_nodes, self.num_attack_types+1), dtype=np.int32)
+        #self.action_space = gym.spaces.Box(low=[0, 0], high=[self.num_nodes, self.num_attack_types],
+        #                                   shape=(2), dtype=np.int32)
+        self.action_space = gym.spaces.Discrete(self.num_actions)
         self.viewer = None
         self.steps_beyond_done = None
-        self.rect_size = 50
         self.metadata = {
-        'render.modes': ['human', 'rgb_array'],
-        'video.frames_per_second' : 50 # Video rendering speed
+         'render.modes': ['human', 'rgb_array'],
+         'video.frames_per_second' : 50 # Video rendering speed
         }
-        self.reward_range = (-float('inf'), float(1))
+        self.reward_range = (float(constants.IDSGAME.NEGATIVE_REWARD), float(constants.IDSGAME.POSITIVE_REWARD))
 
+    def initial_state(self):
+        attack_states = np.zeros((self.num_nodes, self.num_attack_types))
+        defense_states = np.zeros((self.num_nodes, self.num_attack_types))
+        for i in range(self.num_nodes):
+            attack_states[i] = np.array([0]*self.max_value+1) # Plus 1 to indicate whether the agent is currently at this node or not
+        for i in range(self.num_nodes):
+            defense_states[i] = np.array([2] * self.max_value + 1) # Plus 1 to indicate detection value
+            defense_states[i][1] = 0 # innate vulnerability
+            defense_states[i][-1] = 2 # detection value
+        attack_states[0][-1] = 1 # The agent starts at the "START" node
+        state = np.array([attack_states, defense_states])
+        return state
+
+    def __get_server_under_attack(self, action):
+        server = action // self.num_attack_types
+        return server
+
+    def __get_attack_type(self, action):
+        attack_type = action % self.num_attack_types
+        return attack_type
+
+    def __get_grid_pos_of_node(self, node):
+        if node == 0:
+            return 0, self.num_servers_per_layer //2
+        if node == self.num_nodes-1:
+            return self.num_layers-1, self.num_servers_per_layer //2
+        n2 = (node-1) + self.num_servers_per_layer # exclude first layer
+        row = n2 // self.num_cols
+        col = n2 % self.num_cols
+        return row, col
+
+    def __get_node_from_grid_pos(self, row, col):
+        if row == 0 and col == self.num_servers_per_layer //2:
+            return 0
+        if row == self.num_layers-1 and col == self.num_servers_per_layer //2:
+            return self.num_nodes-1
+        n1 = row*col
+        n2 = n1 -2*(self.num_servers_per_layer-1) # first and second layer only contain 1 node
+        return n2
+
+    def __increment_attack_defense_value(self, values, server, type):
+        if values[server][type] < (self.max_value-1):
+            values[server][type] += 1
+
+    def __get_attacker_node(self):
+        attack_states = self.state[0]
+        for i in attack_states.shape[0]:
+            if attack_states[i][-1] == 1:
+                return i
+        raise AssertionError("Could not find the current node of the attacker in the game state")
+
+    def __is_attack_legal(self, server, attack_type, attacker_node):
+        attacker_row, attacker_col = self.__get_grid_pos_of_node(attacker_node)
+        server_row, server_col = self.__get_grid_pos_of_node(server)
+        if self.adjacency_matrix[attacker_row * self.num_cols + attacker_col][server_row * self.num_cols + server_col] == 1:
+            True
+        return False
+
+    def __simulate_attack(self, server, attack_type):
+        if self.state[0][server][attack_type] > self.state[1][server][attack_type]:
+            return True
+        return False
+
+    def __simulate_detection(self, target_node):
+        p_detection = self.state[1][target_node][-1] / 100
+        if np.random.rand() < p_detection:
+            return True
+        else:
+            return False
+
+    def __move_attacker(self, current_node, target_node):
+        self.state[0][current_node][-1] = 0
+        self.state[0][target_node][-1] = 1
+
+    def __is_data_node(self, node):
+        return node == 0
 
     def step(self, action):
-        """
-        Takes a step in the environment using the given action.
-
-        When end of episode is reached, the caller is responsible for calling `reset()`
-        to reset this environment's state.
-
-        :param action: the action to take in the environment
-        :return:
-            observation (object): agent's observation of the current environment
-            reward (float) : amount of reward returned after previous action
-            done (bool): whether the episode has ended, in which case further step() calls will return undefined results
-            info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)
-        """
-        if self.action_descriptors[action] == "Left":
-            if self.x > 0:
-                self.x = self.x-1
-        elif self.action_descriptors[action] == "Right":
-            if self.x < self.width-1:
-                self.x = self.x + 1
-        elif self.action_descriptors[action] == "Up":
-            if self.y > 0:
-                self.y = self.y - 1
-        elif self.action_descriptors[action] == "Down":
-            if self.y < self.height - 1:
-                self.y = self.y + 1
-
-        state = self.__get_state()
-        reward = 1 if np.array_equal(state, self.goal_state) else -1 # Reward is -1 if not at goal state, otherwise it is 1
+        reward = 0
         done = False
-        if reward == 1:
-            done = True
+        info = {}
+        target_node = self.__get_server_under_attack()
+        attack_type = self.__get_attack_type()
+        attacker_node = self.__get_attacker_node()
+        defense_row, defense_col, defense_type = self.__defense_action()
+        defense_node = self.__get_node_from_grid_pos(defense_row, defense_col)
+        self.__increment_attack_defense_value(self.state[1], defense_node, defense_type)
+        if self.__is_attack_legal(target_node, attack_type, attacker_node):
+            self.__increment_attack_defense_value(self.state[0])
+            attack_successful = self.__simulate_attack(target_node, attack_type)
+            if attack_successful:
+                self.__move_attacker(attacker_node, target_node)
+                if self.__is_data_node(target_node):
+                    reward = constants.IDSGAME.POSITIVE_REWARD
+                    done = True
+            else:
+                detected = self.__simulate_detection()
+                if detected:
+                    reward = constants.IDSGAME.NEGATIVE_REWARD
+                    done = True
+        observation = self.state[0]
+        if done:
             if self.steps_beyond_done is None:
                 self.steps_beyond_done = 0
             else:
                 gym.logger.warn("You are calling 'step()' even though this environment has already returned done = True. "
                                 "You should always call 'reset()' once you receive 'done = True' -- "
                                 "any further steps are undefined behavior.")
-                self.steps_beyond_done +=1
+                self.steps_beyond_done += 1
         if self.viewer is not None:
             self.viewer.gridframe.set_state(self.__get_state())
-        return state, reward, done, {}
-
+        return observation, reward, done, info
 
     def reset(self):
         """
@@ -88,11 +167,11 @@ class IdsGameEnv(gym.Env):
         :return: the initial state
         """
         self.steps_beyond_done = None
-        self.x = 0
-        self.y = 0
+        self.state = self.initial_state()
         if self.viewer is not None:
             self.viewer.gridframe.reset()
-        return self.__get_state()
+        observation = self.state[0]
+        return observation
 
     def render(self, mode='human'):
         """
@@ -139,37 +218,55 @@ class IdsGameEnv(gym.Env):
             self.viewer.close()
             self.viewer = None
 
-    def __get_state(self):
-        """
-        Returns a feature representation of the state
+    def __defense_action(self):
+        if self.policy == constants.BASELINE_POLICIES.RANDOM:
+            defend_type = np.random.randint(len(self.defense_values))
+            while True:
+                random_row = np.random.randint(self.network_layout.shape[0])
+                random_col = np.random.randint(self.network_layout.shape[1])
+                if self.network_layout[random_row, random_col] == constants.NODE_TYPES.RESOURCE or self.network_layout[
+                    random_row, random_col] == constants.NODE_TYPES.DATA:
+                    return random_row, random_col, defend_type
+        elif self.policy == constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC:
+            defend_type = 1
+            for i in range(self.network_layout.shape[0]):
+                for j in range(self.network_layout.shape[1]):
+                    if self.network_layout[i, j] == constants.NODE_TYPES.RESOURCE or self.network_layout[
+                        i, j] == constants.NODE_TYPES.DATA:
+                        return i, j, defend_type
 
-        :return: [x,y] list
-        """
-        return np.array([self.x, self.y])
-
-    def print_gridworld(self):
-        """
-        Utility function for printing the grid world and the agent's current position
-
-        :return: None
-        """
-        for i in range(0, self.height):
-            print("|", end='')
-            for j in range(0, self.width):
-                if i == self.y and j == self.x:
-                    print("  X  ", end='')
-                elif np.all(np.array([i,j]), self.goal_state):
-                    print(" +1  ", end='')
+    def __initialize_graph_config(self):
+        self.graph_layout = np.zeros((self.num_rows, self.num_cols))
+        for i in range(self.num_rows):
+            for j in range(self.num_cols):
+                if i == self.num_rows - 1:
+                    if j == self.num_cols // 2:
+                        self.graph_layout[i][j] = constants.NODE_TYPES.START
+                    else:
+                        self.graph_layout[i][j] = constants.NODE_TYPES.NONE
+                elif i == 0:
+                    if j == self.num_cols // 2:
+                        self.graph_layout[i][j] = constants.NODE_TYPES.DATA
+                    else:
+                        self.graph_layout[i][j] = constants.NODE_TYPES.NONE
                 else:
-                    print(" -1  ", end='')
-                print("|", end='')
-            print("")
+                    self.graph_layout[i][j] = constants.NODE_TYPES.RESOURCE
 
-    def get_state_index(self, state):
-        """
-        Utility function for getting the index of a state (useful for tabular algorithms)
-
-        :param state: the feature representation of the state
-        :return: the index of the state
-        """
-        return state[1]*self.width + state[0]
+        self.adjacency_matrix = np.zeros((self.num_rows * self.num_cols, self.num_cols * self.num_rows))
+        for i in range(self.num_rows * self.num_cols):
+            row_1 = i // self.num_cols
+            col_1 = i % self.num_cols
+            for j in range(self.num_rows * self.num_cols):
+                row_2 = j // self.num_cols
+                col_2 = j % self.num_rows
+                if row_1 == 0:
+                    if row_2 == 1 and col_1 == self.num_cols // 2:
+                        self.adjacency_matrix[i][j] = 1
+                        self.adjacency_matrix[j][i] = 1
+                elif row_1 == self.num_rows - 1:
+                    if row_2 == self.num_rows - 2 and col_1 == self.num_cols // 2:
+                        self.adjacency_matrix[i][j] = 1
+                        self.adjacency_matrix[j][i] = 1
+                elif (row_2 == row_1 + 1 and col_1 == col_2):
+                    self.adjacency_matrix[i][j] = 1
+                    self.adjacency_matrix[j][i] = 1

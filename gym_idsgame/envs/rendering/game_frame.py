@@ -15,54 +15,35 @@ class GameFrame(pyglet.window.Window):
     event handler for on_draw is defined by overriding the on_draw function.
     """
 
-    def __init__(self, height=1000, width = 1000, rect_size = constants.IDSGAME.RECT_SIZE,
-                 bg_color = constants.IDSGAME.WHITE, border_color = constants.IDSGAME.BLACK,
-                 hacker_avatar_filename = constants.IDSGAME.HACKER_AVATAR_FILENAME,
-                 server_filename = constants.IDSGAME.SERVER_AVATAR_FILENAME,
-                 data_filename=constants.IDSGAME.DATA_AVATAR_FILENAME,
-                 resources_dir = constants.IDSGAME.RESOURCES_DIR,
-                 agent_scale = 0.3, resource_scale = 0.2, data_scale = 0.2, caption="GridWorld", manual = True,
-                 line_width = constants.IDSGAME.LINE_WIDTH
-                 ):
-        """
-        Gridframe constructor, initializes frame state and creates the window.
-
-        :param height: height of the window
-        :param width: width of the window
-        :param rect_size: size of each cell in the grid
-        :param bg_color: the color of the background of the grid
-        :param border_color: the color of the border of the grid
-        :param hacker_avatar_filename: name of the file-avatar to use for the agent
-        :param resources_dir: the directory where resources are put (e.g. images)
-        :param agent_scale: the scale of the agent avatar
-        :param caption: caption of the frame
-        :param manual: whether to setup the grid for manual play with keyboard
-        :param line_width: line width
-        """
-        super(GameFrame, self).__init__(height=height, width=width, caption=caption) # call constructor of parent class
-        self.bg_color = bg_color
-        self.border_color = border_color
-        self.rect_size = rect_size
-        if self.rect_size < 0 or self.rect_size > (self.height - constants.IDSGAME.PANEL_HEIGHT) or self.rect_size > self.width:
-            raise AssertionError("Rectangle size cannot be less than 0 and not greater than {}".format(
-                max((self.height - constants.IDSGAME.PANEL_HEIGHT), self.width)))
-        self.num_rows = (self.height - constants.IDSGAME.PANEL_HEIGHT) // int((self.rect_size/1.5))
-        self.num_cols = self.width//self.rect_size
-        if self.num_rows < 3 or self.num_cols < 1:
-            raise AssertionError("The frame-size is too small, the frame must be large enough to fit "
-                                 "at least three rows and one column")
-        self.num_cells = self.num_rows*self.num_cols
-        self.resource_network = ResourceNetwork(self.rect_size, self.num_rows, self.num_cols)
+    def __init__(self,num_layers = 1, num_servers_per_layer = 2, num_attack_types = 10, max_value = 10,
+                 defense_policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC,
+                 resources_dir = constants.IDSGAME.RESOURCES_DIR, manual = True):
+        self.num_layers = num_layers
+        self.num_servers_per_layer = num_servers_per_layer
+        self.num_attack_types = num_attack_types
+        self.rect_size = constants.IDSGAME.RECT_SIZE
+        self.num_rows = self.num_layers + 2
+        self.num_cols = num_servers_per_layer
+        height = constants.IDSGAME.PANEL_HEIGHT + int((self.rect_size / 1.5)) * self.num_rows
+        width = self.rect_size * self.num_cols
+        caption = "IDS Game"
+        super(GameFrame, self).__init__(height=height, width=width, caption=caption)  # call constructor of parent class
+        self.max_value = max_value
         self.resources_dir = resources_dir
+        self.defense_policy = defense_policy
+        self.agent_scale = 0.3
+        self.resource_scale = 0.2
+        self.data_scale = 0.2
+        self.line_width = constants.IDSGAME.LINE_WIDTH
+        self.hacker_avatar_filename = constants.IDSGAME.HACKER_AVATAR_FILENAME,
+        self.server_filename = constants.IDSGAME.SERVER_AVATAR_FILENAME,
+        self.data_filename = constants.IDSGAME.DATA_AVATAR_FILENAME,
+        self.bg_color = constants.IDSGAME.WHITE
+        self.border_color = constants.IDSGAME.BLACK,
+        self.num_cells = self.num_rows*self.num_cols
         self.setup_resources_path()
+        self.resource_network = ResourceNetwork(self.rect_size, self.num_rows, self.num_cols)
         self.manual = manual
-        self.avatar_filename = hacker_avatar_filename
-        self.server_filename = server_filename
-        self.data_filename = data_filename
-        self.agent_scale = agent_scale
-        self.resource_scale = resource_scale
-        self.data_scale = data_scale
-        self.line_width = line_width
         self.game_step = 0
         self.attack_type = 1
         self.create_batch()
@@ -144,10 +125,10 @@ class GameFrame(pyglet.window.Window):
                 if i == self.resource_network.num_rows-1:
                     self.resource_network.grid[i][j].draw(i, j, self.border_color, self.batch, self.background,
                                                           self.second_foreground,
-                                                          self.avatar_filename, self.agent_scale,
+                                                          self.hacker_avatar_filename, self.agent_scale,
                                                           start=(j == (self.num_cols//2)))
         # Hacker starts at the start node
-        self.hacker = Hacker(self.avatar_filename, self.num_cols // 2,
+        self.hacker = Hacker(self.hacker_avatar_filename, self.num_cols // 2,
                              self.resource_network.num_rows - 1, self.batch, self.first_foreground, self.second_foreground,
                              self.rect_size, scale=self.agent_scale)
 
@@ -227,7 +208,10 @@ class GameFrame(pyglet.window.Window):
 
         :return: None
         """
+        print("resources_dir?")
+        print(self.resources_dir)
         if os.path.exists(self.resources_dir):
+            print("exists")
             pyglet.resource.path = [self.resources_dir]
         else:
             script_dir = os.path.dirname(__file__)

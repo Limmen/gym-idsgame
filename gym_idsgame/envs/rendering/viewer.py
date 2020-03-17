@@ -23,34 +23,16 @@ from gym_idsgame.envs.rendering import constants
 import numpy as np
 
 class Viewer():
-    def __init__(self, height=1000, width=900, rect_size=constants.IDSGAME.RECT_SIZE,
-                 bg_color=constants.IDSGAME.WHITE, border_color=constants.IDSGAME.BLACK,
-                 avatar_filename=constants.IDSGAME.HACKER_AVATAR_FILENAME,
-                 resources_dir=constants.IDSGAME.RESOURCES_DIR,
-                 caption="IDS Game", manual=True):
-        """
-        Creates the a viewer for the IDS Game
+    def __init__(self, num_layers = 1, num_servers_per_layer = 2, num_attack_types = 10, max_value = 10,
+                 defense_policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC,
+                 resources_dir = constants.IDSGAME.RESOURCES_DIR):
 
-        :param height: height of the window
-        :param width: width of the window
-        :param rect_size: size of each cell in the grid
-        :param bg_color: the color of the background of the grid
-        :param border_color: the color of the border of the grid
-        :param avatar_filename: name of the file-avatar to use for the agent
-        :param resources_dir: the directory where resources are put (e.g. images)
-        :param caption: caption of the frame
-        :param manual: whether to setup the grid for manual play with keyboard
-        """
-
-        self.height = height
-        self.width = width
-        self.rect_size = rect_size
-        self.bg_color = bg_color
-        self.border_color = border_color
-        self.avatar_filename = avatar_filename
+        self.num_layers = num_layers
+        self.num_servers_per_layer = num_servers_per_layer
+        self.num_attack_types = num_attack_types
+        self.max_value = max_value
+        self.defense_policy = defense_policy
         self.resources_dir = resources_dir
-        self.caption = caption
-        self.manual = manual
         self.isopen = True
 
     def manual_start(self):
@@ -59,10 +41,10 @@ class Viewer():
 
         :return: None
         """
-        self.gridframe = GameFrame(width=self.width, height=self.height, rect_size=self.rect_size, bg_color=self.bg_color,
-                                   border_color=self.border_color,
-                                   hacker_avatar_filename=self.avatar_filename, resources_dir=self.resources_dir,
-                                   caption=self.caption, manual=self.manual)
+        self.gridframe = GameFrame(num_layers = self.num_layers, num_servers_per_layer = self.num_servers_per_layer,
+                                   num_attack_types = self.num_attack_types, max_value = self.max_value,
+                                   defense_policy = self.defense_policy,resources_dir = self.resources_dir,
+                                   manual = True)
         self.gridframe.on_close = self.window_closed_by_user
         self.isopen = True
         pyglet.clock.schedule_interval(self.gridframe.update, 1 / 60.)
@@ -73,11 +55,10 @@ class Viewer():
         Creates the frame in a agent-mode, where actions are taken programmatically rather than through
         moving arrow-keys.
         """
-        self.gridframe = GameFrame(width=self.width, height=self.height, rect_size=self.rect_size,
-                                   bg_color=self.bg_color,
-                                   border_color=self.border_color,
-                                   hacker_avatar_filename=self.avatar_filename, resources_dir=self.resources_dir,
-                                   caption=self.caption, manual=self.manual)
+        self.gridframe = GameFrame(num_layers=self.num_layers, num_servers_per_layer=self.num_servers_per_layer,
+                                   num_attack_types=self.num_attack_types, max_value=self.max_value,
+                                   defense_policy=self.defense_policy, resources_dir=self.resources_dir,
+                                   manual=False)
         self.gridframe.on_close = self.window_closed_by_user
         self.isopen = True
 
