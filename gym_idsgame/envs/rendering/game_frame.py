@@ -328,16 +328,30 @@ class GameFrame(pyglet.window.Window):
         self.attack_type_label.text = str(self.attack_type)
         self.hacker.update()
 
-    def set_state(self, attack_states, defense_states, attacker_node):
+    def set_state(self, render_state):
         """
         TODO
 
         :param state: the state
         :return: None
         """
-        # for i in range(self.resource_network.num_rows - 1):
-        #     for j in range(self.resource_network.num_cols):
-        # pass
+        attack_values = render_state[constants.RENDER_STATE.ATTACK_VALUES]
+        defense_values = render_state[constants.RENDER_STATE.DEFENSE_VALUES]
+        det_values = render_state[constants.RENDER_STATE.DEFENSE_DET]
+        attacker_row, attacker_col = render_state[constants.RENDER_STATE.ATTACKER_POS]
+        for i in range(self.resource_network.num_rows):
+            for j in range(self.resource_network.num_cols):
+                self.resource_network.grid[i][j].set_state(attack_values[i][j], defense_values[i][j], det_values[i][j])
+        hacker_node =  self.resource_network.grid[attacker_row][attacker_col].get_node()
+        if hacker_node is not None:
+            self.hacker.move_to(hacker_node.x, hacker_node.y, hacker_node.col, hacker_node.row)
+        self.hacker.set_reward(render_state[constants.RENDER_STATE.ATTACKER_CUMULATIVE_REWARD])
+        self.data_node.set_reward(render_state[constants.RENDER_STATE.DEFENDER_CUMULATIVE_REWARD])
+        self.game_step = render_state[constants.RENDER_STATE.GAME_STEP]
+        self.step_label.text = str(self.game_step)
+        self.a_reward_label.text = str(self.hacker.cumulative_reward)
+        self.d_reward_label.text = str(self.data_node.cumulative_reward)
+        self.hacker.update()
 
     def reset(self):
         """

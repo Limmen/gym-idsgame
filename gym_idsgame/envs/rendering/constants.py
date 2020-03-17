@@ -43,3 +43,12 @@ class NODE_TYPES:
 class BASELINE_POLICIES:
     RANDOM = "random"
     NAIVE_DETERMINISTIC = "naive_deterministic"
+
+class RENDER_STATE:
+    ATTACK_VALUES = "attack_values"
+    DEFENSE_VALUES = "defense_values"
+    DEFENSE_DET = "defense_det"
+    ATTACKER_POS = "attacker_pos"
+    GAME_STEP = "game_step"
+    ATTACKER_CUMULATIVE_REWARD = "attacker_cumulative_reward"
+    DEFENDER_CUMULATIVE_REWARD = "attacker_cumulative_reward"

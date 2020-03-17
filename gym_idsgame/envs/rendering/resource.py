@@ -157,3 +157,8 @@ class Resource(pyglet.sprite.Sprite):
     def unschedule(self):
         clock.unschedule(self.defense_green)
         clock.unschedule(self.attack_red)
+
+    def set_state(self, attack_values, defense_values, det_value):
+        self.attack_values = attack_values
+        self.defense_values = defense_values
+        self.det = det_value

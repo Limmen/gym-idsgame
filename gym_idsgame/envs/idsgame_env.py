@@ -46,6 +46,9 @@ class IdsGameEnv(gym.Env):
          'video.frames_per_second' : 50 # Video rendering speed
         }
         self.reward_range = (float(constants.IDSGAME.NEGATIVE_REWARD), float(constants.IDSGAME.POSITIVE_REWARD))
+        self.attacker_total_reward = 0
+        self.defender_total_reward = 0
+        self.game_step = 0
 
     def initial_state(self):
         attack_states = np.zeros((self.num_nodes, self.num_attack_types+1)) # Plus 1 to indicate whether the agent is currently at this node or not
@@ -160,7 +163,7 @@ class IdsGameEnv(gym.Env):
                                 "any further steps are undefined behavior.")
                 self.steps_beyond_done += 1
         if self.viewer is not None:
-            self.viewer.gridframe.set_state(self.__get_state())
+            self.viewer.gameframe.set_state(self.__get_state())
         return observation, reward, done, info
 
     def reset(self):
@@ -172,9 +175,32 @@ class IdsGameEnv(gym.Env):
         self.steps_beyond_done = None
         self.state = self.initial_state()
         if self.viewer is not None:
-            self.viewer.gridframe.reset()
+            self.viewer.gameframe.reset()
         observation = self.state[0]
         return observation
+
+    def convert_state_to_render_state(self):
+        attacker_node = self.__get_attacker_node()
+        attacker_row, attacker_col = self.__get_grid_pos_of_node(attacker_node)
+        render_attack_values = np.zeros((self.num_rows, self.num_cols, self.num_attack_types))
+        render_defense_values = np.zeros((self.num_rows, self.num_cols, self.num_attack_types))
+        render_defense_det = np.zeros((self.num_rows, self.num_cols))
+        for node in range(self.num_nodes):
+            row, col = self.__get_grid_pos_of_node(node)
+            attack_state = self.state[0][node][:-1]
+            render_attack_values[row][col] = attack_state
+            defense_state = self.state[1][node][:-1]
+            render_defense_values[row][col] = defense_state
+            render_defense_det[row][col] = self.state[1][node][-1]
+        render_state = {}
+        render_state[constants.RENDER_STATE.ATTACK_VALUES] = render_attack_values
+        render_state[constants.RENDER_STATE.DEFENSE_VALUES] = render_defense_values
+        render_state[constants.RENDER_STATE.DEFENSE_DET] = render_defense_det
+        render_state[constants.RENDER_STATE.ATTACKER_POS] = (attacker_row, attacker_col)
+        render_state[constants.RENDER_STATE.GAME_STEP] = self.game_step
+        render_state[constants.RENDER_STATE.ATTACKER_CUMULATIVE_REWARD] = self.attacker_total_reward
+        render_state[constants.RENDER_STATE.DEFENDER_CUMULATIVE_REWARD] = self.defender_total_reward
+        return render_state
 
     def render(self, mode='human'):
         """

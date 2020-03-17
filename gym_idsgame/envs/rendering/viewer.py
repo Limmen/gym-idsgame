@@ -43,13 +43,13 @@ class Viewer():
 
         :return: None
         """
-        self.gridframe = GameFrame(num_layers = self.num_layers, num_servers_per_layer = self.num_servers_per_layer,
+        self.gameframe = GameFrame(num_layers = self.num_layers, num_servers_per_layer = self.num_servers_per_layer,
                                    num_attack_types = self.num_attack_types, max_value = self.max_value,
-                                   defense_policy = self.defense_policy,resources_dir = self.resources_dir,
+                                   defense_policy = self.defense_policy, resources_dir = self.resources_dir,
                                    manual = True, graph_layout=self.graph_layout, adjacency_matrix=self.adjacency_matrix)
-        self.gridframe.on_close = self.window_closed_by_user
+        self.gameframe.on_close = self.window_closed_by_user
         self.isopen = True
-        pyglet.clock.schedule_interval(self.gridframe.update, 1 / 60.)
+        pyglet.clock.schedule_interval(self.gameframe.update, 1 / 60.)
         pyglet.app.run()
 
     def agent_start(self):
@@ -57,11 +57,11 @@ class Viewer():
         Creates the frame in a agent-mode, where actions are taken programmatically rather than through
         moving arrow-keys.
         """
-        self.gridframe = GameFrame(num_layers=self.num_layers, num_servers_per_layer=self.num_servers_per_layer,
+        self.gameframe = GameFrame(num_layers=self.num_layers, num_servers_per_layer=self.num_servers_per_layer,
                                    num_attack_types=self.num_attack_types, max_value=self.max_value,
                                    defense_policy=self.defense_policy, resources_dir=self.resources_dir,
                                    manual=False, graph_layout=self.graph_layout, adjacency_matrix=self.adjacency_matrix)
-        self.gridframe.on_close = self.window_closed_by_user
+        self.gameframe.on_close = self.window_closed_by_user
         self.isopen = True
 
     def window_closed_by_user(self):
@@ -71,7 +71,7 @@ class Viewer():
         :return: None
         """
         self.isopen = False
-        self.gridframe.close()
+        self.gameframe.close()
 
     def close(self):
         """
@@ -79,7 +79,7 @@ class Viewer():
 
         :return: None
         """
-        self.gridframe.close()
+        self.gameframe.close()
 
     def render(self, return_rgb_array = False):
         """
@@ -91,13 +91,13 @@ class Viewer():
 
         :return: None
         """
-        self.gridframe.clear() # Clears the frame
-        self.gridframe.switch_to() # Make this window the current OpenGL rendering context
-        self.gridframe.dispatch_events() # Poll the OS for events and call related handlers for updating the frame
-        self.gridframe.on_draw() # Draw the frame
+        self.gameframe.clear() # Clears the frame
+        self.gameframe.switch_to() # Make this window the current OpenGL rendering context
+        self.gameframe.dispatch_events() # Poll the OS for events and call related handlers for updating the frame
+        self.gameframe.on_draw() # Draw the frame
         if return_rgb_array:
             arr = self.extract_rgb_array()
-        self.gridframe.flip() # Swaps the OpenGL front and back buffers Updates the visible display with the back buffer
+        self.gameframe.flip() # Swaps the OpenGL front and back buffers Updates the visible display with the back buffer
         return arr if return_rgb_array else self.isopen
 
     def extract_rgb_array(self):

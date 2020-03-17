@@ -16,6 +16,14 @@ class ResourceNode:
         self.data = None
         self.circle = False
 
+    def set_state(self, attack_values, defense_values, det_value):
+        if self.resource is not None:
+            self.resource.set_state(attack_values, defense_values, det_value)
+        elif self.circle:
+            return
+        elif self.data is not None:
+            self.data.set_state(attack_values, defense_values, det_value)
+
     def defend(self, defense_type):
         if self.resource is not None:
             self.resource.defend(defense_type)

@@ -45,6 +45,9 @@ class Hacker(pyglet.sprite.Sprite):
     def add_reward(self, reward):
         self.cumulative_reward += reward
 
+    def set_reward(self, reward):
+        self.cumulative_reward = reward
+
     def reset(self):
         self.col = self.starting_col
         self.row = self.starting_row
