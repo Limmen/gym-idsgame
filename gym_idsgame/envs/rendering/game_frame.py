@@ -15,7 +15,7 @@ class GameFrame(pyglet.window.Window):
     event handler for on_draw is defined by overriding the on_draw function.
     """
 
-    def __init__(self, manual = True, num_layers = 1, num_servers_per_layer = 2, num_attack_types = 10, max_value = 10,
+    def __init__(self, adjacency_matrix= None, graph_layout = None, manual = True, num_layers = 1, num_servers_per_layer = 2, num_attack_types = 10, max_value = 10,
                  defense_policy=constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC,
                  resources_dir=constants.IDSGAME.RESOURCES_DIR):
         self.num_layers = num_layers
@@ -50,7 +50,11 @@ class GameFrame(pyglet.window.Window):
         self.game_step = 0
         self.attack_type = 1
         self.create_batch()
-        self.initialize_graph_config()
+        if adjacency_matrix is None or graph_layout is None:
+            self.initialize_graph_config()
+        else:
+            self.adjacency_matrix = adjacency_matrix
+            self.graph_layout = graph_layout
         self.done = False
 
     def initialize_graph_config(self):
@@ -324,14 +328,16 @@ class GameFrame(pyglet.window.Window):
         self.attack_type_label.text = str(self.attack_type)
         self.hacker.update()
 
-    def set_state(self, state):
+    def set_state(self, attack_states, defense_states, attacker_node):
         """
         TODO
 
         :param state: the state
         :return: None
         """
-        pass
+        # for i in range(self.resource_network.num_rows - 1):
+        #     for j in range(self.resource_network.num_cols):
+        # pass
 
     def reset(self):
         """

@@ -25,7 +25,7 @@ import numpy as np
 class Viewer():
     def __init__(self, num_layers = 1, num_servers_per_layer = 2, num_attack_types = 10, max_value = 10,
                  defense_policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC,
-                 resources_dir = constants.IDSGAME.RESOURCES_DIR):
+                 resources_dir = constants.IDSGAME.RESOURCES_DIR, adjacency_matrix = None, graph_layout = None):
 
         self.num_layers = num_layers
         self.num_servers_per_layer = num_servers_per_layer
@@ -34,6 +34,8 @@ class Viewer():
         self.defense_policy = defense_policy
         self.resources_dir = resources_dir
         self.isopen = True
+        self.adjacency_matrix = adjacency_matrix
+        self.graph_layout = graph_layout
 
     def manual_start(self):
         """
@@ -44,7 +46,7 @@ class Viewer():
         self.gridframe = GameFrame(num_layers = self.num_layers, num_servers_per_layer = self.num_servers_per_layer,
                                    num_attack_types = self.num_attack_types, max_value = self.max_value,
                                    defense_policy = self.defense_policy,resources_dir = self.resources_dir,
-                                   manual = True)
+                                   manual = True, graph_layout=self.graph_layout, adjacency_matrix=self.adjacency_matrix)
         self.gridframe.on_close = self.window_closed_by_user
         self.isopen = True
         pyglet.clock.schedule_interval(self.gridframe.update, 1 / 60.)
@@ -58,7 +60,7 @@ class Viewer():
         self.gridframe = GameFrame(num_layers=self.num_layers, num_servers_per_layer=self.num_servers_per_layer,
                                    num_attack_types=self.num_attack_types, max_value=self.max_value,
                                    defense_policy=self.defense_policy, resources_dir=self.resources_dir,
-                                   manual=False)
+                                   manual=False, graph_layout=self.graph_layout, adjacency_matrix=self.adjacency_matrix)
         self.gridframe.on_close = self.window_closed_by_user
         self.isopen = True
 

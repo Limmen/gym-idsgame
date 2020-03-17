@@ -9,16 +9,16 @@ class IdsGameEnv(gym.Env):
     TODO
     """
 
-    def __init__(self, num_layers = 1, num_servers_per_layer = 2, num_attack_types = 10, max_value = 10,
+    def __init__(self, num_layers = 2, num_servers_per_layer = 3, num_attack_types = 10, max_value = 10,
                  defense_policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC):
         """
         TODO
         """
-        if self.num_layers < 1:
+        if num_layers < 1:
             raise AssertionError("The number of layers cannot be less than 1")
-        if self.num_attack_types < 1:
+        if num_attack_types < 1:
             raise AssertionError("The number of attack types cannot be less than 1")
-        if self.max_value < 3:
+        if max_value < 3:
             raise AssertionError("The max attack/defense value cannot be less than 3")
         self.max_value = max_value
         self.num_layers = num_layers
@@ -34,10 +34,10 @@ class IdsGameEnv(gym.Env):
         self.action_descriptors = ["Injection", "Authentication", "CrossSite", "References", "Misssconfiguration",
                                    "Exposure", "Access", "Forgery", "Vulnerabilities", "Redirects"]
         self.num_actions = self.num_attack_types*self.num_nodes
-        self.observation_space = gym.spaces.Box(low=[0,0], high=[self.num_nodes, self.max_value],
-                                                shape=(self.num_nodes, self.num_attack_types+1), dtype=np.int32)
-        #self.action_space = gym.spaces.Box(low=[0, 0], high=[self.num_nodes, self.num_attack_types],
-        #                                   shape=(2), dtype=np.int32)
+        high_row = np.array([self.max_value]*(self.num_attack_types+1))
+        high = np.array([high_row]*self.num_nodes)
+        low = np.zeros((self.num_nodes, self.num_attack_types+1))
+        self.observation_space = gym.spaces.Box(low=low, high=high, dtype=np.int32)
         self.action_space = gym.spaces.Discrete(self.num_actions)
         self.viewer = None
         self.steps_beyond_done = None
@@ -48,12 +48,12 @@ class IdsGameEnv(gym.Env):
         self.reward_range = (float(constants.IDSGAME.NEGATIVE_REWARD), float(constants.IDSGAME.POSITIVE_REWARD))
 
     def initial_state(self):
-        attack_states = np.zeros((self.num_nodes, self.num_attack_types))
-        defense_states = np.zeros((self.num_nodes, self.num_attack_types))
+        attack_states = np.zeros((self.num_nodes, self.num_attack_types+1)) # Plus 1 to indicate whether the agent is currently at this node or not
+        defense_states = np.zeros((self.num_nodes, self.num_attack_types+1)) # Plus 1 to indicate detection value
         for i in range(self.num_nodes):
-            attack_states[i] = np.array([0]*self.max_value+1) # Plus 1 to indicate whether the agent is currently at this node or not
+            attack_states[i] = np.array([0]*(self.max_value+1))
         for i in range(self.num_nodes):
-            defense_states[i] = np.array([2] * self.max_value + 1) # Plus 1 to indicate detection value
+            defense_states[i] = np.array([2] * (self.max_value + 1))
             defense_states[i][1] = 0 # innate vulnerability
             defense_states[i][-1] = 2 # detection value
         attack_states[0][-1] = 1 # The agent starts at the "START" node
@@ -65,26 +65,26 @@ class IdsGameEnv(gym.Env):
         return server
 
     def __get_attack_type(self, action):
-        attack_type = action % self.num_attack_types
+        attack_type = action % (self.num_attack_types)
         return attack_type
 
     def __get_grid_pos_of_node(self, node):
         if node == 0:
-            return 0, self.num_servers_per_layer //2
+            return self.num_rows-1, self.num_servers_per_layer //2
         if node == self.num_nodes-1:
-            return self.num_layers-1, self.num_servers_per_layer //2
-        n2 = (node-1) + self.num_servers_per_layer # exclude first layer
-        row = n2 // self.num_cols
-        col = n2 % self.num_cols
+            return 0, self.num_servers_per_layer //2
+        n2 = (node-1)
+        row = (self.num_rows-2) - (n2//self.num_servers_per_layer)
+        col = n2 % self.num_servers_per_layer
         return row, col
 
     def __get_node_from_grid_pos(self, row, col):
         if row == 0 and col == self.num_servers_per_layer //2:
-            return 0
-        if row == self.num_layers-1 and col == self.num_servers_per_layer //2:
             return self.num_nodes-1
-        n1 = row*col
-        n2 = n1 -2*(self.num_servers_per_layer-1) # first and second layer only contain 1 node
+        if row == self.num_layers-1 and col == self.num_servers_per_layer //2:
+            return 0
+        n1 = row*self.num_cols + col
+        n2 = n1 -(self.num_servers_per_layer-1) # first and second layer only contain 1 node
         return n2
 
     def __increment_attack_defense_value(self, values, server, type):
@@ -93,7 +93,7 @@ class IdsGameEnv(gym.Env):
 
     def __get_attacker_node(self):
         attack_states = self.state[0]
-        for i in attack_states.shape[0]:
+        for i in range(attack_states.shape[0]):
             if attack_states[i][-1] == 1:
                 return i
         raise AssertionError("Could not find the current node of the attacker in the game state")
@@ -101,8 +101,11 @@ class IdsGameEnv(gym.Env):
     def __is_attack_legal(self, server, attack_type, attacker_node):
         attacker_row, attacker_col = self.__get_grid_pos_of_node(attacker_node)
         server_row, server_col = self.__get_grid_pos_of_node(server)
-        if self.adjacency_matrix[attacker_row * self.num_cols + attacker_col][server_row * self.num_cols + server_col] == 1:
-            True
+        attacker_matrix_id = attacker_row * self.num_cols + attacker_col
+        target_attacker_id = server_row * self.num_cols + server_col
+        link = self.adjacency_matrix[attacker_matrix_id][target_attacker_id]
+        if int(link) == 1:
+            return True
         return False
 
     def __simulate_attack(self, server, attack_type):
@@ -128,14 +131,14 @@ class IdsGameEnv(gym.Env):
         reward = 0
         done = False
         info = {}
-        target_node = self.__get_server_under_attack()
-        attack_type = self.__get_attack_type()
+        target_node = self.__get_server_under_attack(action)
+        attack_type = self.__get_attack_type(action)
         attacker_node = self.__get_attacker_node()
         defense_row, defense_col, defense_type = self.__defense_action()
         defense_node = self.__get_node_from_grid_pos(defense_row, defense_col)
         self.__increment_attack_defense_value(self.state[1], defense_node, defense_type)
         if self.__is_attack_legal(target_node, attack_type, attacker_node):
-            self.__increment_attack_defense_value(self.state[0])
+            self.__increment_attack_defense_value(self.state[0], target_node, attack_type)
             attack_successful = self.__simulate_attack(target_node, attack_type)
             if attack_successful:
                 self.__move_attacker(attacker_node, target_node)
@@ -143,7 +146,7 @@ class IdsGameEnv(gym.Env):
                     reward = constants.IDSGAME.POSITIVE_REWARD
                     done = True
             else:
-                detected = self.__simulate_detection()
+                detected = self.__simulate_detection(target_node)
                 if detected:
                     reward = constants.IDSGAME.NEGATIVE_REWARD
                     done = True
@@ -219,19 +222,19 @@ class IdsGameEnv(gym.Env):
             self.viewer = None
 
     def __defense_action(self):
-        if self.policy == constants.BASELINE_POLICIES.RANDOM:
+        if self.defense_policy == constants.BASELINE_POLICIES.RANDOM:
             defend_type = np.random.randint(len(self.defense_values))
             while True:
-                random_row = np.random.randint(self.network_layout.shape[0])
-                random_col = np.random.randint(self.network_layout.shape[1])
-                if self.network_layout[random_row, random_col] == constants.NODE_TYPES.RESOURCE or self.network_layout[
+                random_row = np.random.randint(self.graph_layout.shape[0])
+                random_col = np.random.randint(self.graph_layout.shape[1])
+                if self.graph_layout[random_row, random_col] == constants.NODE_TYPES.RESOURCE or self.graph_layout[
                     random_row, random_col] == constants.NODE_TYPES.DATA:
                     return random_row, random_col, defend_type
-        elif self.policy == constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC:
+        elif self.defense_policy == constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC:
             defend_type = 1
-            for i in range(self.network_layout.shape[0]):
-                for j in range(self.network_layout.shape[1]):
-                    if self.network_layout[i, j] == constants.NODE_TYPES.RESOURCE or self.network_layout[
+            for i in range(self.graph_layout.shape[0]):
+                for j in range(self.graph_layout.shape[1]):
+                    if self.graph_layout[i, j] == constants.NODE_TYPES.RESOURCE or self.graph_layout[
                         i, j] == constants.NODE_TYPES.DATA:
                         return i, j, defend_type
 
