@@ -162,3 +162,4 @@ class Resource(pyglet.sprite.Sprite):
         self.attack_values = attack_values
         self.defense_values = defense_values
         self.det = det_value
+        self.set_labels()

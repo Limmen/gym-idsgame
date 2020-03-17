@@ -163,7 +163,7 @@ class IdsGameEnv(gym.Env):
                                 "any further steps are undefined behavior.")
                 self.steps_beyond_done += 1
         if self.viewer is not None:
-            self.viewer.gameframe.set_state(self.__get_state())
+            self.viewer.gameframe.set_state(self.convert_state_to_render_state())
         return observation, reward, done, info
 
     def reset(self):
@@ -193,9 +193,9 @@ class IdsGameEnv(gym.Env):
             render_defense_values[row][col] = defense_state
             render_defense_det[row][col] = self.state[1][node][-1]
         render_state = {}
-        render_state[constants.RENDER_STATE.ATTACK_VALUES] = render_attack_values
-        render_state[constants.RENDER_STATE.DEFENSE_VALUES] = render_defense_values
-        render_state[constants.RENDER_STATE.DEFENSE_DET] = render_defense_det
+        render_state[constants.RENDER_STATE.ATTACK_VALUES] = render_attack_values.astype(np.int32)
+        render_state[constants.RENDER_STATE.DEFENSE_VALUES] = render_defense_values.astype(np.int32)
+        render_state[constants.RENDER_STATE.DEFENSE_DET] = render_defense_det.astype(np.int32)
         render_state[constants.RENDER_STATE.ATTACKER_POS] = (attacker_row, attacker_col)
         render_state[constants.RENDER_STATE.GAME_STEP] = self.game_step
         render_state[constants.RENDER_STATE.ATTACKER_CUMULATIVE_REWARD] = self.attacker_total_reward
@@ -231,10 +231,9 @@ class IdsGameEnv(gym.Env):
         from gym_idsgame.envs.rendering.viewer import Viewer
         script_dir = os.path.dirname(__file__)
         resource_path = os.path.join(script_dir, './rendering/', constants.IDSGAME.RESOURCES_DIR)
-        self.viewer = Viewer(width=self.width*self.rect_size,
-                             height=(self.height*self.rect_size) + constants.IDSGAME.PANEL_HEIGHT,
-                             rect_size=self.rect_size,
-                             resources_dir=resource_path)
+        self.viewer = Viewer(num_layers=self.num_layers, num_servers_per_layer=self.num_servers_per_layer,
+                             num_attack_types=self.num_attack_types, max_value=self.max_value,
+                        adjacency_matrix=self.adjacency_matrix, graph_layout=self.graph_layout)
         self.viewer.agent_start()
 
     def close(self):
