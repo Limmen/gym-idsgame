@@ -29,6 +29,7 @@ class IDSGAME:
     LINE_WIDTH = 2
     NUM_BLINKS = 14
     BLINK_INTERVAL = 0.2
+    CAPTION = "IDS Game"
 
 class NODE_TYPES:
     """

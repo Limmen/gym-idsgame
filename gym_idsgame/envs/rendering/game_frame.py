@@ -15,35 +15,38 @@ class GameFrame(pyglet.window.Window):
     event handler for on_draw is defined by overriding the on_draw function.
     """
 
-    def __init__(self,num_layers = 1, num_servers_per_layer = 2, num_attack_types = 10, max_value = 10,
-                 defense_policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC,
-                 resources_dir = constants.IDSGAME.RESOURCES_DIR, manual = True):
+    def __init__(self, manual = True, num_layers = 1, num_servers_per_layer = 2, num_attack_types = 10, max_value = 10,
+                 defense_policy=constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC,
+                 resources_dir=constants.IDSGAME.RESOURCES_DIR):
         self.num_layers = num_layers
         self.num_servers_per_layer = num_servers_per_layer
         self.num_attack_types = num_attack_types
-        self.rect_size = constants.IDSGAME.RECT_SIZE
         self.num_rows = self.num_layers + 2
         self.num_cols = num_servers_per_layer
-        height = constants.IDSGAME.PANEL_HEIGHT + int((self.rect_size / 1.5)) * self.num_rows
-        width = self.rect_size * self.num_cols
-        caption = "IDS Game"
-        super(GameFrame, self).__init__(height=height, width=width, caption=caption)  # call constructor of parent class
         self.max_value = max_value
-        self.resources_dir = resources_dir
         self.defense_policy = defense_policy
+        self.resources_dir = resources_dir
+        self.rect_size = constants.IDSGAME.RECT_SIZE
+        self.bg_color = constants.IDSGAME.WHITE
+        self.border_color = constants.IDSGAME.BLACK
+        self.avatar_filename = constants.IDSGAME.HACKER_AVATAR_FILENAME
+        self.server_filename = constants.IDSGAME.SERVER_AVATAR_FILENAME
+        self.data_filename = constants.IDSGAME.DATA_AVATAR_FILENAME
+        self.resources_dir = constants.IDSGAME.RESOURCES_DIR
         self.agent_scale = 0.3
         self.resource_scale = 0.2
         self.data_scale = 0.2
-        self.line_width = constants.IDSGAME.LINE_WIDTH
-        self.hacker_avatar_filename = constants.IDSGAME.HACKER_AVATAR_FILENAME,
-        self.server_filename = constants.IDSGAME.SERVER_AVATAR_FILENAME,
-        self.data_filename = constants.IDSGAME.DATA_AVATAR_FILENAME,
-        self.bg_color = constants.IDSGAME.WHITE
-        self.border_color = constants.IDSGAME.BLACK,
-        self.num_cells = self.num_rows*self.num_cols
-        self.setup_resources_path()
-        self.resource_network = ResourceNetwork(self.rect_size, self.num_rows, self.num_cols)
         self.manual = manual
+        self.line_width = constants.IDSGAME.LINE_WIDTH
+        height = constants.IDSGAME.PANEL_HEIGHT + int((self.rect_size / 1.5)) * self.num_rows
+        width = self.rect_size * self.num_cols
+        caption = constants.IDSGAME.CAPTION
+        super(GameFrame, self).__init__(height=height, width=width, caption=caption) # call constructor of parent class
+        self.num_rows = (self.height - constants.IDSGAME.PANEL_HEIGHT) // int((self.rect_size/1.5))
+        self.num_cols = self.width//self.rect_size
+        self.num_cells = self.num_rows*self.num_cols
+        self.resource_network = ResourceNetwork(self.rect_size, self.num_rows, self.num_cols)
+        self.setup_resources_path()
         self.game_step = 0
         self.attack_type = 1
         self.create_batch()
@@ -125,10 +128,10 @@ class GameFrame(pyglet.window.Window):
                 if i == self.resource_network.num_rows-1:
                     self.resource_network.grid[i][j].draw(i, j, self.border_color, self.batch, self.background,
                                                           self.second_foreground,
-                                                          self.hacker_avatar_filename, self.agent_scale,
+                                                          self.avatar_filename, self.agent_scale,
                                                           start=(j == (self.num_cols//2)))
         # Hacker starts at the start node
-        self.hacker = Hacker(self.hacker_avatar_filename, self.num_cols // 2,
+        self.hacker = Hacker(self.avatar_filename, self.num_cols // 2,
                              self.resource_network.num_rows - 1, self.batch, self.first_foreground, self.second_foreground,
                              self.rect_size, scale=self.agent_scale)
 
@@ -208,10 +211,7 @@ class GameFrame(pyglet.window.Window):
 
         :return: None
         """
-        print("resources_dir?")
-        print(self.resources_dir)
         if os.path.exists(self.resources_dir):
-            print("exists")
             pyglet.resource.path = [self.resources_dir]
         else:
             script_dir = os.path.dirname(__file__)
@@ -340,6 +340,11 @@ class GameFrame(pyglet.window.Window):
         :return: None
         """
         self.done = False
+        for i in range(self.resource_network.num_rows - 1):
+            for j in range(self.resource_network.num_cols):
+                node = self.resource_network.grid[i][j].get_node()
+                if node is not None:
+                    node.unschedule()
         self.hacker.reset()
         for i in range(self.resource_network.num_rows):
             for j in range(self.resource_network.num_cols):
