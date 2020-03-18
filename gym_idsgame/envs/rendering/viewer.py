@@ -19,7 +19,6 @@ except ImportError as e:
     ''')
 
 from gym_idsgame.envs.rendering.frames.game_frame import GameFrame
-from gym_idsgame.envs.rendering.constants import constants
 from gym_idsgame.envs.dao.render_config import RenderConfig
 import numpy as np
 import time
