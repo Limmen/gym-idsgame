@@ -1,22 +1,31 @@
 from gym_idsgame.envs.rendering.network.node import Node
 from gym_idsgame.envs.rendering.util.render_util import batch_line
-
+from gym_idsgame.envs.rendering.network.resource_node import ResourceNode
+from gym_idsgame.envs.dao.render_config import RenderConfig
+from gym_idsgame.envs.rendering.network.data_resource import Data
+from gym_idsgame.envs.rendering.network.server_resource import Server
 class Network:
     """
     Class representing the resource network in the rendering
     """
-    def __init__(self, cell_size, num_rows, num_cols):
-        """
-        Class constructor, initializes the resource network and the state
+    def __init__(self, render_config: RenderConfig):
+        self.render_config = render_config
+        self.grid = [[self.create_node(i,j) for j in range(self.render_config.game_config.num_cols)] for i in
+                     range(self.render_config.game_config.num_rows)]
 
-        :param cell_size: size of an individual cell in the grid
-        :param num_rows: number of rows in the grid
-        :param num_cols: number of columns in the grid
-        """
-        self.num_rows = num_rows
-        self.num_cols = num_cols
-        self.cell_size = cell_size
-        self.grid = [[Node(cell_size) for j in range(self.num_cols)] for i in range(self.num_rows)]
+    def create_node(self, i,j):
+        # Data node
+        if i == 0 and j == self.render_config.game_config.num_cols//2:
+            return Data(self.render_config, i, j)
+        # Start node
+        if i == self.render_config.game_config.num_rows-1 and j == self.render_config.game_config.num_cols//2:
+            return None
+        if i is not 0 and i is not self.render_config.game_config.num_rows-1:
+            return Server(self.render_config, i, j)
+        return None
+        # if i == 0:
+        #     return ResourceNode()
+
 
     def get_cell(self, row, col):
         """

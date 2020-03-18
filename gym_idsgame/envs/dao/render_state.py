@@ -26,7 +26,7 @@ class RenderState():
         for i in range(num_rows):
             for j in range(num_cols):
                 if (graph_layout[i][j] == constants.NODE_TYPES.DATA
-                        or graph_layout[i][j] == constants.NODE_TYPES.RESOURCE):
+                        or graph_layout[i][j] == constants.NODE_TYPES.SERVER):
                     defense_values[i][j] = [2] * num_attack_types
                     defense_values[i][j][0] = 0  # vulnerability
                     det_values[i][j] = 2

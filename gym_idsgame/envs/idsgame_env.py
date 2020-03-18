@@ -300,14 +300,14 @@ class IdsGameEnv(gym.Env):
             while True:
                 random_row = np.random.randint(self.graph_layout.shape[0])
                 random_col = np.random.randint(self.graph_layout.shape[1])
-                if self.graph_layout[random_row, random_col] == constants.NODE_TYPES.RESOURCE or self.graph_layout[
+                if self.graph_layout[random_row, random_col] == constants.NODE_TYPES.SERVER or self.graph_layout[
                     random_row, random_col] == constants.NODE_TYPES.DATA:
                     return random_row, random_col, defend_type
         elif self.defense_policy == constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC:
             defend_type = 1
             for i in range(self.graph_layout.shape[0]):
                 for j in range(self.graph_layout.shape[1]):
-                    if self.graph_layout[i, j] == constants.NODE_TYPES.RESOURCE or self.graph_layout[
+                    if self.graph_layout[i, j] == constants.NODE_TYPES.SERVER or self.graph_layout[
                         i, j] == constants.NODE_TYPES.DATA:
                         return i, j, defend_type
 
@@ -326,7 +326,7 @@ class IdsGameEnv(gym.Env):
                     else:
                         self.graph_layout[i][j] = constants.NODE_TYPES.NONE
                 else:
-                    self.graph_layout[i][j] = constants.NODE_TYPES.RESOURCE
+                    self.graph_layout[i][j] = constants.NODE_TYPES.SERVER
 
         self.adjacency_matrix = np.zeros((self.num_rows * self.num_cols, self.num_cols * self.num_rows))
         for i in range(self.num_rows * self.num_cols):

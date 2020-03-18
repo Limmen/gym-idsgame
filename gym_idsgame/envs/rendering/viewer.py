@@ -20,27 +20,15 @@ except ImportError as e:
 
 from gym_idsgame.envs.rendering.frames.game_frame import GameFrame
 from gym_idsgame.envs.rendering.constants import constants
+from gym_idsgame.envs.dao.render_config import RenderConfig
 import numpy as np
 import time
 
 class Viewer():
-    def __init__(self, num_layers = 1, num_servers_per_layer = 2, num_attack_types = 10, max_value = 10,
-                 defense_policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC,
-                 resources_dir = constants.GAMEFRAME.RESOURCES_DIR, adjacency_matrix = None, graph_layout = None,
-                 blink_interval=constants.GAMEFRAME.MANUAL_BLINK_INTERVAL, num_blinks=constants.GAMEFRAME.MANUAL_NUM_BLINKS
-                 ):
+    def __init__(self, render_config: RenderConfig):
 
-        self.num_layers = num_layers
-        self.num_servers_per_layer = num_servers_per_layer
-        self.num_attack_types = num_attack_types
-        self.max_value = max_value
-        self.defense_policy = defense_policy
-        self.resources_dir = resources_dir
+        self.render_config = render_config
         self.isopen = True
-        self.adjacency_matrix = adjacency_matrix
-        self.graph_layout = graph_layout
-        self.num_blinks = num_blinks
-        self.blink_interval = blink_interval
 
     def manual_start(self):
         """
@@ -48,11 +36,8 @@ class Viewer():
 
         :return: None
         """
-        self.gameframe = GameFrame(num_layers = self.num_layers, num_servers_per_layer = self.num_servers_per_layer,
-                                   num_attack_types = self.num_attack_types, max_value = self.max_value,
-                                   defense_policy = self.defense_policy, resources_dir = self.resources_dir,
-                                   manual = True, graph_layout=self.graph_layout, adjacency_matrix=self.adjacency_matrix,
-                                   num_blinks=self.num_blinks, blink_interval=self.blink_interval)
+        self.render_config.manual = True
+        self.gameframe = GameFrame(render_config=self.render_config)
         self.gameframe.on_close = self.window_closed_by_user
         self.isopen = True
         pyglet.clock.schedule_interval(self.gameframe.update, 1 / 60.)
@@ -63,11 +48,8 @@ class Viewer():
         Creates the frame in a agent-mode, where actions are taken programmatically rather than through
         moving arrow-keys.
         """
-        self.gameframe = GameFrame(num_layers=self.num_layers, num_servers_per_layer=self.num_servers_per_layer,
-                                   num_attack_types=self.num_attack_types, max_value=self.max_value,
-                                   defense_policy=self.defense_policy, resources_dir=self.resources_dir,
-                                   manual=False, graph_layout=self.graph_layout, adjacency_matrix=self.adjacency_matrix,
-                                   num_blinks=self.num_blinks, blink_interval=self.blink_interval)
+        self.render_config.manual = False
+        self.gameframe = GameFrame(render_config=self.render_config)
         self.gameframe.on_close = self.window_closed_by_user
         self.isopen = True
 

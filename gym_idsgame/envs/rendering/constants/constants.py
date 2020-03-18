@@ -40,7 +40,7 @@ class NODE_TYPES:
     """
     NONE = 0
     START = 1
-    RESOURCE = 2
+    SERVER = 2
     DATA = 3
 
 class BASELINE_POLICIES:
