@@ -62,7 +62,7 @@ class Resource(pyglet.sprite.Sprite):
     def initialize_state(self):
         self.attack_values = [0,0,0,0,0,0,0,0,0,0]
         self.defense_values = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
-        self.det = 0.2
+        self.det = 2
 
     def simulate_attack(self, attack_type):
         for i in range(0, constants.GAMEFRAME.NUM_BLINKS):
@@ -79,7 +79,7 @@ class Resource(pyglet.sprite.Sprite):
             return False
 
     def simulate_detection(self):
-        if np.random.rand() < self.det:
+        if np.random.rand() < self.det/10:
             return True
         else:
             return False
@@ -122,6 +122,18 @@ class Resource(pyglet.sprite.Sprite):
     def reset(self):
         self.initialize_state()
         self.set_labels()
+
+    def manual_blink_defense(self, i):
+        if i % 2 == 0:
+            self.defense_green(0)
+        else:
+            self.defense_black(0)
+
+    def manual_blink_attack(self, i):
+        if i % 2 == 0:
+            self.attack_red(0)
+        else:
+            self.attack_black(0)
 
     def defend(self, defend_type):
         if self.defense_values[defend_type] < self.max_value-1:

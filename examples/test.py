@@ -15,11 +15,30 @@ if __name__ == '__main__':
 
     obs = env.reset()
     done = False
-    while not done:
+    for i in range(3):
+        action = 12
         env.render()
-        time.sleep(1)
+        time.sleep(0.5)
         action = 12
         s, reward, done, _ = env.step(action)
+    for i in range(3):
+        action = 42
+        env.render()
+        time.sleep(0.5)
+        s, reward, done, _ = env.step(action)
+    for i in range(3):
+        action = 73
+        env.render()
+        time.sleep(0.5)
+        s, reward, done, _ = env.step(action)
+    while not done:
+        env.render()
+    #     for i in range(3):
+    #
+    #     env.render()
+    #     time.sleep(0.5)
+    #     action = 12
+    #     s, reward, done, _ = env.step(action)
 
     #render_state = env.convert_state_to_render_state()
     # viewer = Viewer(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=10,

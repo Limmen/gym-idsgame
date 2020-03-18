@@ -5,6 +5,9 @@ from gym_idsgame.envs.rendering import constants
 from gym_idsgame.envs.rendering.render_util import batch_label, batch_rect_fill, batch_line
 from gym_idsgame.envs.rendering.resource import Resource
 from gym_idsgame.envs.rendering.data import Data
+from gym_idsgame.envs.dao.render_state import RenderState
+from gym_idsgame.envs.dao.attack_defense_event import AttackDefenseEvent
+from typing import List
 import os
 import numpy as np
 
@@ -44,7 +47,6 @@ class GameFrame(pyglet.window.Window):
         self.line_width = constants.GAMEFRAME.LINE_WIDTH
         height = constants.GAMEFRAME.PANEL_HEIGHT + int((self.rect_size / 1.5)) * self.num_rows
         width = max(self.minimum_width, self.rect_size * self.num_cols)
-        print(width)
         caption = constants.GAMEFRAME.CAPTION
         super(GameFrame, self).__init__(height=height, width=width, caption=caption) # call constructor of parent class
         self.num_rows = (self.height - constants.GAMEFRAME.PANEL_HEIGHT) // int((self.rect_size / 1.5))
@@ -63,10 +65,14 @@ class GameFrame(pyglet.window.Window):
             self.graph_layout = graph_layout
         self.done = False
         if initial_state is None:
-            self.init_state = self.initial_state(self.graph_layout, self.num_rows, self.num_cols, self.num_attack_types)
+            self.init_state = RenderState()
+            self.init_state.default_state(self.graph_layout, self.num_rows, self.num_cols, self.num_attack_types)
         else:
             self.init_state = initial_state
         self.set_state(self.init_state)
+        self.switch_to()
+        self.defense_events = []
+        self.attack_events = []
 
     def initialize_graph_config(self):
         self.graph_layout = np.zeros((self.num_rows, self.num_cols))
@@ -264,11 +270,7 @@ class GameFrame(pyglet.window.Window):
     def on_mouse_press(self, x, y, button, modifiers):
         if self.done:
             return
-        for i in range(self.resource_network.num_rows - 1):
-            for j in range(self.resource_network.num_cols):
-                node = self.resource_network.grid[i][j].get_node()
-                if node is not None:
-                    node.unschedule()
+        self.unschedule_events()
         for i in range(self.resource_network.num_rows-1):
             for j in range(self.resource_network.num_cols):
                 node = self.resource_network.grid[i][j].get_node()
@@ -349,32 +351,76 @@ class GameFrame(pyglet.window.Window):
         self.num_games_label.text = str(self.num_games)
         self.hacker.update()
 
-    def set_state(self, render_state):
+    def set_node_states(self, attack_values, defense_values, det_values):
+        for i in range(self.resource_network.num_rows):
+            for j in range(self.resource_network.num_cols):
+                self.resource_network.grid[i][j].set_state(attack_values[i][j], defense_values[i][j], det_values[i][j])
+
+    def set_state(self, render_state:RenderState):
         """
         TODO
 
         :param state: the state
         :return: None
         """
-        attack_values = render_state[constants.RENDER_STATE.ATTACK_VALUES]
-        defense_values = render_state[constants.RENDER_STATE.DEFENSE_VALUES]
-        det_values = render_state[constants.RENDER_STATE.DEFENSE_DET]
-        attacker_row, attacker_col = render_state[constants.RENDER_STATE.ATTACKER_POS]
-        for i in range(self.resource_network.num_rows):
-            for j in range(self.resource_network.num_cols):
-                self.resource_network.grid[i][j].set_state(attack_values[i][j], defense_values[i][j], det_values[i][j])
+        attack_values = np.copy(render_state.attack_values)
+        defense_values = np.copy(render_state.defense_values)
+        det_values = np.copy(render_state.defense_det)
+        self.set_node_states(attack_values, defense_values, det_values)
+        attacker_row, attacker_col = render_state.attacker_pos
+        self.attack_events = render_state.attack_events
+        self.defense_events = render_state.defense_events
         hacker_node =  self.resource_network.grid[attacker_row][attacker_col].get_node()
         if hacker_node is not None:
             self.hacker.move_to(hacker_node.x, hacker_node.y, hacker_node.col, hacker_node.row)
-        self.hacker.set_reward(render_state[constants.RENDER_STATE.ATTACKER_CUMULATIVE_REWARD])
-        self.data_node.set_reward(render_state[constants.RENDER_STATE.DEFENDER_CUMULATIVE_REWARD])
-        self.game_step = render_state[constants.RENDER_STATE.GAME_STEP]
+        self.hacker.set_reward(render_state.attacker_cumulative_reward)
+        self.data_node.set_reward(render_state.defender_cumulative_reward)
+        self.game_step = render_state.game_step
         self.step_label.text = str(self.game_step)
-        self.num_games = render_state[constants.RENDER_STATE.NUM_GAMES]
-        self.num_games_label.text = str(render_state[constants.RENDER_STATE.NUM_GAMES])
+        self.num_games = render_state.num_games
+        self.num_games_label.text = str(self.num_games)
         self.a_reward_label.text = str(self.hacker.cumulative_reward)
         self.d_reward_label.text = str(self.data_node.cumulative_reward)
+        self.attack_type_label.text = str(self.attack_type)
         self.hacker.update()
+        self.done = render_state.done
+
+    def simulate_events(self, i):
+        self.simulate_defense_events(self.defense_events, i)
+        self.simulate_attack_events(self.attack_events, i)
+
+    def reset_events(self):
+        self.attack_events = []
+        self.defense_events = []
+
+    def simulate_attack_events(self, attack_events: List[AttackDefenseEvent], i):
+        for attack in attack_events:
+            self.attack_type = attack.attack_defense_type
+            target_node = self.resource_network.grid[attack.target_row][attack.target_col].get_node()
+            if isinstance(target_node, Data):
+                edges = []
+                if isinstance(self.resource_network.grid[self.hacker.row][self.hacker.col], Resource):
+                    edges = self.resource_network.grid[self.hacker.row][self.hacker.col].resource.outgoing_edges
+                self.resource_network.grid[attack.target_row][attack.target_col].manual_blink_attack(i, edges)
+            else:
+                self.resource_network.grid[attack.target_row][attack.target_col].manual_blink_attack(i)
+
+    def test(self):
+        if self.defense_event is not None:
+            defense = self.defense_event
+            pyglet.clock.schedule(self.resource_network.grid[defense.target_row][defense.target_col].data.defense_black)
+            pyglet.clock.tick(poll=True)
+
+    def simulate_defense_events(self, defense_events: List[AttackDefenseEvent], i):
+        for defense in defense_events:
+            self.resource_network.grid[defense.target_row][defense.target_col].manual_blink_defense(i)
+
+    def unschedule_events(self):
+        for i in range(self.resource_network.num_rows - 1):
+            for j in range(self.resource_network.num_cols):
+                node = self.resource_network.grid[i][j].get_node()
+                if node is not None:
+                    node.unschedule()
 
     def reset(self):
         """
@@ -383,37 +429,12 @@ class GameFrame(pyglet.window.Window):
         :return: None
         """
         self.done = False
-        for i in range(self.resource_network.num_rows - 1):
-            for j in range(self.resource_network.num_cols):
-                node = self.resource_network.grid[i][j].get_node()
-                if node is not None:
-                    node.unschedule()
+        self.unschedule_events()
         self.hacker.reset()
-        for i in range(self.resource_network.num_rows):
-            for j in range(self.resource_network.num_cols):
-                self.resource_network.grid[i][j].reset()
+        attack_values = np.copy(self.init_state[constants.RENDER_STATE.ATTACK_VALUES])
+        defense_values = np.copy(self.init_state[constants.RENDER_STATE.DEFENSE_VALUES])
+        det_values = np.copy(self.init_state[constants.RENDER_STATE.DEFENSE_DET])
+        self.set_node_states(attack_values, defense_values, det_values)
         self.num_games += 1
         self.game_step = 0
-
-
-    def initial_state(self, graph_layout, num_rows, num_cols, num_attack_types):
-        attack_values = np.zeros((num_rows, num_cols, num_attack_types))
-        defense_values = np.zeros((num_rows, num_cols, num_attack_types))
-        det_values = np.zeros((num_rows, num_cols))
-        for i in range(num_rows):
-            for j in range(num_cols):
-                if graph_layout[i][j] == constants.NODE_TYPES.DATA or graph_layout[i][
-                    j] == constants.NODE_TYPES.RESOURCE:
-                    defense_values[i][j] = [2] * num_attack_types
-                    defense_values[i][j][0] = 0  # vulnerability
-                    det_values[i][j] = 0.2
-        render_state = {}
-        render_state[constants.RENDER_STATE.ATTACK_VALUES] = attack_values.astype(np.int32)
-        render_state[constants.RENDER_STATE.DEFENSE_VALUES] = defense_values.astype(np.int32)
-        render_state[constants.RENDER_STATE.DEFENSE_DET] = det_values.astype(np.int32)
-        render_state[constants.RENDER_STATE.ATTACKER_POS] = (num_rows - 1, num_cols // 2)
-        render_state[constants.RENDER_STATE.GAME_STEP] = 0
-        render_state[constants.RENDER_STATE.ATTACKER_CUMULATIVE_REWARD] = 0
-        render_state[constants.RENDER_STATE.DEFENDER_CUMULATIVE_REWARD] = 0
-        render_state[constants.RENDER_STATE.NUM_GAMES] = 0
-        return render_state
+        self.switch_to()

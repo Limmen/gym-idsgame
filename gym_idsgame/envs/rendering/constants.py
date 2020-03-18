@@ -27,8 +27,8 @@ class GAMEFRAME:
     NEGATIVE_REWARD = -100
     NODE_STATE_FONT_SIZE = 10
     LINE_WIDTH = 2
-    NUM_BLINKS = 14
-    BLINK_INTERVAL = 0.2
+    NUM_BLINKS = 12
+    BLINK_INTERVAL = 0.1
     CAPTION = "IDS Game"
     MIN_WIDTH = 470
 
@@ -44,13 +44,3 @@ class NODE_TYPES:
 class BASELINE_POLICIES:
     RANDOM = "random"
     NAIVE_DETERMINISTIC = "naive_deterministic"
-
-class RENDER_STATE:
-    ATTACK_VALUES = "attack_values"
-    DEFENSE_VALUES = "defense_values"
-    DEFENSE_DET = "defense_det"
-    ATTACKER_POS = "attacker_pos"
-    GAME_STEP = "game_step"
-    ATTACKER_CUMULATIVE_REWARD = "attacker_cumulative_reward"
-    DEFENDER_CUMULATIVE_REWARD = "attacker_cumulative_reward"
-    NUM_GAMES = "num_games"

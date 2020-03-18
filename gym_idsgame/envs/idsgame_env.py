@@ -3,6 +3,8 @@ import numpy as np
 from gym_idsgame.envs.rendering import constants
 import os
 import math
+from gym_idsgame.envs.dao.render_state import RenderState
+from gym_idsgame.envs.dao.attack_defense_event import AttackDefenseEvent
 
 class IdsGameEnv(gym.Env):
     """
@@ -60,6 +62,8 @@ class IdsGameEnv(gym.Env):
         self.defender_total_reward = 0
         self.game_step = 0
         self.num_games = 0
+        self.attack_events = []
+        self.defense_events = []
 
     def initial_state(self):
         attack_states = np.zeros((self.num_nodes, self.num_attack_types+1)) # Plus 1 to indicate whether the agent is currently at this node or not
@@ -112,11 +116,11 @@ class IdsGameEnv(gym.Env):
                 return i
         raise AssertionError("Could not find the current node of the attacker in the game state")
 
-    def __is_attack_legal(self, server, attack_type, attacker_node):
+    def __is_attack_legal(self, target_node, attacker_node):
         attacker_row, attacker_col = self.__get_grid_pos_of_node(attacker_node)
-        server_row, server_col = self.__get_grid_pos_of_node(server)
+        target_row, target_col = self.__get_grid_pos_of_node(target_node)
         attacker_matrix_id = attacker_row * self.num_cols + attacker_col
-        target_attacker_id = server_row * self.num_cols + server_col
+        target_attacker_id = target_row * self.num_cols + target_col
         link = self.adjacency_matrix[attacker_matrix_id][target_attacker_id]
         if int(link) == 1:
             return True
@@ -128,7 +132,7 @@ class IdsGameEnv(gym.Env):
         return False
 
     def __simulate_detection(self, target_node):
-        p_detection = self.state[1][target_node][-1] / 100
+        p_detection = self.state[1][target_node][-1] / 10
         if np.random.rand() < p_detection:
             return True
         else:
@@ -141,7 +145,19 @@ class IdsGameEnv(gym.Env):
     def __is_data_node(self, node):
         return node == 0
 
+    def __add_attack_event(self, target_node, attack_type):
+        target_row, target_col = self.__get_grid_pos_of_node(target_node)
+        attack_event = AttackDefenseEvent(target_col, target_row, attack_type)
+        self.attack_events.append(attack_event)
+
+    def __add_defense_event(self, target_node, defense_type):
+        target_row, target_col = self.__get_grid_pos_of_node(target_node)
+        defense_event = AttackDefenseEvent(target_col, target_row, defense_type)
+        self.defense_events.append(defense_event)
+
     def step(self, action):
+        self.attack_events = []
+        self.defense_events = []
         reward = 0
         done = False
         info = {}
@@ -151,7 +167,9 @@ class IdsGameEnv(gym.Env):
         defense_row, defense_col, defense_type = self.__defense_action()
         defense_node = self.__get_node_from_grid_pos(defense_row, defense_col)
         self.__increment_attack_defense_value(self.state[1], defense_node, defense_type)
-        if self.__is_attack_legal(target_node, attack_type, attacker_node):
+        self.__add_defense_event(defense_node, defense_type)
+        if self.__is_attack_legal(target_node, attacker_node):
+            self.__add_attack_event(target_node, attack_type)
             self.__increment_attack_defense_value(self.state[0], target_node, attack_type)
             attack_successful = self.__simulate_attack(target_node, attack_type)
             if attack_successful:
@@ -173,6 +191,7 @@ class IdsGameEnv(gym.Env):
                                 "You should always call 'reset()' once you receive 'done = True' -- "
                                 "any further steps are undefined behavior.")
                 self.steps_beyond_done += 1
+        self.game_step +=1
         if self.viewer is not None:
             self.viewer.gameframe.set_state(self.convert_state_to_render_state())
         return observation, reward, done, info
@@ -205,15 +224,18 @@ class IdsGameEnv(gym.Env):
             defense_state = self.state[1][node][:-1]
             render_defense_values[row][col] = defense_state
             render_defense_det[row][col] = self.state[1][node][-1]
-        render_state = {}
-        render_state[constants.RENDER_STATE.ATTACK_VALUES] = render_attack_values.astype(np.int32)
-        render_state[constants.RENDER_STATE.DEFENSE_VALUES] = render_defense_values.astype(np.int32)
-        render_state[constants.RENDER_STATE.DEFENSE_DET] = render_defense_det.astype(np.int32)
-        render_state[constants.RENDER_STATE.ATTACKER_POS] = (attacker_row, attacker_col)
-        render_state[constants.RENDER_STATE.GAME_STEP] = self.game_step
-        render_state[constants.RENDER_STATE.ATTACKER_CUMULATIVE_REWARD] = self.attacker_total_reward
-        render_state[constants.RENDER_STATE.DEFENDER_CUMULATIVE_REWARD] = self.defender_total_reward
-        render_state[constants.RENDER_STATE.NUM_GAMES] = self.num_games
+        render_state = RenderState(
+            attack_values=render_attack_values.astype(np.int32),
+            defense_values = render_defense_values.astype(np.int32),
+            defense_det = render_defense_det.astype(np.int32),
+            attacker_pos=(attacker_row, attacker_col),
+            game_step=self.game_step,
+            attacker_cumulative_reward=self.attacker_total_reward,
+            defender_cumulative_reward=self.defender_total_reward,
+            num_games=self.num_games,
+            attack_events=self.attack_events,
+            defense_events = self.defense_events
+        )
         return render_state
 
     def render(self, mode='human'):
@@ -300,7 +322,7 @@ class IdsGameEnv(gym.Env):
             col_1 = i % self.num_cols
             for j in range(self.num_rows * self.num_cols):
                 row_2 = j // self.num_cols
-                col_2 = j % self.num_rows
+                col_2 = j % self.num_cols
                 if row_1 == 0:
                     if row_2 == 1 and col_1 == self.num_cols // 2:
                         self.adjacency_matrix[i][j] = 1

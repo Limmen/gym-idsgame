@@ -21,6 +21,7 @@ except ImportError as e:
 from gym_idsgame.envs.rendering.game_frame import GameFrame
 from gym_idsgame.envs.rendering import constants
 import numpy as np
+import time
 
 class Viewer():
     def __init__(self, num_layers = 1, num_servers_per_layer = 2, num_attack_types = 10, max_value = 10,
@@ -81,6 +82,17 @@ class Viewer():
         """
         self.gameframe.close()
 
+    def render_frame(self, return_rgb_array = False):
+        self.gameframe.clear()  # Clears the frame
+        self.gameframe.switch_to()  # Make this window the current OpenGL rendering context
+        self.gameframe.dispatch_events()  # Poll the OS for events and call related handlers for updating the frame
+        self.gameframe.on_draw()  # Draw the frame
+        if return_rgb_array:
+            arr = self.extract_rgb_array()
+        self.gameframe.flip()  # Swaps the OpenGL front and back buffers Updates the visible display with the back buffer
+        return arr if return_rgb_array else self.isopen
+
+
     def render(self, return_rgb_array = False):
         """
         Renders a a frame. Using pyglet together with openAI gym means that we have to integrate OpenGL's event-loop
@@ -91,14 +103,15 @@ class Viewer():
 
         :return: None
         """
-        self.gameframe.clear() # Clears the frame
-        self.gameframe.switch_to() # Make this window the current OpenGL rendering context
-        self.gameframe.dispatch_events() # Poll the OS for events and call related handlers for updating the frame
-        self.gameframe.on_draw() # Draw the frame
-        if return_rgb_array:
-            arr = self.extract_rgb_array()
-        self.gameframe.flip() # Swaps the OpenGL front and back buffers Updates the visible display with the back buffer
-        return arr if return_rgb_array else self.isopen
+        result = self.render_frame(return_rgb_array)
+        for i in range(constants.GAMEFRAME.NUM_BLINKS):
+            if len(self.gameframe.defense_events) > 0:
+                self.gameframe.simulate_events(i)
+                result = self.render_frame()
+                time.sleep(constants.GAMEFRAME.BLINK_INTERVAL)
+        self.gameframe.reset_events()
+
+        return result if return_rgb_array else self.isopen
 
     def extract_rgb_array(self):
         """

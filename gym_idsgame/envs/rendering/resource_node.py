@@ -16,6 +16,22 @@ class ResourceNode:
         self.data = None
         self.circle = False
 
+    def manual_blink_defense(self, i):
+        if self.resource is not None:
+            self.resource.manual_blink_defense(i)
+        elif self.circle:
+            return
+        elif self.data is not None:
+            self.data.manual_blink_defense(i)
+
+    def manual_blink_attack(self, i, edges=None):
+        if self.resource is not None:
+            self.resource.manual_blink_attack(i)
+        elif self.circle:
+            return
+        elif self.data is not None:
+            self.data.manual_blink_attack(i, edges=edges)
+
     def set_state(self, attack_values, defense_values, det_value):
         if self.resource is not None:
             self.resource.set_state(attack_values, defense_values, det_value)
@@ -24,13 +40,13 @@ class ResourceNode:
         elif self.data is not None:
             self.data.set_state(attack_values, defense_values, det_value)
 
-    def defend(self, defense_type):
+    def defend(self, defense_type, manual=False):
         if self.resource is not None:
             self.resource.defend(defense_type)
         elif self.circle:
             return
         elif self.data is not None:
-            self.data.defend(defense_type)
+            self.data.defend(defense_type, manual=manual)
 
     def reset(self):
         if self.resource is not None:

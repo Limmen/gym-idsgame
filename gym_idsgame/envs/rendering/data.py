@@ -44,7 +44,7 @@ class Data(pyglet.sprite.Sprite):
                                          constants.GAMEFRAME.NODE_STATE_FONT_SIZE, lbl_color, self.batch, self.background, multiline=False,
                                          width=self.size)
         lbl = self.get_det_text()
-        self.det_label = batch_label(lbl, self.col * self.size + self.size / 3, self.row * int((self.size) / 1.5) + self.size / 3,
+        self.det_label = batch_label(lbl, self.col * self.size + self.size / 3.5, self.row * int((self.size) / 1.5) + self.size / 3,
                                      constants.GAMEFRAME.NODE_STATE_FONT_SIZE, lbl_color, self.batch, self.background, multiline=False,
                                      width=self.size)
 
@@ -65,7 +65,7 @@ class Data(pyglet.sprite.Sprite):
     def initialize_state(self):
         self.attack_values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         self.defense_values = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
-        self.det = 0.2
+        self.det = 2
 
     def simulate_attack(self, attack_type, edges_list):
         for i in range(0, constants.GAMEFRAME.NUM_BLINKS):
@@ -82,7 +82,7 @@ class Data(pyglet.sprite.Sprite):
             return False
 
     def simulate_detection(self):
-        if np.random.rand() < self.det:
+        if np.random.rand() < self.det/10:
             return True
         else:
             return False
@@ -157,6 +157,18 @@ class Data(pyglet.sprite.Sprite):
                 clock.schedule_once(self.defense_green, constants.GAMEFRAME.BLINK_INTERVAL * i)
             else:
                 clock.schedule_once(self.defense_black, constants.GAMEFRAME.BLINK_INTERVAL * i)
+
+    def manual_blink_defense(self, i):
+        if i % 2 == 0:
+            self.defense_green(0)
+        else:
+            self.defense_black(0)
+
+    def manual_blink_attack(self, i, edges):
+        if i % 2 == 0:
+            self.attack_red(0, edges)
+        else:
+            self.attack_black(0, edges)
 
     def defense_green(self, dt):
         color = constants.GAMEFRAME.GREEN_ALPHA
