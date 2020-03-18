@@ -79,10 +79,11 @@ class ResourceNode:
 
 
     def draw(self, y, x, color, batch, background, foreground, avatar, scale, server = False, data = False,
-             start= False, max_value = 10):
+             start= False, max_value = 10, blink_interval = constants.GAMEFRAME.BLINK_INTERVAL,
+             num_blinks = constants.GAMEFRAME.NUM_BLINKS):
         if server:
             self.resource = Resource(avatar, x, y, batch, background, foreground, self.size, scale=scale,
-                                     max_value=max_value)
+                                     max_value=max_value, blink_interval=blink_interval, num_blinks=num_blinks)
         elif start:
             create_circle(x * self.size + self.size / 2, y * int(self.size / 1.5) + (self.size / 1.5)/2, self.size / 7,
                           batch, background, color)
@@ -90,7 +91,8 @@ class ResourceNode:
             self.col = x
             self.row = y
         elif data:
-            self.data = Data(avatar, x, y, batch, background, foreground, self.size, scale=scale, max_value=max_value)
+            self.data = Data(avatar, x, y, batch, background, foreground, self.size, scale=scale, max_value=max_value,
+                             blink_interval= blink_interval, num_blinks=num_blinks)
 
     def get_link_coords(self, upper=True, lower=False):
         if self.resource is not None:

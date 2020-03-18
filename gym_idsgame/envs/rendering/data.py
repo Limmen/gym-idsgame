@@ -13,7 +13,8 @@ class Data(pyglet.sprite.Sprite):
     and define state of the sprite
     """
     def __init__(self, avatar_path, col, row, batch, background, foreground, size, scale=0.25,
-                 policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC, max_value = 10):
+                 policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC, max_value = 10,
+                 blink_interval = constants.GAMEFRAME.BLINK_INTERVAL, num_blinks = constants.GAMEFRAME.NUM_BLINKS):
         self.avatar = pyglet.resource.image(avatar_path)
         self.background = background
         self.foreground = foreground
@@ -23,7 +24,6 @@ class Data(pyglet.sprite.Sprite):
         self.row = row
         self.size = size
         self.__center_avatar()
-        #self.reset()
         self.scale = scale
         self.batch = batch
         self.initialize_state()
@@ -32,6 +32,8 @@ class Data(pyglet.sprite.Sprite):
         self.outgoing_edges = []
         self.cumulative_reward = 0
         self.policy = policy
+        self.blink_interval = blink_interval
+        self.num_blinks = num_blinks
 
     def create_labels(self):
         lbl_color = constants.GAMEFRAME.BLACK_ALPHA
@@ -68,11 +70,11 @@ class Data(pyglet.sprite.Sprite):
         self.det = 2
 
     def simulate_attack(self, attack_type, edges_list):
-        for i in range(0, constants.GAMEFRAME.NUM_BLINKS):
+        for i in range(0, self.num_blinks):
             if i % 2 == 0:
-                clock.schedule_once(self.attack_red, constants.GAMEFRAME.BLINK_INTERVAL * i, edges_list)
+                clock.schedule_once(self.attack_red, self.blink_interval * i, edges_list)
             else:
-                clock.schedule_once(self.attack_black, constants.GAMEFRAME.BLINK_INTERVAL * i, edges_list)
+                clock.schedule_once(self.attack_black, self.blink_interval * i, edges_list)
         if self.attack_values[attack_type] < self.max_value-1:
             self.attack_values[attack_type] += 1
         self.attack_label.text = self.get_attack_text()
@@ -152,11 +154,11 @@ class Data(pyglet.sprite.Sprite):
         if self.defense_values[defend_type] < self.max_value-1:
             self.defense_values[defend_type] += 1
         self.defense_label.text = self.get_defense_text()
-        for i in range(0, constants.GAMEFRAME.NUM_BLINKS):
+        for i in range(0, self.num_blinks):
             if i % 2 == 0:
-                clock.schedule_once(self.defense_green, constants.GAMEFRAME.BLINK_INTERVAL * i)
+                clock.schedule_once(self.defense_green, self.blink_interval * i)
             else:
-                clock.schedule_once(self.defense_black, constants.GAMEFRAME.BLINK_INTERVAL * i)
+                clock.schedule_once(self.defense_black, self.blink_interval * i)
 
     def manual_blink_defense(self, i):
         if i % 2 == 0:

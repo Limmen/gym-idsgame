@@ -13,8 +13,9 @@ class IdsGameEnv(gym.Env):
 
     def __init__(self, num_layers = 2, num_servers_per_layer = 3, num_attack_types = 10, max_value = 10,
                  defense_policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC,
-                 adjacency_matrix=None, graph_layout=None, initial_state = None
-                 ):
+                 adjacency_matrix=None, graph_layout=None, initial_state = None,
+                 blink_interval=constants.GAMEFRAME.BLINK_INTERVAL,
+                 num_blinks=constants.GAMEFRAME.NUM_BLINKS):
         """
         TODO
         """
@@ -33,6 +34,8 @@ class IdsGameEnv(gym.Env):
         self.defense_policy = defense_policy
         self.num_nodes = self.num_layers * self.num_servers_per_layer + 2 #+2 for Start and Data Nodes
         self.num_states = math.pow(self.max_value, self.num_attack_types*2* self.num_nodes)*math.pow(10,self.max_value)
+        self.num_blinks = num_blinks
+        self.blink_interval = blink_interval
         if initial_state is None:
             self.init_state = self.initial_state()
         else:
@@ -143,7 +146,7 @@ class IdsGameEnv(gym.Env):
         self.state[0][target_node][-1] = 1
 
     def __is_data_node(self, node):
-        return node == 0
+        return node == self.num_nodes-1
 
     def __add_attack_event(self, target_node, attack_type):
         target_row, target_col = self.__get_grid_pos_of_node(target_node)
@@ -160,6 +163,7 @@ class IdsGameEnv(gym.Env):
         self.defense_events = []
         reward = 0
         done = False
+        detected = False
         info = {}
         target_node = self.__get_server_under_attack(action)
         attack_type = self.__get_attack_type(action)
@@ -192,8 +196,10 @@ class IdsGameEnv(gym.Env):
                                 "any further steps are undefined behavior.")
                 self.steps_beyond_done += 1
         self.game_step +=1
+        self.attacker_total_reward += reward
+        self.defender_total_reward -= reward
         if self.viewer is not None:
-            self.viewer.gameframe.set_state(self.convert_state_to_render_state())
+            self.viewer.gameframe.set_state(self.convert_state_to_render_state(done, detected))
         return observation, reward, done, info
 
     def reset(self):
@@ -211,7 +217,7 @@ class IdsGameEnv(gym.Env):
         self.num_games += 1
         return observation
 
-    def convert_state_to_render_state(self):
+    def convert_state_to_render_state(self, done, detected):
         attacker_node = self.__get_attacker_node()
         attacker_row, attacker_col = self.__get_grid_pos_of_node(attacker_node)
         render_attack_values = np.zeros((self.num_rows, self.num_cols, self.num_attack_types))
@@ -234,7 +240,9 @@ class IdsGameEnv(gym.Env):
             defender_cumulative_reward=self.defender_total_reward,
             num_games=self.num_games,
             attack_events=self.attack_events,
-            defense_events = self.defense_events
+            defense_events = self.defense_events,
+            done=done,
+            detected=detected
         )
         return render_state
 
@@ -257,7 +265,10 @@ class IdsGameEnv(gym.Env):
             raise NotImplemented("mode: {} is not supported".format(mode))
         if self.viewer is None:
             self.__setup_viewer()
-        return self.viewer.render(return_rgb_array = mode=='rgb_array')
+        arr = self.viewer.render(return_rgb_array = mode=='rgb_array')
+        self.attack_events = []
+        self.defense_events = []
+        return arr
 
     def __setup_viewer(self):
         """
@@ -269,7 +280,8 @@ class IdsGameEnv(gym.Env):
         resource_path = os.path.join(script_dir, './rendering/', constants.GAMEFRAME.RESOURCES_DIR)
         self.viewer = Viewer(num_layers=self.num_layers, num_servers_per_layer=self.num_servers_per_layer,
                              num_attack_types=self.num_attack_types, max_value=self.max_value,
-                        adjacency_matrix=self.adjacency_matrix, graph_layout=self.graph_layout)
+                             adjacency_matrix=self.adjacency_matrix, graph_layout=self.graph_layout,
+                             blink_interval=self.blink_interval, num_blinks=self.num_blinks)
         self.viewer.agent_start()
 
     def close(self):

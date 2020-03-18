@@ -22,7 +22,8 @@ class GameFrame(pyglet.window.Window):
                  num_servers_per_layer = 2, num_attack_types = 10, max_value = 10,
                  defense_policy=constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC,
                  resources_dir=constants.GAMEFRAME.RESOURCES_DIR,
-                 initial_state = None
+                 initial_state = None, blink_interval = constants.GAMEFRAME.BLINK_INTERVAL,
+                 num_blinks = constants.GAMEFRAME.NUM_BLINKS
                  ):
         self.minimum_width = constants.GAMEFRAME.MIN_WIDTH
         self.num_layers = num_layers
@@ -33,13 +34,16 @@ class GameFrame(pyglet.window.Window):
         self.max_value = max_value
         self.defense_policy = defense_policy
         self.resources_dir = resources_dir
+        self.blink_interval = blink_interval
+        self.num_blinks = num_blinks
+        print(blink_interval)
+        print(num_blinks)
         self.rect_size = constants.GAMEFRAME.RECT_SIZE
         self.bg_color = constants.GAMEFRAME.WHITE
         self.border_color = constants.GAMEFRAME.BLACK
         self.avatar_filename = constants.GAMEFRAME.HACKER_AVATAR_FILENAME
         self.server_filename = constants.GAMEFRAME.SERVER_AVATAR_FILENAME
         self.data_filename = constants.GAMEFRAME.DATA_AVATAR_FILENAME
-        self.resources_dir = constants.GAMEFRAME.RESOURCES_DIR
         self.agent_scale = 0.3
         self.resource_scale = 0.2
         self.data_scale = 0.2
@@ -135,7 +139,8 @@ class GameFrame(pyglet.window.Window):
                     self.resource_network.grid[i][j].draw(i, j, self.border_color, self.batch, self.background,
                                                           self.second_foreground,
                                                           self.data_filename, self.data_scale,
-                                                          data=(j == (self.num_cols // 2)), max_value=self.max_value)
+                                                          data=(j == (self.num_cols // 2)), max_value=self.max_value,
+                                                          blink_interval=self.blink_interval, num_blinks=self.num_blinks)
                     if j == (self.num_cols // 2):
                         self.data_node = self.resource_network.grid[i][j].get_node()
                 # Server node
@@ -143,14 +148,16 @@ class GameFrame(pyglet.window.Window):
                     self.resource_network.grid[i][j].draw(i, j, self.border_color, self.batch, self.background,
                                                           self.second_foreground,
                                                           self.server_filename, self.resource_scale, server=True,
-                                                          max_value=self.max_value)
+                                                          max_value=self.max_value,
+                                                          blink_interval=self.blink_interval, num_blinks=self.num_blinks)
                 # Start node
                 if i == self.resource_network.num_rows-1:
                     self.resource_network.grid[i][j].draw(i, j, self.border_color, self.batch, self.background,
                                                           self.second_foreground,
                                                           self.avatar_filename, self.agent_scale,
                                                           start=(j == (self.num_cols//2)),
-                                                          max_value=self.max_value
+                                                          max_value=self.max_value,
+                                                          blink_interval=self.blink_interval, num_blinks=self.num_blinks
                                                           )
         # Hacker starts at the start node
         self.hacker = Hacker(self.avatar_filename, self.num_cols // 2,
@@ -384,6 +391,8 @@ class GameFrame(pyglet.window.Window):
         self.attack_type_label.text = str(self.attack_type)
         self.hacker.update()
         self.done = render_state.done
+        if render_state.detected:
+            self.hacker.detected()
 
     def simulate_events(self, i):
         self.simulate_defense_events(self.defense_events, i)
@@ -431,9 +440,9 @@ class GameFrame(pyglet.window.Window):
         self.done = False
         self.unschedule_events()
         self.hacker.reset()
-        attack_values = np.copy(self.init_state[constants.RENDER_STATE.ATTACK_VALUES])
-        defense_values = np.copy(self.init_state[constants.RENDER_STATE.DEFENSE_VALUES])
-        det_values = np.copy(self.init_state[constants.RENDER_STATE.DEFENSE_DET])
+        attack_values = np.copy(self.init_state.attack_values)
+        defense_values = np.copy(self.init_state.defense_values)
+        det_values = np.copy(self.init_state.defense_det)
         self.set_node_states(attack_values, defense_values, det_values)
         self.num_games += 1
         self.game_step = 0

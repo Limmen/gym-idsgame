@@ -26,7 +26,9 @@ import time
 class Viewer():
     def __init__(self, num_layers = 1, num_servers_per_layer = 2, num_attack_types = 10, max_value = 10,
                  defense_policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC,
-                 resources_dir = constants.GAMEFRAME.RESOURCES_DIR, adjacency_matrix = None, graph_layout = None):
+                 resources_dir = constants.GAMEFRAME.RESOURCES_DIR, adjacency_matrix = None, graph_layout = None,
+                 blink_interval=constants.GAMEFRAME.BLINK_INTERVAL, num_blinks=constants.GAMEFRAME.NUM_BLINKS
+                 ):
 
         self.num_layers = num_layers
         self.num_servers_per_layer = num_servers_per_layer
@@ -37,6 +39,8 @@ class Viewer():
         self.isopen = True
         self.adjacency_matrix = adjacency_matrix
         self.graph_layout = graph_layout
+        self.num_blinks = num_blinks
+        self.blink_interval = blink_interval
 
     def manual_start(self):
         """
@@ -47,7 +51,8 @@ class Viewer():
         self.gameframe = GameFrame(num_layers = self.num_layers, num_servers_per_layer = self.num_servers_per_layer,
                                    num_attack_types = self.num_attack_types, max_value = self.max_value,
                                    defense_policy = self.defense_policy, resources_dir = self.resources_dir,
-                                   manual = True, graph_layout=self.graph_layout, adjacency_matrix=self.adjacency_matrix)
+                                   manual = True, graph_layout=self.graph_layout, adjacency_matrix=self.adjacency_matrix,
+                                   num_blinks=self.num_blinks, blink_interval=self.blink_interval)
         self.gameframe.on_close = self.window_closed_by_user
         self.isopen = True
         pyglet.clock.schedule_interval(self.gameframe.update, 1 / 60.)
@@ -61,7 +66,8 @@ class Viewer():
         self.gameframe = GameFrame(num_layers=self.num_layers, num_servers_per_layer=self.num_servers_per_layer,
                                    num_attack_types=self.num_attack_types, max_value=self.max_value,
                                    defense_policy=self.defense_policy, resources_dir=self.resources_dir,
-                                   manual=False, graph_layout=self.graph_layout, adjacency_matrix=self.adjacency_matrix)
+                                   manual=False, graph_layout=self.graph_layout, adjacency_matrix=self.adjacency_matrix,
+                                   num_blinks=self.num_blinks, blink_interval=self.blink_interval)
         self.gameframe.on_close = self.window_closed_by_user
         self.isopen = True
 
@@ -103,15 +109,15 @@ class Viewer():
 
         :return: None
         """
-        result = self.render_frame(return_rgb_array)
-        for i in range(constants.GAMEFRAME.NUM_BLINKS):
-            if len(self.gameframe.defense_events) > 0:
+        arr = self.render_frame(return_rgb_array)
+        for i in range(self.gameframe.num_blinks):
+            if len(self.gameframe.defense_events) > 0 or len(self.gameframe.attack_events) > 0:
                 self.gameframe.simulate_events(i)
-                result = self.render_frame()
-                time.sleep(constants.GAMEFRAME.BLINK_INTERVAL)
+                arr = self.render_frame()
+                time.sleep(self.gameframe.blink_interval)
         self.gameframe.reset_events()
 
-        return result if return_rgb_array else self.isopen
+        return arr if return_rgb_array else self.isopen
 
     def extract_rgb_array(self):
         """

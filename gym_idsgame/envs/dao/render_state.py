@@ -5,7 +5,7 @@ class RenderState():
 
     def __init__(self, attack_values = np.array([0]), defense_values = np.array([0]), defense_det = [0],
                  attacker_pos = (0,0), game_step = 0, attacker_cumulative_reward = 0, defender_cumulative_reward=0,
-                 num_games=0, attack_events = [], defense_events = [], done=False):
+                 num_games=0, attack_events = [], defense_events = [], done=False, detected = False):
         self.attack_values=attack_values
         self.defense_values = defense_values
         self.defense_det = defense_det
@@ -17,6 +17,7 @@ class RenderState():
         self.attack_events = attack_events
         self.defense_events = defense_events
         self.done = done
+        self.detected = detected
 
     def default_state(self, graph_layout, num_rows, num_cols, num_attack_types):
         attack_values = np.zeros((num_rows, num_cols, num_attack_types))
@@ -40,3 +41,4 @@ class RenderState():
         self.attack_events = []
         self.defense_events = []
         self.done = False
+        self.detected = False

@@ -12,7 +12,8 @@ class Resource(pyglet.sprite.Sprite):
     Subclasses pyglet.sprite.Sprite to be able to override draw() and update() methods
     and define state of the sprite
     """
-    def __init__(self, avatar_path, col, row, batch, foreground, background, size, scale=0.25, max_value=10):
+    def __init__(self, avatar_path, col, row, batch, foreground, background, size, scale=0.25, max_value=10,
+                 blink_interval = constants.GAMEFRAME.BLINK_INTERVAL, num_blinks = constants.GAMEFRAME.NUM_BLINKS):
         self.avatar = pyglet.resource.image(avatar_path)
         self.foreground = foreground
         self.background = background
@@ -29,6 +30,8 @@ class Resource(pyglet.sprite.Sprite):
         self.create_labels()
         self.incoming_edges = []
         self.outgoing_edges = []
+        self.blink_interval = blink_interval
+        self.num_blinks = num_blinks
 
     def create_labels(self):
         lbl_color = constants.GAMEFRAME.BLACK_ALPHA
@@ -65,11 +68,11 @@ class Resource(pyglet.sprite.Sprite):
         self.det = 2
 
     def simulate_attack(self, attack_type):
-        for i in range(0, constants.GAMEFRAME.NUM_BLINKS):
+        for i in range(0, self.num_blinks):
             if i % 2 == 0:
-                clock.schedule_once(self.attack_red, constants.GAMEFRAME.BLINK_INTERVAL * i)
+                clock.schedule_once(self.attack_red, self.blink_interval * i)
             else:
-                clock.schedule_once(self.attack_black, constants.GAMEFRAME.BLINK_INTERVAL * i)
+                clock.schedule_once(self.attack_black, self.blink_interval * i)
         if self.attack_values[attack_type] < self.max_value-1:
             self.attack_values[attack_type] += 1
         self.attack_label.text = self.get_attack_text()
@@ -139,11 +142,11 @@ class Resource(pyglet.sprite.Sprite):
         if self.defense_values[defend_type] < self.max_value-1:
             self.defense_values[defend_type] += 1
         self.defense_label.text = self.get_defense_text()
-        for i in range(0, constants.GAMEFRAME.NUM_BLINKS):
+        for i in range(0, self.num_blinks):
             if i % 2 == 0:
-                clock.schedule_once(self.defense_green, constants.GAMEFRAME.BLINK_INTERVAL * i)
+                clock.schedule_once(self.defense_green, self.blink_interval * i)
             else:
-                clock.schedule_once(self.defense_black, constants.GAMEFRAME.BLINK_INTERVAL * i)
+                clock.schedule_once(self.defense_black, self.blink_interval * i)
 
     def defense_green(self, dt):
         color = constants.GAMEFRAME.GREEN_ALPHA
