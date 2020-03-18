@@ -18,8 +18,8 @@ except ImportError as e:
     'xvfb-run -s \"-screen 0 1400x900x24\" python <your_script.py>'
     ''')
 
-from gym_idsgame.envs.rendering.game_frame import GameFrame
-from gym_idsgame.envs.rendering import constants
+from gym_idsgame.envs.rendering.frames.game_frame import GameFrame
+from gym_idsgame.envs.rendering.constants import constants
 import numpy as np
 import time
 

@@ -1,5 +1,5 @@
 import numpy as np
-from gym_idsgame.envs.rendering import constants
+from gym_idsgame.envs.rendering.constants import constants
 
 class RenderState():
 

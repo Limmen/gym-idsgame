@@ -1,12 +1,11 @@
-from gym_idsgame.envs.rendering.resource import Resource
-from gym_idsgame.envs.rendering.data import Data
-from gym_idsgame.envs.rendering.hacker import Hacker
-from gym_idsgame.envs.rendering.render_util import batch_label, batch_rect_fill, batch_rect_border, batch_circle, create_circle
-from gym_idsgame.envs.rendering import constants
+from gym_idsgame.envs.rendering.network.resource import Resource
+from gym_idsgame.envs.rendering.network.data import Data
+from gym_idsgame.envs.rendering.util.render_util import create_circle
+from gym_idsgame.envs.rendering.constants import constants
 
-class ResourceNode:
+class Node:
     """
-    Represents an individual resource-node in the network
+    TODO
     """
 
     def __init__(self, size):

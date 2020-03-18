@@ -1,7 +1,7 @@
-from gym_idsgame.envs.rendering.resource_node import ResourceNode
-from gym_idsgame.envs.rendering.render_util import batch_label, batch_rect_fill, batch_line
+from gym_idsgame.envs.rendering.network.node import Node
+from gym_idsgame.envs.rendering.util.render_util import batch_line
 
-class ResourceNetwork:
+class Network:
     """
     Class representing the resource network in the rendering
     """
@@ -16,7 +16,7 @@ class ResourceNetwork:
         self.num_rows = num_rows
         self.num_cols = num_cols
         self.cell_size = cell_size
-        self.grid = [[ResourceNode(cell_size) for j in range(self.num_cols)] for i in range(self.num_rows)]
+        self.grid = [[Node(cell_size) for j in range(self.num_cols)] for i in range(self.num_rows)]
 
     def get_cell(self, row, col):
         """

@@ -1,10 +1,10 @@
 import pyglet
-from gym_idsgame.envs.rendering.resource_network import ResourceNetwork
-from gym_idsgame.envs.rendering.hacker import Hacker
-from gym_idsgame.envs.rendering import constants
-from gym_idsgame.envs.rendering.render_util import batch_label, batch_rect_fill, batch_line
-from gym_idsgame.envs.rendering.resource import Resource
-from gym_idsgame.envs.rendering.data import Data
+from gym_idsgame.envs.rendering.agents.attacker import Attacker
+from gym_idsgame.envs.rendering.network.network import Network
+from gym_idsgame.envs.rendering.constants import constants
+from gym_idsgame.envs.rendering.util.render_util import batch_label, batch_rect_fill
+from gym_idsgame.envs.rendering.network.resource import Resource
+from gym_idsgame.envs.rendering.network.data import Data
 from gym_idsgame.envs.dao.render_state import RenderState
 from gym_idsgame.envs.dao.attack_defense_event import AttackDefenseEvent
 from typing import List
@@ -54,7 +54,7 @@ class GameFrame(pyglet.window.Window):
         self.num_rows = (self.height - constants.GAMEFRAME.PANEL_HEIGHT) // int((self.rect_size / 1.5))
         self.num_cols = self.width//self.rect_size
         self.num_cells = self.num_rows*self.num_cols
-        self.resource_network = ResourceNetwork(self.rect_size, self.num_rows, self.num_cols)
+        self.resource_network = Network(self.rect_size, self.num_rows, self.num_cols)
         self.setup_resources_path()
         self.game_step = 0
         self.num_games = 0
@@ -158,9 +158,9 @@ class GameFrame(pyglet.window.Window):
                                                           blink_interval=self.blink_interval, num_blinks=self.num_blinks
                                                           )
         # Hacker starts at the start node
-        self.hacker = Hacker(self.avatar_filename, self.num_cols // 2,
-                             self.resource_network.num_rows - 1, self.batch, self.first_foreground, self.second_foreground,
-                             self.rect_size, scale=self.agent_scale)
+        self.hacker = Attacker(self.avatar_filename, self.num_cols // 2,
+                               self.resource_network.num_rows - 1, self.batch, self.first_foreground, self.second_foreground,
+                               self.rect_size, scale=self.agent_scale)
 
         # Connect start node with server nodes
         root_edge = self.resource_network.root_edge(

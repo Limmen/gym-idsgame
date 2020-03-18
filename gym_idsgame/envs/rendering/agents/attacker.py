@@ -1,17 +1,14 @@
 import pyglet
 
 
-class Hacker(pyglet.sprite.Sprite):
+class Attacker(pyglet.sprite.Sprite):
     """
-    Represents the hacker in the ids game.
-
-    Subclasses pyglet.sprite.Sprite to be able to override draw() and update() methods
-    and define state of the sprite
+    TODO
     """
 
     def __init__(self, avatar_path, col, row, batch, first_foreground, second_foreground, size, scale=0.25):
         self.avatar = pyglet.resource.image(avatar_path)
-        super(Hacker, self).__init__(self.avatar, batch=batch, group=first_foreground)
+        super(Attacker, self).__init__(self.avatar, batch=batch, group=first_foreground)
         self.col = col
         self.row = row
         self.starting_col = col
