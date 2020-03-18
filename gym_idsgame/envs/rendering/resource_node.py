@@ -40,13 +40,13 @@ class ResourceNode:
         elif self.data is not None:
             self.data.set_state(attack_values, defense_values, det_value)
 
-    def defend(self, defense_type, manual=False):
+    def defend(self, defense_type):
         if self.resource is not None:
             self.resource.defend(defense_type)
         elif self.circle:
             return
         elif self.data is not None:
-            self.data.defend(defense_type, manual=manual)
+            self.data.defend(defense_type)
 
     def reset(self):
         if self.resource is not None:
@@ -79,8 +79,8 @@ class ResourceNode:
 
 
     def draw(self, y, x, color, batch, background, foreground, avatar, scale, server = False, data = False,
-             start= False, max_value = 10, blink_interval = constants.GAMEFRAME.BLINK_INTERVAL,
-             num_blinks = constants.GAMEFRAME.NUM_BLINKS):
+             start= False, max_value = 10, blink_interval = constants.GAMEFRAME.MANUAL_BLINK_INTERVAL,
+             num_blinks = constants.GAMEFRAME.MANUAL_NUM_BLINKS):
         if server:
             self.resource = Resource(avatar, x, y, batch, background, foreground, self.size, scale=scale,
                                      max_value=max_value, blink_interval=blink_interval, num_blinks=num_blinks)

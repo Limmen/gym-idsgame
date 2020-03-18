@@ -14,8 +14,8 @@ class IdsGameEnv(gym.Env):
     def __init__(self, num_layers = 2, num_servers_per_layer = 3, num_attack_types = 10, max_value = 10,
                  defense_policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC,
                  adjacency_matrix=None, graph_layout=None, initial_state = None,
-                 blink_interval=constants.GAMEFRAME.BLINK_INTERVAL,
-                 num_blinks=constants.GAMEFRAME.NUM_BLINKS):
+                 blink_interval=constants.GAMEFRAME.AGENT_BLINK_INTERVAL,
+                 num_blinks=constants.GAMEFRAME.AGENT_NUM_BLINKS):
         """
         TODO
         """

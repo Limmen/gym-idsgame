@@ -22,8 +22,8 @@ class GameFrame(pyglet.window.Window):
                  num_servers_per_layer = 2, num_attack_types = 10, max_value = 10,
                  defense_policy=constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC,
                  resources_dir=constants.GAMEFRAME.RESOURCES_DIR,
-                 initial_state = None, blink_interval = constants.GAMEFRAME.BLINK_INTERVAL,
-                 num_blinks = constants.GAMEFRAME.NUM_BLINKS
+                 initial_state = None, blink_interval = constants.GAMEFRAME.MANUAL_BLINK_INTERVAL,
+                 num_blinks = constants.GAMEFRAME.MANUAL_NUM_BLINKS
                  ):
         self.minimum_width = constants.GAMEFRAME.MIN_WIDTH
         self.num_layers = num_layers
@@ -36,8 +36,6 @@ class GameFrame(pyglet.window.Window):
         self.resources_dir = resources_dir
         self.blink_interval = blink_interval
         self.num_blinks = num_blinks
-        print(blink_interval)
-        print(num_blinks)
         self.rect_size = constants.GAMEFRAME.RECT_SIZE
         self.bg_color = constants.GAMEFRAME.WHITE
         self.border_color = constants.GAMEFRAME.BLACK

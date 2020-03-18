@@ -13,7 +13,7 @@ class Resource(pyglet.sprite.Sprite):
     and define state of the sprite
     """
     def __init__(self, avatar_path, col, row, batch, foreground, background, size, scale=0.25, max_value=10,
-                 blink_interval = constants.GAMEFRAME.BLINK_INTERVAL, num_blinks = constants.GAMEFRAME.NUM_BLINKS):
+                 blink_interval = constants.GAMEFRAME.MANUAL_BLINK_INTERVAL, num_blinks = constants.GAMEFRAME.MANUAL_NUM_BLINKS):
         self.avatar = pyglet.resource.image(avatar_path)
         self.foreground = foreground
         self.background = background

@@ -27,7 +27,7 @@ class Viewer():
     def __init__(self, num_layers = 1, num_servers_per_layer = 2, num_attack_types = 10, max_value = 10,
                  defense_policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC,
                  resources_dir = constants.GAMEFRAME.RESOURCES_DIR, adjacency_matrix = None, graph_layout = None,
-                 blink_interval=constants.GAMEFRAME.BLINK_INTERVAL, num_blinks=constants.GAMEFRAME.NUM_BLINKS
+                 blink_interval=constants.GAMEFRAME.MANUAL_BLINK_INTERVAL, num_blinks=constants.GAMEFRAME.MANUAL_NUM_BLINKS
                  ):
 
         self.num_layers = num_layers

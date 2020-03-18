@@ -14,7 +14,7 @@ class Data(pyglet.sprite.Sprite):
     """
     def __init__(self, avatar_path, col, row, batch, background, foreground, size, scale=0.25,
                  policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC, max_value = 10,
-                 blink_interval = constants.GAMEFRAME.BLINK_INTERVAL, num_blinks = constants.GAMEFRAME.NUM_BLINKS):
+                 blink_interval = constants.GAMEFRAME.MANUAL_BLINK_INTERVAL, num_blinks = constants.GAMEFRAME.MANUAL_NUM_BLINKS):
         self.avatar = pyglet.resource.image(avatar_path)
         self.background = background
         self.foreground = foreground
