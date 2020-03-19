@@ -76,7 +76,7 @@ class Network:
     def __root_edge(self, n1, n2):
         x1, y1, col1, row1 = n1.get_link_coords(lower=True, upper=False)
         x2, y2, col2, row2 = n2.get_link_coords(upper=True, lower=False)
-        return batch_line(x1, y1 + self.render_config.rect_size / 6, x2, y2, constants.GAMEFRAME.BLACK,
+        return batch_line(x1, y1 + self.render_config.rect_size / 6, x2, y2, constants.RENDERING.BLACK,
                           self.render_config.batch, self.render_config.background, self.render_config.line_width)
 
     def __connect_start_and_server_nodes(self, n1, n2):

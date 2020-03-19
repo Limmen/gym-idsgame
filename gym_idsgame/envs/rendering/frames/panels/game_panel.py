@@ -58,6 +58,6 @@ class GamePanel:
     def update_state_text(self, render_state: RenderState):
         self.attack_type_label.text = str(render_state.attack_type)
         self.a_reward_label.text = str(render_state.attacker_cumulative_reward)
-        self.d_reward_label = str(render_state.defender_cumulative_reward)
-        self.step_label = str(render_state.game_step)
-        self.num_games_label = str(render_state.num_games)
+        self.d_reward_label.text = str(render_state.defender_cumulative_reward)
+        self.step_label.text = str(render_state.game_step)
+        self.num_games_label.text = str(render_state.num_games)

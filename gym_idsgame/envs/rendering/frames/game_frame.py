@@ -11,7 +11,6 @@ from gym_idsgame.envs.rendering.frames.panels.game_panel import GamePanel
 from gym_idsgame.envs.dao.node_type import NodeType
 from typing import List
 import os
-import numpy as np
 
 class GameFrame(pyglet.window.Window):
     """
@@ -26,6 +25,7 @@ class GameFrame(pyglet.window.Window):
         self.resource_network = None
         self.attacker = None
         self.defender = None
+        self.render_state = None
         self.setup_resources_path()
         self.create_batch()
         self.set_state(self.render_config.game_config.initial_state)
@@ -111,22 +111,22 @@ class GameFrame(pyglet.window.Window):
                             self.resource_network.grid[defense_row][defense_col].defend(defend_type)
                             edges = []
                             if node.node_type == NodeType.DATA:
-                                edges = self.resource_network.grid.get(self.attacker.pos).outgoing_edges
+                                edges = self.resource_network.get(self.attacker.pos).outgoing_edges
                             attack_successful = node.simulate_attack(self.render_state.attack_type, edges)
                             self.render_state.game_step += 1
                             if attack_successful:
-                                self.attacker.move_to(node.x, node.y, node.col, node.row)
+                                self.render_state.attacker_pos = node.pos
                                 if node.node_type == NodeType.DATA:
-                                    self.done = True
-                                    self.render_state.attacker_cumulative_reward += constants.GAMEFRAME.POSITIVE_REWARD
-                                    self.render_state.defender_cumulative_reward -= constants.GAMEFRAME.POSITIVE_REWARD
+                                    self.render_state.done = True
+                                    self.render_state.attacker_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
+                                    self.render_state.defender_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
                             else:
                                 detected = node.simulate_detection()
                                 if detected:
-                                    self.done = True
-                                    self.attacker.detected()
-                                    self.render_state.attacker_cumulative_reward -= constants.GAMEFRAME.POSITIVE_REWARD
-                                    self.render_state.defender_cumulative_reward += constants.GAMEFRAME.POSITIVE_REWARD
+                                    self.render_state.done = True
+                                    self.render_state.detected = True
+                                    self.render_state.attacker_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
+                                    self.render_state.defender_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
 
     def on_key_press(self, symbol, modifiers):
         """
@@ -180,6 +180,7 @@ class GameFrame(pyglet.window.Window):
         """
         self.render_state = render_state.copy()
         self.game_panel.update_state_text(self.render_state)
+        self.attacker.move_to_pos(self.render_state.attacker_pos)
         if render_state.detected:
             self.attacker.detected()
         else:
@@ -232,8 +233,4 @@ class GameFrame(pyglet.window.Window):
         self.render_state.new_game(self.render_config.game_config.initial_state)
         self.set_state(self.render_state)
         self.unschedule_events()
-        #self.hacker.reset()
-        # self.resource_network.set_node_states(self.render_state)
-        # self.num_games += 1
-        # self.game_step = 0
         self.switch_to()

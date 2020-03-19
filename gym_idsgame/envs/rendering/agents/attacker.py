@@ -30,7 +30,16 @@ class Attacker(pyglet.sprite.Sprite):
         self.x = self.col * self.render_config.rect_size + self.render_config.rect_size / 2.65
         self.y = int(self.render_config.rect_size / 1.5) * self.row + self.render_config.rect_size / 4.5
 
-    def move_to(self, x, y, col, row) -> None:
+    def move_to_pos(self, pos) -> None:
+        row, col = pos
+        self.col = col
+        self.row = row
+        self.__center_avatar()
+        if not (self.row == self.starting_row and self.col == self.starting_col):
+            self.x = self.x + self.render_config.rect_size / 5
+            self.y = self.y + self.render_config.rect_size / 15
+
+    def move_to_coords(self, x, y, col, row) -> None:
         self.x = x + self.render_config.rect_size / 5
         self.y = y
         self.col = col

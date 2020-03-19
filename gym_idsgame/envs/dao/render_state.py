@@ -1,10 +1,35 @@
 import numpy as np
+from typing import Union
 from gym_idsgame.envs.dao.node_type import NodeType
-class RenderState():
 
-    def __init__(self, attack_values = np.array([0]), defense_values = np.array([0]), defense_det = [0],
-                 attacker_pos = (0,0), game_step = 0, attacker_cumulative_reward = 0, defender_cumulative_reward=0,
-                 num_games=0, attack_events = [], defense_events = [], done=False, detected = False, attack_type=0):
+class RenderState():
+    """
+    DTO representing the state of a current rendering
+    """
+
+    def __init__(self, attack_values:np.ndarray = np.array([0]), defense_values:np.ndarray = np.array([0]),
+                 defense_det:np.ndarray = np.array([0]),
+                 attacker_pos:Union[int, int] = (0,0), game_step:int = 0, attacker_cumulative_reward:int = 0,
+                 defender_cumulative_reward :int =0,
+                 num_games=0, attack_events:list = [], defense_events:list = [], done:bool=False, detected:bool = False,
+                 attack_type:int=0):
+        """
+        Constructor, initializes the DTO
+
+        :param attack_values: the attack values for resource nodes in the network
+        :param defense_values: the defense values for resource nodes in the network
+        :param defense_det: detection values for resource nodes in the network
+        :param attacker_pos: position of attacker in the network
+        :param game_step: the number of steps of the current game
+        :param attacker_cumulative_reward: the cumulative reward over all games of the attacker
+        :param defender_cumulative_reward: the cumulative reward over all games of the defender
+        :param num_games: the number of games played
+        :param attack_events: attack events that are in queue to be simulated
+        :param defense_events: defense events that are in queue to be simulated
+        :param done: True if the game is over and otherwise False
+        :param detected: True if the attacker is in a detected state, otherwise False
+        :param attack_type: the type of the last attack
+        """
         self.attack_values=attack_values
         self.defense_values = defense_values
         self.defense_det = defense_det
@@ -19,7 +44,16 @@ class RenderState():
         self.detected = detected
         self.attack_type = attack_type
 
-    def default_state(self, graph_layout, num_rows, num_cols, num_attack_types):
+    def default_state(self, graph_layout: np.ndarray, num_rows:int, num_cols:int, num_attack_types:int):
+        """
+        Creates a default state
+
+        :param graph_layout: the layout of the network to create a default state for
+        :param num_rows: the number of rows in the grid network
+        :param num_cols: the number of columns in the grid network
+        :param num_attack_types: the number of attack types
+        :return:
+        """
         attack_values = np.zeros((num_rows, num_cols, num_attack_types))
         defense_values = np.zeros((num_rows, num_cols, num_attack_types))
         det_values = np.zeros((num_rows, num_cols))

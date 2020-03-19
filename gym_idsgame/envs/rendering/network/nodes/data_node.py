@@ -35,7 +35,7 @@ class DataNode(ResourceNode):
                 clock.schedule_once(self.attack_red, self.render_config.blink_interval * i, edges_list)
             else:
                 clock.schedule_once(self.attack_black, self.render_config.blink_interval * i, edges_list)
-        if self.attack_values[attack_type] < self.render_config.max_value-1:
+        if self.attack_values[attack_type] < self.render_config.game_config.max_value-1:
             self.attack_values[attack_type] += 1
         self.attack_label.text = self.get_attack_text()
         if self.attack_values[attack_type] > self.defense_values[attack_type]:

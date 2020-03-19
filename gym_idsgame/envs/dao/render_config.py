@@ -1,14 +1,25 @@
+import pyglet
 from gym_idsgame.envs.constants import constants
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.envs.policy_baselines.policy import Policy
-import pyglet
 
 class RenderConfig:
+    """
+    DTO with configuration parameters for the UI rendering
+    """
+    def __init__(self, game_config:GameConfig, defender_policy: Policy,
+                 resources_dir:str=constants.RENDERING.RESOURCES_DIR,
+                 blink_interval:float = constants.RENDERING.MANUAL_BLINK_INTERVAL,
+                 num_blinks:int = constants.RENDERING.MANUAL_NUM_BLINKS):
+        """
+        Constructor, initializes the DTO
 
-    def __init__(self, game_config:GameConfig, defender_policy: Policy, resources_dir=constants.RENDERING.RESOURCES_DIR,
-                 blink_interval = constants.RENDERING.MANUAL_BLINK_INTERVAL,
-                 num_blinks = constants.RENDERING.MANUAL_NUM_BLINKS,
-                 ):
+        :param game_config: the game configuration (e.g. number of rows, columns, adjacency matrix and so on)
+        :param defender_policy: policy of the defender
+        :param resources_dir: directory with resources for rendering
+        :param blink_interval: the interval for blinking when simulating attack/defense operations
+        :param num_blinks: the number of blinks when simulating attack/defense operations
+        """
         self.game_config = game_config
         self.defender_policy = defender_policy
         self.rect_size = constants.RENDERING.RECT_SIZE

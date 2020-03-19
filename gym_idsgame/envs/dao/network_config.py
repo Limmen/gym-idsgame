@@ -1,15 +1,30 @@
 import numpy as np
+from typing import Union
 from gym_idsgame.envs.dao.node_type import NodeType
 
 class NetworkConfig:
-
+    """
+    DTO with configuration of the network for the game, i.e. the servers and their connectivity
+    """
     def __init__(self, num_rows:int, num_cols:int):
+        """
+        Constructor
+
+        :param num_rows: the number of rows in the network layout (think like a grid)
+        :param num_cols: the number of columns in the network layout
+        """
         self.num_rows = num_rows
         self.num_cols = num_cols
         self.graph_layout = self.__default_graph_layout()
         self.adjacency_matrix = self.__default_adjacency_matrix()
 
     def __default_graph_layout(self) -> np.ndarray:
+        """
+        Creates a default graph layout with a specific set of rows
+
+        :return: Numpy array with a grid and in each position in the grid there is a node-type:
+                START, EMPTY, SERVER, or DATA
+        """
         graph_layout = np.zeros((self.num_rows, self.num_cols))
         for i in range(self.num_rows):
             for j in range(self.num_cols):
@@ -28,6 +43,11 @@ class NetworkConfig:
         return graph_layout
 
     def __default_adjacency_matrix(self) -> np.ndarray:
+        """
+        Creates a default adjacency matrix for a given graph layout
+
+        :return: a numpy matrix representing the adjacency matrix with dimension (num_rows*num_cols, num_rows*num_cols)
+        """
         adjacency_matrix = np.zeros((self.num_rows * self.num_cols,
                                      self.num_cols * self.num_rows))
         for i in range(self.num_rows * self.num_cols):
@@ -50,33 +70,54 @@ class NetworkConfig:
         return adjacency_matrix
 
 
-    def get_coords(self, adjacency_matrix_id):
-        row = adjacency_matrix_id // self.num_cols
-        col = adjacency_matrix_id % self.num_cols
+    def get_coords(self, node_id:int) -> Union[int, int]:
+        """
+        Gets the grid-coordinates of a node id
+
+        :param node_id: the id of the node in the adjacency matrix
+        :return: (row,col)
+        """
+        row = node_id // self.num_cols
+        col = node_id % self.num_cols
         return row, col
 
     @property
-    def start_row(self):
+    def start_row(self) -> int:
+        """
+        :return: the starting row of the attacker
+        """
         start_row, _ = self.start_pos
         return start_row
 
     @property
-    def data_row(self):
+    def data_row(self) -> int:
+        """
+        :return: the row of the data node
+        """
         data_row, _ = self.data_pos
         return data_row
 
     @property
-    def start_col(self):
+    def start_col(self) -> int:
+        """
+        :return: the starting col of the attacker
+        """
         _, start_col = self.start_pos
         return start_col
 
     @property
-    def data_col(self):
+    def data_col(self) -> int:
+        """
+        :return: the column of the data node
+        """
         _, data_col = self.data_pos
         return data_col
 
     @property
-    def start_pos(self):
+    def start_pos(self) -> int:
+        """
+        :return: the starting position of the attacker
+        """
         for i in range(self.num_rows):
             for j in range(self.num_cols):
                 if self.graph_layout[i][j] == NodeType.START.value:
@@ -84,7 +125,10 @@ class NetworkConfig:
         raise AssertionError("Could not find start node in graph layout")
 
     @property
-    def data_pos(self):
+    def data_pos(self) -> int:
+        """
+        :return: the position of the data node in the graph
+        """
         for i in range(self.num_rows):
             for j in range(self.num_cols):
                 if self.graph_layout[i][j] == NodeType.DATA.value:
