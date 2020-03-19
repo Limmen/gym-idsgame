@@ -1,17 +1,32 @@
+from typing import Union
+import numpy as np
 from gym_idsgame.envs.policy_baselines.policy import Policy
 from gym_idsgame.envs.dao.render_state import RenderState
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.envs.dao.node_type import NodeType
-from typing import Union
-import numpy as np
 
 class RandomDefense(Policy):
+    """
+    Class implementing a random defense policy: a policy where the defender selects a random node and random
+    defense type in each iteration
+    """
 
     def __init__(self, game_config: GameConfig):
+        """
+        Constructor, initializes the policy
+
+        :param game_config: the game configuration
+        """
         super(RandomDefense, self).__init__(game_config)
 
 
     def action(self, render_state: RenderState) -> Union[int, int, int]:
+        """
+        Samples an action from the policy
+
+        :param render_state: the current state
+        :return: (row, col, defense_type)
+        """
         defend_type = np.random.randint(len(render_state.defense_values))
         defend_row = None
         defend_col = None

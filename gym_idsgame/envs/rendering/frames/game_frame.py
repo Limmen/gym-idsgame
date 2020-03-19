@@ -15,13 +15,20 @@ import os
 class GameFrame(pyglet.window.Window):
     """
     A class representing the OpenGL/Pyglet Game Frame
+
     By subclassing pyglet.window.Window, event handlers can be defined simply by overriding functions, e.g.
     event handler for on_draw is defined by overriding the on_draw function.
     """
 
     def __init__(self, render_config: RenderConfig):
+        """
+        Constructor, initializes the frame
+
+        :param render_config: the render config, e.g the font size, avatars, line width, colors, etc.
+        """
         self.render_config = render_config
-        super(GameFrame, self).__init__(height=render_config.height, width=render_config.width, caption=render_config.caption) # call constructor of parent class
+        super(GameFrame, self).__init__(height=render_config.height, width=render_config.width,
+                                        caption=render_config.caption) # call constructor of parent class
         self.resource_network = None
         self.attacker = None
         self.defender = None
@@ -31,7 +38,7 @@ class GameFrame(pyglet.window.Window):
         self.set_state(self.render_config.game_config.initial_state)
         self.switch_to()
 
-    def create_batch(self):
+    def create_batch(self) -> None:
         """
         Creates a batch of elements to render. By grouping elements in a batch we can utilize OpenGL batch rendering
         and reduce the cpu <–> gpu data transfers and the number of draw-calls.
@@ -59,7 +66,7 @@ class GameFrame(pyglet.window.Window):
         # Game Panel
         self.game_panel = GamePanel(self.render_config)
 
-    def setup_resources_path(self):
+    def setup_resources_path(self) -> None:
         """
         Setup path to resources (e.g. images)
 
@@ -90,7 +97,7 @@ class GameFrame(pyglet.window.Window):
         self.switch_to()
 
 
-    def on_mouse_press(self, x:int, y:int, button, modifiers):
+    def on_mouse_press(self, x:int, y:int, button, modifiers) -> None:
         # Dont do anything if agent is playing
         if not self.render_config.game_config.manual:
             return
@@ -100,19 +107,28 @@ class GameFrame(pyglet.window.Window):
 
         # Unschedule events from previous press, if any
         self.unschedule_events()
-        # Find the node in the network that was pressed
+        # 1. Find the node in the network that was pressed
         for i in range(self.render_config.game_config.num_rows-1):
             for j in range(self.render_config.game_config.num_cols):
                 node = self.resource_network.grid[i][j]
                 if node.node_type != NodeType.EMPTY:
                     if node.x < x < (node.x + node.width) and node.y < y < (node.y + node.height):
+
+                        # 2. Check that the selected node can be attacked (there is a link to it from the current
+                        # position of the attacker)
                         if self.resource_network.is_attack_legal(self.attacker.pos, node.pos):
+
+                            # 3. Simulate defense
                             defense_row, defense_col, defend_type = self.defender.policy.action(self.render_state)
                             self.resource_network.grid[defense_row][defense_col].defend(defend_type)
                             edges = []
                             if node.node_type == NodeType.DATA:
                                 edges = self.resource_network.get(self.attacker.pos).outgoing_edges
+
+                            # 4. Simulate attack
                             attack_successful = node.simulate_attack(self.render_state.attack_type, edges)
+
+                            # 5. Update state
                             self.render_state.game_step += 1
                             if attack_successful:
                                 self.render_state.attacker_pos = node.pos
@@ -128,7 +144,7 @@ class GameFrame(pyglet.window.Window):
                                     self.render_state.attacker_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
                                     self.render_state.defender_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
 
-    def on_key_press(self, symbol, modifiers):
+    def on_key_press(self, symbol, modifiers) -> None:
         """
         Event handler for on_key_press event.
         The user can move the agent with key presses.
@@ -162,7 +178,7 @@ class GameFrame(pyglet.window.Window):
                 self.reset()
 
 
-    def update(self, dt):
+    def update(self, dt) -> None:
         """
         Event handler for the update-event (timer-based typically), used to update the state of the grid.
 
@@ -171,11 +187,11 @@ class GameFrame(pyglet.window.Window):
         """
         self.set_state(self.render_state)
 
-    def set_state(self, render_state:RenderState):
+    def set_state(self, render_state:RenderState) -> None:
         """
-        TODO
+        Updates the current state
 
-        :param state: the state
+        :param state: the new state
         :return: None
         """
         self.render_state = render_state.copy()

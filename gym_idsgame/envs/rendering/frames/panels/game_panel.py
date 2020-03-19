@@ -4,12 +4,25 @@ from gym_idsgame.envs.dao.render_config import RenderConfig
 from gym_idsgame.envs.dao.render_state import RenderState
 
 class GamePanel:
+    """
+    DTO for the top-panel in the game that visualizes the current game-step, cumulative rewards, etc.
+    """
 
     def __init__(self, render_config: RenderConfig):
+        """
+        Constructor, initializes the panel
+
+        :param render_config: the rendering config, e.g line width, font size etc.
+        """
         self.render_config = render_config
         self.set_labels()
 
-    def set_labels(self):
+    def set_labels(self) -> None:
+        """
+        Creates the labels of the panel (should only be called once)
+
+        :return: Noneg
+        """
         batch_label("Attack Reward: ", constants.RENDERING.PANEL_LEFT_MARGIN,
                     self.render_config.height - constants.RENDERING.PANEL_TOP_MARGIN,
                     constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA, self.render_config.batch,
@@ -55,7 +68,13 @@ class GamePanel:
                                            constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
                                            self.render_config.batch, self.render_config.second_foreground)
 
-    def update_state_text(self, render_state: RenderState):
+    def update_state_text(self, render_state: RenderState) -> None:
+        """
+        Updates the text of the labels on the panel
+
+        :param render_state: the state to reflect in the labels
+        :return: Noneg
+        """
         self.attack_type_label.text = str(render_state.attack_type)
         self.a_reward_label.text = str(render_state.attacker_cumulative_reward)
         self.d_reward_label.text = str(render_state.defender_cumulative_reward)

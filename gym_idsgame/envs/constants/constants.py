@@ -1,6 +1,6 @@
 class RENDERING:
     """
-    IDSGame constants
+    Rendering constants
     """
     RECT_SIZE = 200
     BLACK = (0, 0, 0)
@@ -38,5 +38,8 @@ class RENDERING:
     MIN_WIDTH = 470
 
 class GAME_CONFIG:
+    """
+    Game constants
+    """
     POSITIVE_REWARD = +100
     NEGATIVE_REWARD = -100

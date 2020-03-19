@@ -44,7 +44,7 @@ class RenderState():
         self.detected = detected
         self.attack_type = attack_type
 
-    def default_state(self, graph_layout: np.ndarray, num_rows:int, num_cols:int, num_attack_types:int):
+    def default_state(self, graph_layout: np.ndarray, num_rows:int, num_cols:int, num_attack_types:int) -> None:
         """
         Creates a default state
 
@@ -52,7 +52,7 @@ class RenderState():
         :param num_rows: the number of rows in the grid network
         :param num_cols: the number of columns in the grid network
         :param num_attack_types: the number of attack types
-        :return:
+        :return: None
         """
         attack_values = np.zeros((num_rows, num_cols, num_attack_types))
         defense_values = np.zeros((num_rows, num_cols, num_attack_types))
@@ -78,7 +78,13 @@ class RenderState():
         self.detected = False
         self.attack_type = 0
 
-    def new_game(self, init_state):
+    def new_game(self, init_state: "RenderState") -> None:
+        """
+        Updates the current state for a new game
+
+        :param init_state: the initial state of the first game
+        :return: None
+        """
         self.game_step = 0
         self.done = False
         self.detected = False
@@ -91,10 +97,12 @@ class RenderState():
         self.defense_values = np.copy(init_state.defense_values)
         self.defense_det = np.copy(init_state.defense_det)
 
+    def copy(self) -> "RenderState":
+        """
+        Creates a copy of the state
 
-
-
-    def copy(self):
+        :return: a copy of the current state
+        """
         new_state = RenderState()
         new_state.attack_values = np.copy(self.attack_values)
         new_state.defense_values = np.copy(self.defense_values)

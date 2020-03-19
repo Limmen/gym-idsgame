@@ -1,12 +1,23 @@
 import pyglet
+from typing import Union
 from gym_idsgame.envs.dao.render_config import RenderConfig
 
 class Attacker(pyglet.sprite.Sprite):
     """
-    TODO
+    Class representing the attacker the game
+
+    Subclasses pyglet.sprite.Sprite to be able to override draw() and update() methods
+    and define state of the sprite
     """
 
-    def __init__(self, render_config: RenderConfig, col, row):
+    def __init__(self, render_config: RenderConfig, col:int, row:int):
+        """
+        Constructor, initializes the attacker
+
+        :param render_config: the render configuration (e.g avatar, scale, etc)
+        :param col: the column in the grid where the attacker is currently
+        :param row: the row in the grid where the attacker is currently
+        """
         self.render_config = render_config
         self.avatar = pyglet.resource.image(render_config.attacker_filename)
         super(Attacker, self).__init__(self.avatar, batch=render_config.batch, group=render_config.first_foreground)
@@ -25,40 +36,75 @@ class Attacker(pyglet.sprite.Sprite):
     def __center_avatar(self) -> None:
         """
         Utiltiy function for centering the avatar inside a cell
-        :return: The centered coordinates in the grid
+
+        :return: None
         """
         self.x = self.col * self.render_config.rect_size + self.render_config.rect_size / 2.65
         self.y = int(self.render_config.rect_size / 1.5) * self.row + self.render_config.rect_size / 4.5
 
-    def move_to_pos(self, pos) -> None:
+    def move_to_pos(self, pos: Union[int, int]) -> None:
+        """
+        Moves the attacker to a specific position in the grid
+
+        :param pos: the poition to move the attacker to
+        :return: None
+        """
         row, col = pos
         self.col = col
         self.row = row
         self.__center_avatar()
+        # If moving to a server node, move a little bit to the right so it does not cover the text
         if not (self.row == self.starting_row and self.col == self.starting_col):
             self.x = self.x + self.render_config.rect_size / 5
             self.y = self.y + self.render_config.rect_size / 15
 
-    def move_to_coords(self, x, y, col, row) -> None:
+    def move_to_coords(self, x:float, y:float, col:int, row:int) -> None:
+        """
+        Moves the attacker to a specific set of coordinates
+
+        :param x: the x coordinate
+        :param y: the y coordinate
+        :param col: the column in the grid
+        :param row: the row in the grid
+        :return: None
+        """
         self.x = x + self.render_config.rect_size / 5
         self.y = y
         self.col = col
         self.row = row
 
     def reset(self) -> None:
+        """
+        Resets the attacker, moves the attacker back to the start-node and removes the cage
+
+        :return: None
+        """
         self.col = self.starting_col
         self.row = self.starting_row
         self.cage.visible = False
         self.__center_avatar()
 
     def detected(self) -> None:
+        """
+        Called when the attacker was detected, shows a cage over the attacker on the screen
+
+        :return: None
+        """
         self.cage.x = self.x
         self.cage.y = self.y
         self.cage.visible = True
 
     def undetect(self) -> None:
+        """
+        Removes the cage from the attacker
+
+        :return: None
+        """
         self.cage.visible = False
 
     @property
     def pos(self):
+        """
+        :return: the grid position of the attacker
+        """
         return (self.row, self.col)
