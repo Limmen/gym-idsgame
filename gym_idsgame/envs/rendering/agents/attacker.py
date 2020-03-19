@@ -1,31 +1,29 @@
 import pyglet
+from gym_idsgame.envs.rendering.agents.agent import Agent
+from gym_idsgame.envs.dao.render_config import RenderConfig
 
-
-class Attacker(pyglet.sprite.Sprite):
+class Attacker(pyglet.sprite.Sprite, Agent):
     """
     TODO
     """
 
-    def __init__(self, avatar_path, col, row, batch, first_foreground, second_foreground, size, scale=0.25):
-        self.avatar = pyglet.resource.image(avatar_path)
-        super(Attacker, self).__init__(self.avatar, batch=batch, group=first_foreground)
+    def __init__(self, render_config: RenderConfig, col, row):
+        self.render_config = render_config
+        self.avatar = pyglet.resource.image(render_config.attacker_filename)
+        super(Attacker, self).__init__(self.avatar, batch=render_config.batch, group=render_config.first_foreground)
         self.col = col
         self.row = row
         self.starting_col = col
         self.starting_row = row
-        self.size = size
-        self.scale = scale
-        self.batch = batch
-        self.first_foreground = first_foreground
-        self.second_foreground = second_foreground
-        self.cumulative_reward = 0
-        self.cage_avatar = pyglet.resource.image("cage.png")
-        self.cage = pyglet.sprite.Sprite(self.cage_avatar, x=self.x, y=self.y, batch=batch, group=second_foreground)
-        self.cage.scale = 0.05
+        self.scale = render_config.attacker_scale
+        self.cage_avatar = pyglet.resource.image(self.render_config.cage_scale)
+        self.cage = pyglet.sprite.Sprite(self.cage_avatar, x=self.x, y=self.y, batch=render_config.batch,
+                                         group=render_config.second_foreground)
+        self.cage.scale = self.render_config.cage_scale
         self.cage.visible = False
         self.reset()
 
-    def __center_avatar(self):
+    def __center_avatar(self) -> None:
         """
         Utiltiy function for centering the avatar inside a cell
         :return: The centered coordinates in the grid
@@ -33,25 +31,19 @@ class Attacker(pyglet.sprite.Sprite):
         self.x = self.col * self.size + self.size / 2.65
         self.y = int(self.size / 1.5) * self.row + self.size / 4.5
 
-    def move_to(self, x, y, col, row):
+    def move_to(self, x, y, col, row) -> None:
         self.x = x + self.size / 5
         self.y = y
         self.col = col
         self.row = row
 
-    def add_reward(self, reward):
-        self.cumulative_reward += reward
-
-    def set_reward(self, reward):
-        self.cumulative_reward = reward
-
-    def reset(self):
+    def reset(self) -> None:
         self.col = self.starting_col
         self.row = self.starting_row
         self.cage.visible = False
         self.__center_avatar()
 
-    def detected(self):
+    def detected(self) -> None:
         self.cage.x = self.x
         self.cage.y = self.y
         self.cage.visible = True

@@ -1,20 +1,9 @@
-#from gym_idsgame.envs.rendering.network.server import Server
-#from gym_idsgame.envs.rendering.network.data import Data
-from gym_idsgame.envs.rendering.util.render_util import create_circle
-from gym_idsgame.envs.rendering.constants import constants
 from abc import ABC, abstractmethod
 
 class Node(ABC):
     """
     TODO
     """
-    @property
-    def size(self):
-        return self.size
-
-
-    def __init__(self, size):
-        self.size = size
 
     @abstractmethod
     def manual_blink_defense(self, i):
@@ -91,11 +80,11 @@ class Node(ABC):
         #     self.data.outgoing_edges.append(edges)
         #     return
 
-    @abstractmethod
-    def draw(self, y, x, color, batch, background, foreground, avatar, scale, server = False, data = False,
-             start= False, max_value = 10, blink_interval = constants.GAMEFRAME.MANUAL_BLINK_INTERVAL,
-             num_blinks = constants.GAMEFRAME.MANUAL_NUM_BLINKS):
-        pass
+    # @abstractmethod
+    # def draw(self, y, x, color, batch, background, foreground, avatar, scale, server = False, data = False,
+    #          start= False, max_value = 10, blink_interval = constants.GAMEFRAME.MANUAL_BLINK_INTERVAL,
+    #          num_blinks = constants.GAMEFRAME.MANUAL_NUM_BLINKS):
+    #     pass
         # if server:
         #     self.resource = Server(avatar, x, y, batch, background, foreground, self.size, scale=scale,
         #                            max_value=max_value, blink_interval=blink_interval, num_blinks=num_blinks)

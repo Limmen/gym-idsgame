@@ -1,13 +1,9 @@
 import pyglet
-from gym_idsgame.envs.rendering.agents.attacker import Attacker
 from gym_idsgame.envs.rendering.network.network import Network
-from gym_idsgame.envs.rendering.constants import constants
-from gym_idsgame.envs.rendering.util.render_util import batch_label, batch_rect_fill
-#from gym_idsgame.envs.rendering.network.server import Server
-#from gym_idsgame.envs.rendering.network.data import Data
+from gym_idsgame.envs.constants import constants
+from gym_idsgame.envs.rendering.util.render_util import batch_rect_fill
 from gym_idsgame.envs.dao.render_state import RenderState
 from gym_idsgame.envs.dao.attack_defense_event import AttackDefenseEvent
-from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.envs.dao.render_config import RenderConfig
 from gym_idsgame.envs.dao.game_state import GameState
 from typing import List
@@ -24,11 +20,7 @@ class GameFrame(pyglet.window.Window):
     def __init__(self, render_config: RenderConfig):
         self.render_config = render_config
         super(GameFrame, self).__init__(height=render_config.height, width=render_config.width, caption=render_config.caption) # call constructor of parent class
-        #self.num_rows = (self.height - constants.GAMEFRAME.PANEL_HEIGHT) // int((self.rect_size / 1.5))
-        #self.num_cols = self.width//self.rect_size
-        #self.num_cells = self.num_rows*self.num_cols
         self.setup_resources_path()
-        self.resource_network = Network(self.render_config)
         self.game_state = GameState()
         self.create_batch()
         self.set_state(self.render_config.game_config.initial_state)
@@ -45,7 +37,9 @@ class GameFrame(pyglet.window.Window):
         batch_rect_fill(0, 0, self.render_config.width, self.render_config.height, self.render_config.bg_color,
                         self.render_config.batch, self.render_config.background)
 
-        # # Resource Network
+        # Resource Network
+        self.resource_network = Network(self.render_config)
+
         # for i in range(self.resource_network.num_rows):
         #     for j in range(self.resource_network.num_cols):
         #         # Data node

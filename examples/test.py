@@ -2,12 +2,6 @@
 Runner for the IDS Game GUI Manual Game
 """
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
-from gym_idsgame.envs.rendering.viewer import Viewer
-import time
-from gym_idsgame.envs.rendering import constants
-import numpy as np
-
-
 
 if __name__ == '__main__':
     env = IdsGameEnv(num_layers = 2, num_servers_per_layer = 3, num_attack_types = 10, max_value = 10,

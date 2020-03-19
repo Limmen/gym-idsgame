@@ -1,6 +1,6 @@
 import gym
 import numpy as np
-from gym_idsgame.envs.rendering.constants import constants
+from gym_idsgame.envs.constants import constants
 import os
 import math
 from gym_idsgame.envs.dao.render_state import RenderState
