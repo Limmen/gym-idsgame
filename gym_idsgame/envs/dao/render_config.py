@@ -1,12 +1,16 @@
 from gym_idsgame.envs.constants import constants
 from gym_idsgame.envs.dao.game_config import GameConfig
+from gym_idsgame.envs.policy_baselines.policy import Policy
 import pyglet
+
 class RenderConfig:
 
-    def __init__(self, game_config:GameConfig, resources_dir=constants.RENDERING.RESOURCES_DIR,
+    def __init__(self, game_config:GameConfig, defender_policy: Policy, resources_dir=constants.RENDERING.RESOURCES_DIR,
                  blink_interval = constants.RENDERING.MANUAL_BLINK_INTERVAL,
-                 num_blinks = constants.RENDERING.MANUAL_NUM_BLINKS):
+                 num_blinks = constants.RENDERING.MANUAL_NUM_BLINKS,
+                 ):
         self.game_config = game_config
+        self.defender_policy = defender_policy
         self.rect_size = constants.RENDERING.RECT_SIZE
         self.bg_color = constants.RENDERING.WHITE
         self.border_color = constants.RENDERING.BLACK

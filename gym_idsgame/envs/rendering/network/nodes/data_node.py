@@ -9,13 +9,14 @@ class DataNode(ResourceNode):
     def __init__(self, render_config: RenderConfig, row: int, col: int):
         avatar = pyglet.resource.image(render_config.data_filename)
         super(DataNode, self).__init__(avatar, render_config, render_config.background)
-        self.node_type = NodeType.DATA
         self.col = col
         self.row = row
         self.scale = render_config.data_scale
-        self.center_avatar()
-        self.initialize_state()
-        self.init_labels()
+        self.reset()
+
+    @property
+    def node_type(self):
+        return NodeType.DATA
 
     def init_labels(self):
         attack_label_x = self.col * self.render_config.rect_size + self.render_config.rect_size / 2
@@ -29,12 +30,12 @@ class DataNode(ResourceNode):
                            det_label_x=det_label_x, det_label_y=det_label_y)
 
     def simulate_attack(self, attack_type, edges_list=None):
-        for i in range(0, self.num_blinks):
+        for i in range(0, self.render_config.num_blinks):
             if i % 2 == 0:
                 clock.schedule_once(self.attack_red, self.render_config.blink_interval * i, edges_list)
             else:
                 clock.schedule_once(self.attack_black, self.render_config.blink_interval * i, edges_list)
-        if self.attack_values[attack_type] < self.max_value-1:
+        if self.attack_values[attack_type] < self.render_config.max_value-1:
             self.attack_values[attack_type] += 1
         self.attack_label.text = self.get_attack_text()
         if self.attack_values[attack_type] > self.defense_values[attack_type]:
@@ -70,33 +71,8 @@ class DataNode(ResourceNode):
         self.x = self.col*self.render_config.rect_size + self.render_config.rect_size/2.5
         self.y = int((self.render_config.rect_size/1.5))*self.row + self.render_config.rect_size/3.5
 
-    def manual_blink_defense(self, i):
-        pass
-
-    def manual_blink_attack(self, i, edges=None):
-        pass
-
-    def set_state(self, attack_values, defense_values, det_value):
-        pass
-
-    def defend(self, defense_type):
-        pass
-
-    def reset(self):
-        pass
-
-    def add_in_edge(self, edges):
-        pass
-
-    def add_out_edge(self, edges):
-        pass
-
     def get_link_coords(self, upper=True, lower=False):
-        pass
-
-    def get_coords(self):
-        pass
-
-    def get_node(self):
-        pass
+        x = self.col * self.render_config.rect_size + self.render_config.rect_size / 2
+        y = (self.row + 1) * (self.render_config.rect_size / 1.5) - self.render_config.rect_size / 15
+        return x, y, self.col, self.row
 

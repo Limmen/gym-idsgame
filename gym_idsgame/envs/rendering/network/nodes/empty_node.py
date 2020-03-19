@@ -6,10 +6,13 @@ class EmptyNode(Node):
 
     def __init__(self, render_config: RenderConfig, row: int, col: int):
         super(EmptyNode, self).__init__()
-        self.node_type = NodeType.EMPTY
         self.render_config = render_config
         self.row = row
         self.col = col
+
+    @property
+    def node_type(self):
+        return NodeType.EMPTY
 
     def manual_blink_defense(self, i):
         pass
@@ -26,10 +29,10 @@ class EmptyNode(Node):
     def reset(self):
         pass
 
-    def add_in_edge(self, edges):
+    def add_in_edges(self, edges):
         pass
 
-    def add_out_edge(self, edges):
+    def add_out_edges(self, edges):
         pass
 
     def get_link_coords(self, upper=True, lower=False):
@@ -39,4 +42,7 @@ class EmptyNode(Node):
         pass
 
     def get_node(self):
+        pass
+
+    def unschedule(self):
         pass

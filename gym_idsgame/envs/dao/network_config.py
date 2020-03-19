@@ -36,19 +36,24 @@ class NetworkConfig:
             for j in range(self.num_rows * self.num_cols):
                 row_2 = j // self.num_cols
                 col_2 = j % self.num_cols
-                if row_1 == 0:
-                    if row_2 == 1 and col_1 == self.num_cols // 2:
+                if row_1 == self.data_row:
+                    if row_2 == self.data_row+1 and col_1 == self.data_col:
                         adjacency_matrix[i][j] = 1
                         adjacency_matrix[j][i] = 1
-                elif row_1 == self.num_rows - 1:
-                    if (row_2 == self.num_rows - 2
-                            and col_1 == self.num_cols // 2):
+                elif row_1 == self.start_row:
+                    if row_2 == self.start_row-1 and col_1 == self.start_col:
                         adjacency_matrix[i][j] = 1
                         adjacency_matrix[j][i] = 1
-                elif (row_2 == row_1 + 1 and col_1 == col_2):
+                elif row_2 == (row_1 + 1) and col_1 == col_2 and row_1 != self.start_row and row_2 != self.start_row:
                     adjacency_matrix[i][j] = 1
                     adjacency_matrix[j][i] = 1
         return adjacency_matrix
+
+
+    def get_coords(self, adjacency_matrix_id):
+        row = adjacency_matrix_id // self.num_cols
+        col = adjacency_matrix_id % self.num_cols
+        return row, col
 
     @property
     def start_row(self):
@@ -59,6 +64,16 @@ class NetworkConfig:
     def data_row(self):
         data_row, _ = self.data_pos
         return data_row
+
+    @property
+    def start_col(self):
+        _, start_col = self.start_pos
+        return start_col
+
+    @property
+    def data_col(self):
+        _, data_col = self.data_pos
+        return data_col
 
     @property
     def start_pos(self):

@@ -15,6 +15,9 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
     def __init__(self, avatar, render_config: RenderConfig, group):
         self.render_config = render_config
         super(ResourceNode, self).__init__(avatar, batch=render_config.batch, group=group)
+        self.outgoing_edges = []
+        self.incoming_edges = []
+        self.initialize_state()
 
     @abstractmethod
     def center_avatar(self):
@@ -36,19 +39,15 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
     def attack_black(self, dt, edges_list=None):
         pass
 
-    def reset(self):
-        self.initialize_state()
-        self.set_labels()
-
     def defend(self, defend_type):
-        if self.defense_values[defend_type] < self.max_value - 1:
+        if self.defense_values[defend_type] < self.render_config.game_config.max_value - 1:
             self.defense_values[defend_type] += 1
         self.defense_label.text = self.get_defense_text()
-        for i in range(0, self.num_blinks):
+        for i in range(0, self.render_config.num_blinks):
             if i % 2 == 0:
-                clock.schedule_once(self.defense_green, self.blink_interval * i)
+                clock.schedule_once(self.defense_green, self.render_config.blink_interval * i)
             else:
-                clock.schedule_once(self.defense_black, self.blink_interval * i)
+                clock.schedule_once(self.defense_black, self.render_config.blink_interval * i)
 
     def simulate_detection(self):
         if np.random.rand() < self.det / 10:
@@ -123,3 +122,14 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
                                      constants.RENDERING.NODE_STATE_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
                                      self.render_config.batch, self.render_config.background, multiline=False,
                                      width=self.render_config.rect_size)
+
+    def add_out_edges(self, edges):
+        self.outgoing_edges.append(edges)
+
+    def add_in_edges(self, edges):
+        self.incoming_edges.append(edges)
+
+    def reset(self):
+        self.center_avatar()
+        self.initialize_state()
+        self.init_labels()

@@ -1,8 +1,7 @@
 import pyglet
-from gym_idsgame.envs.rendering.agents.agent import Agent
 from gym_idsgame.envs.dao.render_config import RenderConfig
 
-class Attacker(pyglet.sprite.Sprite, Agent):
+class Attacker(pyglet.sprite.Sprite):
     """
     TODO
     """
@@ -28,11 +27,11 @@ class Attacker(pyglet.sprite.Sprite, Agent):
         Utiltiy function for centering the avatar inside a cell
         :return: The centered coordinates in the grid
         """
-        self.x = self.col * self.size + self.size / 2.65
-        self.y = int(self.size / 1.5) * self.row + self.size / 4.5
+        self.x = self.col * self.render_config.rect_size + self.render_config.rect_size / 2.65
+        self.y = int(self.render_config.rect_size / 1.5) * self.row + self.render_config.rect_size / 4.5
 
     def move_to(self, x, y, col, row) -> None:
-        self.x = x + self.size / 5
+        self.x = x + self.render_config.rect_size / 5
         self.y = y
         self.col = col
         self.row = row
@@ -47,3 +46,10 @@ class Attacker(pyglet.sprite.Sprite, Agent):
         self.cage.x = self.x
         self.cage.y = self.y
         self.cage.visible = True
+
+    def undetect(self) -> None:
+        self.cage.visible = False
+
+    @property
+    def pos(self):
+        return (self.row, self.col)
