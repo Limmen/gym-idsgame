@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 class Node(ABC):
     """
-    TODO
+    Abstract node in the grid network
     """
 
     @property

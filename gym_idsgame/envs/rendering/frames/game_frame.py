@@ -226,7 +226,7 @@ class GameFrame(pyglet.window.Window):
     def test(self):
         if self.defense_event is not None:
             defense = self.defense_event
-            pyglet.clock.schedule(self.resource_network.grid[defense.target_row][defense.target_col].data.defense_black)
+            pyglet.clock.schedule(self.resource_network.grid[defense.target_row][defense.target_col].data.blink_black_defense)
             pyglet.clock.tick(poll=True)
 
     def simulate_defense_events(self, defense_events: List[AttackDefenseEvent], i):
