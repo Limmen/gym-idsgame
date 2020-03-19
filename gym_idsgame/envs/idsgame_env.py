@@ -5,6 +5,8 @@ import os
 import math
 from gym_idsgame.envs.dao.render_state import RenderState
 from gym_idsgame.envs.dao.attack_defense_event import AttackDefenseEvent
+from gym_idsgame.envs.dao.node_type import NodeType
+from gym_idsgame.envs.dao.policy_type import PolicyType
 
 class IdsGameEnv(gym.Env):
     """
@@ -12,10 +14,10 @@ class IdsGameEnv(gym.Env):
     """
 
     def __init__(self, num_layers = 2, num_servers_per_layer = 3, num_attack_types = 10, max_value = 10,
-                 defense_policy = constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC,
+                 defense_policy = PolicyType.DETERMINISTIC_DEFENSE,
                  adjacency_matrix=None, graph_layout=None, initial_state = None,
-                 blink_interval=constants.GAMEFRAME.AGENT_BLINK_INTERVAL,
-                 num_blinks=constants.GAMEFRAME.AGENT_NUM_BLINKS):
+                 blink_interval=constants.RENDERING.AGENT_BLINK_INTERVAL,
+                 num_blinks=constants.RENDERING.AGENT_NUM_BLINKS):
         """
         TODO
         """
@@ -60,7 +62,7 @@ class IdsGameEnv(gym.Env):
          'render.modes': ['human', 'rgb_array'],
          'video.frames_per_second' : 50 # Video rendering speed
         }
-        self.reward_range = (float(constants.GAMEFRAME.NEGATIVE_REWARD), float(constants.GAMEFRAME.POSITIVE_REWARD))
+        self.reward_range = (float(constants.RENDERING.NEGATIVE_REWARD), float(constants.RENDERING.POSITIVE_REWARD))
         self.attacker_total_reward = 0
         self.defender_total_reward = 0
         self.game_step = 0
@@ -179,12 +181,12 @@ class IdsGameEnv(gym.Env):
             if attack_successful:
                 self.__move_attacker(attacker_node, target_node)
                 if self.__is_data_node(target_node):
-                    reward = constants.GAMEFRAME.POSITIVE_REWARD
+                    reward = constants.RENDERING.POSITIVE_REWARD
                     done = True
             else:
                 detected = self.__simulate_detection(target_node)
                 if detected:
-                    reward = constants.GAMEFRAME.NEGATIVE_REWARD
+                    reward = constants.RENDERING.NEGATIVE_REWARD
                     done = True
         observation = self.state[0]
         if done:
@@ -277,7 +279,7 @@ class IdsGameEnv(gym.Env):
         """
         from gym_idsgame.envs.rendering.viewer import Viewer
         script_dir = os.path.dirname(__file__)
-        resource_path = os.path.join(script_dir, './rendering/', constants.GAMEFRAME.RESOURCES_DIR)
+        resource_path = os.path.join(script_dir, './rendering/', constants.RENDERING.RESOURCES_DIR)
         self.viewer = Viewer(num_layers=self.num_layers, num_servers_per_layer=self.num_servers_per_layer,
                              num_attack_types=self.num_attack_types, max_value=self.max_value,
                              adjacency_matrix=self.adjacency_matrix, graph_layout=self.graph_layout,
@@ -300,15 +302,15 @@ class IdsGameEnv(gym.Env):
             while True:
                 random_row = np.random.randint(self.graph_layout.shape[0])
                 random_col = np.random.randint(self.graph_layout.shape[1])
-                if self.graph_layout[random_row, random_col] == constants.NODE_TYPES.SERVER or self.graph_layout[
-                    random_row, random_col] == constants.NODE_TYPES.DATA:
+                if self.graph_layout[random_row, random_col] == NodeType.SERVER or self.graph_layout[
+                    random_row, random_col] == NodeType.DATA:
                     return random_row, random_col, defend_type
         elif self.defense_policy == constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC:
             defend_type = 1
             for i in range(self.graph_layout.shape[0]):
                 for j in range(self.graph_layout.shape[1]):
-                    if self.graph_layout[i, j] == constants.NODE_TYPES.SERVER or self.graph_layout[
-                        i, j] == constants.NODE_TYPES.DATA:
+                    if self.graph_layout[i, j] == NodeType.SERVER or self.graph_layout[
+                        i, j] == NodeType.DATA:
                         return i, j, defend_type
 
     def __initialize_graph_config(self):
@@ -317,16 +319,16 @@ class IdsGameEnv(gym.Env):
             for j in range(self.num_cols):
                 if i == self.num_rows - 1:
                     if j == self.num_cols // 2:
-                        self.graph_layout[i][j] = constants.NODE_TYPES.START
+                        self.graph_layout[i][j] = NodeType.START
                     else:
-                        self.graph_layout[i][j] = constants.NODE_TYPES.NONE
+                        self.graph_layout[i][j] = NodeType.EMPTY
                 elif i == 0:
                     if j == self.num_cols // 2:
-                        self.graph_layout[i][j] = constants.NODE_TYPES.DATA
+                        self.graph_layout[i][j] = NodeType.DATA
                     else:
-                        self.graph_layout[i][j] = constants.NODE_TYPES.NONE
+                        self.graph_layout[i][j] = NodeType.EMPTY
                 else:
-                    self.graph_layout[i][j] = constants.NODE_TYPES.SERVER
+                    self.graph_layout[i][j] = NodeType.SERVER
 
         self.adjacency_matrix = np.zeros((self.num_rows * self.num_cols, self.num_cols * self.num_rows))
         for i in range(self.num_rows * self.num_cols):

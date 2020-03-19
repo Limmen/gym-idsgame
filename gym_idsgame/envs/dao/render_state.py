@@ -1,6 +1,5 @@
 import numpy as np
-from gym_idsgame.envs.constants import constants
-
+from gym_idsgame.envs.dao.node_type import NodeType
 class RenderState():
 
     def __init__(self, attack_values = np.array([0]), defense_values = np.array([0]), defense_det = [0],
@@ -25,8 +24,8 @@ class RenderState():
         det_values = np.zeros((num_rows, num_cols))
         for i in range(num_rows):
             for j in range(num_cols):
-                if (graph_layout[i][j] == constants.NODE_TYPES.DATA
-                        or graph_layout[i][j] == constants.NODE_TYPES.SERVER):
+                if (graph_layout[i][j] == NodeType.DATA
+                        or graph_layout[i][j] == NodeType.SERVER):
                     defense_values[i][j] = [2] * num_attack_types
                     defense_values[i][j][0] = 0  # vulnerability
                     det_values[i][j] = 2

@@ -1,10 +1,12 @@
 from gym_idsgame.envs.rendering.network.nodes.node import Node
 from gym_idsgame.envs.dao.render_config import RenderConfig
+from gym_idsgame.envs.dao.node_type import NodeType
 
 class EmptyNode(Node):
 
     def __init__(self, render_config: RenderConfig, row: int, col: int):
         super(EmptyNode, self).__init__()
+        self.node_type = NodeType.EMPTY
         self.render_config = render_config
         self.row = row
         self.col = col

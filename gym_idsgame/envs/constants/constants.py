@@ -1,4 +1,4 @@
-class GAMEFRAME:
+class RENDERING:
     """
     IDSGame constants
     """
@@ -28,8 +28,6 @@ class GAMEFRAME:
     PANEL_LEFT_MARGIN = 60
     PANEL_TOP_MARGIN = 30
     PANEL_FONT_SIZE = 12
-    POSITIVE_REWARD = +100
-    NEGATIVE_REWARD = -100
     NODE_STATE_FONT_SIZE = 10
     LINE_WIDTH = 2
     MANUAL_NUM_BLINKS = 14
@@ -39,15 +37,6 @@ class GAMEFRAME:
     CAPTION = "IDS Game"
     MIN_WIDTH = 470
 
-class NODE_TYPES:
-    """
-    TODO
-    """
-    NONE = 0
-    START = 1
-    SERVER = 2
-    DATA = 3
-
-class BASELINE_POLICIES:
-    RANDOM = "random"
-    NAIVE_DETERMINISTIC = "naive_deterministic"
+class GAME_CONFIG:
+    POSITIVE_REWARD = +100
+    NEGATIVE_REWARD = -100

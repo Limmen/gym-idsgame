@@ -6,6 +6,7 @@ from gym_idsgame.envs.dao.render_state import RenderState
 from gym_idsgame.envs.dao.attack_defense_event import AttackDefenseEvent
 from gym_idsgame.envs.dao.render_config import RenderConfig
 from gym_idsgame.envs.dao.game_state import GameState
+from gym_idsgame.envs.rendering.agents.attacker import Attacker
 from typing import List
 import os
 import numpy as np
@@ -20,6 +21,9 @@ class GameFrame(pyglet.window.Window):
     def __init__(self, render_config: RenderConfig):
         self.render_config = render_config
         super(GameFrame, self).__init__(height=render_config.height, width=render_config.width, caption=render_config.caption) # call constructor of parent class
+        self.resource_network = None
+        self.attacker = None
+        self.defender = None
         self.setup_resources_path()
         self.game_state = GameState()
         self.create_batch()
@@ -33,6 +37,7 @@ class GameFrame(pyglet.window.Window):
 
         :return: None
         """
+
         # Sets the background color
         batch_rect_fill(0, 0, self.render_config.width, self.render_config.height, self.render_config.bg_color,
                         self.render_config.batch, self.render_config.background)
@@ -40,33 +45,10 @@ class GameFrame(pyglet.window.Window):
         # Resource Network
         self.resource_network = Network(self.render_config)
 
-        # for i in range(self.resource_network.num_rows):
-        #     for j in range(self.resource_network.num_cols):
-        #         # Data node
-        #         if i == 0:
-        #             self.resource_network.grid[i][j].draw(i, j, self.border_color, self.batch, self.background,
-        #                                                   self.second_foreground,
-        #                                                   self.data_filename, self.data_scale,
-        #                                                   data=(j == (self.num_cols // 2)), max_value=self.max_value,
-        #                                                   blink_interval=self.blink_interval, num_blinks=self.num_blinks)
-        #             if j == (self.num_cols // 2):
-        #                 self.data_node = self.resource_network.grid[i][j].get_node()
-        #         # Server node
-        #         if i > 0 and i < self.resource_network.num_rows-1:
-        #             self.resource_network.grid[i][j].draw(i, j, self.border_color, self.batch, self.background,
-        #                                                   self.second_foreground,
-        #                                                   self.server_filename, self.resource_scale, server=True,
-        #                                                   max_value=self.max_value,
-        #                                                   blink_interval=self.blink_interval, num_blinks=self.num_blinks)
-        #         # Start node
-        #         if i == self.resource_network.num_rows-1:
-        #             self.resource_network.grid[i][j].draw(i, j, self.border_color, self.batch, self.background,
-        #                                                   self.second_foreground,
-        #                                                   self.avatar_filename, self.agent_scale,
-        #                                                   start=(j == (self.num_cols//2)),
-        #                                                   max_value=self.max_value,
-        #                                                   blink_interval=self.blink_interval, num_blinks=self.num_blinks
-        #                                                   )
+
+        # Attacker
+        #self.attacker = Attacker(self.render_config, 0,0)
+
         # # Hacker starts at the start node
         # self.hacker = Attacker(self.avatar_filename, self.num_cols // 2,
         #                        self.resource_network.num_rows - 1, self.batch, self.first_foreground, self.second_foreground,
@@ -161,7 +143,7 @@ class GameFrame(pyglet.window.Window):
             pyglet.resource.path = [self.render_config.resources_dir]
         else:
             script_dir = os.path.dirname(__file__)
-            resource_path = os.path.join(script_dir, './', constants.GAMEFRAME.RESOURCES_DIR)
+            resource_path = os.path.join(script_dir, './', constants.RENDERING.RESOURCES_DIR)
             pyglet.resource.path = [resource_path]
         pyglet.resource.reindex()
 
@@ -211,9 +193,9 @@ class GameFrame(pyglet.window.Window):
                                 else:
                                     detected = node.simulate_detection()
                                     if detected:
-                                        self.hacker.add_reward(constants.GAMEFRAME.NEGATIVE_REWARD)
+                                        self.hacker.add_reward(constants.RENDERING.NEGATIVE_REWARD)
                                         self.hacker.detected()
-                                        self.data_node.add_reward(constants.GAMEFRAME.POSITIVE_REWARD)
+                                        self.data_node.add_reward(constants.RENDERING.POSITIVE_REWARD)
                                         self.done = True
                             return
 

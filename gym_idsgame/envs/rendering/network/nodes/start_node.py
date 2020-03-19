@@ -2,11 +2,13 @@ from gym_idsgame.envs.rendering.network.nodes.node import Node
 from gym_idsgame.envs.rendering.util.render_util import create_circle
 from gym_idsgame.envs.dao.render_config import RenderConfig
 from gym_idsgame.envs.constants import constants
+from gym_idsgame.envs.dao.node_type import NodeType
 
 class StartNode(Node):
 
     def __init__(self, render_config: RenderConfig, row: int, col: int):
         super(StartNode, self).__init__()
+        self.node_type = NodeType.START
         self.render_config = render_config
         self.row = row
         self.col = col
@@ -16,7 +18,7 @@ class StartNode(Node):
         create_circle(self.col * self.render_config.rect_size + self.render_config.rect_size / 2,
                       self.row * int(self.render_config.rect_size / 1.5) + (self.render_config.rect_size / 1.5) / 2,
                       self.render_config.rect_size / 7, self.render_config.batch, self.render_config.first_foreground,
-                      constants.GAMEFRAME.BLACK)
+                      constants.RENDERING.BLACK)
 
     def manual_blink_defense(self, i):
         pass

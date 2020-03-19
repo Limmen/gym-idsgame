@@ -2,6 +2,7 @@ from gym_idsgame.envs.policy_baselines.policy import Policy
 from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.envs.constants import constants
+from gym_idsgame.envs.dao.node_type import NodeType
 from typing import Union
 import numpy as np
 
@@ -17,8 +18,8 @@ class RandomDefense(Policy):
         defend_col = None
         for row in game_config.graph_layout.shape[0]:
             for col in game_config.graph_layout.shape[0]:
-                if (game_config.graph_layout[row][col] == constants.NODE_TYPES.SERVER
-                        or game_config.graph_layout[row][col] == constants.NODE_TYPES.DATA):
+                if (game_config.graph_layout[row][col] == NodeType.SERVER
+                        or game_config.graph_layout[row][col] == NodeType.DATA):
                     if defend_row == None or defend_col == None:
                         defend_row, defend_col = row, col
                     else:

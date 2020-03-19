@@ -1,14 +1,15 @@
 import pyglet
-from gym_idsgame.envs.rendering.util.render_util import batch_label
 from gym_idsgame.envs.constants import constants
 from pyglet import clock
 from gym_idsgame.envs.rendering.network.nodes.resource_node import ResourceNode
 from gym_idsgame.envs.dao.render_config import RenderConfig
+from gym_idsgame.envs.dao.node_type import NodeType
 
 class DataNode(ResourceNode):
     def __init__(self, render_config: RenderConfig, row: int, col: int):
         avatar = pyglet.resource.image(render_config.data_filename)
         super(DataNode, self).__init__(avatar, render_config, render_config.background)
+        self.node_type = NodeType.DATA
         self.col = col
         self.row = row
         self.scale = render_config.data_scale
@@ -42,24 +43,24 @@ class DataNode(ResourceNode):
             return False
 
     def attack_red(self, dt, edges_list) -> None:
-        color = constants.GAMEFRAME.RED
+        color = constants.RENDERING.RED
         color_list = list(color) + list(color)
         for edges in edges_list:
             for e1 in edges:
                 e1.colors = color_list
-        lbl_color = constants.GAMEFRAME.RED_ALPHA
+        lbl_color = constants.RENDERING.RED_ALPHA
         self.attack_label.color = lbl_color
-        self.color = constants.GAMEFRAME.RED
+        self.color = constants.RENDERING.RED
 
     def attack_black(self, dt, edges_list) -> None:
-        color = constants.GAMEFRAME.BLACK
+        color = constants.RENDERING.BLACK
         color_list = list(color) + list(color)
         for edges in edges_list:
             for e1 in edges:
                 e1.colors = color_list
-        lbl_color = constants.GAMEFRAME.BLACK_ALPHA
+        lbl_color = constants.RENDERING.BLACK_ALPHA
         self.attack_label.color = lbl_color
-        self.color = constants.GAMEFRAME.WHITE
+        self.color = constants.RENDERING.WHITE
 
     def center_avatar(self) -> None:
         """

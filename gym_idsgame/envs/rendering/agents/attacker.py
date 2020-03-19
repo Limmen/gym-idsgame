@@ -16,7 +16,7 @@ class Attacker(pyglet.sprite.Sprite, Agent):
         self.starting_col = col
         self.starting_row = row
         self.scale = render_config.attacker_scale
-        self.cage_avatar = pyglet.resource.image(self.render_config.cage_scale)
+        self.cage_avatar = pyglet.resource.image(self.render_config.cage_filename)
         self.cage = pyglet.sprite.Sprite(self.cage_avatar, x=self.x, y=self.y, batch=render_config.batch,
                                          group=render_config.second_foreground)
         self.cage.scale = self.render_config.cage_scale

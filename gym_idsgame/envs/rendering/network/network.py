@@ -1,5 +1,6 @@
 from gym_idsgame.envs.rendering.util.render_util import batch_line
 from gym_idsgame.envs.dao.render_config import RenderConfig
+from gym_idsgame.envs.dao.node_type import NodeType
 from gym_idsgame.envs.rendering.network.nodes.data_node import DataNode
 from gym_idsgame.envs.rendering.network.nodes.server_node import ServerNode
 from gym_idsgame.envs.rendering.network.nodes.start_node import StartNode
@@ -15,11 +16,11 @@ class Network:
                      range(self.render_config.game_config.num_rows)]
 
     def create_node(self, i,j) -> Node:
-        if i == 0 and j == self.render_config.game_config.num_cols//2:
+        if self.render_config.game_config.network_config.graph_layout[i][j] == NodeType.DATA.value:
             return DataNode(self.render_config, i, j) # Data node
-        elif i == self.render_config.game_config.num_rows-1 and j == self.render_config.game_config.num_cols//2:
+        elif self.render_config.game_config.network_config.graph_layout[i][j] == NodeType.START.value:
             return StartNode(self.render_config, i, j) # Start node
-        elif i is not 0 and i is not self.render_config.game_config.num_rows-1:
+        elif self.render_config.game_config.network_config.graph_layout[i][j] == NodeType.SERVER.value:
             return ServerNode(self.render_config, i, j) # Server node
         else:
             return EmptyNode(self.render_config, i, j) # Empty node
