@@ -1,3 +1,6 @@
+"""
+A defender agent for the gym-idsgame environment
+"""
 from gym_idsgame.envs.policy_baselines.policy import Policy
 
 class Defender():

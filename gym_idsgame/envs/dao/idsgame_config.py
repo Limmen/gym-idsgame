@@ -1,3 +1,6 @@
+"""
+Configuration for the gym-idsgame environment
+"""
 from gym_idsgame.envs.dao.render_config import RenderConfig
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.envs.policy_baselines.policy import Policy
@@ -8,7 +11,7 @@ class IdsGameConfig:
     DTO representing the configuration of the IdsGameEnv:
     """
 
-    def __init__(self, render_config: RenderConfig = None, game_config:GameConfig = None,
+    def __init__(self, render_config: RenderConfig = None, game_config: GameConfig = None,
                  defender_policy: Policy = None):
         """
         Constructor, initializes the config

@@ -1,12 +1,15 @@
-import numpy as np
+"""
+Network configuration for the gym-idsgame environment. E.g. number of servers, connectivity, etc.
+"""
 from typing import Union, List
+import numpy as np
 from gym_idsgame.envs.dao.node_type import NodeType
 
 class NetworkConfig:
     """
     DTO with configuration of the network for the game, i.e. the servers and their connectivity
     """
-    def __init__(self, num_rows:int, num_cols:int):
+    def __init__(self, num_rows: int, num_cols: int):
         """
         Constructor
 
@@ -70,7 +73,7 @@ class NetworkConfig:
         return adjacency_matrix
 
 
-    def get_coords(self, node_id:int) -> Union[int, int]:
+    def get_coords(self, node_id: int) -> Union[int, int]:
         """
         Gets the grid-coordinates of a node id
 
@@ -121,7 +124,7 @@ class NetworkConfig:
         for i in range(self.num_rows):
             for j in range(self.num_cols):
                 if self.graph_layout[i][j] == NodeType.START.value:
-                    return i,j
+                    return i, j
         raise AssertionError("Could not find start node in graph layout")
 
     @property
@@ -163,7 +166,7 @@ class NetworkConfig:
                 if node_id == count and self.graph_layout[i][j] != NodeType.EMPTY.value:
                     return (i, j)
                 if self.graph_layout[i][j] != NodeType.EMPTY.value:
-                    count +=1
+                    count += 1
         raise ValueError("Invalid node id")
 
     def get_node_id(self, pos: Union[int, int]) -> int:
@@ -182,8 +185,7 @@ class NetworkConfig:
                 if row == i and col == j:
                     if self.graph_layout[i][j] == NodeType.EMPTY.value:
                         return -1
-                    else:
-                        return count
+                    return count
                 if self.graph_layout[i][j] != NodeType.EMPTY.value:
                     count += 1
         raise ValueError("Invalid node position")

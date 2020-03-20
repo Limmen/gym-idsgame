@@ -1,7 +1,10 @@
-import pyglet
+"""
+Represents a data node in the network of the gym-idsgame environment
+"""
 from typing import Union
-from gym_idsgame.envs.constants import constants
+import pyglet
 from pyglet import clock
+from gym_idsgame.envs.constants import constants
 from gym_idsgame.envs.rendering.network.nodes.resource_node import ResourceNode
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.dao.node_type import NodeType
@@ -63,7 +66,7 @@ class DataNode(ResourceNode):
                            defense_label_x=defense_label_x, defense_label_y=defense_label_y,
                            det_label_x=det_label_x, det_label_y=det_label_y)
 
-    def visualize_attack(self, attack_type:int, edges_list:list=None) -> None:
+    def visualize_attack(self, attack_type: int, edges_list: list = None) -> None:
         """
         Simulates an attack against the node.
 
@@ -79,7 +82,7 @@ class DataNode(ResourceNode):
                 clock.schedule_once(self.blink_black_attack,
                                     self.idsgame_config.render_config.blink_interval * i, edges_list)
 
-    def blink_red_attack(self, dt, edges_list:list) -> None:
+    def blink_red_attack(self, dt, edges_list: list) -> None:
         """
         Makes the node and its links blink red to visualize an attack
 
@@ -96,7 +99,7 @@ class DataNode(ResourceNode):
         self.attack_label.color = lbl_color
         self.color = constants.RENDERING.RED
 
-    def blink_black_attack(self, dt, edges_list:list) -> None:
+    def blink_black_attack(self, dt, edges_list: list) -> None:
         """
         Makes the node and its links blink black to visualize an attack
 
@@ -124,7 +127,7 @@ class DataNode(ResourceNode):
         self.y = int((self.idsgame_config.render_config.rect_size/1.5))*self.row + \
                  self.idsgame_config.render_config.rect_size/3.5
 
-    def get_link_coords(self, upper:bool=True, lower:bool=False) -> Union[float, float, int, int]:
+    def get_link_coords(self, upper: bool = True, lower: bool = False) -> Union[float, float, int, int]:
         """
         Gets the coordinates of link endpoints of the node
 

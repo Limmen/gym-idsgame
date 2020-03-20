@@ -1,5 +1,8 @@
-import pyglet
+"""
+Attacker agent-sprite to be rendered for the gym-idgame environment
+"""
 from typing import Union
+import pyglet
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 
 class Attacker(pyglet.sprite.Sprite):
@@ -10,7 +13,7 @@ class Attacker(pyglet.sprite.Sprite):
     and define state of the sprite
     """
 
-    def __init__(self, idsgame_config: IdsGameConfig, col:int, row:int):
+    def __init__(self, idsgame_config: IdsGameConfig, col: int, row: int):
         """
         Constructor, initializes the attacker
 
@@ -22,6 +25,8 @@ class Attacker(pyglet.sprite.Sprite):
         self.avatar = pyglet.resource.image(idsgame_config.render_config.attacker_filename)
         super(Attacker, self).__init__(self.avatar, batch=idsgame_config.render_config.batch,
                                        group=idsgame_config.render_config.first_foreground)
+        self.x = 0
+        self.y = 0
         self.col = col
         self.row = row
         self.starting_col = col
@@ -61,7 +66,7 @@ class Attacker(pyglet.sprite.Sprite):
             self.x = self.x + self.idsgame_config.render_config.rect_size / 5
             self.y = self.y + self.idsgame_config.render_config.rect_size / 15
 
-    def move_to_coords(self, x:float, y:float, col:int, row:int) -> None:
+    def move_to_coords(self, x: float, y: float, col: int, row: int) -> None:
         """
         Moves the attacker to a specific set of coordinates
 

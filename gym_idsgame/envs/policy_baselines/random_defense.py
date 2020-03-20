@@ -1,3 +1,6 @@
+"""
+A random defense policy for the gym-idsgame environment
+"""
 from typing import Union
 import numpy as np
 from gym_idsgame.envs.policy_baselines.policy import Policy

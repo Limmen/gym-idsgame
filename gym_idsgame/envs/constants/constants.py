@@ -1,3 +1,7 @@
+"""
+Constants for the gym-idsgame environment
+"""
+
 class RENDERING:
     """
     Rendering constants
@@ -13,7 +17,7 @@ class RENDERING:
     BLACK_ALPHA = (0, 0, 0, 255)
     WHITE_ALPHA = (255, 255, 255, 255)
     RED_ALPHA = (128, 0, 0, 255)
-    WHITE = (255,255,255)
+    WHITE = (255, 255, 255)
     GREY = (220, 220, 220)
     RESOURCES_DIR = "resources"
     HACKER_AVATAR_FILENAME = "hacker.png"
@@ -36,6 +40,7 @@ class RENDERING:
     AGENT_BLINK_INTERVAL = 0.000001
     CAPTION = "IDS Game"
     MIN_WIDTH = 470
+    DEFAULT_HEIGHT = 800
 
 class GAME_CONFIG:
     """

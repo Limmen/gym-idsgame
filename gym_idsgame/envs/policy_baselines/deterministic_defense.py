@@ -1,3 +1,6 @@
+"""
+A Deterministic Defense Policy Baseline for the gym-idsgame environment
+"""
 from typing import Union
 from gym_idsgame.envs.policy_baselines.policy import Policy
 from gym_idsgame.envs.dao.game_state import GameState
@@ -8,8 +11,7 @@ class DeterministicDefense(Policy):
     Implements a deterministic defense policy: a policy where the defender always defends the same node using the same
     defense type
     """
-
-    def __init__(self, game_config: GameConfig, defend_type:int, defend_row:int, defend_col:int):
+    def __init__(self, game_config: GameConfig, defend_type: int, defend_row: int, defend_col: int):
         """
         Class constructor, intializes the policy
 

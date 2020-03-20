@@ -1,3 +1,6 @@
+"""
+Abstract node in the network of the gym-idsgame environment
+"""
 from abc import ABC, abstractmethod
 
 class Node(ABC):

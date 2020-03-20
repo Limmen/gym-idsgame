@@ -1,3 +1,6 @@
+"""
+Render-configuration for the gym-idsgame environment
+"""
 import pyglet
 from gym_idsgame.envs.constants import constants
 
@@ -5,9 +8,9 @@ class RenderConfig:
     """
     DTO with configuration parameters for the UI rendering
     """
-    def __init__(self, resources_dir:str=constants.RENDERING.RESOURCES_DIR,
-                 blink_interval:float = constants.RENDERING.AGENT_BLINK_INTERVAL,
-                 num_blinks:int = constants.RENDERING.AGENT_NUM_BLINKS):
+    def __init__(self, resources_dir: str = constants.RENDERING.RESOURCES_DIR,
+                 blink_interval: float = constants.RENDERING.AGENT_BLINK_INTERVAL,
+                 num_blinks: int = constants.RENDERING.AGENT_NUM_BLINKS):
         """
         Constructor, initializes the DTO
 
@@ -36,6 +39,8 @@ class RenderConfig:
         self.background = pyglet.graphics.OrderedGroup(0)
         self.first_foreground = pyglet.graphics.OrderedGroup(1)
         self.second_foreground = pyglet.graphics.OrderedGroup(2)
+        self.height = constants.RENDERING.DEFAULT_HEIGHT
+        self.width = constants.RENDERING.MIN_WIDTH
 
 
     def manual_default(self) -> None:
@@ -57,7 +62,7 @@ class RenderConfig:
         self.height = constants.RENDERING.PANEL_HEIGHT + int((self.rect_size / 1.5)) * num_rows
 
 
-    def set_width(self, num_cols:int) -> None:
+    def set_width(self, num_cols: int) -> None:
         """
         Sets the width for the main gameframe
 

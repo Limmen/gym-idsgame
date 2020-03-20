@@ -1,3 +1,6 @@
+"""
+Type of nodes in the gym-idsgame environment
+"""
 from enum import Enum
 
 class NodeType(Enum):

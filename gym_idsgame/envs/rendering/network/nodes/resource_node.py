@@ -1,6 +1,8 @@
-import pyglet
+"""
+Abstract resource node in the network of the gym-idsgame environment
+"""
 from abc import ABC, abstractmethod
-import numpy as np
+import pyglet
 from pyglet import clock
 from gym_idsgame.envs.rendering.network.nodes.node import Node
 from gym_idsgame.envs.constants import constants
@@ -139,7 +141,7 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         else:
             self.blink_black_defense(0)
 
-    def manual_blink_attack(self, i:int, edges:list=None) -> None:
+    def manual_blink_attack(self, i: int, edges: list = None) -> None:
         """
         Manual attack blink, when not using the clock to schedule blinks but rather ticking the clock manually.
         Used when the agent plays the game and not a human.

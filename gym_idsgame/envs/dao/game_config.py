@@ -1,3 +1,6 @@
+"""
+Game-specific configuration for the gym-idsgame environment
+"""
 import math
 import gym
 import numpy as np
@@ -8,9 +11,9 @@ class GameConfig():
     """
     DTO with game configuration parameters
     """
-    def __init__(self, network_config:NetworkConfig = None, manual:bool = True, num_layers:int = 1,
-                 num_servers_per_layer:int = 2, num_attack_types:int = 10, max_value:int = 9,
-                 initial_state:bool = None):
+    def __init__(self, network_config: NetworkConfig = None, manual: bool = True, num_layers: int = 1,
+                 num_servers_per_layer: int = 2, num_attack_types: int = 10, max_value: int = 9,
+                 initial_state: bool = None):
         """
         Class constructor, initializes the DTO
 

@@ -1,3 +1,6 @@
+"""
+The viewer for rendering the gym-idsgame environment. Supports both agent-mode and manual-mode
+"""
 try:
     import pyglet
 except ImportError as e:
@@ -74,7 +77,7 @@ class Viewer():
         """
         self.gameframe.close()
 
-    def render_frame(self, return_rgb_array:bool = False):
+    def render_frame(self, return_rgb_array: bool = False):
         """
         Renders a frame manually.
 

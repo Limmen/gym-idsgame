@@ -1,3 +1,6 @@
+"""
+Represents the network that the attacker must penetrate and defender should defend in the gym-idsgame environment
+"""
 from typing import Union
 from gym_idsgame.envs.rendering.util.render_util import batch_line
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
@@ -55,7 +58,7 @@ class Network:
                     node.set_state(game_state.attack_values[node.id], game_state.defense_values[node.id],
                                               game_state.defense_det[node.id])
 
-    def __create_node(self, row:int, col:int) -> Node:
+    def __create_node(self, row: int, col: int) -> Node:
         """
         Creates a node in the network. Based on the network config it creates either a DATA node, a START node,
         a SERVER node, or an EMPTY node.
@@ -112,7 +115,7 @@ class Network:
         row, col = pos
         return self.grid[row][col]
 
-    def __root_edge(self, n1:Node):
+    def __root_edge(self, n1: Node):
         """
         Creates the "root edge", the edge between the START node and all immediate child nodes.
         This edge is created in a special method because it should be blinking when visualizing all attacks on
@@ -127,7 +130,7 @@ class Network:
         constants.RENDERING.BLACK, self.idsgame_config.render_config.batch, self.idsgame_config.render_config.background,
                           self.idsgame_config.render_config.line_width)
 
-    def __connect_start_and_server_nodes(self, n1:Node, n2:Node) -> list:
+    def __connect_start_and_server_nodes(self, n1: Node, n2: Node) -> list:
         """
         Creates a link between the start node and server nodes on the layer below
 
@@ -146,7 +149,7 @@ class Network:
         edges.append(e2)
         return edges
 
-    def __connect_server_and_server_nodes(self, n1:Node, n2:Node) -> list:
+    def __connect_server_and_server_nodes(self, n1: Node, n2: Node) -> list:
         """
         Creates a link between two server nodes
         :param n1: node1
@@ -159,7 +162,7 @@ class Network:
                         self.idsgame_config.render_config.background, self.idsgame_config.render_config.line_width)
         return [e1]
 
-    def __connect_server_and_data_nodes(self, n1:Node, n2:Node) -> list:
+    def __connect_server_and_data_nodes(self, n1: Node, n2: Node) -> list:
         """
         Creates a link between a server node and the data node
 

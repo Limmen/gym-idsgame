@@ -1,10 +1,13 @@
+"""
+Attack-defense event for rendering in agent-mode
+"""
 from typing import Union
 
 class AttackDefenseEvent:
     """
     Represents an attack-defense event to be rendered
     """
-    def __init__(self, target_pos:Union[int, int], attack_defense_type:int):
+    def __init__(self, target_pos: Union[int, int], attack_defense_type: int):
         """
         Class constructor, initializes the DTO
 

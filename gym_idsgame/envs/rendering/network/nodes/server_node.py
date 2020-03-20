@@ -1,3 +1,6 @@
+"""
+Represents a server node in the network of the gym-idsgame environment
+"""
 from typing import Union
 import pyglet
 from pyglet import clock
@@ -78,7 +81,7 @@ class ServerNode(ResourceNode):
             else:
                 clock.schedule_once(self.blink_black_attack, self.idsgame_config.render_config.blink_interval * i)
 
-    def blink_red_attack(self, dt, edges_list:list=None) -> None:
+    def blink_red_attack(self, dt, edges_list: list = None) -> None:
         """
         Makes the node and its links blink red to visualize an attack
 
@@ -95,7 +98,8 @@ class ServerNode(ResourceNode):
         self.attack_label.color = lbl_color
         self.color = constants.RENDERING.RED
 
-    def blink_black_attack(self, dt, edges_list:list=None) -> None:
+
+    def blink_black_attack(self, dt, edges_list: list = None) -> None:
         """
         Makes the node and its links blink black to visualize an attack
 
@@ -122,7 +126,7 @@ class ServerNode(ResourceNode):
         self.y = int((self.idsgame_config.render_config.rect_size/1.5))*self.row + \
                  self.idsgame_config.render_config.rect_size/3.5
 
-    def get_link_coords(self, upper:bool=True, lower:bool=False) -> Union[float, float, int, int]:
+    def get_link_coords(self, upper: bool= True, lower: bool= False) -> Union[float, float, int, int]:
         """
         Gets the coordinates of link endpoints of the node
 

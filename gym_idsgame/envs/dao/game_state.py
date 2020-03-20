@@ -1,5 +1,8 @@
-import numpy as np
+"""
+Stateful data of the gym-idsgame environment
+"""
 from typing import Union, List
+import numpy as np
 from gym_idsgame.envs.dao.node_type import NodeType
 from gym_idsgame.envs.constants import constants
 from gym_idsgame.envs.dao.attack_defense_event import AttackDefenseEvent
@@ -9,12 +12,14 @@ class GameState():
     DTO representing the state of the game
     """
 
-    def __init__(self, attack_values:np.ndarray = np.array([0]), defense_values:np.ndarray = np.array([0]),
-                 defense_det:np.ndarray = np.array([0]),
-                 attacker_pos:Union[int, int] = (0,0), game_step:int = 0, attacker_cumulative_reward:int = 0,
-                 defender_cumulative_reward :int =0,
-                 num_games=0, attack_events:List[AttackDefenseEvent] = [], defense_events:List[AttackDefenseEvent] = [],
-                 done:bool=False, detected:bool = False, attack_type:int=0, num_hacks:int = 0, hacked:bool=False):
+    def __init__(self, attack_values: np.ndarray = None, defense_values: np.ndarray = None,
+                 defense_det: np.ndarray = None,
+                 attacker_pos: Union[int, int] = (0, 0), game_step: int = 0, attacker_cumulative_reward: int = 0,
+                 defender_cumulative_reward: int = 0,
+                 num_games: int = 0, attack_events: List[AttackDefenseEvent] = [],
+                 defense_events: List[AttackDefenseEvent] = [],
+                 done: bool = False, detected: bool = False, attack_type: int = 0, num_hacks: int = 0,
+                 hacked: bool = False):
         """
         Constructor, initializes the DTO
 
@@ -34,7 +39,7 @@ class GameState():
         :param num_hacks: number of wins for the attacker
         :param hacked: True if the attacker hacked the data node otherwise False
         """
-        self.attack_values=attack_values
+        self.attack_values = attack_values
         self.defense_values = defense_values
         self.defense_det = defense_det
         self.attacker_pos = attacker_pos
@@ -52,7 +57,7 @@ class GameState():
         self.action_descriptors = ["Injection", "Authentication", "CrossSite", "References", "Misssconfiguration",
                                    "Exposure", "Access", "Forgery", "Vulnerabilities", "Redirects"]
 
-    def default_state(self, node_list: List[int], attacker_pos: Union[int, int], num_attack_types:int) -> None:
+    def default_state(self, node_list: List[int], attacker_pos: Union[int, int], num_attack_types: int) -> None:
         """
         Creates a default state
 
@@ -71,7 +76,7 @@ class GameState():
                 defense_values[node_id] = [2] * num_attack_types
                 defense_values[node_id][0] = 0 # vulnerability
                 det_values[node_id] = 2
-        self.attack_values =  attack_values.astype(np.int32)
+        self.attack_values = attack_values.astype(np.int32)
         self.defense_values = defense_values.astype(np.int32)
         self.defense_det = det_values.astype(np.int32)
         self.attacker_pos = attacker_pos
@@ -97,7 +102,7 @@ class GameState():
         self.game_step = 0
         self.done = False
         self.attack_type = 0
-        self.num_games +=1
+        self.num_games += 1
         self.attack_events = []
         self.defense_events = []
         self.attacker_pos = init_state.attacker_pos
@@ -111,9 +116,8 @@ class GameState():
         if self.hacked:
             self.attacker_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
             self.defender_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
-            self.num_hacks +=1
+            self.num_hacks += 1
         self.hacked = False
-        return
 
     def copy(self) -> "GameState":
         """
@@ -139,7 +143,7 @@ class GameState():
         new_state.hacked = self.hacked
         return new_state
 
-    def attack(self, node_id:int, attack_type:int, max_value:int) -> None:
+    def attack(self, node_id: int, attack_type: int, max_value: int) -> None:
         """
         Increments the attack value of the specified node and attack type
 
@@ -151,7 +155,7 @@ class GameState():
         if self.attack_values[node_id][attack_type] < max_value:
             self.attack_values[node_id][attack_type] += 1
 
-    def defend(self, node_id:int, defense_type:int, max_value:int) -> None:
+    def defend(self, node_id: int, defense_type: int, max_value: int) -> None:
         """
         Increments the defense value of the specified node and defense type
 
@@ -163,7 +167,7 @@ class GameState():
         if self.defense_values[node_id][defense_type] < max_value:
             self.defense_values[node_id][defense_type] += 1
 
-    def simulate_attack(self, attacked_node_id:int, attack_type:int) -> bool:
+    def simulate_attack(self, attacked_node_id: int, attack_type: int) -> bool:
         """
         Simulates an attack operation
 
@@ -171,23 +175,17 @@ class GameState():
         :param attack_type: the type of the attack
         :return: True if the attack was successful otherwise False
         """
-        if self.attack_values[attacked_node_id][attack_type] > self.defense_values[attacked_node_id][attack_type]:
-            return True
-        else:
-            return False
+        return self.attack_values[attacked_node_id][attack_type] > self.defense_values[attacked_node_id][attack_type]
 
-    def simulate_detection(self, node_id:int) -> bool:
+    def simulate_detection(self, node_id: int) -> bool:
         """
         Simulates detection for a unsuccessful attack
 
         :return: True if the node was detected, otherwise False
         """
-        if np.random.rand() < self.defense_det[node_id] / 10:
-            return True
-        else:
-            return False
+        return np.random.rand() < self.defense_det[node_id] / 10
 
-    def get_attacker_observation(self, num_rows:int, num_cols:int, num_attack_types:int) -> np.ndarray:
+    def get_attacker_observation(self, num_rows: int, num_cols: int, num_attack_types: int) -> np.ndarray:
         """
         Converts the state of the dynamical system into an observation for the attacker. As the environment
         is a partially observed markov decision process, the attacker observation is only a subset of the game state
@@ -200,7 +198,7 @@ class GameState():
         attack_observation = np.zeros((num_rows, num_cols, num_attack_types))
         return attack_observation
 
-    def add_attack_event(self, target_pos:Union[int, int], attack_type:int) -> None:
+    def add_attack_event(self, target_pos: Union[int, int], attack_type: int) -> None:
         """
         Adds an attack event to the state
 
@@ -211,7 +209,7 @@ class GameState():
         attack_event = AttackDefenseEvent(target_pos, attack_type)
         self.attack_events.append(attack_event)
 
-    def add_defense_event(self, target_pos: Union[int, int], defense_type:int) -> None:
+    def add_defense_event(self, target_pos: Union[int, int], defense_type: int) -> None:
         """
         Adds a defense event to the state
 

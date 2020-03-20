@@ -1,3 +1,6 @@
+"""
+Represents the START node in the network in the gym-idsgame to be rendered
+"""
 from typing import Union
 from gym_idsgame.envs.rendering.network.nodes.node import Node
 from gym_idsgame.envs.rendering.util.render_util import create_circle

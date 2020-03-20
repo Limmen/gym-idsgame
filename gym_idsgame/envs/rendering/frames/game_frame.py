@@ -1,3 +1,8 @@
+"""
+The main gameframe for the gym-idsgame environment
+"""
+from typing import List
+import os
 import pyglet
 import gym_idsgame.envs.util.idsgame_util as util
 from gym_idsgame.envs.rendering.network.network import Network
@@ -11,8 +16,6 @@ from gym_idsgame.envs.rendering.agents.defender import Defender
 from gym_idsgame.envs.rendering.frames.panels.game_panel import GamePanel
 from gym_idsgame.envs.dao.node_type import NodeType
 from gym_idsgame.envs.rendering.network.nodes.node import Node
-from typing import List
-import os
 
 class GameFrame(pyglet.window.Window):
     """
@@ -99,7 +102,6 @@ class GameFrame(pyglet.window.Window):
         self.idsgame_config.render_config.batch.draw()
         # Make this window the current OpenGL rendering context
         self.switch_to()
-
 
     def on_mouse_press(self, x:int, y:int, button, modifiers) -> None:
         # Dont do anything if agent is playing
@@ -212,6 +214,7 @@ class GameFrame(pyglet.window.Window):
         :return: None
         """
         self.set_state(self.game_state)
+
 
     def set_state(self, game_state:GameState) -> None:
         """

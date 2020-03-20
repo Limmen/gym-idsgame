@@ -1,3 +1,6 @@
+"""
+Type of policy baselines for the gym-idsgame environment
+"""
 from enum import Enum
 
 class PolicyType(Enum):

@@ -1,3 +1,6 @@
+"""
+The top-panel in the frame of the gym-idsgame environment
+"""
 from gym_idsgame.envs.rendering.util.render_util import batch_label
 from gym_idsgame.envs.constants import constants
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
@@ -82,12 +85,11 @@ class GamePanel:
                                            constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
                                            self.idsgame_config.render_config.batch,
                                            self.idsgame_config.render_config.second_foreground)
-        self.hack_probability = batch_label("0.0",
-                                           constants.RENDERING.PANEL_LEFT_MARGIN * 7.5,
-                                           self.idsgame_config.render_config.height -
+        self.hack_probability = batch_label("0.0", constants.RENDERING.PANEL_LEFT_MARGIN * 7.5,
+                                            self.idsgame_config.render_config.height -
                                             constants.RENDERING.PANEL_TOP_MARGIN*2,
-                                           constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
-                                           self.idsgame_config.render_config.batch,
+                                            constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
+                                            self.idsgame_config.render_config.batch,
                                             self.idsgame_config.render_config.second_foreground)
 
     def update_state_text(self, render_state: GameState) -> None:

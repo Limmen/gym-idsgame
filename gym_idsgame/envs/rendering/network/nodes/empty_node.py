@@ -1,3 +1,6 @@
+"""
+Represents an empty node in the gym-idsgame environment
+"""
 from gym_idsgame.envs.rendering.network.nodes.node import Node
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.dao.node_type import NodeType
