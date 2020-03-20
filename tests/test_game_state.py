@@ -8,7 +8,7 @@ import numpy as np
 from gym_idsgame.envs.dao.game_state import GameState
 
 class TestGameStateSuite():
-    pytest.logger = logging.getLogger("featurestore_tests")
+    pytest.logger = logging.getLogger("gamestate_tests")
 
     def test_initialization(self):
         GameState()

@@ -70,10 +70,10 @@ class NetworkConfig:
                 elif row_2 == (row_1 + 1) and col_1 == col_2 and row_1 != self.start_row and row_2 != self.start_row:
                     adjacency_matrix[i][j] = 1
                     adjacency_matrix[j][i] = 1
-        return adjacency_matrix
+        return adjacency_matrix.astype(np.int32)
 
 
-    def get_coords(self, node_id: int) -> Union[int, int]:
+    def get_coords_of_adjacency_matrix_id(self, node_id: int) -> Union[int, int]:
         """
         Gets the grid-coordinates of a node id
 

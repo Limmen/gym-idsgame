@@ -37,9 +37,9 @@ class Network:
         for i in range(self.idsgame_config.game_config.network_config.adjacency_matrix.shape[0]-1, -1, -1):
             for j in range(i-1, -1,-1):
                 if self.idsgame_config.game_config.network_config.adjacency_matrix[i][j] == int(1):
-                    row_1, col_1 = self.idsgame_config.game_config.network_config.get_coords(i)
+                    row_1, col_1 = self.idsgame_config.game_config.network_config.get_coords_of_adjacency_matrix_id(i)
                     n1 = self.grid[row_1][col_1]
-                    row_2, col_2 = self.idsgame_config.game_config.network_config.get_coords(j)
+                    row_2, col_2 = self.idsgame_config.game_config.network_config.get_coords_of_adjacency_matrix_id(j)
                     n2 = self.grid[row_2][col_2]
                     self.__create_link(n1, n2, root_edge)
 
