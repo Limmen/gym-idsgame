@@ -26,6 +26,9 @@ $ pip install -e gym-idsgame --upgrade
 git clone https://github.com/Limmen/gym-idsgame
 cd gym-idsgame
 pip3 install -e .
+
+# run tests
+pytest
 ```
 
 ## Requirements
