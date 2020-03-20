@@ -55,21 +55,6 @@ class Network:
                     node.set_state(game_state.attack_values[node.id], game_state.defense_values[node.id],
                                               game_state.defense_det[node.id])
 
-    def is_attack_legal(self, attacker_pos: Union[int, int], target_pos: Union[int, int]) -> bool:
-        """
-        Checks whether an attack is legal. That is, can the attacker reach the target node from its current
-        position in 1 step given the network configuration?
-
-        :param attacker_pos: the position of the attacker
-        :param target_pos: the position of the target node
-        :return: True if the attack is legal, otherwise False
-        """
-        attacker_row, attacker_col = attacker_pos
-        target_row, target_col = target_pos
-        attacker_id = attacker_row*self.idsgame_config.game_config.num_cols + attacker_col
-        target_id = target_row* self.idsgame_config.game_config.num_cols + target_col
-        return self.idsgame_config.game_config.network_config.adjacency_matrix[attacker_id][target_id] == int(1)
-
     def __create_node(self, row:int, col:int) -> Node:
         """
         Creates a node in the network. Based on the network config it creates either a DATA node, a START node,

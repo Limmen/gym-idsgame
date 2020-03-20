@@ -105,11 +105,11 @@ class Viewer():
         :return: RGB array or bool
         """
         arr = self.render_frame(return_rgb_array)
-        for i in range(self.gameframe.num_blinks):
-            if len(self.gameframe.defense_events) > 0 or len(self.gameframe.attack_events) > 0:
+        for i in range(self.gameframe.idsgame_config.render_config.num_blinks):
+            if len(self.gameframe.game_state.defense_events) > 0 or len(self.gameframe.game_state.attack_events) > 0:
                 self.gameframe.simulate_events(i)
                 arr = self.render_frame()
-                time.sleep(self.gameframe.blink_interval)
+                time.sleep(self.gameframe.idsgame_config.render_config.blink_interval)
         self.gameframe.reset_events()
 
         return arr if return_rgb_array else self.isopen

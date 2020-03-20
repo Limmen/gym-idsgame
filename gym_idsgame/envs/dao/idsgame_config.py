@@ -8,7 +8,8 @@ class IdsGameConfig:
     DTO representing the configuration of the IdsGameEnv:
     """
 
-    def __init__(self, render_config: RenderConfig, game_config:GameConfig, defender_policy: Policy):
+    def __init__(self, render_config: RenderConfig = None, game_config:GameConfig = None,
+                 defender_policy: Policy = None):
         """
         Constructor, initializes the config
 

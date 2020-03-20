@@ -135,6 +135,7 @@ class NetworkConfig:
                     return i, j
         raise AssertionError("Could not find data node in graph layout")
 
+
     @property
     def node_list(self) -> List[int]:
         """
@@ -151,7 +152,7 @@ class NetworkConfig:
         count = 0
         for i in range(self.num_rows):
             for j in range(self.num_cols):
-                if node_id == count:
+                if node_id == count and self.graph_layout[i][j] != NodeType.EMPTY.value:
                     return (i, j)
                 if self.graph_layout[i][j] != NodeType.EMPTY.value:
                     count +=1

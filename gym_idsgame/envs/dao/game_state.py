@@ -3,6 +3,7 @@ from typing import Union, List
 import gym
 from gym_idsgame.envs.dao.node_type import NodeType
 from gym_idsgame.envs.constants import constants
+from gym_idsgame.envs.dao.attack_defense_event import AttackDefenseEvent
 
 class GameState():
     """
@@ -13,8 +14,8 @@ class GameState():
                  defense_det:np.ndarray = np.array([0]),
                  attacker_pos:Union[int, int] = (0,0), game_step:int = 0, attacker_cumulative_reward:int = 0,
                  defender_cumulative_reward :int =0,
-                 num_games=0, attack_events:list = [], defense_events:list = [], done:bool=False, detected:bool = False,
-                 attack_type:int=0, num_hacks:int = 0, hacked:bool=False):
+                 num_games=0, attack_events:List[AttackDefenseEvent] = [], defense_events:List[AttackDefenseEvent] = [],
+                 done:bool=False, detected:bool = False, attack_type:int=0, num_hacks:int = 0, hacked:bool=False):
         """
         Constructor, initializes the DTO
 
@@ -32,7 +33,7 @@ class GameState():
         :param detected: True if the attacker is in a detected state, otherwise False
         :param attack_type: the type of the last attack
         :param num_hacks: number of wins for the attacker
-        :param detected: True if the attacker hacked the data node otherwise False
+        :param hacked: True if the attacker hacked the data node otherwise False
         """
         self.attack_values=attack_values
         self.defense_values = defense_values
@@ -113,6 +114,7 @@ class GameState():
             self.defender_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
             self.num_hacks +=1
         self.hacked = False
+        return
 
     def copy(self) -> "GameState":
         """
@@ -175,16 +177,40 @@ class GameState():
         else:
             return False
 
+    def simulate_detection(self, node_id) -> bool:
+        """
+        Simulates detection for a unsuccessful attack
+
+        :return: True if the node was detected, otherwise False
+        """
+        if np.random.rand() < self.defense_det[node_id] / 10:
+            return True
+        else:
+            return False
+
     @staticmethod
     def get_attacker_observation_space(max_value, num_attack_types, num_nodes):
-        high = np.array([max_value] * (num_attack_types + 1) * num_nodes)
+        high_row = np.array([max_value] * (num_attack_types + 1))
+        high = np.array([high_row] * num_nodes)
         low = np.zeros((num_nodes, num_attack_types + 1))
         observation_space = gym.spaces.Box(low=low, high=high, dtype=np.int32)
         return observation_space
 
+    @staticmethod
+    def get_attacker_action_space(num_actions):
+        return gym.spaces.Discrete(num_actions)
+
     def get_attacker_observation(self, num_rows, num_cols, num_attack_types):
         attack_observation = np.zeros((num_rows, num_cols, num_attack_types))
-        pass
+        return attack_observation
+
+    def add_attack_event(self, target_pos, attack_type):
+        attack_event = AttackDefenseEvent(target_pos, attack_type)
+        self.attack_events.append(attack_event)
+
+    def add_defense_event(self, target_pos, defense_type):
+        defense_event = AttackDefenseEvent(target_pos, defense_type)
+        self.defense_events.append(defense_event)
 
     def get_defender_observation(self):
         pass

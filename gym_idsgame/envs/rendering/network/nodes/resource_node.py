@@ -42,17 +42,6 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
             else:
                 clock.schedule_once(self.blink_black_defense, self.idsgame_config.render_config.blink_interval * i)
 
-    def simulate_detection(self) -> bool:
-        """
-        Simulates detection for a unsuccessful attack
-
-        :return: True if the node was detected, otherwise False
-        """
-        if np.random.rand() < self.det / 10:
-            return True
-        else:
-            return False
-
     def set_labels(self) -> None:
         """
         Updates the labels of the node
@@ -150,7 +139,7 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         else:
             self.blink_black_defense(0)
 
-    def manual_blink_attack(self, i:int) -> None:
+    def manual_blink_attack(self, i:int, edges:list=None) -> None:
         """
         Manual attack blink, when not using the clock to schedule blinks but rather ticking the clock manually.
         Used when the agent plays the game and not a human.
@@ -159,9 +148,9 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         :return: None
        """
         if i % 2 == 0:
-            self.blink_red_attack(0)
+            self.blink_red_attack(0, edges_list=edges)
         else:
-            self.blink_black_attack(0)
+            self.blink_black_attack(0, edges_list=edges)
 
     def create_labels(self, attack_label_x: int, attack_label_y: int, defense_label_x: int, defense_label_y: int,
                       det_label_x: int, det_label_y: int) -> None:

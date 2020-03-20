@@ -1,4 +1,5 @@
 import pyglet
+import gym_idsgame.envs.util.idsgame_util as util
 from gym_idsgame.envs.rendering.network.network import Network
 from gym_idsgame.envs.constants import constants
 from gym_idsgame.envs.rendering.util.render_util import batch_rect_fill
@@ -9,6 +10,7 @@ from gym_idsgame.envs.rendering.agents.attacker import Attacker
 from gym_idsgame.envs.rendering.agents.defender import Defender
 from gym_idsgame.envs.rendering.frames.panels.game_panel import GamePanel
 from gym_idsgame.envs.dao.node_type import NodeType
+from gym_idsgame.envs.rendering.network.nodes.node import Node
 from typing import List
 import os
 
@@ -128,7 +130,8 @@ class GameFrame(pyglet.window.Window):
 
                         # 2. Check that the selected node can be attacked (there is a link to it from the current
                         # position of the attacker)
-                        if self.resource_network.is_attack_legal(self.attacker.pos, node.pos):
+                        if util.is_attack_legal(self.attacker.pos, node.pos, self.idsgame_config.game_config.num_cols,
+                                                self.idsgame_config.game_config.network_config.adjacency_matrix):
 
                             # 3. Update defense state
                             defense_row, defense_col, defend_type = self.defender.policy.action(self.game_state)
@@ -163,7 +166,7 @@ class GameFrame(pyglet.window.Window):
                                     self.game_state.done = True
                                     self.game_state.hacked = True
                             else:
-                                detected = node.simulate_detection()
+                                detected = self.game_state.simulate_detection(node.id)
                                 if detected:
                                     self.game_state.done = True
                                     self.game_state.detected = True
@@ -228,31 +231,21 @@ class GameFrame(pyglet.window.Window):
         self.resource_network.set_node_states(self.game_state)
 
     def simulate_events(self, i):
-        self.simulate_defense_events(self.defense_events, i)
-        self.simulate_attack_events(self.attack_events, i)
+        self.simulate_defense_events(self.game_state.defense_events, i)
+        self.simulate_attack_events(self.game_state.attack_events, i)
 
     def reset_events(self):
-        self.attack_events = []
-        self.defense_events = []
+        self.game_state.attack_events = []
+        self.game_state.defense_events = []
 
     def simulate_attack_events(self, attack_events: List[AttackDefenseEvent], i):
         for attack in attack_events:
             self.attack_type = attack.attack_defense_type
-            target_node = self.resource_network.grid[attack.target_row][attack.target_col].get_node()
-            # if isinstance(target_node, Data):
-            #     edges = []
-            #     if isinstance(self.resource_network.grid[self.hacker.row][self.hacker.col], Server):
-            #         edges = self.resource_network.grid[self.hacker.row][self.hacker.col].resource.outgoing_edges
-            #     self.resource_network.grid[attack.target_row][attack.target_col].manual_blink_attack(i, edges)
-            # else:
-            #     self.resource_network.grid[attack.target_row][attack.target_col].manual_blink_attack(i)
-
-    def test(self):
-        if self.defense_event is not None:
-            defense = self.defense_event
-            pyglet.clock.schedule(
-                self.resource_network.grid[defense.target_row][defense.target_col].data.blink_black_defense)
-            pyglet.clock.tick(poll=True)
+            target_node: Node = self.resource_network.grid[attack.target_row][attack.target_col]
+            edges = []
+            if target_node.node_type == NodeType.DATA:
+                edges = self.resource_network.get(self.attacker.pos).outgoing_edges
+            self.resource_network.grid[attack.target_row][attack.target_col].manual_blink_attack(i, edges)
 
     def simulate_defense_events(self, defense_events: List[AttackDefenseEvent], i):
         for defense in defense_events:
@@ -273,5 +266,6 @@ class GameFrame(pyglet.window.Window):
         """
         self.game_state.new_game(self.idsgame_config.game_config.initial_state)
         self.set_state(self.game_state)
+        self.reset_events()
         self.unschedule_events()
         self.switch_to()
