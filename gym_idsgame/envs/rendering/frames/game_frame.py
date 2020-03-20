@@ -2,7 +2,7 @@ import pyglet
 from gym_idsgame.envs.rendering.network.network import Network
 from gym_idsgame.envs.constants import constants
 from gym_idsgame.envs.rendering.util.render_util import batch_rect_fill
-from gym_idsgame.envs.dao.render_state import RenderState
+from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.attack_defense_event import AttackDefenseEvent
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.rendering.agents.attacker import Attacker
@@ -33,7 +33,7 @@ class GameFrame(pyglet.window.Window):
         self.resource_network = None
         self.attacker = None
         self.defender = None
-        self.render_state = None
+        self.game_state: GameState = None
         self.setup_resources_path()
         self.create_batch()
         self.set_state(self.idsgame_config.game_config.initial_state)
@@ -104,7 +104,7 @@ class GameFrame(pyglet.window.Window):
         if not self.idsgame_config.game_config.manual:
             return
         # Dont do anything if game is over
-        if self.render_state.done:
+        if self.game_state.done:
             return
 
         # Unschedule events from previous press, if any
@@ -120,8 +120,8 @@ class GameFrame(pyglet.window.Window):
                             # 1.5 Special case: if it is the start node, let the attacker move there without making
                             # any attack or risk to be detected
                             if node.node_type == NodeType.START:
-                                self.render_state.attacker_pos = node.pos
-                                self.render_state.game_step += 1
+                                self.game_state.attacker_pos = node.pos
+                                self.game_state.game_step += 1
                                 return
 
                     if node.x < x < (node.x + node.width) and node.y < y < (node.y + node.height):
@@ -130,28 +130,43 @@ class GameFrame(pyglet.window.Window):
                         # position of the attacker)
                         if self.resource_network.is_attack_legal(self.attacker.pos, node.pos):
 
-                            # 3. Simulate defense
-                            defense_row, defense_col, defend_type = self.defender.policy.action(self.render_state)
-                            self.resource_network.grid[defense_row][defense_col].defend(defend_type)
+                            # 3. Update defense state
+                            defense_row, defense_col, defend_type = self.defender.policy.action(self.game_state)
+                            defend_node_id = self.idsgame_config.game_config.network_config.get_node_id((defense_row,
+                                                                                                         defense_col))
+                            self.game_state.defend(defend_node_id, defend_type,
+                                                   self.idsgame_config.game_config.max_value)
+
+                            # 4. Visualize defense
+                            self.resource_network.grid[defense_row][defense_col].visualize_defense(defend_type)
+
+                            # 5. Update attack state
+                            self.game_state.attack(node.id, self.game_state.attack_type,
+                                                   self.idsgame_config.game_config.max_value)
+
+
+                            # 6. Visualize attack
                             edges = []
                             if node.node_type == NodeType.DATA:
                                 edges = self.resource_network.get(self.attacker.pos).outgoing_edges
 
-                            # 4. Simulate attack
-                            attack_successful = node.simulate_attack(self.render_state.attack_type, edges)
+                            node.visualize_attack(self.game_state.attack_type, edges)
 
-                            # 5. Update state
-                            self.render_state.game_step += 1
+                            # 7. Simulate attack outcome
+                            attack_successful = self.game_state.simulate_attack(node.id, self.game_state.attack_type)
+
+                            # 8. Update game state based on the outcome of the attack
+                            self.game_state.game_step += 1
                             if attack_successful:
-                                self.render_state.attacker_pos = node.pos
+                                self.game_state.attacker_pos = node.pos
                                 if node.node_type == NodeType.DATA:
-                                    self.render_state.done = True
-                                    self.render_state.hacked = True
+                                    self.game_state.done = True
+                                    self.game_state.hacked = True
                             else:
                                 detected = node.simulate_detection()
                                 if detected:
-                                    self.render_state.done = True
-                                    self.render_state.detected = True
+                                    self.game_state.done = True
+                                    self.game_state.detected = True
 
     def on_key_press(self, symbol, modifiers) -> None:
         """
@@ -164,25 +179,25 @@ class GameFrame(pyglet.window.Window):
         """
         if self.idsgame_config.game_config.manual:
             if symbol == pyglet.window.key._1:
-                self.render_state.attack_type = 1
+                self.game_state.attack_type = 1
             elif symbol == pyglet.window.key._2:
-                self.render_state.attack_type = 2
+                self.game_state.attack_type = 2
             elif symbol == pyglet.window.key._3:
-                self.render_state.attack_type = 3
+                self.game_state.attack_type = 3
             elif symbol == pyglet.window.key._4:
-                self.render_state.attack_type = 4
+                self.game_state.attack_type = 4
             elif symbol == pyglet.window.key._5:
-                self.render_state.attack_type = 5
+                self.game_state.attack_type = 5
             elif symbol == pyglet.window.key._6:
-                self.render_state.attack_type = 6
+                self.game_state.attack_type = 6
             elif symbol == pyglet.window.key._7:
-                self.render_state.attack_type = 7
+                self.game_state.attack_type = 7
             elif symbol == pyglet.window.key._8:
-                self.render_state.attack_type = 8
+                self.game_state.attack_type = 8
             elif symbol == pyglet.window.key._9:
-                self.render_state.attack_type = 9
+                self.game_state.attack_type = 9
             elif symbol == pyglet.window.key._0:
-                self.render_state.attack_type = 0
+                self.game_state.attack_type = 0
             elif symbol == pyglet.window.key.SPACE:
                 self.reset()
 
@@ -194,23 +209,23 @@ class GameFrame(pyglet.window.Window):
         :param dt: the number of seconds since the function was last called
         :return: None
         """
-        self.set_state(self.render_state)
+        self.set_state(self.game_state)
 
-    def set_state(self, render_state:RenderState) -> None:
+    def set_state(self, game_state:GameState) -> None:
         """
         Updates the current state
 
         :param state: the new state
         :return: None
         """
-        self.render_state = render_state.copy()
-        self.game_panel.update_state_text(self.render_state)
-        self.attacker.move_to_pos(self.render_state.attacker_pos)
-        if render_state.detected:
+        self.game_state = game_state.copy()
+        self.game_panel.update_state_text(self.game_state)
+        self.attacker.move_to_pos(self.game_state.attacker_pos)
+        if game_state.detected:
             self.attacker.detected()
         else:
             self.attacker.undetect()
-        self.resource_network.set_node_states(self.render_state)
+        self.resource_network.set_node_states(self.game_state)
 
     def simulate_events(self, i):
         self.simulate_defense_events(self.defense_events, i)
@@ -256,7 +271,7 @@ class GameFrame(pyglet.window.Window):
 
         :return: None
         """
-        self.render_state.new_game(self.idsgame_config.game_config.initial_state)
-        self.set_state(self.render_state)
+        self.game_state.new_game(self.idsgame_config.game_config.initial_state)
+        self.set_state(self.game_state)
         self.unschedule_events()
         self.switch_to()

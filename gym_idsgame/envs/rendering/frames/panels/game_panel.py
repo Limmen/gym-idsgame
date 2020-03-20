@@ -1,7 +1,7 @@
 from gym_idsgame.envs.rendering.util.render_util import batch_label
 from gym_idsgame.envs.constants import constants
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
-from gym_idsgame.envs.dao.render_state import RenderState
+from gym_idsgame.envs.dao.game_state import GameState
 
 class GamePanel:
     """
@@ -90,7 +90,7 @@ class GamePanel:
                                            self.idsgame_config.render_config.batch,
                                             self.idsgame_config.render_config.second_foreground)
 
-    def update_state_text(self, render_state: RenderState) -> None:
+    def update_state_text(self, render_state: GameState) -> None:
         """
         Updates the text of the labels on the panel
 

@@ -1,11 +1,12 @@
 import numpy as np
-from typing import Union
+from typing import Union, List
+import gym
 from gym_idsgame.envs.dao.node_type import NodeType
 from gym_idsgame.envs.constants import constants
 
-class RenderState():
+class GameState():
     """
-    DTO representing the state of a current rendering
+    DTO representing the state of the game
     """
 
     def __init__(self, attack_values:np.ndarray = np.array([0]), defense_values:np.ndarray = np.array([0]),
@@ -48,8 +49,10 @@ class RenderState():
         self.attack_type = attack_type
         self.num_hacks = num_hacks
         self.hacked = hacked
+        self.action_descriptors = ["Injection", "Authentication", "CrossSite", "References", "Misssconfiguration",
+                                   "Exposure", "Access", "Forgery", "Vulnerabilities", "Redirects"]
 
-    def default_state(self, graph_layout: np.ndarray, num_rows:int, num_cols:int, num_attack_types:int) -> None:
+    def default_state(self, node_list: List[int], attacker_pos: Union[int, int], num_attack_types:int) -> None:
         """
         Creates a default state
 
@@ -59,20 +62,19 @@ class RenderState():
         :param num_attack_types: the number of attack types
         :return: None
         """
-        attack_values = np.zeros((num_rows, num_cols, num_attack_types))
-        defense_values = np.zeros((num_rows, num_cols, num_attack_types))
-        det_values = np.zeros((num_rows, num_cols))
-        for i in range(num_rows):
-            for j in range(num_cols):
-                if (graph_layout[i][j] == NodeType.DATA.value
-                        or graph_layout[i][j] == NodeType.SERVER.value):
-                    defense_values[i][j] = [2] * num_attack_types
-                    defense_values[i][j][0] = 0  # vulnerability
-                    det_values[i][j] = 2
+        num_nodes = len(node_list)
+        attack_values = np.zeros((num_nodes, num_attack_types))
+        defense_values = np.zeros((num_nodes, num_attack_types))
+        det_values = np.zeros(num_nodes)
+        for node_id in range(num_nodes):
+            if node_list[node_id] == NodeType.DATA.value or node_list[node_id] == NodeType.SERVER.value:
+                defense_values[node_id] = [2] * num_attack_types
+                defense_values[node_id][0] = 0 # vulnerability
+                det_values[node_id] = 2
         self.attack_values =  attack_values.astype(np.int32)
         self.defense_values = defense_values.astype(np.int32)
         self.defense_det = det_values.astype(np.int32)
-        self.attacker_pos = (num_rows - 1, num_cols // 2)
+        self.attacker_pos = attacker_pos
         self.game_step = 0
         self.attacker_cumulative_reward = 0
         self.defender_cumulative_reward = 0
@@ -85,7 +87,7 @@ class RenderState():
         self.num_hacks = 0
         self.hacked = False
 
-    def new_game(self, init_state: "RenderState") -> None:
+    def new_game(self, init_state: "GameState") -> None:
         """
         Updates the current state for a new game
 
@@ -112,13 +114,13 @@ class RenderState():
             self.num_hacks +=1
         self.hacked = False
 
-    def copy(self) -> "RenderState":
+    def copy(self) -> "GameState":
         """
         Creates a copy of the state
 
         :return: a copy of the current state
         """
-        new_state = RenderState()
+        new_state = GameState()
         new_state.attack_values = np.copy(self.attack_values)
         new_state.defense_values = np.copy(self.defense_values)
         new_state.defense_det = np.copy(self.defense_det)
@@ -135,3 +137,54 @@ class RenderState():
         new_state.num_hacks = self.num_hacks
         new_state.hacked = self.hacked
         return new_state
+
+    def attack(self, node_id:int, attack_type:int, max_value:int) -> None:
+        """
+        Increments the attack value of the specified node and attack type
+
+        :param node_id: id of the node to defend
+        :param attack_type: the type of attack attribute to increment
+        :param max_value: the maximum defense value
+        :return: None
+        """
+        if self.attack_values[node_id][attack_type] < max_value:
+            self.attack_values[node_id][attack_type] += 1
+
+    def defend(self, node_id:int, defense_type:int, max_value:int) -> None:
+        """
+        Increments the defense value of the specified node and defense type
+
+        :param node_id: id of the node to defend
+        :param defense_type: the type of defense attribute to increment
+        :param max_value: the maximum defense value
+        :return: None
+        """
+        if self.defense_values[node_id][defense_type] < max_value:
+            self.defense_values[node_id][defense_type] += 1
+
+    def simulate_attack(self, attacked_node_id:int, attack_type:int) -> bool:
+        """
+        Simulates an attack operation
+
+        :param attacked_node_id: the id of the node that is attacked
+        :param attack_type: the type of the attack
+        :return: True if the attack was successful otherwise False
+        """
+        if self.attack_values[attacked_node_id][attack_type] > self.defense_values[attacked_node_id][attack_type]:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def get_attacker_observation_space(max_value, num_attack_types, num_nodes):
+        high = np.array([max_value] * (num_attack_types + 1) * num_nodes)
+        low = np.zeros((num_nodes, num_attack_types + 1))
+        observation_space = gym.spaces.Box(low=low, high=high, dtype=np.int32)
+        return observation_space
+
+    def get_attacker_observation(self, num_rows, num_cols, num_attack_types):
+        attack_observation = np.zeros((num_rows, num_cols, num_attack_types))
+        pass
+
+    def get_defender_observation(self):
+        pass

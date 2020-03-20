@@ -1,5 +1,5 @@
 import numpy as np
-from typing import Union
+from typing import Union, List
 from gym_idsgame.envs.dao.node_type import NodeType
 
 class NetworkConfig:
@@ -134,3 +134,39 @@ class NetworkConfig:
                 if self.graph_layout[i][j] == NodeType.DATA.value:
                     return i, j
         raise AssertionError("Could not find data node in graph layout")
+
+    @property
+    def node_list(self) -> List[int]:
+        """
+        :return: a list of node-types where the index in the list corresponds to the node id.
+        """
+        node_list = []
+        for i in range(self.num_rows):
+            for j in range(self.num_cols):
+                if self.graph_layout[i][j] != NodeType.EMPTY.value:
+                    node_list.append(self.graph_layout[i][j])
+        return node_list
+
+    def get_node_pos(self, node_id: int) -> Union[int, int]:
+        count = 0
+        for i in range(self.num_rows):
+            for j in range(self.num_cols):
+                if node_id == count:
+                    return (i, j)
+                if self.graph_layout[i][j] != NodeType.EMPTY.value:
+                    count +=1
+        raise ValueError("Invalid node id")
+
+    def get_node_id(self, pos: Union[int, int]):
+        row, col = pos
+        count = 0
+        for i in range(self.num_rows):
+            for j in range(self.num_cols):
+                if row == i and col == j:
+                    if self.graph_layout[i][j] == NodeType.EMPTY.value:
+                        return -1
+                    else:
+                        return count
+                if self.graph_layout[i][j] != NodeType.EMPTY.value:
+                    count += 1
+        raise ValueError("Invalid node position")

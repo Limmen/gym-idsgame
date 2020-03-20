@@ -1,7 +1,7 @@
 from typing import Union
 import numpy as np
 from gym_idsgame.envs.policy_baselines.policy import Policy
-from gym_idsgame.envs.dao.render_state import RenderState
+from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.envs.dao.node_type import NodeType
 
@@ -20,7 +20,7 @@ class RandomDefense(Policy):
         super(RandomDefense, self).__init__(game_config)
 
 
-    def action(self, render_state: RenderState) -> Union[int, int, int]:
+    def action(self, render_state: GameState) -> Union[int, int, int]:
         """
         Samples an action from the policy
 

@@ -1,7 +1,7 @@
 from typing import Union
 from gym_idsgame.envs.rendering.util.render_util import batch_line
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
-from gym_idsgame.envs.dao.render_state import RenderState
+from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.node_type import NodeType
 from gym_idsgame.envs.rendering.network.nodes.data_node import DataNode
 from gym_idsgame.envs.rendering.network.nodes.server_node import ServerNode
@@ -41,17 +41,19 @@ class Network:
                     self.__create_link(n1, n2, root_edge)
 
 
-    def set_node_states(self, render_state: RenderState) -> None:
+    def set_node_states(self, game_state: GameState) -> None:
         """
         Updates the node states
 
-        :param render_state: the render state to update the nodes with
+        :param game_state: the render state to update the nodes with
         :return: None
         """
         for i in range(self.idsgame_config.game_config.num_rows):
             for j in range(self.idsgame_config.game_config.num_cols):
-                self.grid[i][j].set_state(render_state.attack_values[i][j], render_state.defense_values[i][j],
-                    render_state.defense_det[i][j])
+                node = self.grid[i][j]
+                if node.node_type != NodeType.EMPTY:
+                    node.set_state(game_state.attack_values[node.id], game_state.defense_values[node.id],
+                                              game_state.defense_det[node.id])
 
     def is_attack_legal(self, attacker_pos: Union[int, int], target_pos: Union[int, int]) -> bool:
         """
@@ -77,14 +79,15 @@ class Network:
         :param col: column in the grid
         :return: the created node
         """
+        node_id = self.idsgame_config.game_config.network_config.get_node_id((row, col))
         if self.idsgame_config.game_config.network_config.graph_layout[row][col] == NodeType.DATA.value:
-            return DataNode(self.idsgame_config, row, col) # Data node
+            return DataNode(self.idsgame_config, row, col, node_id) # Data node
         elif self.idsgame_config.game_config.network_config.graph_layout[row][col] == NodeType.START.value:
-            return StartNode(self.idsgame_config, row, col) # Start node
+            return StartNode(self.idsgame_config, row, col, node_id) # Start node
         elif self.idsgame_config.game_config.network_config.graph_layout[row][col] == NodeType.SERVER.value:
-            return ServerNode(self.idsgame_config, row, col) # Server node
+            return ServerNode(self.idsgame_config, row, col, node_id) # Server node
         else:
-            return EmptyNode(self.idsgame_config, row, col) # Empty node
+            return EmptyNode(self.idsgame_config, row, col, node_id) # Empty node
 
     def __create_link(self, n1: Node, n2: Node, root_edge) -> None:
         """

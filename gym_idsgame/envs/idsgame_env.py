@@ -1,13 +1,14 @@
+from typing import Union
 import gym
 import numpy as np
 from gym_idsgame.envs.constants import constants
 import os
-import math
-from gym_idsgame.envs.dao.render_state import RenderState
+from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.attack_defense_event import AttackDefenseEvent
 from gym_idsgame.envs.dao.node_type import NodeType
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 import gym_idsgame.envs.util.idsgame_util as util
+from gym_idsgame.envs.rendering.agents.defender import Defender
 
 class IdsGameEnv(gym.Env):
     """
@@ -19,14 +20,10 @@ class IdsGameEnv(gym.Env):
         TODO
         """
         util.validate_config(idsgame_config)
-        self.idsgame_config = idsgame_config
-        self.state = np.copy(self.init_state)
-        self.action_descriptors = ["Injection", "Authentication", "CrossSite", "References", "Misssconfiguration",
-                                   "Exposure", "Access", "Forgery", "Vulnerabilities", "Redirects"]
-        high_row = np.array([self.max_value]*(self.num_attack_types+1))
-        high = np.array([high_row]*self.num_nodes)
-        low = np.zeros((self.num_nodes, self.num_attack_types+1))
-        self.observation_space = gym.spaces.Box(low=low, high=high, dtype=np.int32)
+        self.idsgame_config: IdsGameConfig = idsgame_config
+        self.state: GameState = self.idsgame_config.game_config.initial_state
+        self.observation_space = idsgame_config.game_config.get_attacker_observation_space()
+        self.defender = Defender(self.idsgame_config.defender_policy)
         self.action_space = gym.spaces.Discrete(self.num_actions)
         self.viewer = None
         self.steps_beyond_done = None
@@ -35,29 +32,25 @@ class IdsGameEnv(gym.Env):
          'video.frames_per_second' : 50 # Video rendering speed
         }
         self.reward_range = (float(constants.GAME_CONFIG.NEGATIVE_REWARD), float(constants.GAME_CONFIG.POSITIVE_REWARD))
-        self.attacker_total_reward = 0
-        self.defender_total_reward = 0
-        self.game_step = 0
-        self.num_games = 0
-        self.attack_events = []
-        self.defense_events = []
 
-    def initial_state(self):
-        attack_states = np.zeros((self.num_nodes, self.num_attack_types+1)) # Plus 1 to indicate whether the agent is currently at this node or not
-        defense_states = np.zeros((self.num_nodes, self.num_attack_types+1)) # Plus 1 to indicate detection value
-        for i in range(self.num_nodes):
-            attack_states[i] = np.array([0]*(self.num_attack_types+1))
-        for i in range(self.num_nodes):
-            defense_states[i] = np.array([2] * (self.num_attack_types + 1))
-            defense_states[i][1] = 0 # innate vulnerability
-            defense_states[i][-1] = 2 # detection value
-        attack_states[0][-1] = 1 # The agent starts at the "START" node
-        state = np.array([attack_states, defense_states])
-        return state
+    # def initial_state(self):
+    #     attack_states = np.zeros((self.num_nodes, self.num_attack_types+1)) # Plus 1 to indicate whether the agent is currently at this node or not
+    #     defense_states = np.zeros((self.num_nodes, self.num_attack_types+1)) # Plus 1 to indicate detection value
+    #     for i in range(self.num_nodes):
+    #         attack_states[i] = np.array([0]*(self.num_attack_types+1))
+    #     for i in range(self.num_nodes):
+    #         defense_states[i] = np.array([2] * (self.num_attack_types + 1))
+    #         defense_states[i][1] = 0 # innate vulnerability
+    #         defense_states[i][-1] = 2 # detection value
+    #     attack_states[0][-1] = 1 # The agent starts at the "START" node
+    #     state = np.array([attack_states, defense_states])
+    #     return state
 
-    def __get_server_under_attack(self, action):
-        server = action // self.num_attack_types
-        return server
+    def __get_server_under_attack(self, action:int) -> Union[int, Union[int,int], int]:
+        server_id = action // self.num_attack_types
+        server_pos = self.idsgame_config.game_config.network_config.get_node_pos(server_id)
+        attack_type = self.__get_attack_type(action)
+        return server_id, server_pos, attack_type
 
     def __get_attack_type(self, action):
         attack_type = action % (self.num_attack_types)
@@ -82,7 +75,7 @@ class IdsGameEnv(gym.Env):
         n2 = n1 -(self.num_servers_per_layer-1) # first and second layer only contain 1 node
         return n2
 
-    def __increment_attack_defense_value(self, values, server, type):
+    def __increment_attack_value(self, target_id, type):
         if values[server][type] < (self.max_value-1):
             values[server][type] += 1
 
@@ -132,49 +125,61 @@ class IdsGameEnv(gym.Env):
         defense_event = AttackDefenseEvent(target_col, target_row, defense_type)
         self.defense_events.append(defense_event)
 
+    def __simulate_attach(self):
+        pass
+
     def step(self, action):
-        self.attack_events = []
-        self.defense_events = []
         reward = 0
         done = False
         detected = False
         info = {}
-        target_node = self.__get_server_under_attack(action)
-        attack_type = self.__get_attack_type(action)
-        attacker_node = self.__get_attacker_node()
-        defense_row, defense_col, defense_type = self.__defense_action()
-        defense_node = self.__get_node_from_grid_pos(defense_row, defense_col)
-        self.__increment_attack_defense_value(self.state[1], defense_node, defense_type)
-        self.__add_defense_event(defense_node, defense_type)
-        if self.__is_attack_legal(target_node, attacker_node):
-            self.__add_attack_event(target_node, attack_type)
-            self.__increment_attack_defense_value(self.state[0], target_node, attack_type)
-            attack_successful = self.__simulate_attack(target_node, attack_type)
-            if attack_successful:
-                self.__move_attacker(attacker_node, target_node)
-                if self.__is_data_node(target_node):
-                    reward = constants.RENDERING.POSITIVE_REWARD
-                    done = True
-            else:
-                detected = self.__simulate_detection(target_node)
-                if detected:
-                    reward = constants.RENDERING.NEGATIVE_REWARD
-                    done = True
-        observation = self.state[0]
-        if done:
-            if self.steps_beyond_done is None:
-                self.steps_beyond_done = 0
-            else:
-                gym.logger.warn("You are calling 'step()' even though this environment has already returned done = True. "
-                                "You should always call 'reset()' once you receive 'done = True' -- "
-                                "any further steps are undefined behavior.")
-                self.steps_beyond_done += 1
-        self.game_step +=1
-        self.attacker_total_reward += reward
-        self.defender_total_reward -= reward
-        if self.viewer is not None:
-            self.viewer.gameframe.set_state(self.convert_state_to_render_state(done, detected))
-        return observation, reward, done, info
+        self.state.attack_events = []
+        self.state.defense_events = []
+        target_node_id, target_pos, attack_type = self.__get_server_under_attack(action)
+        defense_pos, defense_type, defense_node_id = self.__defense_action()
+        return None, None, None, None
+        # self.attack_events = []
+        # self.defense_events = []
+        # reward = 0
+        # done = False
+        # detected = False
+        # info = {}
+        # target_node = self.__get_server_under_attack(action)
+        # attack_type = self.__get_attack_type(action)
+        # attacker_node = self.__get_attacker_node()
+        # defense_row, defense_col, defense_type = self.__defense_action()
+        # defense_node = self.__get_node_from_grid_pos(defense_row, defense_col)
+        # self.__increment_attack_defense_value(self.state[1], defense_node, defense_type)
+        # self.__add_defense_event(defense_node, defense_type)
+        # if self.__is_attack_legal(target_node, attacker_node):
+        #     self.__add_attack_event(target_node, attack_type)
+        #     self.__increment_attack_defense_value(self.state[0], target_node, attack_type)
+        #     attack_successful = self.__simulate_attack(target_node, attack_type)
+        #     if attack_successful:
+        #         self.__move_attacker(attacker_node, target_node)
+        #         if self.__is_data_node(target_node):
+        #             reward = constants.RENDERING.POSITIVE_REWARD
+        #             done = True
+        #     else:
+        #         detected = self.__simulate_detection(target_node)
+        #         if detected:
+        #             reward = constants.RENDERING.NEGATIVE_REWARD
+        #             done = True
+        # observation = self.state[0]
+        # if done:
+        #     if self.steps_beyond_done is None:
+        #         self.steps_beyond_done = 0
+        #     else:
+        #         gym.logger.warn("You are calling 'step()' even though this environment has already returned done = True. "
+        #                         "You should always call 'reset()' once you receive 'done = True' -- "
+        #                         "any further steps are undefined behavior.")
+        #         self.steps_beyond_done += 1
+        # self.game_step +=1
+        # self.attacker_total_reward += reward
+        # self.defender_total_reward -= reward
+        # if self.viewer is not None:
+        #     self.viewer.gameframe.set_state(self.convert_state_to_render_state(done, detected))
+        # return observation, reward, done, info
 
     def reset(self):
         """
@@ -204,7 +209,7 @@ class IdsGameEnv(gym.Env):
             defense_state = self.state[1][node][:-1]
             render_defense_values[row][col] = defense_state
             render_defense_det[row][col] = self.state[1][node][-1]
-        render_state = RenderState(
+        render_state = GameState(
             attack_values=render_attack_values.astype(np.int32),
             defense_values = render_defense_values.astype(np.int32),
             defense_det = render_defense_det.astype(np.int32),
@@ -268,22 +273,11 @@ class IdsGameEnv(gym.Env):
             self.viewer.close()
             self.viewer = None
 
-    def __defense_action(self):
-        if self.defense_policy == constants.BASELINE_POLICIES.RANDOM:
-            defend_type = np.random.randint(len(self.defense_values))
-            while True:
-                random_row = np.random.randint(self.graph_layout.shape[0])
-                random_col = np.random.randint(self.graph_layout.shape[1])
-                if self.graph_layout[random_row, random_col] == NodeType.SERVER or self.graph_layout[
-                    random_row, random_col] == NodeType.DATA:
-                    return random_row, random_col, defend_type
-        elif self.defense_policy == constants.BASELINE_POLICIES.NAIVE_DETERMINISTIC:
-            defend_type = 1
-            for i in range(self.graph_layout.shape[0]):
-                for j in range(self.graph_layout.shape[1]):
-                    if self.graph_layout[i, j] == NodeType.SERVER or self.graph_layout[
-                        i, j] == NodeType.DATA:
-                        return i, j, defend_type
+    def __defense_action(self) -> Union[Union[int, int], int, int]:
+        defense_row, defense_col, defense_type = self.defender.policy.action(self.state)
+        defense_pos = (defense_row, defense_col)
+        defense_node_id = self.idsgame_config.game_config.network_config.get_node_id(defense_pos)
+        return defense_pos, defense_type, defense_node_id
 
     def __initialize_graph_config(self):
         self.graph_layout = np.zeros((self.num_rows, self.num_cols))

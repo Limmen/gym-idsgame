@@ -29,16 +29,13 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         self.incoming_edges = []
         self.initialize_state()
 
-    def defend(self, defend_type: int) -> None:
+    def visualize_defense(self, defend_type: int) -> None:
         """
         Simulates defense of the node
 
         :param defend_type: the type of defense
         :return: None
         """
-        if self.defense_values[defend_type] < self.idsgame_config.game_config.max_value - 1:
-            self.defense_values[defend_type] += 1
-        self.defense_label.text = self.defense_text
         for i in range(0, self.idsgame_config.render_config.num_blinks):
             if i % 2 == 0:
                 clock.schedule_once(self.blink_green_defense, self.idsgame_config.render_config.blink_interval * i)
@@ -229,7 +226,7 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         pass
 
     @abstractmethod
-    def simulate_attack(self, attack_type, edges_list=None):
+    def visualize_attack(self, attack_type, edges_list=None):
         pass
 
     @abstractmethod

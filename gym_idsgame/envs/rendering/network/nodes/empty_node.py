@@ -7,18 +7,20 @@ class EmptyNode(Node):
     Represents an empty node in the grid-network
     """
 
-    def __init__(self, idsgame_config: IdsGameConfig, row: int, col: int):
+    def __init__(self, idsgame_config: IdsGameConfig, row: int, col: int, id: int):
         """
         Class constructor, initializes the node
 
         :param idsgame_config: configuration for the IdsGameEnv
         :param row: the row in the grid
         :param col: the column in the grid
+        :param id: the id of the node
         """
         super(EmptyNode, self).__init__()
         self.idsgame_config = idsgame_config
         self.row = row
         self.col = col
+        self._id = id
 
     @property
     def node_type(self) -> NodeType:
@@ -26,6 +28,13 @@ class EmptyNode(Node):
         :return: the node type
         """
         return NodeType.EMPTY
+
+    @property
+    def id(self) -> int:
+        """
+        :return: the id of the node
+        """
+        return self._id
 
     # --- Inherited methods----
     # empty nodes cannot be attacked or defended so simply do nothing when they are called
@@ -39,7 +48,7 @@ class EmptyNode(Node):
     def set_state(self, attack_values, defense_values, det_value):
         pass
 
-    def defend(self, defense_type):
+    def visualize_defense(self, defense_type):
         pass
 
     def reset(self):

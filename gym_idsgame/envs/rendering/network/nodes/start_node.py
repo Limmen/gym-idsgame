@@ -9,18 +9,20 @@ class StartNode(Node):
     """
     Represents the start node the grid network
     """
-    def __init__(self, idsgame_config: IdsGameConfig, row: int, col: int):
+    def __init__(self, idsgame_config: IdsGameConfig, row: int, col: int, id: int):
         """
         Initializes the node
 
         :param idsgame_config: configuratin for the IdsGameEnv
         :param row: the row in the grid network
         :param col: the column in the grid network
+        :param id: the id of the node
         """
         super(StartNode, self).__init__()
         self.idsgame_config = idsgame_config
         self.row = row
         self.col = col
+        self._id = id
         self.x = self.col * self.idsgame_config.render_config.rect_size \
                  + self.idsgame_config.render_config.rect_size / 2
         self.y = self.row * int(self.idsgame_config.render_config.rect_size / 1.5) \
@@ -34,6 +36,13 @@ class StartNode(Node):
         :return: the node type (START)
         """
         return NodeType.START
+
+    @property
+    def id(self) -> int:
+        """
+        :return: the id of the node
+        """
+        return self._id
 
     def __draw(self) -> None:
         """
@@ -70,7 +79,7 @@ class StartNode(Node):
     def set_state(self, attack_values, defense_values, det_value):
         pass
 
-    def defend(self, defense_type):
+    def visualize_defense(self, defense_type):
         pass
 
     def reset(self):

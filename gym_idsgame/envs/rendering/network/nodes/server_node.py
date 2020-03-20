@@ -10,19 +10,21 @@ class ServerNode(ResourceNode):
     """
     Represents a server node in the grid network
     """
-    def __init__(self, idsgame_config: IdsGameConfig, row: int, col: int):
+    def __init__(self, idsgame_config: IdsGameConfig, row: int, col: int, id: int):
         """
         Initializes the node
 
         :param idsgame_config: configuration for the IdsGameEnv
         :param row: the row in the grid
         :param col: the column in the grid
+        :param id: the id of the node
         """
         avatar = pyglet.resource.image(idsgame_config.render_config.server_filename)
         super(ServerNode, self).__init__(avatar, idsgame_config,
                                          idsgame_config.render_config.background)
         self.col = col
         self.row = row
+        self._id = id
         self.scale = idsgame_config.render_config.server_scale
         self.reset()
 
@@ -32,6 +34,13 @@ class ServerNode(ResourceNode):
         :return: the type of the node (SERVER)
         """
         return NodeType.SERVER
+
+    @property
+    def id(self) -> int:
+        """
+        :return: the id of the node
+        """
+        return self._id
 
     def init_labels(self) -> None:
         """
@@ -55,26 +64,19 @@ class ServerNode(ResourceNode):
                            defense_label_x=defense_label_x, defense_label_y=defense_label_y,
                            det_label_x=det_label_x, det_label_y=det_label_y)
 
-    def simulate_attack(self, attack_type:int, edges_list:list=None) -> bool:
+    def visualize_attack(self, attack_type:int, edges_list:list=None) -> None:
         """
         Simulates an attack against the node.
 
         :param attack_type: the type of the attack
         :param edges_list: edges list for visualization (blinking)
-        :return: True if the attack was successful otherwise False
+        :return: None
         """
         for i in range(0, self.idsgame_config.render_config.num_blinks):
             if i % 2 == 0:
                 clock.schedule_once(self.blink_red_attack, self.idsgame_config.render_config.blink_interval * i)
             else:
                 clock.schedule_once(self.blink_black_attack, self.idsgame_config.render_config.blink_interval * i)
-        if self.attack_values[attack_type] < self.idsgame_config.game_config.max_value-1:
-            self.attack_values[attack_type] += 1
-        self.attack_label.text = self.attack_text
-        if self.attack_values[attack_type] > self.defense_values[attack_type]:
-            return True # successful attack
-        else:
-            return False
 
     def blink_red_attack(self, dt, edges_list:list=None) -> None:
         """

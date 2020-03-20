@@ -1,6 +1,6 @@
 from typing import Union
 from gym_idsgame.envs.policy_baselines.policy import Policy
-from gym_idsgame.envs.dao.render_state import RenderState
+from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.game_config import GameConfig
 
 class DeterministicDefense(Policy):
@@ -29,7 +29,7 @@ class DeterministicDefense(Policy):
         if defend_col is None:
             raise ValueError("defend_row cannot be None for a Deterministic Defense Policy")
 
-    def action(self, render_state: RenderState) -> Union[int, int, int]:
+    def action(self, render_state: GameState) -> Union[int, int, int]:
         """
         Returns the action from the deterministic policy
 

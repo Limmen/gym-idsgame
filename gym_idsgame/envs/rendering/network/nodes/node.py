@@ -11,6 +11,11 @@ class Node(ABC):
         pass
 
     @property
+    @abstractmethod
+    def id(self):
+        pass
+
+    @property
     def pos(self):
         return (self.row, self.col)
 
@@ -31,7 +36,7 @@ class Node(ABC):
         pass
 
     @abstractmethod
-    def defend(self, defense_type):
+    def visualize_defense(self, defense_type):
         pass
 
     @abstractmethod
