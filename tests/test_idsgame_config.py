@@ -13,4 +13,4 @@ class TestIdsGameConfigSuite():
         idsgame_config = IdsGameConfig()
         assert idsgame_config.render_config is not None
         assert idsgame_config.game_config is not None
-        assert idsgame_config.defender_policy is not None
+        assert idsgame_config.defender_agent is not None

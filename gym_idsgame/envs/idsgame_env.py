@@ -7,7 +7,6 @@ import gym
 import os
 from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
-from gym_idsgame.envs.rendering.agents.defender import Defender
 import gym_idsgame.envs.util.idsgame_util as util
 from gym_idsgame.envs.constants import constants
 
@@ -43,7 +42,7 @@ class IdsGameEnv(gym.Env):
         self.idsgame_config: IdsGameConfig = idsgame_config
         self.state: GameState = self.idsgame_config.game_config.initial_state.copy()
         self.observation_space = self.idsgame_config.game_config.get_attacker_observation_space()
-        self.defender = Defender(self.idsgame_config.defender_policy)
+        self.defender = self.idsgame_config.defender_agent
         self.action_space = self.idsgame_config.game_config.get_attacker_action_space()
         self.viewer = None
         self.steps_beyond_done = None
@@ -194,7 +193,7 @@ class IdsGameEnv(gym.Env):
 
         :return: position of the node to defend, defense-type, defense-node-id
         """
-        defense_row, defense_col, defense_type = self.defender.policy.action(self.state)
+        defense_row, defense_col, defense_type = self.defender.action(self.state)
         defense_pos = (defense_row, defense_col)
         defense_node_id = self.idsgame_config.game_config.network_config.get_node_id(defense_pos)
         return defense_pos, defense_type, defense_node_id

@@ -12,7 +12,6 @@ from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.attack_defense_event import AttackDefenseEvent
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.rendering.agents.attacker import Attacker
-from gym_idsgame.envs.rendering.agents.defender import Defender
 from gym_idsgame.envs.rendering.frames.panels.game_panel import GamePanel
 from gym_idsgame.envs.dao.node_type import NodeType
 from gym_idsgame.envs.rendering.network.nodes.node import Node
@@ -68,7 +67,7 @@ class GameFrame(pyglet.window.Window):
         self.attacker = Attacker(self.idsgame_config, attacker_col, attacker_row)
 
         # Defender
-        self.defender = Defender(self.idsgame_config.defender_policy)
+        self.defender = self.idsgame_config.defender_agent
 
         # Game Panel
         self.game_panel = GamePanel(self.idsgame_config)
@@ -136,7 +135,7 @@ class GameFrame(pyglet.window.Window):
                                                 self.idsgame_config.game_config.network_config.adjacency_matrix):
 
                             # 3. Update defense state
-                            defense_row, defense_col, defend_type = self.defender.policy.action(self.game_state)
+                            defense_row, defense_col, defend_type = self.defender.action(self.game_state)
                             defend_node_id = self.idsgame_config.game_config.network_config.get_node_id((defense_row,
                                                                                                          defense_col))
                             self.game_state.defend(defend_node_id, defend_type,
