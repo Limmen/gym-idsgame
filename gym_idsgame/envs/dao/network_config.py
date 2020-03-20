@@ -149,6 +149,14 @@ class NetworkConfig:
         return node_list
 
     def get_node_pos(self, node_id: int) -> Union[int, int]:
+        """
+        Utility function for getting the position in the network of a node id.
+
+        :param node_id: the id of the node
+        :return: the row,col position in the network
+
+        :raises ValueError when the node id cannot be recognized
+        """
         count = 0
         for i in range(self.num_rows):
             for j in range(self.num_cols):
@@ -158,7 +166,15 @@ class NetworkConfig:
                     count +=1
         raise ValueError("Invalid node id")
 
-    def get_node_id(self, pos: Union[int, int]):
+    def get_node_id(self, pos: Union[int, int]) -> int:
+        """
+        Gets the node-id of a position in the grid
+
+        :param pos: row,col in the grid
+        :return: the id of the node in the grid, -1 if the node is empty
+
+        :raises ValueError when the position could not be found
+        """
         row, col = pos
         count = 0
         for i in range(self.num_rows):

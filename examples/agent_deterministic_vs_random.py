@@ -1,5 +1,5 @@
 """
-Runner for the IDS Game GUI Manual Game
+Runner for the IDS Environment using a deterministic attack policy against a Random Defense Policy
 """
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
 from gym_idsgame.envs.policy_baselines.random_defense import RandomDefense

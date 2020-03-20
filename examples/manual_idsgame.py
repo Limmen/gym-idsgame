@@ -7,6 +7,7 @@ from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.dao.render_config import RenderConfig
 from gym_idsgame.envs.policy_baselines.random_defense import RandomDefense
 
+# Program entry point, uses the gym-idsgame environment for manual play
 if __name__ == '__main__':
     game_config = GameConfig(num_layers = 2, num_servers_per_layer = 3, num_attack_types = 10, max_value = 9)
     defender_policy = RandomDefense(game_config)

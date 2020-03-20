@@ -1,6 +1,5 @@
 import numpy as np
 from typing import Union, List
-import gym
 from gym_idsgame.envs.dao.node_type import NodeType
 from gym_idsgame.envs.constants import constants
 from gym_idsgame.envs.dao.attack_defense_event import AttackDefenseEvent
@@ -177,7 +176,7 @@ class GameState():
         else:
             return False
 
-    def simulate_detection(self, node_id) -> bool:
+    def simulate_detection(self, node_id:int) -> bool:
         """
         Simulates detection for a unsuccessful attack
 
@@ -188,27 +187,38 @@ class GameState():
         else:
             return False
 
-    @staticmethod
-    def get_attacker_observation_space(max_value, num_attack_types, num_nodes):
-        high_row = np.array([max_value] * (num_attack_types + 1))
-        high = np.array([high_row] * num_nodes)
-        low = np.zeros((num_nodes, num_attack_types + 1))
-        observation_space = gym.spaces.Box(low=low, high=high, dtype=np.int32)
-        return observation_space
+    def get_attacker_observation(self, num_rows:int, num_cols:int, num_attack_types:int) -> np.ndarray:
+        """
+        Converts the state of the dynamical system into an observation for the attacker. As the environment
+        is a partially observed markov decision process, the attacker observation is only a subset of the game state
 
-    @staticmethod
-    def get_attacker_action_space(num_actions):
-        return gym.spaces.Discrete(num_actions)
-
-    def get_attacker_observation(self, num_rows, num_cols, num_attack_types):
+        :param num_rows: the number of rows in the network
+        :param num_cols: the number of columns in the network
+        :param num_attack_types: the number of attack types
+        :return: An observation of the environment
+        """
         attack_observation = np.zeros((num_rows, num_cols, num_attack_types))
         return attack_observation
 
-    def add_attack_event(self, target_pos, attack_type):
+    def add_attack_event(self, target_pos:Union[int, int], attack_type:int) -> None:
+        """
+        Adds an attack event to the state
+
+        :param target_pos: position in the grid of the target node
+        :param attack_type: the type of the attack
+        :return: None
+        """
         attack_event = AttackDefenseEvent(target_pos, attack_type)
         self.attack_events.append(attack_event)
 
-    def add_defense_event(self, target_pos, defense_type):
+    def add_defense_event(self, target_pos: Union[int, int], defense_type:int) -> None:
+        """
+        Adds a defense event to the state
+
+        :param target_pos: the position in the grid of the target node
+        :param defense_type: the type of the defense
+        :return: None
+        """
         defense_event = AttackDefenseEvent(target_pos, defense_type)
         self.defense_events.append(defense_event)
 

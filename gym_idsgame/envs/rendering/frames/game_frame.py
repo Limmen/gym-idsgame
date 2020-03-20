@@ -147,7 +147,6 @@ class GameFrame(pyglet.window.Window):
                             self.game_state.attack(node.id, self.game_state.attack_type,
                                                    self.idsgame_config.game_config.max_value)
 
-
                             # 6. Visualize attack
                             edges = []
                             if node.node_type == NodeType.DATA:
@@ -230,15 +229,33 @@ class GameFrame(pyglet.window.Window):
             self.attacker.undetect()
         self.resource_network.set_node_states(self.game_state)
 
-    def simulate_events(self, i):
+    def simulate_events(self, i:int) -> None:
+        """
+        Simulates attack/defense events manually. Method used when rendering in agent-mode
+
+        :param i: the index of the event visualization
+        :return:  None
+        """
         self.simulate_defense_events(self.game_state.defense_events, i)
         self.simulate_attack_events(self.game_state.attack_events, i)
 
-    def reset_events(self):
+    def reset_events(self) -> None:
+        """
+        Resets the events for agent-mode rendering
+
+        :return: None
+        """
         self.game_state.attack_events = []
         self.game_state.defense_events = []
 
-    def simulate_attack_events(self, attack_events: List[AttackDefenseEvent], i):
+    def simulate_attack_events(self, attack_events: List[AttackDefenseEvent], i:int) -> None:
+        """
+        Simulate attack events manually for rendering in agent-mode
+
+        :param attack_events: the list of attack events to simulate
+        :param i: the index of the event visualization
+        :return: None
+        """
         for attack in attack_events:
             self.attack_type = attack.attack_defense_type
             target_node: Node = self.resource_network.grid[attack.target_row][attack.target_col]
@@ -247,18 +264,31 @@ class GameFrame(pyglet.window.Window):
                 edges = self.resource_network.get(self.attacker.pos).outgoing_edges
             self.resource_network.grid[attack.target_row][attack.target_col].manual_blink_attack(i, edges)
 
-    def simulate_defense_events(self, defense_events: List[AttackDefenseEvent], i):
+    def simulate_defense_events(self, defense_events: List[AttackDefenseEvent], i:int) -> None:
+        """
+        Simulate defense events manually for rendering in agent-mode
+
+        :param defense_events: the list of defense events to simulate
+        :param i: the index of the event visualization
+        :return: None
+        """
         for defense in defense_events:
             self.resource_network.grid[defense.target_row][defense.target_col].manual_blink_defense(i)
 
-    def unschedule_events(self):
+    def unschedule_events(self) -> None:
+        """
+        Utilitym method for unscheduling events. When the user triggers an action before the last action completed,
+        this method will be called to avoid getting spam-visualizations in the UI.
+
+        :return: None
+        """
         for i in range(self.idsgame_config.game_config.num_rows - 1):
             for j in range(self.idsgame_config.game_config.num_cols):
                 node = self.resource_network.grid[i][j]
                 if node is not None:
                     node.unschedule()
 
-    def reset(self):
+    def reset(self) -> None:
         """
         Resets the agent state without closing the screen
 

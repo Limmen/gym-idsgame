@@ -1,7 +1,5 @@
 import pyglet
 from gym_idsgame.envs.constants import constants
-from gym_idsgame.envs.dao.game_config import GameConfig
-from gym_idsgame.envs.policy_baselines.policy import Policy
 
 class RenderConfig:
     """
@@ -39,6 +37,7 @@ class RenderConfig:
         self.first_foreground = pyglet.graphics.OrderedGroup(1)
         self.second_foreground = pyglet.graphics.OrderedGroup(2)
 
+
     def manual_default(self) -> None:
         """
         default settings for manual rendering
@@ -47,8 +46,22 @@ class RenderConfig:
         self.num_blinks = constants.RENDERING.MANUAL_NUM_BLINKS
         self.blink_interval = constants.RENDERING.MANUAL_BLINK_INTERVAL
 
-    def set_height(self, num_rows):
+
+    def set_height(self, num_rows: int) -> None:
+        """
+        Sets the height for the main gameframe
+
+        :param num_rows: number of rows in the network
+        :return: None
+        """
         self.height = constants.RENDERING.PANEL_HEIGHT + int((self.rect_size / 1.5)) * num_rows
 
-    def set_width(self, num_cols):
+
+    def set_width(self, num_cols:int) -> None:
+        """
+        Sets the width for the main gameframe
+
+        :param num_cols: the number of columns in the network
+        :return: None
+        """
         self.width = max(self.minimum_width, self.rect_size * num_cols)
