@@ -1,3 +1,6 @@
+"""
+RL environment for an intrusion detection Markov game
+"""
 from typing import Union
 import numpy as np
 import gym
@@ -137,7 +140,7 @@ class IdsGameEnv(gym.Env):
                                                           self.idsgame_config.game_config.num_nodes)
         return observation
 
-    def render(self, mode='human'):
+    def render(self, mode: str ='human'):
         """
         Renders the environment
 
