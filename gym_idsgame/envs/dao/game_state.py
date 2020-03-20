@@ -6,6 +6,7 @@ import numpy as np
 from gym_idsgame.envs.dao.node_type import NodeType
 from gym_idsgame.envs.constants import constants
 from gym_idsgame.envs.dao.attack_defense_event import AttackDefenseEvent
+from gym_idsgame.envs.dao.network_config import NetworkConfig
 
 class GameState():
     """
@@ -185,17 +186,26 @@ class GameState():
         """
         return np.random.rand() < self.defense_det[node_id] / 10
 
-    def get_attacker_observation(self, num_rows: int, num_cols: int, num_attack_types: int) -> np.ndarray:
+    def get_attacker_observation(self, network_config: NetworkConfig) -> np.ndarray:
         """
         Converts the state of the dynamical system into an observation for the attacker. As the environment
         is a partially observed markov decision process, the attacker observation is only a subset of the game state
 
-        :param num_rows: the number of rows in the network
-        :param num_cols: the number of columns in the network
-        :param num_attack_types: the number of attack types
+        :param network_config: the network configuration of the game
         :return: An observation of the environment
         """
-        attack_observation = np.zeros((num_rows, num_cols, num_attack_types))
+        attack_observation = np.zeros((len(network_config.node_list), self.attack_values.shape[1]))
+        current_pos = self.attacker_pos
+        current_node_id = network_config.get_node_id(current_pos)
+        current_row, current_col = current_pos
+        current_adjacency_matrix_id = network_config.get_adjacency_matrix_id(current_row, current_col)
+        for node_id in range(len(network_config.node_list)):
+            pos = network_config.get_node_pos(node_id)
+            node_row, node_col = pos
+            node_adjacency_matrix_id = network_config.get_adjacency_matrix_id(node_row, node_col)
+            if (node_id == current_node_id or
+                    network_config.adjacency_matrix[current_adjacency_matrix_id][node_adjacency_matrix_id]):
+                attack_observation[node_id] = self.attack_values[node_id]
         return attack_observation
 
     def add_attack_event(self, target_pos: Union[int, int], attack_type: int) -> None:

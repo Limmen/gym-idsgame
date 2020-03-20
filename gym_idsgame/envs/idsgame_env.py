@@ -117,9 +117,7 @@ class IdsGameEnv(gym.Env):
                                 "any further steps are undefined behavior.")
                 self.steps_beyond_done += 1
         self.state.game_step += 1
-        observation = self.state.get_attacker_observation(self.idsgame_config.game_config.max_value,
-                                                          self.idsgame_config.game_config.num_attack_types,
-                                                          self.idsgame_config.game_config.num_nodes)
+        observation = self.state.get_attacker_observation(self.idsgame_config.game_config.network_config)
         if self.viewer is not None:
             self.viewer.gameframe.set_state(self.state)
         return observation, reward, self.state.done, info
@@ -134,9 +132,7 @@ class IdsGameEnv(gym.Env):
         self.state.new_game(self.idsgame_config.game_config.initial_state)
         if self.viewer is not None:
             self.viewer.gameframe.reset()
-        observation = self.state.get_attacker_observation(self.idsgame_config.game_config.max_value,
-                                                          self.idsgame_config.game_config.num_attack_types,
-                                                          self.idsgame_config.game_config.num_nodes)
+        observation = self.state.get_attacker_observation(self.idsgame_config.game_config.network_config)
         return observation
 
     def render(self, mode: str ='human'):

@@ -84,6 +84,16 @@ class NetworkConfig:
         col = node_id % self.num_cols
         return row, col
 
+    def get_adjacency_matrix_id(self, row: int, col:int) -> Union[int, int]:
+        """
+        Get the adjacency matrix id from a set of coordinates in the grid
+
+        :param row: the row
+        :param col: the col
+        :return: (row,col)
+        """
+        return row*self.num_cols + col
+
     @property
     def start_row(self) -> int:
         """
