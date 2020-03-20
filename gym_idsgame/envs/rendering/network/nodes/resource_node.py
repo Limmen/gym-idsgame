@@ -4,7 +4,7 @@ import numpy as np
 from pyglet import clock
 from gym_idsgame.envs.rendering.network.nodes.node import Node
 from gym_idsgame.envs.constants import constants
-from gym_idsgame.envs.dao.render_config import RenderConfig
+from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.rendering.util.render_util import batch_label
 
 class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
@@ -15,16 +15,16 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
     and define state of the sprite
     """
 
-    def __init__(self, avatar, render_config: RenderConfig, group):
+    def __init__(self, avatar, idsgame_config: IdsGameConfig, group):
         """
         Class constructor, initializes the resource node
 
         :param avatar: the avatar of the node
-        :param render_config: render config, e.g. what colors to use for rendering etc.
+        :param idsgame_config: configuration for the IdsGameEnv
         :param group: the group to render the resource in (background or foreground)
         """
-        self.render_config = render_config
-        super(ResourceNode, self).__init__(avatar, batch=render_config.batch, group=group)
+        self.idsgame_config = idsgame_config
+        super(ResourceNode, self).__init__(avatar, batch=idsgame_config.render_config.batch, group=group)
         self.outgoing_edges = []
         self.incoming_edges = []
         self.initialize_state()
@@ -36,14 +36,14 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         :param defend_type: the type of defense
         :return: None
         """
-        if self.defense_values[defend_type] < self.render_config.game_config.max_value - 1:
+        if self.defense_values[defend_type] < self.idsgame_config.game_config.max_value - 1:
             self.defense_values[defend_type] += 1
         self.defense_label.text = self.defense_text
-        for i in range(0, self.render_config.num_blinks):
+        for i in range(0, self.idsgame_config.render_config.num_blinks):
             if i % 2 == 0:
-                clock.schedule_once(self.blink_green_defense, self.render_config.blink_interval * i)
+                clock.schedule_once(self.blink_green_defense, self.idsgame_config.render_config.blink_interval * i)
             else:
-                clock.schedule_once(self.blink_black_defense, self.render_config.blink_interval * i)
+                clock.schedule_once(self.blink_black_defense, self.idsgame_config.render_config.blink_interval * i)
 
     def simulate_detection(self) -> bool:
         """
@@ -181,18 +181,19 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         """
         self.attack_label = batch_label(self.attack_text, attack_label_x, attack_label_y,
                                         constants.RENDERING.NODE_STATE_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
-                                        self.render_config.batch,
-                                        self.render_config.background, multiline=False,
-                                        width=self.render_config.rect_size)
+                                        self.idsgame_config.render_config.batch,
+                                        self.idsgame_config.render_config.background, multiline=False,
+                                        width=self.idsgame_config.render_config.rect_size)
         self.defense_label = batch_label(self.defense_text, defense_label_x, defense_label_y,
                                          constants.RENDERING.NODE_STATE_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
-                                         self.render_config.batch,
-                                         self.render_config.background, multiline=False,
-                                         width=self.render_config.rect_size)
+                                         self.idsgame_config.render_config.batch,
+                                         self.idsgame_config.render_config.background, multiline=False,
+                                         width=self.idsgame_config.render_config.rect_size)
         self.det_label = batch_label(self.det_text, det_label_x, det_label_y,
                                      constants.RENDERING.NODE_STATE_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
-                                     self.render_config.batch, self.render_config.background, multiline=False,
-                                     width=self.render_config.rect_size)
+                                     self.idsgame_config.render_config.batch,
+                                     self.idsgame_config.render_config.background, multiline=False,
+                                     width=self.idsgame_config.render_config.rect_size)
 
     def add_out_edges(self, edges: list) -> None:
         """

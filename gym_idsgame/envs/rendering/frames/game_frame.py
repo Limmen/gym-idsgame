@@ -4,7 +4,7 @@ from gym_idsgame.envs.constants import constants
 from gym_idsgame.envs.rendering.util.render_util import batch_rect_fill
 from gym_idsgame.envs.dao.render_state import RenderState
 from gym_idsgame.envs.dao.attack_defense_event import AttackDefenseEvent
-from gym_idsgame.envs.dao.render_config import RenderConfig
+from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.rendering.agents.attacker import Attacker
 from gym_idsgame.envs.rendering.agents.defender import Defender
 from gym_idsgame.envs.rendering.frames.panels.game_panel import GamePanel
@@ -20,22 +20,23 @@ class GameFrame(pyglet.window.Window):
     event handler for on_draw is defined by overriding the on_draw function.
     """
 
-    def __init__(self, render_config: RenderConfig):
+    def __init__(self, idsgame_config: IdsGameConfig):
         """
         Constructor, initializes the frame
 
-        :param render_config: the render config, e.g the font size, avatars, line width, colors, etc.
+        :param idsgame_config: Config for the IdsGameEnv
         """
-        self.render_config = render_config
-        super(GameFrame, self).__init__(height=render_config.height, width=render_config.width,
-                                        caption=render_config.caption) # call constructor of parent class
+        self.idsgame_config = idsgame_config
+        super(GameFrame, self).__init__(height=idsgame_config.render_config.height,
+                                        width=idsgame_config.render_config.width,
+                                        caption=idsgame_config.render_config.caption) # call constructor of parent class
         self.resource_network = None
         self.attacker = None
         self.defender = None
         self.render_state = None
         self.setup_resources_path()
         self.create_batch()
-        self.set_state(self.render_config.game_config.initial_state)
+        self.set_state(self.idsgame_config.game_config.initial_state)
         self.switch_to()
 
     def create_batch(self) -> None:
@@ -47,24 +48,25 @@ class GameFrame(pyglet.window.Window):
         """
 
         # Sets the background color
-        batch_rect_fill(0, 0, self.render_config.width, self.render_config.height, self.render_config.bg_color,
-                        self.render_config.batch, self.render_config.background)
+        batch_rect_fill(0, 0, self.idsgame_config.render_config.width, self.idsgame_config.render_config.height,
+                        self.idsgame_config.render_config.bg_color,
+                        self.idsgame_config.render_config.batch, self.idsgame_config.render_config.background)
 
         # Resource Network
-        self.resource_network = Network(self.render_config)
+        self.resource_network = Network(self.idsgame_config)
 
         # Resource Network Links
         self.resource_network.create_links()
 
         # Attacker
-        attacker_row, attacker_col = self.render_config.game_config.network_config.start_pos
-        self.attacker = Attacker(self.render_config, attacker_col, attacker_row)
+        attacker_row, attacker_col = self.idsgame_config.game_config.network_config.start_pos
+        self.attacker = Attacker(self.idsgame_config, attacker_col, attacker_row)
 
         # Defender
-        self.defender = Defender(self.render_config.defender_policy)
+        self.defender = Defender(self.idsgame_config.defender_policy)
 
         # Game Panel
-        self.game_panel = GamePanel(self.render_config)
+        self.game_panel = GamePanel(self.idsgame_config)
 
     def setup_resources_path(self) -> None:
         """
@@ -72,8 +74,8 @@ class GameFrame(pyglet.window.Window):
 
         :return: None
         """
-        if os.path.exists(self.render_config.resources_dir):
-            pyglet.resource.path = [self.render_config.resources_dir]
+        if os.path.exists(self.idsgame_config.render_config.resources_dir):
+            pyglet.resource.path = [self.idsgame_config.render_config.resources_dir]
         else:
             script_dir = os.path.dirname(__file__)
             resource_path = os.path.join(script_dir, './', constants.RENDERING.RESOURCES_DIR)
@@ -92,14 +94,14 @@ class GameFrame(pyglet.window.Window):
         # Clear the window
         self.clear()
         # Draw batch with the frame contents
-        self.render_config.batch.draw()
+        self.idsgame_config.render_config.batch.draw()
         # Make this window the current OpenGL rendering context
         self.switch_to()
 
 
     def on_mouse_press(self, x:int, y:int, button, modifiers) -> None:
         # Dont do anything if agent is playing
-        if not self.render_config.game_config.manual:
+        if not self.idsgame_config.game_config.manual:
             return
         # Dont do anything if game is over
         if self.render_state.done:
@@ -108,10 +110,20 @@ class GameFrame(pyglet.window.Window):
         # Unschedule events from previous press, if any
         self.unschedule_events()
         # 1. Find the node in the network that was pressed
-        for i in range(self.render_config.game_config.num_rows-1):
-            for j in range(self.render_config.game_config.num_cols):
+        for i in range(self.idsgame_config.game_config.num_rows):
+            for j in range(self.idsgame_config.game_config.num_cols):
                 node = self.resource_network.grid[i][j]
                 if node.node_type != NodeType.EMPTY:
+
+                    if node.node_type == NodeType.START:
+                        if node.x-node.radius < x < (node.x + node.radius) and node.y-node.radius < y < (node.y + node.radius):
+                            # 1.5 Special case: if it is the start node, let the attacker move there without making
+                            # any attack or risk to be detected
+                            if node.node_type == NodeType.START:
+                                self.render_state.attacker_pos = node.pos
+                                self.render_state.game_step += 1
+                                return
+
                     if node.x < x < (node.x + node.width) and node.y < y < (node.y + node.height):
 
                         # 2. Check that the selected node can be attacked (there is a link to it from the current
@@ -134,15 +146,12 @@ class GameFrame(pyglet.window.Window):
                                 self.render_state.attacker_pos = node.pos
                                 if node.node_type == NodeType.DATA:
                                     self.render_state.done = True
-                                    self.render_state.attacker_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
-                                    self.render_state.defender_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
+                                    self.render_state.hacked = True
                             else:
                                 detected = node.simulate_detection()
                                 if detected:
                                     self.render_state.done = True
                                     self.render_state.detected = True
-                                    self.render_state.attacker_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
-                                    self.render_state.defender_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
 
     def on_key_press(self, symbol, modifiers) -> None:
         """
@@ -153,7 +162,7 @@ class GameFrame(pyglet.window.Window):
         :param modifiers: _
         :return: None
         """
-        if self.render_config.game_config.manual:
+        if self.idsgame_config.game_config.manual:
             if symbol == pyglet.window.key._1:
                 self.render_state.attack_type = 1
             elif symbol == pyglet.window.key._2:
@@ -226,7 +235,8 @@ class GameFrame(pyglet.window.Window):
     def test(self):
         if self.defense_event is not None:
             defense = self.defense_event
-            pyglet.clock.schedule(self.resource_network.grid[defense.target_row][defense.target_col].data.blink_black_defense)
+            pyglet.clock.schedule(
+                self.resource_network.grid[defense.target_row][defense.target_col].data.blink_black_defense)
             pyglet.clock.tick(poll=True)
 
     def simulate_defense_events(self, defense_events: List[AttackDefenseEvent], i):
@@ -234,8 +244,8 @@ class GameFrame(pyglet.window.Window):
             self.resource_network.grid[defense.target_row][defense.target_col].manual_blink_defense(i)
 
     def unschedule_events(self):
-        for i in range(self.render_config.game_config.num_rows - 1):
-            for j in range(self.render_config.game_config.num_cols):
+        for i in range(self.idsgame_config.game_config.num_rows - 1):
+            for j in range(self.idsgame_config.game_config.num_cols):
                 node = self.resource_network.grid[i][j]
                 if node is not None:
                     node.unschedule()
@@ -246,7 +256,7 @@ class GameFrame(pyglet.window.Window):
 
         :return: None
         """
-        self.render_state.new_game(self.render_config.game_config.initial_state)
+        self.render_state.new_game(self.idsgame_config.game_config.initial_state)
         self.set_state(self.render_state)
         self.unschedule_events()
         self.switch_to()

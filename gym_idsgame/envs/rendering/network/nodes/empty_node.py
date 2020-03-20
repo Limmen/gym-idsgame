@@ -1,5 +1,5 @@
 from gym_idsgame.envs.rendering.network.nodes.node import Node
-from gym_idsgame.envs.dao.render_config import RenderConfig
+from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.dao.node_type import NodeType
 
 class EmptyNode(Node):
@@ -7,16 +7,16 @@ class EmptyNode(Node):
     Represents an empty node in the grid-network
     """
 
-    def __init__(self, render_config: RenderConfig, row: int, col: int):
+    def __init__(self, idsgame_config: IdsGameConfig, row: int, col: int):
         """
         Class constructor, initializes the node
 
-        :param render_config: the configuration for rendering, e.g. the font-size etc.
+        :param idsgame_config: configuration for the IdsGameEnv
         :param row: the row in the grid
         :param col: the column in the grid
         """
         super(EmptyNode, self).__init__()
-        self.render_config = render_config
+        self.idsgame_config = idsgame_config
         self.row = row
         self.col = col
 

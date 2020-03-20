@@ -1,7 +1,7 @@
 from typing import Union
 from gym_idsgame.envs.rendering.network.nodes.node import Node
 from gym_idsgame.envs.rendering.util.render_util import create_circle
-from gym_idsgame.envs.dao.render_config import RenderConfig
+from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.constants import constants
 from gym_idsgame.envs.dao.node_type import NodeType
 
@@ -9,21 +9,23 @@ class StartNode(Node):
     """
     Represents the start node the grid network
     """
-    def __init__(self, render_config: RenderConfig, row: int, col: int):
+    def __init__(self, idsgame_config: IdsGameConfig, row: int, col: int):
         """
         Initializes the node
 
-        :param render_config: the render config, e.g scale of the node, color, etc.
+        :param idsgame_config: configuratin for the IdsGameEnv
         :param row: the row in the grid network
         :param col: the column in the grid network
         """
         super(StartNode, self).__init__()
-        self.render_config = render_config
+        self.idsgame_config = idsgame_config
         self.row = row
         self.col = col
-        self.x = self.col * self.render_config.rect_size + self.render_config.rect_size / 2
-        self.y = self.row * int(self.render_config.rect_size / 1.5) + (self.render_config.rect_size / 1.5) / 2
-        self.radius = self.render_config.rect_size / 7
+        self.x = self.col * self.idsgame_config.render_config.rect_size \
+                 + self.idsgame_config.render_config.rect_size / 2
+        self.y = self.row * int(self.idsgame_config.render_config.rect_size / 1.5) \
+                 + (self.idsgame_config.render_config.rect_size / 1.5) / 2
+        self.radius = self.idsgame_config.render_config.rect_size / 7
         self.__draw()
 
     @property
@@ -38,7 +40,8 @@ class StartNode(Node):
         Draws the node (a black circle)
         :return: None
         """
-        create_circle(self.x, self.y, self.radius, self.render_config.batch, self.render_config.first_foreground,
+        create_circle(self.x, self.y, self.radius, self.idsgame_config.render_config.batch,
+                      self.idsgame_config.render_config.first_foreground,
                       constants.RENDERING.BLACK)
 
     def get_link_coords(self, upper: bool = True, lower: bool = False) -> Union[float, float, int, int]:
@@ -49,8 +52,10 @@ class StartNode(Node):
         :param lower: if False, returns the lower endpoint
         :return: (x-coordinate, y-coordinate, grid-column, grid-row)
         """
-        x = self.col * self.render_config.rect_size + self.render_config.rect_size / 2
-        y = (self.row + 1) * (self.render_config.rect_size / 1.5) - self.render_config.rect_size / 1.75
+        x = self.col * self.idsgame_config.render_config.rect_size + \
+            self.idsgame_config.render_config.rect_size / 2
+        y = (self.row + 1) * (self.idsgame_config.render_config.rect_size / 1.5) - \
+            self.idsgame_config.render_config.rect_size / 1.75
         return x, y, self.col, self.row
 
     # --- Inherited methods----

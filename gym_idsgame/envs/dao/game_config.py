@@ -1,3 +1,4 @@
+import math
 from gym_idsgame.envs.dao.render_state import RenderState
 from gym_idsgame.envs.dao.network_config import NetworkConfig
 
@@ -14,11 +15,16 @@ class GameConfig():
         self.num_attack_types = num_attack_types
         self.max_value = max_value
         self.num_rows = self.num_layers + 2
+        self.num_nodes = self.num_layers * self.num_servers_per_layer + 2  # +2 for Start and Data Nodes
         self.num_cols = self.num_servers_per_layer
+        self.num_actions = self.num_attack_types * self.num_nodes
+        self.num_states = math.pow(self.max_value, self.num_attack_types * 2 * self.num_nodes) \
+                          * math.pow(10, self.max_value)
         self.network_config = network_config
         if network_config is None:
             self.network_config = NetworkConfig(self.num_rows, self.num_cols)
         self.initial_state = initial_state
         if self.initial_state is None:
             self.initial_state = RenderState()
-            self.initial_state.default_state(self.network_config.graph_layout, self.num_rows, self.num_cols, self.num_attack_types)
+            self.initial_state.default_state(self.network_config.graph_layout, self.num_rows, self.num_cols,
+                                             self.num_attack_types)

@@ -3,26 +3,27 @@ import pyglet
 from pyglet import clock
 from gym_idsgame.envs.constants import constants
 from gym_idsgame.envs.rendering.network.nodes.resource_node import ResourceNode
-from gym_idsgame.envs.dao.render_config import RenderConfig
+from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.dao.node_type import NodeType
 
 class ServerNode(ResourceNode):
     """
     Represents a server node in the grid network
     """
-    def __init__(self, render_config: RenderConfig, row: int, col: int):
+    def __init__(self, idsgame_config: IdsGameConfig, row: int, col: int):
         """
         Initializes the node
 
-        :param render_config: render config, e.g font size, avatar, etc.
+        :param idsgame_config: configuration for the IdsGameEnv
         :param row: the row in the grid
         :param col: the column in the grid
         """
-        avatar = pyglet.resource.image(render_config.server_filename)
-        super(ServerNode, self).__init__(avatar, render_config, render_config.background)
+        avatar = pyglet.resource.image(idsgame_config.render_config.server_filename)
+        super(ServerNode, self).__init__(avatar, idsgame_config,
+                                         idsgame_config.render_config.background)
         self.col = col
         self.row = row
-        self.scale = render_config.server_scale
+        self.scale = idsgame_config.render_config.server_scale
         self.reset()
 
     @property
@@ -38,12 +39,18 @@ class ServerNode(ResourceNode):
 
         :return: None
         """
-        attack_label_x = self.col * self.render_config.rect_size + self.render_config.rect_size / 2
-        attack_label_y = self.row * int((self.render_config.rect_size) / 1.5) + self.render_config.rect_size / 4
-        defense_label_x = self.col * self.render_config.rect_size + self.render_config.rect_size / 2
-        defense_label_y = self.row * int((self.render_config.rect_size) / 1.5) + self.render_config.rect_size / 7
-        det_label_x = self.col * self.render_config.rect_size + self.render_config.rect_size / 3
-        det_label_y = self.row * int((self.render_config.rect_size) / 1.5) + self.render_config.rect_size / 3
+        attack_label_x = self.col * self.idsgame_config.render_config.rect_size + \
+                         self.idsgame_config.render_config.rect_size / 2
+        attack_label_y = self.row * int((self.idsgame_config.render_config.rect_size) / 1.5) + \
+                         self.idsgame_config.render_config.rect_size / 4
+        defense_label_x = self.col * self.idsgame_config.render_config.rect_size + \
+                          self.idsgame_config.render_config.rect_size / 2
+        defense_label_y = self.row * int((self.idsgame_config.render_config.rect_size) / 1.5) + \
+                          self.idsgame_config.render_config.rect_size / 7
+        det_label_x = self.col * self.idsgame_config.render_config.rect_size + \
+                      self.idsgame_config.render_config.rect_size / 3
+        det_label_y = self.row * int((self.idsgame_config.render_config.rect_size) / 1.5) + \
+                      self.idsgame_config.render_config.rect_size / 3
         self.create_labels(attack_label_x=attack_label_x, attack_label_y=attack_label_y,
                            defense_label_x=defense_label_x, defense_label_y=defense_label_y,
                            det_label_x=det_label_x, det_label_y=det_label_y)
@@ -56,12 +63,12 @@ class ServerNode(ResourceNode):
         :param edges_list: edges list for visualization (blinking)
         :return: True if the attack was successful otherwise False
         """
-        for i in range(0, self.render_config.num_blinks):
+        for i in range(0, self.idsgame_config.render_config.num_blinks):
             if i % 2 == 0:
-                clock.schedule_once(self.blink_red_attack, self.render_config.blink_interval * i)
+                clock.schedule_once(self.blink_red_attack, self.idsgame_config.render_config.blink_interval * i)
             else:
-                clock.schedule_once(self.blink_black_attack, self.render_config.blink_interval * i)
-        if self.attack_values[attack_type] < self.render_config.game_config.max_value-1:
+                clock.schedule_once(self.blink_black_attack, self.idsgame_config.render_config.blink_interval * i)
+        if self.attack_values[attack_type] < self.idsgame_config.game_config.max_value-1:
             self.attack_values[attack_type] += 1
         self.attack_label.text = self.attack_text
         if self.attack_values[attack_type] > self.defense_values[attack_type]:
@@ -109,8 +116,9 @@ class ServerNode(ResourceNode):
 
         :return: The centered coordinates in the grid
         """
-        self.x = self.col*self.render_config.rect_size + self.render_config.rect_size/2.3
-        self.y = int((self.render_config.rect_size/1.5))*self.row + self.render_config.rect_size/3.5
+        self.x = self.col*self.idsgame_config.render_config.rect_size + self.idsgame_config.render_config.rect_size/2.3
+        self.y = int((self.idsgame_config.render_config.rect_size/1.5))*self.row + \
+                 self.idsgame_config.render_config.rect_size/3.5
 
     def get_link_coords(self, upper:bool=True, lower:bool=False) -> Union[float, float, int, int]:
         """
@@ -121,9 +129,13 @@ class ServerNode(ResourceNode):
         :return: (x-coordinate, y-coordinate, grid-column, grid-row)
         """
         if upper:
-            x = self.col*self.render_config.rect_size + self.render_config.rect_size/2
-            y = (self.row+1)*(self.render_config.rect_size/1.5) - self.render_config.rect_size/6
+            x = self.col*self.idsgame_config.render_config.rect_size \
+                + self.idsgame_config.render_config.rect_size/2
+            y = (self.row+1)*(self.idsgame_config.render_config.rect_size/1.5) - \
+                self.idsgame_config.render_config.rect_size/6
         elif lower:
-            x = self.col * self.render_config.rect_size + self.render_config.rect_size / 2
-            y = (self.row + 1) * (self.render_config.rect_size / 1.5) - self.render_config.rect_size / 1.75
+            x = self.col * self.idsgame_config.render_config.rect_size + \
+                self.idsgame_config.render_config.rect_size / 2
+            y = (self.row + 1) * (self.idsgame_config.render_config.rect_size / 1.5) - \
+                self.idsgame_config.render_config.rect_size / 1.75
         return x, y, self.col, self.row

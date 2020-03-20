@@ -17,42 +17,47 @@ except ImportError as e:
     If you're running on a server, you may need a virtual frame buffer; something like this should work:
     'xvfb-run -s \"-screen 0 1400x900x24\" python <your_script.py>'
     ''')
-
-from gym_idsgame.envs.rendering.frames.game_frame import GameFrame
-from gym_idsgame.envs.dao.render_config import RenderConfig
 import numpy as np
 import time
+from gym_idsgame.envs.rendering.frames.game_frame import GameFrame
+from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 
 class Viewer():
-    def __init__(self, render_config: RenderConfig):
+    """
+    Class representing a viewer for the IDS-game. Can be used for either agent-view, or manual-view (human player)
+    """
+    def __init__(self, idsgame_config: IdsGameConfig):
+        """
 
-        self.render_config = render_config
+        :param idsgame_config: configuratin for the IdsGameEnv
+        """
+        self.idsgame_config = idsgame_config
         self.isopen = True
 
-    def manual_start(self):
+    def manual_start(self) -> None:
         """
-        Starts the gridframe app in a manual mode where the agent is controlled through arrow-keys
+        Starts the IDS-game app in a manual mode where the agent is controlled with keyboard and mouse
 
         :return: None
         """
-        self.render_config.manual = True
-        self.gameframe = GameFrame(render_config=self.render_config)
+        self.idsgame_config.render_config.manual = True
+        self.gameframe = GameFrame(idsgame_config=self.idsgame_config)
         self.gameframe.on_close = self.window_closed_by_user
         self.isopen = True
         pyglet.clock.schedule_interval(self.gameframe.update, 1 / 60.)
         pyglet.app.run()
 
-    def agent_start(self):
+    def agent_start(self) -> None:
         """
-        Creates the frame in a agent-mode, where actions are taken programmatically rather than through
-        moving arrow-keys.
+        Creates the IDS-game frame in agent-mode, where actions are taken programmatically rather than through
+        moving mouse and keyboard.
         """
-        self.render_config.manual = False
-        self.gameframe = GameFrame(render_config=self.render_config)
+        self.idsgame_config.render_config.manual = False
+        self.gameframe = GameFrame(idsgame_config=self.idsgame_config)
         self.gameframe.on_close = self.window_closed_by_user
         self.isopen = True
 
-    def window_closed_by_user(self):
+    def window_closed_by_user(self) -> None:
         """
         Callback when the frame is closed by the user
 
@@ -61,7 +66,7 @@ class Viewer():
         self.isopen = False
         self.gameframe.close()
 
-    def close(self):
+    def close(self) -> None:
         """
         Closes the frame
 
@@ -69,7 +74,17 @@ class Viewer():
         """
         self.gameframe.close()
 
-    def render_frame(self, return_rgb_array = False):
+    def render_frame(self, return_rgb_array:bool = False):
+        """
+        Renders a frame manually.
+
+        Using pyglet together with openAI gym means that we have to integrate OpenGL's event-loop
+        with the event-loop of the RL agent and the gym framework. That's why we render things manually and dispatch
+        events manually rather than just calling pyglet.app.run().
+
+        :param return_rgb_array: if this is true it returns the RGB array for the rendered frame (for recording)
+        :return: RGB array or bool
+        """
         self.gameframe.clear()  # Clears the frame
         self.gameframe.switch_to()  # Make this window the current OpenGL rendering context
         self.gameframe.dispatch_events()  # Poll the OS for events and call related handlers for updating the frame
@@ -82,13 +97,12 @@ class Viewer():
 
     def render(self, return_rgb_array = False):
         """
-        Renders a a frame. Using pyglet together with openAI gym means that we have to integrate OpenGL's event-loop
-        with the event-loop of the RL agent and the gym framework. That's why we render things manually and dispatch
-        events manually rather than just calling pyglet.app.run().
+        Renders a state of the IDS game. A single state might include many frames. For example if an attack or defense
+        move was made, this will cause several frames to visualize the attack/defense.
 
         :param return_rgb_array: boolean whether to return rgb array or not
 
-        :return: None
+        :return: RGB array or bool
         """
         arr = self.render_frame(return_rgb_array)
         for i in range(self.gameframe.num_blinks):
@@ -100,7 +114,7 @@ class Viewer():
 
         return arr if return_rgb_array else self.isopen
 
-    def extract_rgb_array(self):
+    def extract_rgb_array(self) -> np.ndarray:
         """
         Extract RGB array from pyglet, this can then be used to record video of the rendering through gym's API
 

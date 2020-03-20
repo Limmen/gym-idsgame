@@ -6,51 +6,23 @@ import math
 from gym_idsgame.envs.dao.render_state import RenderState
 from gym_idsgame.envs.dao.attack_defense_event import AttackDefenseEvent
 from gym_idsgame.envs.dao.node_type import NodeType
-from gym_idsgame.envs.dao.policy_type import PolicyType
+from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
+import gym_idsgame.envs.util.idsgame_util as util
 
 class IdsGameEnv(gym.Env):
     """
     TODO
     """
 
-    def __init__(self, num_layers = 2, num_servers_per_layer = 3, num_attack_types = 10, max_value = 10,
-                 defense_policy = PolicyType.DETERMINISTIC_DEFENSE,
-                 adjacency_matrix=None, graph_layout=None, initial_state = None,
-                 blink_interval=constants.RENDERING.AGENT_BLINK_INTERVAL,
-                 num_blinks=constants.RENDERING.AGENT_NUM_BLINKS):
+    def __init__(self, idsgame_config: IdsGameConfig):
         """
         TODO
         """
-        if num_layers < 1:
-            raise AssertionError("The number of layers cannot be less than 1")
-        if num_attack_types < 1:
-            raise AssertionError("The number of attack types cannot be less than 1")
-        if max_value < 3:
-            raise AssertionError("The max attack/defense value cannot be less than 3")
-        self.max_value = max_value
-        self.num_layers = num_layers
-        self.num_servers_per_layer = num_servers_per_layer
-        self.num_rows = self.num_layers + 2
-        self.num_cols = self.num_servers_per_layer
-        self.num_attack_types = num_attack_types
-        self.defense_policy = defense_policy
-        self.num_nodes = self.num_layers * self.num_servers_per_layer + 2 #+2 for Start and Data Nodes
-        self.num_states = math.pow(self.max_value, self.num_attack_types*2* self.num_nodes)*math.pow(10,self.max_value)
-        self.num_blinks = num_blinks
-        self.blink_interval = blink_interval
-        if initial_state is None:
-            self.init_state = self.initial_state()
-        else:
-            self.init_state = initial_state
+        util.validate_config(idsgame_config)
+        self.idsgame_config = idsgame_config
         self.state = np.copy(self.init_state)
-        if adjacency_matrix is None or graph_layout is None:
-            self.__initialize_graph_config()
-        else:
-            self.adjacency_matrix = adjacency_matrix
-            self.graph_layout = graph_layout
         self.action_descriptors = ["Injection", "Authentication", "CrossSite", "References", "Misssconfiguration",
                                    "Exposure", "Access", "Forgery", "Vulnerabilities", "Redirects"]
-        self.num_actions = self.num_attack_types*self.num_nodes
         high_row = np.array([self.max_value]*(self.num_attack_types+1))
         high = np.array([high_row]*self.num_nodes)
         low = np.zeros((self.num_nodes, self.num_attack_types+1))
@@ -62,7 +34,7 @@ class IdsGameEnv(gym.Env):
          'render.modes': ['human', 'rgb_array'],
          'video.frames_per_second' : 50 # Video rendering speed
         }
-        self.reward_range = (float(constants.RENDERING.NEGATIVE_REWARD), float(constants.RENDERING.POSITIVE_REWARD))
+        self.reward_range = (float(constants.GAME_CONFIG.NEGATIVE_REWARD), float(constants.GAME_CONFIG.POSITIVE_REWARD))
         self.attacker_total_reward = 0
         self.defender_total_reward = 0
         self.game_step = 0
@@ -319,16 +291,16 @@ class IdsGameEnv(gym.Env):
             for j in range(self.num_cols):
                 if i == self.num_rows - 1:
                     if j == self.num_cols // 2:
-                        self.graph_layout[i][j] = NodeType.START
+                        self.graph_layout[i][j] = NodeType.START.value
                     else:
-                        self.graph_layout[i][j] = NodeType.EMPTY
+                        self.graph_layout[i][j] = NodeType.EMPTY.value
                 elif i == 0:
                     if j == self.num_cols // 2:
-                        self.graph_layout[i][j] = NodeType.DATA
+                        self.graph_layout[i][j] = NodeType.DATA.value
                     else:
-                        self.graph_layout[i][j] = NodeType.EMPTY
+                        self.graph_layout[i][j] = NodeType.EMPTY.value
                 else:
-                    self.graph_layout[i][j] = NodeType.SERVER
+                    self.graph_layout[i][j] = NodeType.SERVER.value
 
         self.adjacency_matrix = np.zeros((self.num_rows * self.num_cols, self.num_cols * self.num_rows))
         for i in range(self.num_rows * self.num_cols):

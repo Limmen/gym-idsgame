@@ -1,6 +1,7 @@
 import numpy as np
 from typing import Union
 from gym_idsgame.envs.dao.node_type import NodeType
+from gym_idsgame.envs.constants import constants
 
 class RenderState():
     """
@@ -12,7 +13,7 @@ class RenderState():
                  attacker_pos:Union[int, int] = (0,0), game_step:int = 0, attacker_cumulative_reward:int = 0,
                  defender_cumulative_reward :int =0,
                  num_games=0, attack_events:list = [], defense_events:list = [], done:bool=False, detected:bool = False,
-                 attack_type:int=0):
+                 attack_type:int=0, num_hacks:int = 0, hacked:bool=False):
         """
         Constructor, initializes the DTO
 
@@ -29,6 +30,8 @@ class RenderState():
         :param done: True if the game is over and otherwise False
         :param detected: True if the attacker is in a detected state, otherwise False
         :param attack_type: the type of the last attack
+        :param num_hacks: number of wins for the attacker
+        :param detected: True if the attacker hacked the data node otherwise False
         """
         self.attack_values=attack_values
         self.defense_values = defense_values
@@ -43,6 +46,8 @@ class RenderState():
         self.done = done
         self.detected = detected
         self.attack_type = attack_type
+        self.num_hacks = num_hacks
+        self.hacked = hacked
 
     def default_state(self, graph_layout: np.ndarray, num_rows:int, num_cols:int, num_attack_types:int) -> None:
         """
@@ -77,6 +82,8 @@ class RenderState():
         self.done = False
         self.detected = False
         self.attack_type = 0
+        self.num_hacks = 0
+        self.hacked = False
 
     def new_game(self, init_state: "RenderState") -> None:
         """
@@ -87,7 +94,6 @@ class RenderState():
         """
         self.game_step = 0
         self.done = False
-        self.detected = False
         self.attack_type = 0
         self.num_games +=1
         self.attack_events = []
@@ -96,6 +102,15 @@ class RenderState():
         self.attack_values = np.copy(init_state.attack_values)
         self.defense_values = np.copy(init_state.defense_values)
         self.defense_det = np.copy(init_state.defense_det)
+        if self.detected:
+            self.attacker_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
+            self.defender_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
+        self.detected = False
+        if self.hacked:
+            self.attacker_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
+            self.defender_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
+            self.num_hacks +=1
+        self.hacked = False
 
     def copy(self) -> "RenderState":
         """
@@ -117,4 +132,6 @@ class RenderState():
         new_state.done = self.done
         new_state.detected = self.detected
         new_state.attack_type = self.attack_type
+        new_state.num_hacks = self.num_hacks
+        new_state.hacked = self.hacked
         return new_state

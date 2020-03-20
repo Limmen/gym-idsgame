@@ -1,6 +1,6 @@
 import pyglet
 from typing import Union
-from gym_idsgame.envs.dao.render_config import RenderConfig
+from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 
 class Attacker(pyglet.sprite.Sprite):
     """
@@ -10,26 +10,27 @@ class Attacker(pyglet.sprite.Sprite):
     and define state of the sprite
     """
 
-    def __init__(self, render_config: RenderConfig, col:int, row:int):
+    def __init__(self, idsgame_config: IdsGameConfig, col:int, row:int):
         """
         Constructor, initializes the attacker
 
-        :param render_config: the render configuration (e.g avatar, scale, etc)
+        :param idsgame_config: configuration for IdsGameEnv
         :param col: the column in the grid where the attacker is currently
         :param row: the row in the grid where the attacker is currently
         """
-        self.render_config = render_config
-        self.avatar = pyglet.resource.image(render_config.attacker_filename)
-        super(Attacker, self).__init__(self.avatar, batch=render_config.batch, group=render_config.first_foreground)
+        self.idsgame_config = idsgame_config
+        self.avatar = pyglet.resource.image(idsgame_config.render_config.attacker_filename)
+        super(Attacker, self).__init__(self.avatar, batch=idsgame_config.render_config.batch,
+                                       group=idsgame_config.render_config.first_foreground)
         self.col = col
         self.row = row
         self.starting_col = col
         self.starting_row = row
-        self.scale = render_config.attacker_scale
-        self.cage_avatar = pyglet.resource.image(self.render_config.cage_filename)
-        self.cage = pyglet.sprite.Sprite(self.cage_avatar, x=self.x, y=self.y, batch=render_config.batch,
-                                         group=render_config.second_foreground)
-        self.cage.scale = self.render_config.cage_scale
+        self.scale = idsgame_config.render_config.attacker_scale
+        self.cage_avatar = pyglet.resource.image(self.idsgame_config.render_config.cage_filename)
+        self.cage = pyglet.sprite.Sprite(self.cage_avatar, x=self.x, y=self.y, batch=idsgame_config.render_config.batch,
+                                         group=idsgame_config.render_config.second_foreground)
+        self.cage.scale = self.idsgame_config.render_config.cage_scale
         self.cage.visible = False
         self.reset()
 
@@ -39,8 +40,10 @@ class Attacker(pyglet.sprite.Sprite):
 
         :return: None
         """
-        self.x = self.col * self.render_config.rect_size + self.render_config.rect_size / 2.65
-        self.y = int(self.render_config.rect_size / 1.5) * self.row + self.render_config.rect_size / 4.5
+        self.x = self.col * self.idsgame_config.render_config.rect_size + \
+                 self.idsgame_config.render_config.rect_size / 2.65
+        self.y = int(self.idsgame_config.render_config.rect_size / 1.5) * \
+                 self.row + self.idsgame_config.render_config.rect_size / 4.5
 
     def move_to_pos(self, pos: Union[int, int]) -> None:
         """
@@ -55,8 +58,8 @@ class Attacker(pyglet.sprite.Sprite):
         self.__center_avatar()
         # If moving to a server node, move a little bit to the right so it does not cover the text
         if not (self.row == self.starting_row and self.col == self.starting_col):
-            self.x = self.x + self.render_config.rect_size / 5
-            self.y = self.y + self.render_config.rect_size / 15
+            self.x = self.x + self.idsgame_config.render_config.rect_size / 5
+            self.y = self.y + self.idsgame_config.render_config.rect_size / 15
 
     def move_to_coords(self, x:float, y:float, col:int, row:int) -> None:
         """
@@ -68,7 +71,7 @@ class Attacker(pyglet.sprite.Sprite):
         :param row: the row in the grid
         :return: None
         """
-        self.x = x + self.render_config.rect_size / 5
+        self.x = x + self.idsgame_config.render_config.rect_size / 5
         self.y = y
         self.col = col
         self.row = row
