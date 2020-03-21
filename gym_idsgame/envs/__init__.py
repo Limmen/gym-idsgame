@@ -1,1 +1,2 @@
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
+from gym_idsgame.envs.idsgame_env import IdsGameRandomDefense1L1S10ADEnv

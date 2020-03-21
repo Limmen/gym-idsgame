@@ -34,8 +34,7 @@ class GameConfig():
         self.num_nodes = self.num_layers * self.num_servers_per_layer + 2  # +2 for Start and Data Nodes
         self.num_cols = self.num_servers_per_layer
         self.num_actions = self.num_attack_types * self.num_nodes
-        self.num_states = math.pow(self.max_value+1, self.num_attack_types * 2 * self.num_nodes) \
-                          * math.pow(10, self.max_value+1)
+        self.num_states = self.num_nodes
         self.network_config = network_config
         if network_config is None:
             self.network_config = NetworkConfig(self.num_rows, self.num_cols)

@@ -9,7 +9,7 @@ from gym_idsgame.agents.random_defense_agent import RandomDefenseAgent
 
 # Program entry point, uses the gym-idsgame environment for manual play
 if __name__ == '__main__':
-    game_config = GameConfig(num_layers = 2, num_servers_per_layer = 3, num_attack_types = 10, max_value = 9)
+    game_config = GameConfig(num_layers = 5, num_servers_per_layer = 7, num_attack_types = 10, max_value = 9)
     defender_policy = RandomDefenseAgent(game_config)
     render_config = RenderConfig()
     render_config.manual_default()
