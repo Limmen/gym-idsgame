@@ -4,7 +4,7 @@ from gym_idsgame.agents.random_defense_agent import RandomDefenseAgent
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.dao.render_config import RenderConfig
-from gym_idsgame.algorithms.q_learning import QAgent
+from gym_idsgame.algorithms.q_agent import QAgent
 
 # Program entrypoint
 if __name__ == '__main__':
@@ -19,7 +19,7 @@ if __name__ == '__main__':
     q_agent = QAgent(env, gamma=0.9, alpha=0.3, epsilon=1, render=False, eval_sleep=0.5,
                      min_epsilon=0.1, eval_epochs=10, log_frequency=100, epsilon_decay=0.999, video=False,
                      video_fps=5, video_dir="./videos")
-    episode_rewards, episode_steps, epsilon_values = q_agent.run(5000)
+    episode_rewards, episode_steps, epsilon_values = q_agent.train(5000)
     q_agent.print_state_values()
     #episode_rewards, episode_steps, epsilon_values = q_agent.run(40000)
     q_agent.eval()

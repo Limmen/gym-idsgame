@@ -37,6 +37,7 @@ pytest
 - NumPy
 - Pyglet (OpenGL 3D graphics)
 - GPU for 3D graphics acceleration (optional)
+- jsonpickle (for configuration files)
 
 ## Usage
 The environment can be accessed like any other OpenAI environment with `gym.make`.
@@ -53,7 +54,7 @@ The environment ships with an implementation of the tabular Q(0) algorithm, see 
 
 ```python
 import gym
-from gym_idsgame.algorithms.q_learning import QAgent
+from gym_idsgame.algorithms.q_agent import QAgent
 TODO
 ```
 

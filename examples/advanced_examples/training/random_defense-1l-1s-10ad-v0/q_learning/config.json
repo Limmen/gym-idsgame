@@ -1,0 +1,23 @@
+{
+    "attacker_type": 0,
+    "defender_type": 1,
+    "env_name": "idsgame-random_defense-1l-1s-10ad-v0",
+    "mode": 0,
+    "py/object": "gym_idsgame.config.client_config.ClientConfig",
+    "q_agent_config": {
+        "alpha": 0.3,
+        "epsilon": 1,
+        "epsilon_decay": 0.999,
+        "eval_episodes": 5,
+        "eval_sleep": 0.5,
+        "gamma": 0.9,
+        "log_frequency": 100,
+        "min_epsilon": 0.1,
+        "num_episodes": 5000,
+        "py/object": "gym_idsgame.algorithms.q_agent_config.QAgentConfig",
+        "render": false,
+        "video": false,
+        "video_dir": "./videos",
+        "video_fps": 5
+    }
+}

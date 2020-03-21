@@ -250,7 +250,5 @@ class IdsGameRandomDefense1L1S10ADEnv(IdsGameEnv):
     def __init__(self):
         game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
         defender_policy = RandomDefenseAgent(game_config)
-        render_config = RenderConfig(num_blinks=6, blink_interval=0.01)
-        idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_policy,
-                                       render_config=render_config)
+        idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_policy)
         super().__init__(idsgame_config=idsgame_config)
