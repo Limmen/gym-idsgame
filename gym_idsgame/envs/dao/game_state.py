@@ -73,6 +73,8 @@ class GameState():
         defense_values = np.zeros((num_nodes, num_attack_types))
         det_values = np.zeros(num_nodes)
         for node_id in range(num_nodes):
+            # if node_list[node_id] == NodeType.START.value:
+            #     det_values[node_id] = 2
             if node_list[node_id] == NodeType.DATA.value or node_list[node_id] == NodeType.SERVER.value:
                 defense_values[node_id] = [2] * num_attack_types
                 defense_values[node_id][0] = 0 # vulnerability
@@ -144,44 +146,51 @@ class GameState():
         new_state.hacked = self.hacked
         return new_state
 
-    def attack(self, node_id: int, attack_type: int, max_value: int) -> None:
+    def attack(self, node_id: int, attack_type: int, max_value: int, network_config: NetworkConfig) -> None:
         """
         Increments the attack value of the specified node and attack type
 
         :param node_id: id of the node to defend
         :param attack_type: the type of attack attribute to increment
         :param max_value: the maximum defense value
+        :param network_config: NetworkConfig
         :return: None
         """
-        if self.attack_values[node_id][attack_type] < max_value:
+        if network_config.node_list[node_id] != NodeType.START and self.attack_values[node_id][attack_type] < max_value:
             self.attack_values[node_id][attack_type] += 1
 
-    def defend(self, node_id: int, defense_type: int, max_value: int) -> None:
+    def defend(self, node_id: int, defense_type: int, max_value: int, network_config: NetworkConfig) -> None:
         """
         Increments the defense value of the specified node and defense type
 
         :param node_id: id of the node to defend
         :param defense_type: the type of defense attribute to increment
         :param max_value: the maximum defense value
+        :param network_config: NetworkConfig
         :return: None
         """
-        if self.defense_values[node_id][defense_type] < max_value:
+        if network_config.node_list[node_id] != NodeType.START and \
+                self.defense_values[node_id][defense_type] < max_value:
             self.defense_values[node_id][defense_type] += 1
 
-    def simulate_attack(self, attacked_node_id: int, attack_type: int) -> bool:
+    def simulate_attack(self, attacked_node_id: int, attack_type: int, network_config: NetworkConfig) -> bool:
         """
         Simulates an attack operation
 
         :param attacked_node_id: the id of the node that is attacked
         :param attack_type: the type of the attack
+        :param network_config: NetworkConfig
         :return: True if the attack was successful otherwise False
         """
+        if network_config.node_list[attacked_node_id] == NodeType.START:
+            return True
         return self.attack_values[attacked_node_id][attack_type] > self.defense_values[attacked_node_id][attack_type]
 
     def simulate_detection(self, node_id: int) -> bool:
         """
         Simulates detection for a unsuccessful attack
 
+        :param node_id: the id of the node to simulate deteciton of
         :return: True if the node was detected, otherwise False
         """
         return np.random.rand() < self.defense_det[node_id] / 10

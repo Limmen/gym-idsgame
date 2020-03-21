@@ -82,7 +82,7 @@ class IdsGameEnv(gym.Env):
 
         # 1. Interpret attacker action
         attacker_pos = self.state.attacker_pos
-        target_node_id, target_pos, attack_type = self.__get_server_under_attack(action)
+        target_node_id, target_pos, attack_type = util.interpret_attack(action, self.idsgame_config.game_config)
         #print("target node: {}".format(target_node_id))
         if target_node_id == self.idsgame_config.game_config.num_nodes-1:
             print("target start node")
@@ -91,17 +91,20 @@ class IdsGameEnv(gym.Env):
         defense_pos, defense_type, defense_node_id = self.__defense_action()
 
         # 3. Defend
-        self.state.defend(defense_node_id, defense_type, self.idsgame_config.game_config.max_value)
+        self.state.defend(defense_node_id, defense_type, self.idsgame_config.game_config.max_value,
+                          self.idsgame_config.game_config.network_config)
         self.state.add_defense_event(defense_pos, defense_type)
 
         if util.is_attack_legal(attacker_pos, target_pos, self.idsgame_config.game_config.num_cols,
                                 self.idsgame_config.game_config.network_config.adjacency_matrix):
             # 4. Attack
-            self.state.attack(target_node_id, attack_type, self.idsgame_config.game_config.max_value)
+            self.state.attack(target_node_id, attack_type, self.idsgame_config.game_config.max_value,
+                              self.idsgame_config.game_config.network_config)
             self.state.add_attack_event(target_pos, attack_type)
 
             # 5. Simulate attack outcome
-            attack_successful = self.state.simulate_attack(target_node_id, attack_type)
+            attack_successful = self.state.simulate_attack(target_node_id, attack_type,
+                                                           self.idsgame_config.game_config.network_config)
 
             # 6. Update state based on attack outcome
             if attack_successful:
@@ -191,6 +194,9 @@ class IdsGameEnv(gym.Env):
             hack_probability = float(self.state.num_hacks) / float(self.state.num_games)
         return hack_probability
 
+    def is_attack_legal(self, attack_action):
+        return util.is_attack_id_legal(attack_action, self.idsgame_config.game_config, self.state.attacker_pos)
+
     # -------- Private methods ------------
 
     def __setup_viewer(self):
@@ -215,26 +221,3 @@ class IdsGameEnv(gym.Env):
         defense_pos = (defense_row, defense_col)
         defense_node_id = self.idsgame_config.game_config.network_config.get_node_id(defense_pos)
         return defense_pos, defense_type, defense_node_id
-
-
-    def __get_server_under_attack(self, action: int) -> Union[int, Union[int, int], int]:
-        """
-        Utility method for getting the server under attack from an action-id
-
-        :param action: the attack action-id
-        :return: server-id, server-position, attack-type
-        """
-        server_id = action // self.idsgame_config.game_config.num_attack_types
-        server_pos = self.idsgame_config.game_config.network_config.get_node_pos(server_id)
-        attack_type = self.__get_attack_type(action)
-        return server_id, server_pos, attack_type
-
-    def __get_attack_type(self, action: int) -> int:
-        """
-        Utility method for getting the type of action-id
-
-        :param action: action-id
-        :return: action type
-        """
-        attack_type = action % self.idsgame_config.game_config.num_attack_types
-        return attack_type

@@ -122,7 +122,9 @@ class GameFrame(pyglet.window.Window):
                         if node.x-node.radius < x < (node.x + node.radius) and node.y-node.radius < y < (node.y + node.radius):
                             # 1.5 Special case: if it is the start node, let the attacker move there without making
                             # any attack or risk to be detected
-                            if node.node_type == NodeType.START:
+                            if node.node_type == NodeType.START and util.is_attack_legal(
+                                    self.attacker.pos, node.pos, self.idsgame_config.game_config.num_cols,
+                                    self.idsgame_config.game_config.network_config.adjacency_matrix):
                                 self.game_state.attacker_pos = node.pos
                                 self.game_state.game_step += 1
                                 return
@@ -139,14 +141,16 @@ class GameFrame(pyglet.window.Window):
                             defend_node_id = self.idsgame_config.game_config.network_config.get_node_id((defense_row,
                                                                                                          defense_col))
                             self.game_state.defend(defend_node_id, defend_type,
-                                                   self.idsgame_config.game_config.max_value)
+                                                   self.idsgame_config.game_config.max_value,
+                                                   self.idsgame_config.game_config.network_config)
 
                             # 4. Visualize defense
                             self.resource_network.grid[defense_row][defense_col].visualize_defense(defend_type)
 
                             # 5. Update attack state
                             self.game_state.attack(node.id, self.game_state.attack_type,
-                                                   self.idsgame_config.game_config.max_value)
+                                                   self.idsgame_config.game_config.max_value,
+                                                   self.idsgame_config.game_config.network_config)
 
                             # 6. Visualize attack
                             edges = []
@@ -156,7 +160,8 @@ class GameFrame(pyglet.window.Window):
                             node.visualize_attack(self.game_state.attack_type, edges)
 
                             # 7. Simulate attack outcome
-                            attack_successful = self.game_state.simulate_attack(node.id, self.game_state.attack_type)
+                            attack_successful = self.game_state.simulate_attack(
+                                node.id, self.game_state.attack_type, self.idsgame_config.game_config.network_config)
 
                             # 8. Update game state based on the outcome of the attack
                             self.game_state.game_step += 1

@@ -46,6 +46,6 @@ class GAME_CONFIG:
     """
     Game constants
     """
-    POSITIVE_REWARD = +100
-    NEGATIVE_REWARD = -100
+    POSITIVE_REWARD = 1
+    NEGATIVE_REWARD = -1
     MAX_GAME_STEPS = 400

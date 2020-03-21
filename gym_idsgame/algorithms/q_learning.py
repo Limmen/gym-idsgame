@@ -1,6 +1,6 @@
 
 import numpy as np
-import random
+import math
 import time
 import tqdm
 from gym import wrappers
@@ -35,7 +35,7 @@ class QAgent:
         self.env = env
         self.alpha = alpha
         self.epsilon=epsilon
-        self.Q = np.random.rand(self.env.num_states, self.env.num_actions)
+        self.Q = np.zeros((self.env.num_states, self.env.num_actions))
         self.render = render
         self.eval_sleep = eval_sleep
         self.epsilon_decay = epsilon_decay
@@ -54,9 +54,20 @@ class QAgent:
         :param s:  the state to sample an action for
         :return: a sampled action
         """
+        actions = list(range(self.env.num_actions))
+        legal_actions = list(filter(lambda action: self.env.is_attack_legal(action), actions))
         if np.random.rand() < self.epsilon and not eval:
-            return random.randrange(self.env.num_actions)
-        return np.argmax(self.Q[s]).item()
+            return np.random.choice(legal_actions)
+        #return np.argmax(self.Q[s])
+        max_legal_action_value = float("-inf")
+        max_legal_action = float("-inf")
+        for i in range(len(self.Q[s])):
+            if i in legal_actions and self.Q[s][i] > max_legal_action_value:
+                max_legal_action_value = self.Q[s][i]
+                max_legal_action = i
+        if max_legal_action == float("-inf") or max_legal_action_value == float("-inf"):
+            raise AssertionError("Error when selecting action greedily according to the Q-function")
+        return max_legal_action
 
 
     def run(self, num_episodes):
@@ -88,11 +99,6 @@ class QAgent:
                     self.env.render(mode="human")
                 attacker_node_id = self.env.get_attacker_node_from_observation(obs)
                 action = self.get_action(attacker_node_id)
-                # print(self.env.idsgame_config.game_config.num_nodes)
-                # print(self.env.idsgame_config.game_config.num_attack_types)
-                # print((self.env.idsgame_config.game_config.num_nodes-1))
-                # print(self.env.idsgame_config.game_config.num_attack_types)
-                # print((self.env.idsgame_config.game_config.num_nodes-1)*self.env.idsgame_config.game_config.num_attack_types)
                 while action >= (self.env.idsgame_config.game_config.num_nodes-1)*self.env.idsgame_config.game_config.num_attack_types:
                     action = self.get_action(attacker_node_id)
                 obs_prime, reward, done, info = self.env.step(action)
@@ -102,7 +108,7 @@ class QAgent:
                 # Q-learning update
                 self.Q[attacker_node_id, action] = self.Q[attacker_node_id, action] + \
                                                    self.alpha*(reward + self.gamma*np.max(self.Q[attacker_node_id_prime])
-                                                               - self.Q[attacker_node_id_prime,action])
+                                                               - self.Q[attacker_node_id,action])
                 obs = obs_prime
 
             episode_rewards.append(episode_reward)
@@ -146,8 +152,6 @@ class QAgent:
                 i = i+1
                 attacker_node_id = self.env.get_attacker_node_from_observation(obs)
                 action = self.get_action(attacker_node_id, eval=True)
-                print("action: {}".format(action))
-                #action = self.get_action(attacker_node_id, eval=True)
                 obs, reward, done, _ = self.env.step(action)
             self.env.render()
             time.sleep(self.eval_sleep)

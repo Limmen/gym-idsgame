@@ -177,7 +177,7 @@ class NetworkConfig:
                     return (i, j)
                 if self.graph_layout[i][j] != NodeType.EMPTY.value:
                     count += 1
-        raise ValueError("Invalid node id")
+        raise ValueError("Invalid node id: {}".format(node_id))
 
     def get_node_id(self, pos: Union[int, int]) -> int:
         """

@@ -4,6 +4,7 @@ Utility functions for the gym-idsgame environment
 from typing import Union
 import numpy as np
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
+from gym_idsgame.envs.dao.game_config import GameConfig
 
 def validate_config(idsgame_config: IdsGameConfig) -> None:
     """
@@ -31,8 +32,45 @@ def is_attack_legal(target_pos: Union[int, int], attacker_pos: Union[int, int], 
     :param adjacency_matrix: the adjacency matrix
     :return: True if the attack is legal, otherwise False
     """
+    if target_pos == attacker_pos:
+        return False
     attacker_row, attacker_col = attacker_pos
     attacker_adjacency_matrix_id = attacker_row * num_cols + attacker_col
     target_row, target_col = target_pos
     target_adjacency_matrix_id = target_row * num_cols + target_col
     return adjacency_matrix[attacker_adjacency_matrix_id][target_adjacency_matrix_id] == int(1)
+
+
+def is_attack_id_legal(attack_id: int, game_config: GameConfig, attacker_pos) -> bool:
+    server_id, server_pos, attack_type = interpret_attack(attack_id, game_config)
+    return is_attack_legal(server_pos, attacker_pos, game_config.num_cols, game_config.network_config.adjacency_matrix)
+
+def interpret_attack(action: int, game_config: GameConfig) -> Union[int, Union[int, int], int]:
+    """
+    Utility method for getting the server under attack from an action-id
+
+    :param action: the attack action-id
+    :param game_config: game configuration
+    :return: server-id, server-position, attack-type
+    """
+    server_id = action // game_config.num_attack_types
+    try:
+        server_pos = game_config.network_config.get_node_pos(server_id)
+    except:
+        print("invalid action: {}".format(action))
+        import sys
+        sys.exit(0)
+    server_pos = game_config.network_config.get_node_pos(server_id)
+    attack_type = get_attack_type(action, game_config)
+    return server_id, server_pos, attack_type
+
+def get_attack_type(action: int, game_config: GameConfig) -> int:
+    """
+    Utility method for getting the type of action-id
+
+    :param action: action-id
+    :param game_config: game configuration
+    :return: action type
+    """
+    attack_type = action % game_config.num_attack_types
+    return attack_type
