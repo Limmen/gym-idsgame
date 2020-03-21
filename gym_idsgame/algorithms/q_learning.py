@@ -58,7 +58,6 @@ class QAgent:
         legal_actions = list(filter(lambda action: self.env.is_attack_legal(action), actions))
         if np.random.rand() < self.epsilon and not eval:
             return np.random.choice(legal_actions)
-        #return np.argmax(self.Q[s])
         max_legal_action_value = float("-inf")
         max_legal_action = float("-inf")
         for i in range(len(self.Q[s])):
@@ -167,14 +166,3 @@ class QAgent:
         """
         if self.epsilon > self.min_epsilon:
             self.epsilon = self.epsilon*self.epsilon_decay
-
-# Program entrypoint, runs the Q(0)-learning algorithm
-if __name__ == '__main__':
-    pass
-    # env = YagwEnv(height=8, width=8)
-    # q_agent = QAgent(env, gamma=0.99, alpha=0.2, epsilon=1, render=False, eval_sleep=0.3,
-    #                  min_epsilon=0.1, eval_epochs=2, log_frequency=100, epsilon_decay=0.999, video=True,
-    #                  video_fps = 5, video_dir="./videos")
-    # episode_rewards, episode_steps, epsilon_values = q_agent.run(5000)
-    # q_agent.print_state_values(height=env.height, width=env.width)
-    # q_agent.eval()

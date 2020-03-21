@@ -220,6 +220,12 @@ class GameState():
         return attack_observation
 
     def get_attacker_node_from_observation(self, observation: np.ndarray) -> int:
+        """
+        Extracts which node the attacker is currently at from the observation representation
+
+        :param observation: the observation representation emitted from the environment
+        :return: the id of the node that the attacker is in
+        """
         for node_id in range(len(observation)):
             if observation[node_id][-1] == 1:
                 return node_id
@@ -250,7 +256,11 @@ class GameState():
     def get_defender_observation(self):
         pass
 
-    def restart(self):
+    def restart(self) -> None:
+        """
+        Resets the game state, clears up all the history
+        :return: Noen
+        """
         self.num_games = 0
         self.num_hacks = 0
         self.defender_cumulative_reward = 0

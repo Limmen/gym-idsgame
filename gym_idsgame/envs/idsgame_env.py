@@ -147,6 +147,11 @@ class IdsGameEnv(gym.Env):
         return observation
 
     def restart(self) -> None:
+        """
+        Restarts the game, and all the history
+
+        :return: the observation from the first state
+        """
         obs = self.reset()
         self.state.restart()
         return obs
@@ -186,15 +191,30 @@ class IdsGameEnv(gym.Env):
             self.viewer = None
 
     def get_attacker_node_from_observation(self, observation: np.ndarray) -> int:
+        """
+        Extracts which node the attacker is currently at from the observation representation
+
+        :param observation: the observation representation emitted from the environment
+        :return: the id of the node that the attacker is in
+        """
         return self.state.get_attacker_node_from_observation(observation)
 
     def hack_probabiltiy(self) -> float:
+        """
+        :return: the hack-probabiltiy according to the game history
+        """
         hack_probability = 0.0
         if self.state.num_hacks > 0:
             hack_probability = float(self.state.num_hacks) / float(self.state.num_games)
         return hack_probability
 
-    def is_attack_legal(self, attack_action):
+    def is_attack_legal(self, attack_action:int) -> bool:
+        """
+        Check if a given attack is legal or not.
+
+        :param attack_action: the attack to verify
+        :return: True if legal otherwise False
+        """
         return util.is_attack_id_legal(attack_action, self.idsgame_config.game_config, self.state.attacker_pos)
 
     # -------- Private methods ------------

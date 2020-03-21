@@ -42,6 +42,14 @@ def is_attack_legal(target_pos: Union[int, int], attacker_pos: Union[int, int], 
 
 
 def is_attack_id_legal(attack_id: int, game_config: GameConfig, attacker_pos) -> bool:
+    """
+    Check if a given attack is legal or not.
+
+    :param attack_id: the attack to verify
+    :param game_config: game configuration
+    :param attacker_pos: the current position of the attacker
+    :return: True if legal otherwise False
+    """
     server_id, server_pos, attack_type = interpret_attack(attack_id, game_config)
     return is_attack_legal(server_pos, attacker_pos, game_config.num_cols, game_config.network_config.adjacency_matrix)
 
@@ -54,12 +62,6 @@ def interpret_attack(action: int, game_config: GameConfig) -> Union[int, Union[i
     :return: server-id, server-position, attack-type
     """
     server_id = action // game_config.num_attack_types
-    try:
-        server_pos = game_config.network_config.get_node_pos(server_id)
-    except:
-        print("invalid action: {}".format(action))
-        import sys
-        sys.exit(0)
     server_pos = game_config.network_config.get_node_pos(server_id)
     attack_type = get_attack_type(action, game_config)
     return server_id, server_pos, attack_type
