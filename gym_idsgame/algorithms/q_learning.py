@@ -166,3 +166,15 @@ class QAgent:
         """
         if self.epsilon > self.min_epsilon:
             self.epsilon = self.epsilon*self.epsilon_decay
+
+    def print_state_values(self):
+        """
+        Utility function for printing the state-values according to the learned Q-function
+        :return:
+        """
+        print("--- State Values ---")
+        for i in range(len(self.Q)):
+            state_value = sum(self.Q[i])
+            node_id = i
+            print("s:{},V(s):{}".format(node_id, state_value))
+        print("--------------------")

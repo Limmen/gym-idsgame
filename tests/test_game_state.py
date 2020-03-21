@@ -6,6 +6,7 @@ import pytest
 import logging
 import numpy as np
 from gym_idsgame.envs.dao.game_state import GameState
+from gym_idsgame.envs.dao.network_config import NetworkConfig
 
 class TestGameStateSuite():
     pytest.logger = logging.getLogger("gamestate_tests")
@@ -59,6 +60,7 @@ class TestGameStateSuite():
 
     def test_attack(self):
         state = GameState()
+        network_config = NetworkConfig(3,3)
         num_nodes = 8
         num_attack_types = 10
         state.default_state(list(range(num_nodes)), (3, 1), num_attack_types)
@@ -66,15 +68,16 @@ class TestGameStateSuite():
         attack_type =4
         max_value = 10
         old_count = state.attack_values[attack_node_id][attack_type]
-        state.attack(attack_node_id, attack_type, max_value)
+        state.attack(attack_node_id, attack_type, max_value, network_config)
         assert state.attack_values[attack_node_id][attack_type] < max_value
         assert state.attack_values[attack_node_id][attack_type] == old_count+1
         state.attack_values[attack_node_id][attack_type] = 10
-        state.attack(attack_node_id, attack_type, max_value)
+        state.attack(attack_node_id, attack_type, max_value, network_config)
         assert state.attack_values[attack_node_id][attack_type] == max_value
 
     def test_defend(self):
         state = GameState()
+        network_config = NetworkConfig(3,3)
         num_nodes = 8
         num_attack_types = 10
         state.default_state(list(range(num_nodes)), (3, 1), num_attack_types)
@@ -82,15 +85,16 @@ class TestGameStateSuite():
         defense_type = 4
         max_value = 10
         old_count = state.defense_values[defend_node_id][defense_type]
-        state.defend(defend_node_id, defense_type, max_value)
+        state.defend(defend_node_id, defense_type, max_value, network_config)
         assert state.defense_values[defend_node_id][defense_type] < max_value
         assert state.defense_values[defend_node_id][defense_type] == old_count + 1
         state.defense_values[defend_node_id][defense_type] = 10
-        state.defend(defend_node_id, defense_type, max_value)
+        state.defend(defend_node_id, defense_type, max_value, network_config)
         assert state.defense_values[defend_node_id][defense_type] == max_value
 
     def test_simulate_attack(self):
         state = GameState()
+        network_config = NetworkConfig(3, 3)
         num_nodes = 8
         num_attack_types = 10
         state.default_state(list(range(num_nodes)), (3, 1), num_attack_types)
@@ -98,7 +102,7 @@ class TestGameStateSuite():
         attack_type = 4
         state.defense_values[attack_node_id][attack_type] = 5
         state.attack_values[attack_node_id][attack_type] = 5
-        assert not state.simulate_attack(attack_node_id, attack_type)
+        assert not state.simulate_attack(attack_node_id, attack_type, network_config)
         state.defense_values[attack_node_id][attack_type] = 5
         state.attack_values[attack_node_id][attack_type] = 6
-        assert state.simulate_attack(attack_node_id, attack_type)
+        assert state.simulate_attack(attack_node_id, attack_type, network_config)
