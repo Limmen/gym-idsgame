@@ -51,12 +51,14 @@ class IdsGameEnv(gym.Env):
          'video.frames_per_second' : 50 # Video rendering speed
         }
         self.reward_range = (float(constants.GAME_CONFIG.NEGATIVE_REWARD), float(constants.GAME_CONFIG.POSITIVE_REWARD))
+        self.num_states = self.idsgame_config.game_config.num_nodes
+        self.num_actions = self.idsgame_config.game_config.num_actions
 
     # -------- API ------------
 
     def step(self, action) -> Union[np.ndarray, int, bool, dict]:
         """
-        Takes a steo in the environment using the given action.
+        Takes a step in the environment using the given action.
 
 
         When end of episode is reached, the caller is responsible for calling `reset()`
@@ -75,9 +77,15 @@ class IdsGameEnv(gym.Env):
         self.state.attack_events = []
         self.state.defense_events = []
 
+        if self.state.game_step > constants.GAME_CONFIG.MAX_GAME_STEPS:
+            return self.state.get_attacker_observation(self.idsgame_config.game_config.network_config), 0, True, info
+
         # 1. Interpret attacker action
         attacker_pos = self.state.attacker_pos
         target_node_id, target_pos, attack_type = self.__get_server_under_attack(action)
+        #print("target node: {}".format(target_node_id))
+        if target_node_id == self.idsgame_config.game_config.num_nodes-1:
+            print("target start node")
 
         # 2. Sample defense action
         defense_pos, defense_type, defense_node_id = self.__defense_action()
@@ -135,6 +143,11 @@ class IdsGameEnv(gym.Env):
         observation = self.state.get_attacker_observation(self.idsgame_config.game_config.network_config)
         return observation
 
+    def restart(self) -> None:
+        obs = self.reset()
+        self.state.restart()
+        return obs
+
     def render(self, mode: str ='human'):
         """
         Renders the environment
@@ -168,6 +181,15 @@ class IdsGameEnv(gym.Env):
         if self.viewer:
             self.viewer.close()
             self.viewer = None
+
+    def get_attacker_node_from_observation(self, observation: np.ndarray) -> int:
+        return self.state.get_attacker_node_from_observation(observation)
+
+    def hack_probabiltiy(self) -> float:
+        hack_probability = 0.0
+        if self.state.num_hacks > 0:
+            hack_probability = float(self.state.num_hacks) / float(self.state.num_games)
+        return hack_probability
 
     # -------- Private methods ------------
 

@@ -92,19 +92,19 @@ class GamePanel:
                                             self.idsgame_config.render_config.batch,
                                             self.idsgame_config.render_config.second_foreground)
 
-    def update_state_text(self, render_state: GameState) -> None:
+    def update_state_text(self, game_state: GameState) -> None:
         """
         Updates the text of the labels on the panel
 
-        :param render_state: the state to reflect in the labels
+        :param game_state: the state to reflect in the labels
         :return: None
         """
-        self.attack_type_label.text = str(render_state.attack_type)
-        self.a_reward_label.text = str(render_state.attacker_cumulative_reward)
-        self.d_reward_label.text = str(render_state.defender_cumulative_reward)
-        self.step_label.text = str(render_state.game_step)
-        self.num_games_label.text = str(render_state.num_games)
+        self.attack_type_label.text = str(game_state.attack_type)
+        self.a_reward_label.text = str(game_state.attacker_cumulative_reward)
+        self.d_reward_label.text = str(game_state.defender_cumulative_reward)
+        self.step_label.text = str(game_state.game_step)
+        self.num_games_label.text = str(game_state.num_games)
         hack_probability = 0.0
-        if render_state.num_hacks > 0:
-            hack_probability = float(render_state.num_hacks)/float(render_state.num_games)
+        if game_state.num_hacks > 0:
+            hack_probability = float(game_state.num_hacks) / float(game_state.num_games)
         self.hack_probability.text = "{0:.2f}".format(hack_probability)

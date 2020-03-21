@@ -23,14 +23,14 @@ class RandomDefenseAgent(Agent):
         super(RandomDefenseAgent, self).__init__(game_config)
 
 
-    def action(self, render_state: GameState) -> Union[int, int, int]:
+    def action(self, game_state: GameState) -> Union[int, int, int]:
         """
         Samples an action from the policy
 
-        :param render_state: the current state
+        :param game_state: the current state
         :return: (row, col, defense_type)
         """
-        defend_type = np.random.randint(len(render_state.defense_values))
+        defend_type = np.random.randint(game_state.defense_values.shape[1])
         defend_row = None
         defend_col = None
         for row in range(self.game_config.network_config.graph_layout.shape[0]):

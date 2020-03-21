@@ -194,7 +194,8 @@ class GameState():
         :param network_config: the network configuration of the game
         :return: An observation of the environment
         """
-        attack_observation = np.zeros((len(network_config.node_list), self.attack_values.shape[1]))
+        # +1 to have an extra feature that indicates if this is the node that the attacker is currently in
+        attack_observation = np.zeros((len(network_config.node_list), self.attack_values.shape[1]+1))
         current_pos = self.attacker_pos
         current_node_id = network_config.get_node_id(current_pos)
         current_row, current_col = current_pos
@@ -203,10 +204,17 @@ class GameState():
             pos = network_config.get_node_pos(node_id)
             node_row, node_col = pos
             node_adjacency_matrix_id = network_config.get_adjacency_matrix_id(node_row, node_col)
-            if (node_id == current_node_id or
-                    network_config.adjacency_matrix[current_adjacency_matrix_id][node_adjacency_matrix_id]):
-                attack_observation[node_id] = self.attack_values[node_id]
+            if node_id == current_node_id:
+                attack_observation[node_id] = np.append(self.attack_values[node_id], 1)
+            if network_config.adjacency_matrix[current_adjacency_matrix_id][node_adjacency_matrix_id]:
+                attack_observation[node_id] = np.append(self.attack_values[node_id], 0)
         return attack_observation
+
+    def get_attacker_node_from_observation(self, observation: np.ndarray) -> int:
+        for node_id in range(len(observation)):
+            if observation[node_id][-1] == 1:
+                return node_id
+        raise AssertionError("Could not find the node that the attacker is in")
 
     def add_attack_event(self, target_pos: Union[int, int], attack_type: int) -> None:
         """
@@ -232,3 +240,9 @@ class GameState():
 
     def get_defender_observation(self):
         pass
+
+    def restart(self):
+        self.num_games = 0
+        self.num_hacks = 0
+        self.defender_cumulative_reward = 0
+        self.attacker_cumulative_reward = 0

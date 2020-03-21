@@ -19,11 +19,12 @@ if __name__ == '__main__':
     i = 0
     done = False
     while True:
-        env.render()
+        #env.render()
         if done or i == len(actions):
             i = 0
             env.reset()
         time.sleep(0.001)
         action = actions[i]
-        s, reward, done, _ = env.step(action)
+        obs, reward, done, _ = env.step(action)
+        node_id = env.state.get_attacker_node_from_observation(obs)
         i+=1

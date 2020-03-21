@@ -1,9 +1,10 @@
-from gym_idsgame.envs.idsgame_env import IdsGameEnv
+
 import numpy as np
 import random
 import time
 import tqdm
 from gym import wrappers
+from gym_idsgame.envs.idsgame_env import IdsGameEnv
 
 class QAgent:
     """
@@ -66,7 +67,7 @@ class QAgent:
         :return: None
         """
         done = False
-        s = self.env.reset()
+        obs = self.env.reset()
 
         # Tracking metrics
         episode_rewards = []
@@ -85,45 +86,41 @@ class QAgent:
             while not done:
                 if self.render:
                     self.env.render(mode="human")
-                s_index = self.env.get_state_index(s)
-                action = self.get_action(s_index)
-                s_prime, reward, done, _ = self.env.step(action)
+                attacker_node_id = self.env.get_attacker_node_from_observation(obs)
+                action = self.get_action(attacker_node_id)
+                # print(self.env.idsgame_config.game_config.num_nodes)
+                # print(self.env.idsgame_config.game_config.num_attack_types)
+                # print((self.env.idsgame_config.game_config.num_nodes-1))
+                # print(self.env.idsgame_config.game_config.num_attack_types)
+                # print((self.env.idsgame_config.game_config.num_nodes-1)*self.env.idsgame_config.game_config.num_attack_types)
+                while action >= (self.env.idsgame_config.game_config.num_nodes-1)*self.env.idsgame_config.game_config.num_attack_types:
+                    action = self.get_action(attacker_node_id)
+                obs_prime, reward, done, info = self.env.step(action)
                 episode_reward += reward
                 episode_step += 1
-                s_prime_index = self.env.get_state_index(s_prime)
+                attacker_node_id_prime = self.env.get_attacker_node_from_observation(obs_prime)
                 # Q-learning update
-                self.Q[s_index, action] = self.Q[s_index, action] + self.alpha*(reward + self.gamma*np.max(self.Q[s_prime_index]) - self.Q[s_index,action])
-                s = s_prime
+                self.Q[attacker_node_id, action] = self.Q[attacker_node_id, action] + \
+                                                   self.alpha*(reward + self.gamma*np.max(self.Q[attacker_node_id_prime])
+                                                               - self.Q[attacker_node_id_prime,action])
+                obs = obs_prime
 
             episode_rewards.append(episode_reward)
             episode_steps.append(episode_step)
             if episode % self.log_frequency == 0 and episode > 0:
-                outer.set_description_str("epsilon:{:.2f},avg_R:{:.2f},avg_t:{:.2f}".format(
-                    self.epsilon, sum(episode_rewards)/episode, sum(episode_steps)/episode))
+                outer.set_description_str("epsilon:{:.2f},avg_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f},"
+                                          "acc_D_R:{:.2f}".format(self.epsilon, sum(episode_rewards)/episode,
+                                                                  sum(episode_steps)/episode,
+                                                                  self.env.hack_probabiltiy(),
+                                                                  self.env.state.attacker_cumulative_reward,
+                                                                  self.env.state.defender_cumulative_reward))
             self.anneal_epsilon()
             done=False
-            s = self.env.reset()
+            obs = self.env.reset()
             outer.update(1)
 
         print("Training Complete")
         return episode_rewards, episode_steps, epsilon_values
-
-    def print_state_values(self, width=5, height=5):
-        """
-        Utility function for pretty printing the state-values of the gridworld_v1 env
-
-        :param width: the width of the grid
-        :param height: the height of the grid
-        :return:
-        """
-        print("State values:")
-        state_values = list(map(lambda i: self.Q[i].sum(), range(0, self.env.num_states)))
-        for j in range(height):
-            str = ''
-            for i in range(width):
-                idx = i*width + j
-                str = '{} {:+02.2f}'.format(str, state_values[idx])
-            print(str)
 
     def eval(self):
         """
@@ -140,19 +137,23 @@ class QAgent:
                                      "the video_dir argument")
             self.env = wrappers.Monitor(self.env, self.video_dir, force=True)
             self.env.metadata["video.frames_per_second"] = self.video_fps
-        s = self.env.reset()
+        obs = self.env.restart()
         for epoch in range(self.eval_epochs):
             i = 0
             while not done:
                 self.env.render()
                 time.sleep(self.eval_sleep)
                 i = i+1
-                s_index = self.env.get_state_index(s)
-                action = self.get_action(s_index, eval=True)
-                s, reward, done, _ = self.env.step(action)
-            print("Eval epoch: {}, Reached the goal after {} steps".format(epoch, i))
+                attacker_node_id = self.env.get_attacker_node_from_observation(obs)
+                action = self.get_action(attacker_node_id, eval=True)
+                print("action: {}".format(action))
+                #action = self.get_action(attacker_node_id, eval=True)
+                obs, reward, done, _ = self.env.step(action)
+            self.env.render()
+            time.sleep(self.eval_sleep)
+            print("Eval epoch: {}, Game ended after {} steps".format(epoch, i))
             done = False
-            s = self.env.reset()
+            obs = self.env.reset()
 
     def anneal_epsilon(self):
         """
