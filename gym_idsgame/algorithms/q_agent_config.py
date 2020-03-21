@@ -1,4 +1,7 @@
 class QAgentConfig:
+    """
+    DTO with configuration for QAgent
+    """
 
     def __init__(self, gamma=0.8, alpha=0.1, epsilon=0.9, render = False, eval_sleep = 0.35,
                  epsilon_decay = 0.999, min_epsilon = 0.1, eval_episodes = 1, log_frequency = 100,

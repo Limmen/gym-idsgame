@@ -3,7 +3,7 @@ import jsonpickle
 import json
 import io
 import os
-from gym_idsgame.config.idsgame_mode import IdsGameMode
+from gym_idsgame.config.runner_mode import RunnerMode
 from gym_idsgame.algorithms.q_agent_config import QAgentConfig
 from gym_idsgame.agents.agent_type import AgentType
 from gym_idsgame.config.client_config import ClientConfig
@@ -36,7 +36,7 @@ def default_config():
                                   video_fps=5, video_dir="./videos", num_episodes=5000)
     env_name = "idsgame-random_defense-1l-1s-10ad-v0"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.Q_AGENT.value,
-                                 mode=IdsGameMode.TRAIN_ATTACKER.value,
+                                 mode=RunnerMode.TRAIN_ATTACKER.value,
                                  q_agent_config=q_agent_config)
     return client_config
 

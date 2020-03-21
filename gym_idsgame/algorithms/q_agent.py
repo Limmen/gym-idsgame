@@ -1,3 +1,6 @@
+"""
+An agent for the IDSGameEnv that implements the tabular Q-learning algorithm.
+"""
 import numpy as np
 import time
 import tqdm
