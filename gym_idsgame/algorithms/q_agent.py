@@ -45,7 +45,6 @@ class QAgent(TrainAgent):
             raise AssertionError("Error when selecting action greedily according to the Q-function")
         return max_legal_action
 
-
     def train(self):
         """
         Runs the Q(0)-learning algorithm for estimating the state values under a given policy for a specific MDP
@@ -91,18 +90,20 @@ class QAgent(TrainAgent):
             episode_rewards.append(episode_reward)
             episode_steps.append(episode_step)
             if episode % self.config.log_frequency == 0 and episode > 0:
-                outer.set_description_str("epsilon:{:.2f},avg_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f},"
+                log_str = "epsilon:{:.2f},avg_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
                                           "acc_D_R:{:.2f}".format(self.config.epsilon, sum(episode_rewards)/episode,
                                                                   sum(episode_steps)/episode,
                                                                   self.env.hack_probabiltiy(),
                                                                   self.env.state.attacker_cumulative_reward,
-                                                                  self.env.state.defender_cumulative_reward))
+                                                                  self.env.state.defender_cumulative_reward)
+                outer.set_description_str(log_str)
+                self.config.logger.info(log_str)
             self.anneal_epsilon()
             done=False
             obs = self.env.reset()
             outer.update(1)
 
-        print("Training Complete")
+        self.config.logger.info("Training Complete")
         return TrainResult(episode_rewards=episode_rewards, episode_steps=episode_steps, epsilon_values=epsilon_values)
 
     def eval(self):
@@ -144,7 +145,7 @@ class QAgent(TrainAgent):
                 episode_step += 1
             self.env.render()
             time.sleep(self.config.eval_sleep)
-            print("Eval episode: {}, Game ended after {} steps".format(episode, i))
+            self.config.logger.info("Eval episode: {}, Game ended after {} steps".format(episode, i))
             episode_rewards.append(episode_reward)
             episode_steps.append(episode_step)
             done = False
@@ -161,14 +162,14 @@ class QAgent(TrainAgent):
         if self.config.epsilon > self.config.min_epsilon:
             self.config.epsilon = self.config.epsilon*self.config.epsilon_decay
 
-    def print_state_values(self):
+    def log_state_values(self):
         """
         Utility function for printing the state-values according to the learned Q-function
         :return:
         """
-        print("--- State Values ---")
+        self.config.logger.info("--- State Values ---")
         for i in range(len(self.Q)):
             state_value = sum(self.Q[i])
             node_id = i
-            print("s:{},V(s):{}".format(node_id, state_value))
-        print("--------------------")
+            self.config.logger.info("s:{},V(s):{}".format(node_id, state_value))
+        self.config.logger.info("--------------------")

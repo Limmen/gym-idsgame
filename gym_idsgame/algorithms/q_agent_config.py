@@ -35,3 +35,4 @@ class QAgentConfig:
         self.video_fps = video_fps
         self.video_dir = video_dir
         self.num_episodes = num_episodes
+        self.logger = False

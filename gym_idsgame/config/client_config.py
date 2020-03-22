@@ -25,3 +25,4 @@ class ClientConfig:
         self.defender_type = defender_type
         self.mode = mode
         self.q_agent_config = q_agent_config
+        self.logger = None

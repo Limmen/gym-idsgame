@@ -20,7 +20,7 @@ if __name__ == '__main__':
                      min_epsilon=0.1, eval_epochs=10, log_frequency=100, epsilon_decay=0.999, video=False,
                      video_fps=5, video_dir="./videos")
     episode_rewards, episode_steps, epsilon_values = q_agent.train(5000)
-    q_agent.print_state_values()
+    q_agent.log_state_values()
     #episode_rewards, episode_steps, epsilon_values = q_agent.run(40000)
     q_agent.eval()
     #plot_results(episode_rewards, episode_steps)
