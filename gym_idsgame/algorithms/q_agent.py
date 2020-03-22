@@ -55,6 +55,7 @@ class QAgent(TrainAgent):
         :return: None
         """
         self.config.logger.info("Starting Training")
+        self.config.logger.info(self.config.to_str())
         if len(self.train_result.avg_episode_steps) > 0:
             self.config.logger.warning("starting training with non-empty result object")
         done = False

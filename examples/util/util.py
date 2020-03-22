@@ -1,14 +1,37 @@
+"""
+Utility functions for experiments with the idsgame-env
+"""
 import io
 import json
 import jsonpickle
-import os
 import logging
-import tqdm
 import time
 import argparse
+import os
 from gym_idsgame.config.client_config import ClientConfig
 
-def setup_logger(name:str, logdir:str):
+def create_artefact_dirs(output_dir: str) -> None:
+    """
+    Creates artefact directories if they do not already exist
+
+    :param output_dir: the base directory
+    :return: None
+    """
+    if not os.path.exists(output_dir + "/logs/"):
+        os.makedirs(output_dir + "/logs/")
+    if not os.path.exists(output_dir + "/plots/"):
+        os.makedirs(output_dir + "/plots/")
+    if not os.path.exists(output_dir + "/data/"):
+        os.makedirs(output_dir + "/data/")
+
+def setup_logger(name: str, logdir: str):
+    """
+    Configures the logger for writing log-data of experiments
+
+    :param name: name of the logger
+    :param logdir: directory to save log files
+    :return: None
+    """
     # create formatter
     formatter = logging.Formatter('%(asctime)s,%(message)s')
     # log to console
@@ -28,7 +51,14 @@ def setup_logger(name:str, logdir:str):
     #logger.addHandler(ch)
     return logger
 
-def write_config_file(config, path):
+def write_config_file(config: ClientConfig, path: str) -> None:
+    """
+    Writes a config object to a config file
+
+    :param config: the config to write
+    :param path: the path to write the file
+    :return: None
+    """
     json_str = json.dumps(json.loads(jsonpickle.encode(config)), indent=4, sort_keys=True)
     with io.open(path, 'w', encoding='utf-8') as f:
         f.write(json_str)

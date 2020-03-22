@@ -39,3 +39,16 @@ class QAgentConfig:
         self.video_dir = video_dir
         self.num_episodes = num_episodes
         self.logger = False
+
+    def to_str(self):
+        return "Hyperparameters: gamma:{0},alpha:{1},epsilon:{2},render:{3},eval_sleep:{4}," \
+                                "epsilon_decay:{5},min_epsilon:{6},eval_episodes:{7},train_log_frequency:{8}," \
+                                "eval_log_frequency:{9},video:{10},video_fps:{11}," \
+                                "video_dir:{12},num_episodes:{13}".format(self.gamma, self.alpha,
+                                                                          self.epsilon, self.render,
+                                                                          self.eval_sleep, self.epsilon_decay,
+                                                                          self.min_epsilon, self.eval_episodes,
+                                                                          self.train_log_frequency,
+                                                                          self.eval_log_frequency, self.video,
+                                                                          self.video_fps, self.video_dir,
+                                                                          self.num_episodes)
