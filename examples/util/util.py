@@ -34,16 +34,6 @@ def write_config_file(config, path):
         f.write(json_str)
 
 
-def test():
-    script_dir = os.path.dirname(__file__)
-    log = setup_logger("test", script_dir)
-    #config_path = os.path.join(script_dir, './config.json')
-    for i in tqdm.tqdm(range(100)):
-        if i == 50:
-            log.info("Half-way there!")
-        time.sleep(0.1)
-
-
 def read_config(config_path) -> ClientConfig:
     """
     Reads configuration of the experiment from a json file

@@ -23,7 +23,8 @@ class QAgent(TrainAgent):
         self.env = env
         self.config = config
         self.Q = np.zeros((self.env.num_states, self.env.num_actions))
-        self.result = TrainResult()
+        self.train_result = TrainResult()
+        self.eval_result = TrainResult()
         self.outer = tqdm.tqdm(total=self.config.num_episodes, desc='Episode', position=0)
 
     def get_action(self, s, eval=False):
@@ -53,6 +54,9 @@ class QAgent(TrainAgent):
 
         :return: None
         """
+        self.config.logger.info("Starting Training")
+        if len(self.train_result.avg_episode_steps) > 0:
+            self.config.logger.warning("starting training with non-empty result object")
         done = False
         obs = self.env.reset()
 
@@ -89,9 +93,9 @@ class QAgent(TrainAgent):
             episode_rewards.append(episode_reward)
             episode_steps.append(episode_step)
 
-            # Log average metrics every <self.config.log_frequency> episodes
-            if episode % self.config.log_frequency == 0 and episode > 0:
-                self.log_metrics(episode_rewards, episode_steps)
+            # Log average metrics every <self.config.train_log_frequency> episodes
+            if episode % self.config.train_log_frequency == 0:
+                self.log_metrics(self.train_result, episode_rewards, episode_steps)
                 episode_rewards = []
                 episode_steps = []
             self.anneal_epsilon()
@@ -100,12 +104,14 @@ class QAgent(TrainAgent):
             self.outer.update(1)
 
         self.config.logger.info("Training Complete")
-        return self.result
+        self.log_state_values()
+        return self.train_result
 
-    def log_metrics(self, episode_rewards:list, episode_steps:list) -> None:
+    def log_metrics(self, result: TrainResult, episode_rewards:list, episode_steps:list) -> None:
         """
         Logs average metrics for the last <self.config.log_frequency> episodes
 
+        :param result: the result object to add the results to
         :param episode_rewards: list of episode rewards for the last <self.config.log_frequency> episodes
         :param episode_steps: list of episode steps for the last <self.config.log_frequency> episodes
         :return: None
@@ -120,12 +126,12 @@ class QAgent(TrainAgent):
                                           self.env.state.defender_cumulative_reward)
         self.outer.set_description_str(log_str)
         self.config.logger.info(log_str)
-        self.result.avg_episode_steps.append(avg_episode_steps)
-        self.result.avg_episode_rewards.append(avg_episode_reward)
-        self.result.epsilon_values.append(self.config.epsilon)
-        self.result.hack_probability.append(self.env.hack_probabiltiy())
-        self.result.attacker_cumulative_reward.append(self.env.state.attacker_cumulative_reward)
-        self.result.defender_cumulative_reward.append(self.env.state.defender_cumulative_reward)
+        result.avg_episode_steps.append(avg_episode_steps)
+        result.avg_episode_rewards.append(avg_episode_reward)
+        result.epsilon_values.append(self.config.epsilon)
+        result.hack_probability.append(self.env.hack_probabiltiy())
+        result.attacker_cumulative_reward.append(self.env.state.attacker_cumulative_reward)
+        result.defender_cumulative_reward.append(self.env.state.defender_cumulative_reward)
 
     def eval(self):
         """
@@ -133,6 +139,10 @@ class QAgent(TrainAgent):
 
         :return: None
         """
+        self.config.logger.info("Starting Evaluation")
+
+        if len(self.eval_result.avg_episode_steps) > 0:
+            self.config.logger.warning("starting eval with non-empty result object")
         if(self.config.eval_episodes < 1):
             return
         done = False
@@ -169,10 +179,17 @@ class QAgent(TrainAgent):
             self.config.logger.info("Eval episode: {}, Game ended after {} steps".format(episode, i))
             episode_rewards.append(episode_reward)
             episode_steps.append(episode_step)
+
+            # Log average metrics every <self.config.eval_log_frequency> episodes
+            if episode % self.config.eval_log_frequency == 0:
+                self.log_metrics(self.eval_result, episode_rewards, episode_steps)
+                episode_rewards = []
+                episode_steps = []
             done = False
             obs = self.env.reset()
 
-        return TrainResult(episode_rewards = episode_rewards, episode_steps = episode_steps)
+        self.config.logger.info("Evaluation Complete")
+        return self.eval_result
 
     def anneal_epsilon(self):
         """
