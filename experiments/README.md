@@ -1,3 +1,3 @@
-# `gym-idsgame` Examples
+# Experiments
 
 TODO

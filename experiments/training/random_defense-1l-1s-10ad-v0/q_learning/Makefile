@@ -4,4 +4,4 @@ run: run.py run.sh
 all: run
 
 clean:
-	rm -rf data logs plots
+	rm -rf data logs plots hyperparameters
