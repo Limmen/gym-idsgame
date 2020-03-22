@@ -23,13 +23,16 @@ def create_artefact_dirs(output_dir: str) -> None:
         os.makedirs(output_dir + "/plots/")
     if not os.path.exists(output_dir + "/data/"):
         os.makedirs(output_dir + "/data/")
+        if not os.path.exists(output_dir + "/hyperparameters/"):
+            os.makedirs(output_dir + "/hyperparameters/")
 
-def setup_logger(name: str, logdir: str):
+def setup_logger(name: str, logdir: str, time_str = None):
     """
     Configures the logger for writing log-data of experiments
 
     :param name: name of the logger
     :param logdir: directory to save log files
+    :param time_str: time string for file names
     :return: None
     """
     # create formatter
@@ -42,7 +45,9 @@ def setup_logger(name: str, logdir: str):
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
     # log to file
-    fh = logging.FileHandler(logdir + "/" + str(time.time()) + "_" + name + ".log", mode="w")
+    if time_str is None:
+        time_str = str(time.time())
+    fh = logging.FileHandler(logdir + "/" + time_str + "_" + name + ".log", mode="w")
     fh.setLevel(logging.INFO)
     fh.setFormatter(formatter)
 

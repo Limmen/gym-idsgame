@@ -5,15 +5,21 @@ from gym_idsgame.algorithms.q_agent_config import QAgentConfig
 from gym_idsgame.agents.agent_type import AgentType
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.runnner import Runner
-from examples.util import util
-from examples.util import plotting_util
+from experiments.util import plotting_util, util
+
+
+def default_output_dir() -> str:
+    """
+    :return: the default output dir
+    """
+    script_dir = os.path.dirname(__file__)
+    return script_dir
 
 def default_config_path() -> str:
     """
     :return: the default path to configuration file
     """
-    script_dir = os.path.dirname(__file__)
-    config_path = os.path.join(script_dir, './config.json')
+    config_path = os.path.join(default_output_dir(), './config.json')
     return config_path
 
 
@@ -21,15 +27,14 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    dir = os.path.dirname(__file__)
     q_agent_config = QAgentConfig(gamma=0.9, alpha=0.3, epsilon=1, render=False, eval_sleep=0.5,
                                   min_epsilon=0.1, eval_episodes=5, train_log_frequency=100,
                                   epsilon_decay=0.999, video=False, eval_log_frequency=1,
-                                  video_fps=5, video_dir=dir + "/videos", num_episodes=5000)
+                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5000)
     env_name = "idsgame-random_defense-1l-1s-10ad-v0"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.Q_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
-                                 q_agent_config=q_agent_config, output_dir=dir)
+                                 q_agent_config=q_agent_config, output_dir=default_output_dir())
     return client_config
 
 
@@ -76,14 +81,17 @@ if __name__ == '__main__':
         config = util.read_config(args.configpath)
     else:
         config = default_config()
+    time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir)
-    logger = util.setup_logger("random_defense-1l-1s-10ad-v0-Q_learning", config.output_dir + "/logs/")
+    logger = util.setup_logger("random_defense-1l-1s-10ad-v0-Q_learning", config.output_dir + "/logs/",
+                               time_str=time_str)
     config.logger = logger
     config.q_agent_config.logger = logger
+    config.q_agent_config.to_csv(config.output_dir + "/hyperparameters/" + time_str + ".csv")
     train_result, eval_result = Runner.run(config)
-    train_csv_path = config.output_dir + "/data/" + str(time.time()) + "_train" + ".csv"
+    train_csv_path = config.output_dir + "/data/" + time_str + "_train" + ".csv"
     train_result.to_csv(train_csv_path)
-    eval_csv_path = config.output_dir + "/data/" + str(time.time()) + "_eval" + ".csv"
+    eval_csv_path = config.output_dir + "/data/" + time_str + "_eval" + ".csv"
     eval_result.to_csv(eval_csv_path)
     plot_csv(config, eval_csv_path, train_csv_path)
 

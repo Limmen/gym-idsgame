@@ -4,7 +4,7 @@
     "env_name": "idsgame-random_defense-1l-1s-10ad-v0",
     "logger": null,
     "mode": 0,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/examples/advanced_examples/training/random_defense-1l-1s-10ad-v0/q_learning",
+    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/random_defense-1l-1s-10ad-v0/q_learning",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
         "alpha": 0.3,
@@ -21,7 +21,7 @@
         "render": false,
         "train_log_frequency": 100,
         "video": false,
-        "video_dir": "/home/kim/storage/workspace/gym-idsgame/examples/advanced_examples/training/random_defense-1l-1s-10ad-v0/q_learning/videos",
+        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/random_defense-1l-1s-10ad-v0/q_learning/videos",
         "video_fps": 5
     }
 }

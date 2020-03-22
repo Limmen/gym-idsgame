@@ -1,3 +1,8 @@
+"""
+Configuratin for QAgent
+"""
+import csv
+
 class QAgentConfig:
     """
     DTO with configuration for QAgent
@@ -40,7 +45,10 @@ class QAgentConfig:
         self.num_episodes = num_episodes
         self.logger = False
 
-    def to_str(self):
+    def to_str(self) -> str:
+        """
+        :return: a string with information about all of the parameters
+        """
         return "Hyperparameters: gamma:{0},alpha:{1},epsilon:{2},render:{3},eval_sleep:{4}," \
                                 "epsilon_decay:{5},min_epsilon:{6},eval_episodes:{7},train_log_frequency:{8}," \
                                 "eval_log_frequency:{9},video:{10},video_fps:{11}," \
@@ -52,3 +60,28 @@ class QAgentConfig:
                                                                           self.eval_log_frequency, self.video,
                                                                           self.video_fps, self.video_dir,
                                                                           self.num_episodes)
+
+    def to_csv(self, file_path: str) -> None:
+        """
+        Write parameters to csv file
+
+        :param file_path: path to the file
+        :return: None
+        """
+        with open(file_path, "w") as f:
+            writer = csv.writer(f)
+            writer.writerow(["parameter", "value"])
+            writer.writerow(["gamma", str(self.gamma)])
+            writer.writerow(["alpha", str(self.alpha)])
+            writer.writerow(["epsilon", str(self.epsilon)])
+            writer.writerow(["render", str(self.render)])
+            writer.writerow(["eval_sleep", str(self.eval_sleep)])
+            writer.writerow(["epsilon_decay", str(self.epsilon_decay)])
+            writer.writerow(["min_epsilon", str(self.min_epsilon)])
+            writer.writerow(["eval_episodes", str(self.eval_episodes)])
+            writer.writerow(["train_log_frequency", str(self.train_log_frequency)])
+            writer.writerow(["eval_log_frequency", str(self.eval_log_frequency)])
+            writer.writerow(["video", str(self.video)])
+            writer.writerow(["video_fps", str(self.video_fps)])
+            writer.writerow(["video_dir", str(self.video_dir)])
+            writer.writerow(["num_episodes", str(self.num_episodes)])
