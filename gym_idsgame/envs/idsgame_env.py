@@ -7,7 +7,6 @@ import gym
 import os
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.agents.random_defense_agent import RandomDefenseBotAgent
-from gym_idsgame.envs.dao.render_config import RenderConfig
 from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 import gym_idsgame.envs.util.idsgame_util as util
@@ -136,7 +135,7 @@ class IdsGameEnv(gym.Env):
             self.viewer.gameframe.set_state(self.state)
         return observation, reward, self.state.done, info
 
-    def reset(self) -> None:
+    def reset(self) -> np.ndarray:
         """
         Resets the environment and returns the initial state
 
@@ -149,7 +148,7 @@ class IdsGameEnv(gym.Env):
         observation = self.state.get_attacker_observation(self.idsgame_config.game_config.network_config)
         return observation
 
-    def restart(self) -> None:
+    def restart(self) -> np.ndarray:
         """
         Restarts the game, and all the history
 

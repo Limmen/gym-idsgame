@@ -5,6 +5,7 @@ import numpy as np
 import time
 import tqdm
 from gym import wrappers
+from gym_idsgame.envs.rendering.video.idsgame_monitor import IdsGameMonitor
 from gym_idsgame.agents.dao.q_agent_config import QAgentConfig
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
 from gym_idsgame.agents.dao.train_result import TrainResult
@@ -147,27 +148,30 @@ class QAgent(TrainAgent):
         if(self.config.eval_episodes < 1):
             return
         done = False
+        mode = "human"
 
         # Video config
         if self.config.video:
             if self.config.video_dir is None:
                 raise AssertionError("Video is set to True but no video_dir is provided, please specify "
                                      "the video_dir argument")
-            self.env = wrappers.Monitor(self.env, self.config.video_dir, force=True)
+            self.env = IdsGameMonitor(self.env, self.config.video_dir, force=True)
             self.env.metadata["video.frames_per_second"] = self.config.video_fps
+            mode = "rgb_array"
 
         # Tracking metrics
         episode_rewards = []
         episode_steps = []
 
         # Eval
-        obs = self.env.restart()
+        obs = self.env.reset()
+        self.env.state.restart()
         for episode in range(self.config.eval_episodes):
             i = 0
             episode_reward = 0
             episode_step = 0
             while not done:
-                self.env.render()
+                self.env.render(mode)
                 time.sleep(self.config.eval_sleep)
                 i = i+1
                 attacker_node_id = self.env.get_attacker_node_from_observation(obs)
@@ -175,7 +179,7 @@ class QAgent(TrainAgent):
                 obs, reward, done, _ = self.env.step(action)
                 episode_reward += reward
                 episode_step += 1
-            self.env.render()
+            self.env.render(mode)
             time.sleep(self.config.eval_sleep)
             self.config.logger.info("Eval episode: {}, Game ended after {} steps".format(episode, i))
             episode_rewards.append(episode_reward)

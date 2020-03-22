@@ -15,6 +15,7 @@ def default_output_dir() -> str:
     script_dir = os.path.dirname(__file__)
     return script_dir
 
+
 def default_config_path() -> str:
     """
     :return: the default path to configuration file
@@ -49,6 +50,7 @@ def write_default_config(path:str = None) -> None:
         path = default_config_path()
     config = default_config()
     util.write_config_file(config, path)
+
 
 def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str) -> None:
     """

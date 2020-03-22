@@ -2,6 +2,7 @@
 Configuratin for QAgent
 """
 import csv
+import logging
 
 class QAgentConfig:
     """
@@ -43,7 +44,7 @@ class QAgentConfig:
         self.video_fps = video_fps
         self.video_dir = video_dir
         self.num_episodes = num_episodes
-        self.logger = False
+        self.logger = logging.getLogger('QAgent')
 
     def to_str(self) -> str:
         """
