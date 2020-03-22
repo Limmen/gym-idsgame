@@ -23,8 +23,10 @@ def create_artefact_dirs(output_dir: str) -> None:
         os.makedirs(output_dir + "/plots/")
     if not os.path.exists(output_dir + "/data/"):
         os.makedirs(output_dir + "/data/")
-        if not os.path.exists(output_dir + "/hyperparameters/"):
-            os.makedirs(output_dir + "/hyperparameters/")
+    if not os.path.exists(output_dir + "/hyperparameters/"):
+        os.makedirs(output_dir + "/hyperparameters/")
+    if not os.path.exists(output_dir + "/gifs/"):
+        os.makedirs(output_dir + "/gifs/")
 
 def setup_logger(name: str, logdir: str, time_str = None):
     """

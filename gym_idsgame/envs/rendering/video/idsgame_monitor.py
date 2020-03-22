@@ -5,6 +5,7 @@ from gym.wrappers.monitoring import stats_recorder
 from gym_idsgame.envs.rendering.video import idsgame_video_recorder
 from gym.utils import atomic_write, closer
 from gym.utils.json_utils import json_encode_np
+import imageio
 
 FILE_PREFIX = 'openaigym'
 MANIFEST_PREFIX = FILE_PREFIX + '.manifest'
@@ -22,9 +23,9 @@ class IdsGameMonitor(Wrapper):
         self.episode_id = 0
         self._monitor_id = None
         self.env_semantics_autoreset = env.metadata.get('semantics.autoreset')
-
         self._start(directory, video_callable, force, resume,
                             write_upon_reset, uid, mode)
+        self.episode_frames = []
 
     def step(self, action):
         self._before_step(action)
@@ -171,13 +172,20 @@ class IdsGameMonitor(Wrapper):
         # Record stats
         self.stats_recorder.after_step(observation, reward, done, info)
         # Record video
-        self.video_recorder.capture_frame()
-
+        frames = self.video_recorder.capture_frame()
+        if frames is not None:
+            for frame in frames:
+                self.episode_frames.append(frame)
         return done
+
+    def generate_gif(self, path, fps = 55):
+        if self.episode_frames is not None and len(self.episode_frames) > 0:
+            imageio.mimsave(path, self.episode_frames, fps=fps)
 
     def _before_reset(self):
         if not self.enabled: return
         self.stats_recorder.before_reset()
+        self.episode_frames = []
 
     def _after_reset(self, observation):
         if not self.enabled: return
@@ -206,7 +214,10 @@ class IdsGameMonitor(Wrapper):
             metadata={'episode_id': self.episode_id},
             enabled=self._video_enabled(),
         )
-        self.video_recorder.capture_frame()
+        frames = self.video_recorder.capture_frame()
+        if frames is not None:
+            for frame in frames:
+                self.episode_frames.append(frame)
 
     def _close_video_recorder(self):
         self.video_recorder.close()

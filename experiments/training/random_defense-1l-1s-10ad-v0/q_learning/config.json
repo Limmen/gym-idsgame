@@ -12,15 +12,29 @@
         "epsilon_decay": 0.999,
         "eval_episodes": 5,
         "eval_log_frequency": 1,
+        "eval_render": true,
         "eval_sleep": 0.5,
         "gamma": 0.9,
-        "logger": false,
+        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/random_defense-1l-1s-10ad-v0/q_learning/gifs",
+        "gifs": true,
+        "logger": {
+            "py/reduce": [
+                {
+                    "py/function": "logging.getLogger"
+                },
+                {
+                    "py/tuple": [
+                        "QAgent"
+                    ]
+                }
+            ]
+        },
         "min_epsilon": 0.1,
         "num_episodes": 5000,
         "py/object": "gym_idsgame.agents.dao.q_agent_config.QAgentConfig",
         "render": false,
         "train_log_frequency": 100,
-        "video": false,
+        "video": true,
         "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/random_defense-1l-1s-10ad-v0/q_learning/videos",
         "video_fps": 5
     }

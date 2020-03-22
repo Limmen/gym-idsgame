@@ -4,7 +4,6 @@ An agent for the IDSGameEnv that implements the tabular Q-learning algorithm.
 import numpy as np
 import time
 import tqdm
-from gym import wrappers
 from gym_idsgame.envs.rendering.video.idsgame_monitor import IdsGameMonitor
 from gym_idsgame.agents.dao.q_agent_config import QAgentConfig
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
@@ -148,7 +147,6 @@ class QAgent(TrainAgent):
         if(self.config.eval_episodes < 1):
             return
         done = False
-        mode = "human"
 
         # Video config
         if self.config.video:
@@ -170,7 +168,8 @@ class QAgent(TrainAgent):
             episode_reward = 0
             episode_step = 0
             while not done:
-                self.env.render()
+                if self.config.eval_render:
+                    self.env.render()
                 time.sleep(self.config.eval_sleep)
                 i = i+1
                 attacker_node_id = self.env.get_attacker_node_from_observation(obs)
@@ -178,7 +177,8 @@ class QAgent(TrainAgent):
                 obs, reward, done, _ = self.env.step(action)
                 episode_reward += reward
                 episode_step += 1
-            self.env.render()
+            if self.config.eval_render:
+                self.env.render()
             time.sleep(self.config.eval_sleep)
             self.config.logger.info("Eval episode: {}, Game ended after {} steps".format(episode, i))
             episode_rewards.append(episode_reward)
@@ -189,6 +189,11 @@ class QAgent(TrainAgent):
                 self.log_metrics(self.eval_result, episode_rewards, episode_steps)
                 episode_rewards = []
                 episode_steps = []
+            time_str = str(time.time())
+            if self.config.gifs:
+                self.env.generate_gif(self.config.gif_dir + "/episode_" + str(episode) + "_"
+                                      + time_str + ".gif", self.config.video_fps)
+
             done = False
             obs = self.env.reset()
 

@@ -30,8 +30,9 @@ def default_config() -> ClientConfig:
     """
     q_agent_config = QAgentConfig(gamma=0.9, alpha=0.3, epsilon=1, render=False, eval_sleep=0.5,
                                   min_epsilon=0.1, eval_episodes=5, train_log_frequency=100,
-                                  epsilon_decay=0.999, video=False, eval_log_frequency=1,
-                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5000)
+                                  epsilon_decay=0.999, video=True, eval_log_frequency=1,
+                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5000,
+                                  eval_render=True, gifs=True, gif_dir=default_output_dir() + "/gifs")
     env_name = "idsgame-random_defense-1l-1s-10ad-v0"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.Q_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,

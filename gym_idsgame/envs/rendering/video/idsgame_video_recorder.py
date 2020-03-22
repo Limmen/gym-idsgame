@@ -115,6 +115,7 @@ class IdsGameVideoRecorder(object):
                     self._encode_ansi_frame(frame)
                 else:
                     self._encode_image_frame(frame)
+        return frames
 
     def close(self):
         """Make sure to manually close, or else you'll leak the encoder process"""
