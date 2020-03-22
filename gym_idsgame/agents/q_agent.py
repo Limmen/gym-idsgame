@@ -157,7 +157,6 @@ class QAgent(TrainAgent):
                                      "the video_dir argument")
             self.env = IdsGameMonitor(self.env, self.config.video_dir, force=True)
             self.env.metadata["video.frames_per_second"] = self.config.video_fps
-            mode = "rgb_array"
 
         # Tracking metrics
         episode_rewards = []
@@ -171,7 +170,7 @@ class QAgent(TrainAgent):
             episode_reward = 0
             episode_step = 0
             while not done:
-                self.env.render(mode)
+                self.env.render()
                 time.sleep(self.config.eval_sleep)
                 i = i+1
                 attacker_node_id = self.env.get_attacker_node_from_observation(obs)
@@ -179,7 +178,7 @@ class QAgent(TrainAgent):
                 obs, reward, done, _ = self.env.step(action)
                 episode_reward += reward
                 episode_step += 1
-            self.env.render(mode)
+            self.env.render()
             time.sleep(self.config.eval_sleep)
             self.config.logger.info("Eval episode: {}, Game ended after {} steps".format(episode, i))
             episode_rewards.append(episode_reward)
