@@ -23,6 +23,8 @@ class QAgent(TrainAgent):
         self.env = env
         self.config = config
         self.Q = np.zeros((self.env.num_states, self.env.num_actions))
+        self.result = TrainResult()
+        self.outer = tqdm.tqdm(total=self.config.num_episodes, desc='Episode', position=0)
 
     def get_action(self, s, eval=False):
         """
@@ -57,17 +59,14 @@ class QAgent(TrainAgent):
         # Tracking metrics
         episode_rewards = []
         episode_steps = []
-        epsilon_values = []
 
         # Logging
-        outer = tqdm.tqdm(total=self.config.num_episodes, desc='Epoch', position=0)
-        outer.set_description_str("epsilon:{:.2f},avg_R:{:.2f},avg_t:{:.2f}".format(self.config.epsilon, 0.0, 0.0))
+        self.outer.set_description_str("epsilon:{:.2f},avg_R:{:.2f},avg_t:{:.2f}".format(self.config.epsilon, 0.0, 0.0))
 
         # Training
         for episode in range(self.config.num_episodes):
             episode_reward = 0
             episode_step = 0
-            epsilon_values.append(self.config.epsilon)
             while not done:
                 if self.config.render:
                     self.env.render(mode="human")
@@ -89,22 +88,44 @@ class QAgent(TrainAgent):
 
             episode_rewards.append(episode_reward)
             episode_steps.append(episode_step)
+
+            # Log average metrics every <self.config.log_frequency> episodes
             if episode % self.config.log_frequency == 0 and episode > 0:
-                log_str = "epsilon:{:.2f},avg_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
-                                          "acc_D_R:{:.2f}".format(self.config.epsilon, sum(episode_rewards)/episode,
-                                                                  sum(episode_steps)/episode,
-                                                                  self.env.hack_probabiltiy(),
-                                                                  self.env.state.attacker_cumulative_reward,
-                                                                  self.env.state.defender_cumulative_reward)
-                outer.set_description_str(log_str)
-                self.config.logger.info(log_str)
+                self.log_metrics(episode_rewards, episode_steps)
+                episode_rewards = []
+                episode_steps = []
             self.anneal_epsilon()
             done=False
             obs = self.env.reset()
-            outer.update(1)
+            self.outer.update(1)
 
         self.config.logger.info("Training Complete")
-        return TrainResult(episode_rewards=episode_rewards, episode_steps=episode_steps, epsilon_values=epsilon_values)
+        return self.result
+
+    def log_metrics(self, episode_rewards:list, episode_steps:list) -> None:
+        """
+        Logs average metrics for the last <self.config.log_frequency> episodes
+
+        :param episode_rewards: list of episode rewards for the last <self.config.log_frequency> episodes
+        :param episode_steps: list of episode steps for the last <self.config.log_frequency> episodes
+        :return: None
+        """
+        avg_episode_reward = np.mean(episode_rewards)
+        avg_episode_steps = np.mean(episode_steps)
+        log_str = "epsilon:{:.2f},avg_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
+                  "acc_D_R:{:.2f}".format(self.config.epsilon, avg_episode_reward,
+                                          avg_episode_steps,
+                                          self.env.hack_probabiltiy(),
+                                          self.env.state.attacker_cumulative_reward,
+                                          self.env.state.defender_cumulative_reward)
+        self.outer.set_description_str(log_str)
+        self.config.logger.info(log_str)
+        self.result.avg_episode_steps.append(avg_episode_steps)
+        self.result.avg_episode_rewards.append(avg_episode_reward)
+        self.result.epsilon_values.append(self.config.epsilon)
+        self.result.hack_probability.append(self.env.hack_probabiltiy())
+        self.result.attacker_cumulative_reward.append(self.env.state.attacker_cumulative_reward)
+        self.result.defender_cumulative_reward.append(self.env.state.defender_cumulative_reward)
 
     def eval(self):
         """
