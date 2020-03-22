@@ -5,10 +5,10 @@ import numpy as np
 import time
 import tqdm
 from gym import wrappers
-from gym_idsgame.algorithms.q_agent_config import QAgentConfig
+from gym_idsgame.agents.dao.q_agent_config import QAgentConfig
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
-from gym_idsgame.algorithms.train_result import TrainResult
-from gym_idsgame.algorithms.train_agent import TrainAgent
+from gym_idsgame.agents.dao.train_result import TrainResult
+from gym_idsgame.agents.train_agent import TrainAgent
 
 class QAgent(TrainAgent):
     """

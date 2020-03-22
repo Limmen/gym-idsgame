@@ -1,7 +1,7 @@
 """
 Client configuration for running experiments (parsed from JSON)
 """
-from gym_idsgame.algorithms.q_agent_config import QAgentConfig
+from gym_idsgame.agents.dao.q_agent_config import QAgentConfig
 
 class ClientConfig:
     """

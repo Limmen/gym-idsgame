@@ -2,7 +2,7 @@
 Runner for the IDS Environment using a deterministic attack policy against a Random Defense Policy
 """
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
-from gym_idsgame.agents.random_defense_agent import RandomDefenseAgent
+from gym_idsgame.agents.random_defense_agent import RandomDefenseBotAgent
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.dao.render_config import RenderConfig
@@ -10,7 +10,7 @@ import time
 
 if __name__ == '__main__':
     game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
-    defender_policy = RandomDefenseAgent(game_config)
+    defender_policy = RandomDefenseBotAgent(game_config)
     render_config = RenderConfig(num_blinks=6, blink_interval=0.01)
     idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_policy,
                                    render_config=render_config)

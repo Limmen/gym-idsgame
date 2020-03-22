@@ -3,12 +3,12 @@ A random defense agent for the gym-idsgame environment
 """
 from typing import Union
 import numpy as np
-from gym_idsgame.agents.agent import Agent
+from gym_idsgame.agents.bot_agent import BotAgent
 from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.envs.dao.node_type import NodeType
 
-class RandomDefenseAgent(Agent):
+class RandomDefenseBotAgent(BotAgent):
     """
     Class implementing a random defense policy: a policy where the defender selects a random node and random
     defense type in each iteration
@@ -20,7 +20,7 @@ class RandomDefenseAgent(Agent):
 
         :param game_config: the game configuration
         """
-        super(RandomDefenseAgent, self).__init__(game_config)
+        super(RandomDefenseBotAgent, self).__init__(game_config)
 
 
     def action(self, game_state: GameState) -> Union[int, int, int]:

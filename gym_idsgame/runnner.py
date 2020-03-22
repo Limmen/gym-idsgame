@@ -5,10 +5,12 @@ from typing import Union
 import gym
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.config.runner_mode import RunnerMode
-from gym_idsgame.agents.agent_type import AgentType
-from gym_idsgame.algorithms.q_agent import QAgent
-from gym_idsgame.algorithms.train_agent import TrainAgent
-from gym_idsgame.algorithms.train_result import TrainResult
+from gym_idsgame.agents.dao.agent_type import AgentType
+from gym_idsgame.agents.q_agent import QAgent
+from gym_idsgame.agents.train_agent import TrainAgent
+from gym_idsgame.agents.dao.train_result import TrainResult
+from gym_idsgame.agents.manual_attack_agent import ManualAttackBotAgent
+from gym_idsgame.envs.idsgame_env import IdsGameEnv
 
 class Runner:
     """
@@ -71,13 +73,14 @@ class Runner:
             raise AssertionError("Defender type not recognized: {}".format(config.defender_type))
 
     @staticmethod
-    def simulate(config:ClientConfig):
+    def simulate(config: ClientConfig):
         pass
 
     @staticmethod
-    def manual_play_attacker(config):
-        pass
+    def manual_play_attacker(config: ClientConfig):
+        env: IdsGameEnv = gym.make(config.env_name)
+        attack_agent = ManualAttackBotAgent(env.idsgame_config)
 
     @staticmethod
-    def manual_play_defender(config):
+    def manual_play_defender(config: ClientConfig):
         pass

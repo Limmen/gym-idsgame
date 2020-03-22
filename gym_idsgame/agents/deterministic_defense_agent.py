@@ -2,25 +2,25 @@
 A Deterministic Defense Agent Baseline for the gym-idsgame environment
 """
 from typing import Union
-from gym_idsgame.agents.agent import Agent
+from gym_idsgame.agents.bot_agent import BotAgent
 from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.game_config import GameConfig
 
-class DeterministicDefenseAgent(Agent):
+class DeterministicDefenseBotAgent(BotAgent):
     """
     Implements a deterministic defense policy: a policy where the defender always defends the same node using the same
     defense type
     """
     def __init__(self, game_config: GameConfig, defend_type: int, defend_row: int, defend_col: int):
         """
-        Class constructor, intializes the policy
+        Class constructor, initializes the policy
 
         :param game_config: configuration of the game
         :param defend_type: the type of defense
         :param defend_row: the row in the grid to defend
         :param defend_col: the columns in the grid to defend
         """
-        super(DeterministicDefenseAgent, self).__init__(game_config)
+        super(DeterministicDefenseBotAgent, self).__init__(game_config)
         self.defend_type = defend_type
         self.defend_row = defend_row
         self.defend_col = defend_col

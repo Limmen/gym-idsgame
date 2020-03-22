@@ -54,7 +54,7 @@ The environment ships with an implementation of the tabular Q(0) algorithm, see 
 
 ```python
 import gym
-from gym_idsgame.algorithms.q_agent import QAgent
+from gym_idsgame.agents.q_agent import QAgent
 TODO
 ```
 
