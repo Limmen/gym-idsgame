@@ -191,6 +191,7 @@ class IdsGameEnv(gym.Env):
         if self.viewer:
             self.viewer.close()
             self.viewer = None
+            self.idsgame_config.render_config.new_window()
 
     def get_attacker_node_from_observation(self, observation: np.ndarray) -> int:
         """

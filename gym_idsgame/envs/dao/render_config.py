@@ -35,12 +35,16 @@ class RenderConfig:
         self.resources_dir = resources_dir
         self.blink_interval = blink_interval
         self.num_blinks = num_blinks
+        self.new_window()
+        self.height = constants.RENDERING.DEFAULT_HEIGHT
+        self.width = constants.RENDERING.MIN_WIDTH
+
+
+    def new_window(self):
         self.batch = pyglet.graphics.Batch()
         self.background = pyglet.graphics.OrderedGroup(0)
         self.first_foreground = pyglet.graphics.OrderedGroup(1)
         self.second_foreground = pyglet.graphics.OrderedGroup(2)
-        self.height = constants.RENDERING.DEFAULT_HEIGHT
-        self.width = constants.RENDERING.MIN_WIDTH
 
 
     def manual_default(self) -> None:

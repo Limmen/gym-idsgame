@@ -4,6 +4,7 @@ An agent for the IDSGameEnv that implements the tabular Q-learning algorithm.
 import numpy as np
 import time
 import tqdm
+import logging
 from gym_idsgame.envs.rendering.video.idsgame_monitor import IdsGameMonitor
 from gym_idsgame.agents.dao.q_agent_config import QAgentConfig
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
@@ -26,6 +27,8 @@ class QAgent(TrainAgent):
         self.train_result = TrainResult()
         self.eval_result = TrainResult()
         self.outer = tqdm.tqdm(total=self.config.num_episodes, desc='Episode', position=0)
+        if self.config.logger is None:
+            self.logger = logging.getLogger('QAgent')
 
     def get_action(self, s, eval=False):
         """
@@ -99,7 +102,15 @@ class QAgent(TrainAgent):
                 self.log_metrics(self.train_result, episode_rewards, episode_steps)
                 episode_rewards = []
                 episode_steps = []
+
+            # Run evaluation every <self.config.eval_frequency> episodes
+            if episode % self.config.eval_frequency == 0 and episode > 0:
+                self.eval()
+
+            # Anneal epsilon linearly
             self.anneal_epsilon()
+
+            # Reset environment for the next episode
             done=False
             obs = self.env.reset()
             self.outer.update(1)
@@ -141,6 +152,7 @@ class QAgent(TrainAgent):
         :return: None
         """
         self.config.logger.info("Starting Evaluation")
+        time_str = str(time.time())
 
         if len(self.eval_result.avg_episode_steps) > 0:
             self.config.logger.warning("starting eval with non-empty result object")
@@ -153,7 +165,7 @@ class QAgent(TrainAgent):
             if self.config.video_dir is None:
                 raise AssertionError("Video is set to True but no video_dir is provided, please specify "
                                      "the video_dir argument")
-            self.env = IdsGameMonitor(self.env, self.config.video_dir, force=True)
+            self.env = IdsGameMonitor(self.env, self.config.video_dir + "/" + time_str, force=True)
             self.env.metadata["video.frames_per_second"] = self.config.video_fps
 
         # Tracking metrics
@@ -170,7 +182,7 @@ class QAgent(TrainAgent):
             while not done:
                 if self.config.eval_render:
                     self.env.render()
-                time.sleep(self.config.eval_sleep)
+                    time.sleep(self.config.eval_sleep)
                 i = i+1
                 attacker_node_id = self.env.get_attacker_node_from_observation(obs)
                 action = self.get_action(attacker_node_id, eval=True)
@@ -179,7 +191,7 @@ class QAgent(TrainAgent):
                 episode_step += 1
             if self.config.eval_render:
                 self.env.render()
-            time.sleep(self.config.eval_sleep)
+                time.sleep(self.config.eval_sleep)
             self.config.logger.info("Eval episode: {}, Game ended after {} steps".format(episode, i))
             episode_rewards.append(episode_reward)
             episode_steps.append(episode_step)
@@ -189,14 +201,13 @@ class QAgent(TrainAgent):
                 self.log_metrics(self.eval_result, episode_rewards, episode_steps)
                 episode_rewards = []
                 episode_steps = []
-            time_str = str(time.time())
-            if self.config.gifs:
+            if self.config.gifs and self.config.video:
                 self.env.generate_gif(self.config.gif_dir + "/episode_" + str(episode) + "_"
                                       + time_str + ".gif", self.config.video_fps)
 
             done = False
             obs = self.env.reset()
-
+        self.env.close()
         self.config.logger.info("Evaluation Complete")
         return self.eval_result
 
