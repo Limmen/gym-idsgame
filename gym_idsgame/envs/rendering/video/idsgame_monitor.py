@@ -12,7 +12,7 @@ MANIFEST_PREFIX = FILE_PREFIX + '.manifest'
 
 class IdsGameMonitor(Wrapper):
     def __init__(self, env, directory, video_callable=None, force=False, resume=False,
-                 write_upon_reset=False, uid=None, mode=None):
+                 write_upon_reset=False, uid=None, mode=None, video_frequency = 1):
         super(IdsGameMonitor, self).__init__(env)
 
         self.videos = []
@@ -26,12 +26,15 @@ class IdsGameMonitor(Wrapper):
         self._start(directory, video_callable, force, resume,
                             write_upon_reset, uid, mode)
         self.episode_frames = []
+        self.video_frequency = video_frequency
 
     def step(self, action):
         self._before_step(action)
+        # if self.episode_id % self.video_frequency == 0:
+        #     self._before_step(action)
         observation, reward, done, info = self.env.step(action)
+        # if self.episode_id % self.video_frequency == 0:
         done = self._after_step(observation, reward, done, info)
-
         return observation, reward, done, info
 
     def reset(self, **kwargs):
@@ -73,7 +76,7 @@ class IdsGameMonitor(Wrapper):
                 os.makedirs(directory)
 
         if video_callable is None:
-            video_callable = capped_cubic_video_schedule
+            video_callable = self.periodic_video_schedule
         elif video_callable == False:
             video_callable = disable_videos
         elif not callable(video_callable):
@@ -179,13 +182,13 @@ class IdsGameMonitor(Wrapper):
         return done
 
     def generate_gif(self, path, fps = 55):
-        if self.episode_frames is not None and len(self.episode_frames) > 0:
+        if (self.episode_frames is not None and len(self.episode_frames) > 0
+                and (self.episode_id-1) % (self.video_frequency) == 0):
             imageio.mimsave(path, self.episode_frames, fps=fps)
 
     def _before_reset(self):
         if not self.enabled: return
         self.stats_recorder.before_reset()
-        self.episode_frames = []
 
     def _after_reset(self, observation):
         if not self.enabled: return
@@ -194,6 +197,7 @@ class IdsGameMonitor(Wrapper):
         self.stats_recorder.after_reset(observation)
 
         self.reset_video_recorder()
+        self.episode_frames = []
 
         # Bump *after* all reset activity has finished
         self.episode_id += 1
@@ -247,6 +251,12 @@ class IdsGameMonitor(Wrapper):
 
     def get_episode_lengths(self):
         return self.stats_recorder.episode_lengths
+
+    def periodic_video_schedule(self, episode_id):
+        if episode_id % self.video_frequency == 0:
+            return True
+        else:
+            return False
 
 def detect_training_manifests(training_dir, files=None):
     if files is None:

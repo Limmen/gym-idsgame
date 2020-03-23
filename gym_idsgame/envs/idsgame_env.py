@@ -200,7 +200,7 @@ class IdsGameEnv(gym.Env, ABC):
         """
         return self.state.get_attacker_node_from_observation(observation)
 
-    def hack_probabiltiy(self) -> float:
+    def hack_probability(self) -> float:
         """
         :return: the hack-probabiltiy according to the game history
         """
@@ -254,11 +254,6 @@ class AttackerEnv(IdsGameEnv, ABC):
         return util.interpret_action(action, self.idsgame_config.game_config)
 
     def get_defender_action(self, action) -> Union[Union[int, int], int, int]:
-        """
-        Utility method that samples an action from a defender strategy
-
-        :return: position of the node to defend, defense-type, defense-node-id
-        """
         defend_id = self.idsgame_config.defender_agent.action(self.state.attacker_pos)
         defend_node_id, defend_node_pos, defend_type = util.interpret_action(
             defend_id, self.idsgame_config.game_config)
@@ -277,11 +272,6 @@ class DefenderEnv(IdsGameEnv, ABC):
         return util.interpret_action(action, self.idsgame_config.game_config)
 
     def get_attacker_action(self, action) -> Union[Union[int, int], int, int]:
-        """
-        Utility method that samples an action from a defender strategy
-
-        :return: position of the node to defend, defense-type, defense-node-id
-        """
         attack_id = self.attacker_agent.action(self.game_state.attacker_pos)
         attack_node_id, attack_node_pos, attack_type = util.interpret_action(attack_id, self.idsgame_config.game_config)
         return attack_node_id, attack_node_pos, attack_type
@@ -299,11 +289,6 @@ class AttackDefenseEnv(IdsGameEnv, ABC):
         return util.interpret_action(defender_action, self.idsgame_config.game_config)
 
     def get_attacker_action(self, action: Union[int, int]) -> Union[Union[int, int], int, int]:
-        """
-        Utility method that samples an action from a defender strategy
-
-        :return: position of the node to defend, defense-type, defense-node-id
-        """
         attacker_action, _ = action
         return util.interpret_action(attacker_action, self.idsgame_config.game_config)
 

@@ -134,7 +134,7 @@ class QAgent(TrainAgent):
         log_str = "epsilon:{:.2f},avg_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
                   "acc_D_R:{:.2f}".format(self.config.epsilon, avg_episode_reward,
                                           avg_episode_steps,
-                                          self.env.hack_probabiltiy(),
+                                          self.env.hack_probability(),
                                           self.env.state.attacker_cumulative_reward,
                                           self.env.state.defender_cumulative_reward)
         self.outer.set_description_str(log_str)
@@ -142,7 +142,7 @@ class QAgent(TrainAgent):
         result.avg_episode_steps.append(avg_episode_steps)
         result.avg_episode_rewards.append(avg_episode_reward)
         result.epsilon_values.append(self.config.epsilon)
-        result.hack_probability.append(self.env.hack_probabiltiy())
+        result.hack_probability.append(self.env.hack_probability())
         result.attacker_cumulative_reward.append(self.env.state.attacker_cumulative_reward)
         result.defender_cumulative_reward.append(self.env.state.defender_cumulative_reward)
 
