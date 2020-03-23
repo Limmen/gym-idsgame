@@ -166,7 +166,8 @@ class QAgent(TrainAgent):
             if self.config.video_dir is None:
                 raise AssertionError("Video is set to True but no video_dir is provided, please specify "
                                      "the video_dir argument")
-            self.env = IdsGameMonitor(self.env, self.config.video_dir + "/" + time_str, force=True)
+            self.env = IdsGameMonitor(self.env, self.config.video_dir + "/" + time_str, force=True,
+                                      video_frequency=self.config.video_frequency)
             self.env.metadata["video.frames_per_second"] = self.config.video_fps
 
         # Tracking metrics

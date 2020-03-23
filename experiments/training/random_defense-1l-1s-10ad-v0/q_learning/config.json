@@ -26,6 +26,8 @@
         "train_log_frequency": 100,
         "video": true,
         "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/random_defense-1l-1s-10ad-v0/q_learning/videos",
-        "video_fps": 5
-    }
+        "video_fps": 5,
+        "video_frequency": 1
+    },
+    "simulation_config": null
 }

@@ -69,12 +69,12 @@ def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str) -> No
                                train_df["epsilon_values"], train_df["hack_probability"],
                                train_df["attacker_cumulative_reward"], train_df["defender_cumulative_reward"],
                                config.q_agent_config.train_log_frequency,
-                               config.output_dir, eval=False)
+                               config.output_dir, eval=False, sim=False)
     plotting_util.plot_results(eval_df["avg_episode_rewards"].values, eval_df["avg_episode_steps"].values,
                                eval_df["epsilon_values"], eval_df["hack_probability"],
                                eval_df["attacker_cumulative_reward"], eval_df["defender_cumulative_reward"],
                                config.q_agent_config.train_log_frequency,
-                               config.output_dir, eval=True)
+                               config.output_dir, eval=True, sim=False)
 
 
 # Program entrypoint
