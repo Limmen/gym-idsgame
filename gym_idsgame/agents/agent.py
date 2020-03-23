@@ -6,7 +6,7 @@ from gym_idsgame.envs.dao.game_config import GameConfig
 
 class Agent(ABC):
     """
-    Abstract class representing a policy
+    Abstract class representing an agent
     """
 
     def __init__(self, game_config: GameConfig):

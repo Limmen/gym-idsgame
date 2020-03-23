@@ -18,6 +18,12 @@ class GamePanel:
         :param idsgame_config: IdsGameEnv config
         """
         self.idsgame_config = idsgame_config
+        self.attack_type_label = None
+        self.a_reward_label = None
+        self.d_reward_label = None
+        self.step_label = None
+        self.num_games_label = None
+        self.hack_probability = None
         self.set_labels()
 
     def set_labels(self) -> None:

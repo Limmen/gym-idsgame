@@ -36,19 +36,3 @@ class RandomDefenseBotAgent(BotAgent):
         target_node_id, target_pos, attack_type = idsgame_util.interpret_attack(action, self.game_config)
         target_row, target_col = target_pos
         return target_row, target_col, attack_type, target_node_id
-
-        # defend_type = np.random.randint(game_state.defense_values.shape[1])
-        # defend_row = None
-        # defend_col = None
-        # for row in range(self.game_config.network_config.graph_layout.shape[0]):
-        #     for col in range(self.game_config.network_config.graph_layout.shape[1]):
-        #         if (self.game_config.network_config.graph_layout[row][col] == NodeType.SERVER.value
-        #                 or self.game_config.network_config.graph_layout[row][col] == NodeType.DATA.value):
-        #             if defend_row is None or defend_col is None:
-        #                 defend_row, defend_col = row, col
-        #             else:
-        #                 if np.random.rand() >= 0.5:
-        #                     defend_row, defend_col = row, col
-        # if defend_row is None or defend_col is None:
-        #     raise AssertionError("Invalid Network Config, could not find any node to defend")
-        # return defend_row, defend_col, defend_type
