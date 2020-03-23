@@ -1,12 +1,13 @@
 import os
 import time
 from gym_idsgame.config.runner_mode import RunnerMode
-from gym_idsgame.agents.dao.q_agent_config import QAgentConfig
+from gym_idsgame.simulation.dao.simulation_config import SimulationConfig
 from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.runnner import Runner
 from experiments.util import plotting_util, util
-
+from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
+from gym_idsgame.agents.random_attack_bot_agent import RandomAttackBotAgent
 
 def default_output_dir() -> str:
     """
@@ -28,16 +29,13 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    q_agent_config = QAgentConfig(gamma=0.9, alpha=0.3, epsilon=1, render=False, eval_sleep=0.5,
-                                  min_epsilon=0.1, eval_episodes=2, train_log_frequency=100,
-                                  epsilon_decay=0.999, video=True, eval_log_frequency=1,
-                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=10000,
-                                  eval_render=True, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                                  eval_frequency= 1000)
-    env_name = "idsgame-random_defense-1l-1s-10ad-v0"
-    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.Q_AGENT.value,
-                                 mode=RunnerMode.TRAIN_ATTACKER.value,
-                                 q_agent_config=q_agent_config, output_dir=default_output_dir())
+    simulation_config = SimulationConfig(render=False, sleep=0.5, video=True, log_frequency=1,
+                                         video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=10000,
+                                         gifs=True, gif_dir=default_output_dir() + "/gifs")
+    env_name = "idsgame-1l-1s-10ad-v0"
+    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.RANDOM.value,
+                                 defender_type=AgentType.RANDOM.value, mode=RunnerMode.SIMULATE.value,
+                                 simulation_config=simulation_config, output_dir=default_output_dir())
     return client_config
 
 
@@ -67,12 +65,12 @@ def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str) -> No
     plotting_util.plot_results(train_df["avg_episode_rewards"].values, train_df["avg_episode_steps"].values,
                                train_df["epsilon_values"], train_df["hack_probability"],
                                train_df["attacker_cumulative_reward"], train_df["defender_cumulative_reward"],
-                               config.q_agent_config.train_log_frequency,
+                               config.simulation_config.log_frequency,
                                config.output_dir, eval=False)
     plotting_util.plot_results(eval_df["avg_episode_rewards"].values, eval_df["avg_episode_steps"].values,
                                eval_df["epsilon_values"], eval_df["hack_probability"],
                                eval_df["attacker_cumulative_reward"], eval_df["defender_cumulative_reward"],
-                               config.q_agent_config.train_log_frequency,
+                               config.simulation_config.log_frequency,
                                config.output_dir, eval=True)
 
 
@@ -87,17 +85,19 @@ if __name__ == '__main__':
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir)
-    logger = util.setup_logger("1l-1s-10ad-v0-Q_learning", config.output_dir + "/logs/",
+    logger = util.setup_logger("idsgame-1l-1s-10ad-v0-random_vs_random", config.output_dir + "/logs/",
                                time_str=time_str)
     config.logger = logger
-    config.q_agent_config.logger = logger
-    config.q_agent_config.to_csv(config.output_dir + "/hyperparameters/" + time_str + ".csv")
-    train_result, eval_result = Runner.run(config)
-    train_csv_path = config.output_dir + "/data/" + time_str + "_train" + ".csv"
-    train_result.to_csv(train_csv_path)
-    eval_csv_path = config.output_dir + "/data/" + time_str + "_eval" + ".csv"
-    eval_result.to_csv(eval_csv_path)
-    plot_csv(config, eval_csv_path, train_csv_path)
+    config.simulation_config.logger = logger
+    result = Runner.run(config)
+    # config.q_agent_config.logger = logger
+    # config.q_agent_config.to_csv(config.output_dir + "/hyperparameters/" + time_str + ".csv")
+    # train_result, eval_result = Runner.run(config)
+    # train_csv_path = config.output_dir + "/data/" + time_str + "_train" + ".csv"
+    # train_result.to_csv(train_csv_path)
+    # eval_csv_path = config.output_dir + "/data/" + time_str + "_eval" + ".csv"
+    # eval_result.to_csv(eval_csv_path)
+    # plot_csv(config, eval_csv_path, train_csv_path)
 
 
 

@@ -144,8 +144,10 @@ class GameFrame(pyglet.window.Window):
                                                    self.idsgame_config.game_config.network_config)
 
                             # 3. Update attack state
-                            attack_row, attack_col, attack_type, attack_node_id = self.attacker_agent.action(
-                                self.game_state)
+                            attack_id = self.attacker_agent.action(self.game_state.attacker_pos)
+                            attack_node_id, attack_node_pos, attack_type = util.interpret_action(
+                                attack_id, self.idsgame_config.game_config)
+                            attack_row, attack_col = attack_node_pos
 
                             self.game_state.attack(attack_node_id, attack_type,
                                                    self.idsgame_config.game_config.max_value,
@@ -189,8 +191,11 @@ class GameFrame(pyglet.window.Window):
                                                     self.idsgame_config.game_config.network_config.adjacency_matrix):
 
                                 # 3. Update defense state
-                                defense_row, defense_col, defend_type, defend_node_id = self.defender_agent.action(
-                                    self.game_state)
+                                defend_id = self.defender_agent.action(self.game_state.attacker_pos)
+                                defend_node_id, defend_node_pos, defend_type = util.interpret_action(
+                                    defend_id, self.idsgame_config.game_config)
+                                defense_row, defense_col = defend_node_pos
+
                                 defend_node_id = self.idsgame_config.game_config.network_config.get_node_id(
                                     (defense_row, defense_col))
                                 self.game_state.defend(defend_node_id, defend_type,

@@ -61,12 +61,13 @@ def is_attack_id_legal(attack_id: int, game_config: GameConfig, attacker_pos) ->
     :param attacker_pos: the current position of the attacker
     :return: True if legal otherwise False
     """
-    server_id, server_pos, attack_type = interpret_attack(attack_id, game_config)
+    server_id, server_pos, attack_type = interpret_action(attack_id, game_config)
     return is_attack_legal(server_pos, attacker_pos, game_config.num_cols, game_config.network_config.adjacency_matrix)
 
-def interpret_attack(action: int, game_config: GameConfig) -> Union[int, Union[int, int], int]:
+
+def interpret_action(action: int, game_config: GameConfig) -> Union[int, Union[int, int], int]:
     """
-    Utility method for getting the server under attack from an action-id
+    Utility method for interpreting the given action, converting it into server_id,pos,type
 
     :param action: the attack action-id
     :param game_config: game configuration
@@ -74,10 +75,11 @@ def interpret_attack(action: int, game_config: GameConfig) -> Union[int, Union[i
     """
     server_id = action // game_config.num_attack_types
     server_pos = game_config.network_config.get_node_pos(server_id)
-    attack_type = get_attack_type(action, game_config)
-    return server_id, server_pos, attack_type
+    attack_defense_type = get_attack_defense_type(action, game_config)
+    return server_id, server_pos, attack_defense_type
 
-def get_attack_type(action: int, game_config: GameConfig) -> int:
+
+def get_attack_defense_type(action: int, game_config: GameConfig) -> int:
     """
     Utility method for getting the type of action-id
 
@@ -85,5 +87,5 @@ def get_attack_type(action: int, game_config: GameConfig) -> int:
     :param game_config: game configuration
     :return: action type
     """
-    attack_type = action % game_config.num_attack_types
-    return attack_type
+    attack_defense_type = action % game_config.num_attack_types
+    return attack_defense_type

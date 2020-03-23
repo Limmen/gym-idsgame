@@ -8,11 +8,14 @@ from gym_idsgame.config.runner_mode import RunnerMode
 from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.agents.q_agent import QAgent
 from gym_idsgame.agents.train_agent import TrainAgent
+from gym_idsgame.agents.bot_agent import BotAgent
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
 from gym_idsgame.agents.manual_attack_agent import ManualAttackAgent
 from gym_idsgame.agents.manual_defense_agent import ManualDefenseAgent
 from gym_idsgame.envs.idsgame_env import IdsGameEnv, AttackDefenseEnv, AttackerEnv, DefenderEnv
 from gym_idsgame.simulation.simulator import Simulator
+from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
+from gym_idsgame.agents.random_attack_bot_agent import RandomAttackBotAgent
 
 class Runner:
     """
@@ -80,8 +83,28 @@ class Runner:
         env = gym.make(config.env_name)
         if not issubclass(type(env), AttackDefenseEnv):
             raise AssertionError("Simulations can only be run for Attack-Defense environments")
-        env.idsgame_config.defender_agent = config.simulation_config.defender_agent
-        env.idsgame_config.attacker_agent = config.simulation_config.attacker_agent
+
+        defender: BotAgent = None
+        if config.defender_type == AgentType.RANDOM.value:
+            defender = RandomDefenseBotAgent(env.idsgame_config.game_config)
+        elif config.defender_type == AgentType.DETERMINISTIC.value:
+            pass
+        elif config.defender_type == AgentType.Q_AGENT.value:
+            pass
+        else:
+            raise AssertionError("Defender type not recognized: {}".format(config.defender_type))
+
+        attacker: BotAgent = None
+        if config.attacker_type == AgentType.Q_AGENT.value:
+            pass
+        elif config.attacker_type == AgentType.RANDOM.value:
+            attacker = RandomAttackBotAgent(env.idsgame_config.game_config)
+        elif config.attacker_type == AgentType.DETERMINISTIC.value:
+            pass
+        else:
+            raise AssertionError("Attacker type not recognized: {}".format(config.attacker_type))
+        env.idsgame_config.defender_agent = defender
+        env.idsgame_config.attacker_agent = attacker
         simulator = Simulator(env, config.simulation_config)
         return simulator.simulate()
 

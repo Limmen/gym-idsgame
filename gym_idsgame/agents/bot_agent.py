@@ -16,12 +16,12 @@ class BotAgent(Agent):
         super(BotAgent, self).__init__(game_config)
 
     @abstractmethod
-    def action(self, game_state: GameState) -> Union[int, int, int, int]:
+    def action(self, game_state: GameState) -> int:
         """
         Abstract method to be implemented by sub-classes.
         A method that takes in the current state and outputs an action
 
         :param game_state: the current state
-        :return: (row, col, type, node_id)
+        :return: action_id
         """
         pass

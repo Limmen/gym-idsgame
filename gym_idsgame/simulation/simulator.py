@@ -15,7 +15,8 @@ class Simulator:
         self.outer = tqdm.tqdm(total=self.config.num_episodes, desc='Episode', position=0)
         if self.config.logger is None:
             self.config.logger = logging.getLogger('Simulation')
-        pass
+        self.attacker = self.env.idsgame_config.attacker_agent
+        self.defender = self.env.idsgame_config.defender_agent
 
     def simulate(self):
         self.config.logger.info("Starting Simulation")
@@ -47,25 +48,27 @@ class Simulator:
             episode_reward = 0
             episode_step = 0
             while not done:
-                if self.config.eval_render:
+                if self.config.render:
                     self.env.render()
-                    time.sleep(self.config.eval_sleep)
+                    time.sleep(self.config.sleep)
                 i = i + 1
                 attacker_node_id = self.env.get_attacker_node_from_observation(obs)
-                action = self.get_action(attacker_node_id, eval=True)
-                obs, reward, done, _ = self.env.step(action)
+                attacker_node_pos = self.env.idsgame_config.game_config.network_config.get_node_pos(attacker_node_id)
+                defense_id = self.defender.action(attacker_node_pos)
+                attack_id = self.attacker.action(attacker_node_pos)
+                obs, reward, done, _ = self.env.step((attack_id, defense_id))
                 episode_reward += reward
                 episode_step += 1
-            if self.config.eval_render:
+            if self.config.render:
                 self.env.render()
-                time.sleep(self.config.eval_sleep)
+                time.sleep(self.config.sleep)
             self.config.logger.info("Eval episode: {}, Game ended after {} steps".format(episode, i))
             episode_rewards.append(episode_reward)
             episode_steps.append(episode_step)
 
             # Log average metrics every <self.config.eval_log_frequency> episodes
-            if episode % self.config.eval_log_frequency == 0:
-                self.log_metrics(self.eval_result, episode_rewards, episode_steps)
+            if episode % self.config.log_frequency == 0:
+                #self.log_metrics(self.eval_result, episode_rewards, episode_steps)
                 episode_rewards = []
                 episode_steps = []
             if self.config.gifs and self.config.video:
@@ -75,5 +78,5 @@ class Simulator:
             done = False
             obs = self.env.reset()
         self.env.close()
-        self.config.logger.info("Evaluation Complete")
-        return self.eval_result
+        self.config.logger.info("Simulation Complete")
+        return self.experiment_result

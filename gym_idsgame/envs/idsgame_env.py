@@ -5,7 +5,7 @@ from typing import Union
 import numpy as np
 import gym
 import os
-from abc import ABC
+from abc import ABC, abstractmethod
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
 from gym_idsgame.agents.random_attack_bot_agent import RandomAttackBotAgent
@@ -14,7 +14,7 @@ from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 import gym_idsgame.envs.util.idsgame_util as util
 from gym_idsgame.envs.constants import constants
 
-class IdsGameEnv(gym.Env):
+class IdsGameEnv(gym.Env, ABC):
     """
     Implementation of the RL environment from the paper
     "Adversarial Reinforcement Learning in a Cyber Security Simulation" by Edlerman et. al.
@@ -46,7 +46,6 @@ class IdsGameEnv(gym.Env):
         self.idsgame_config: IdsGameConfig = idsgame_config
         self.state: GameState = self.idsgame_config.game_config.initial_state.copy()
         self.observation_space = self.idsgame_config.game_config.get_attacker_observation_space()
-        self.defender = self.idsgame_config.defender_agent
         self.action_space = self.idsgame_config.game_config.get_attacker_action_space()
         self.viewer = None
         self.steps_beyond_done = None
@@ -59,11 +58,9 @@ class IdsGameEnv(gym.Env):
         self.num_actions = self.idsgame_config.game_config.num_actions
 
     # -------- API ------------
-
-    def step(self, action) -> Union[np.ndarray, int, bool, dict]:
+    def step(self, action: int) -> Union[np.ndarray, int, bool, dict]:
         """
         Takes a step in the environment using the given action.
-
 
         When end of episode is reached, the caller is responsible for calling `reset()`
         to reset this environment's state.
@@ -86,13 +83,10 @@ class IdsGameEnv(gym.Env):
 
         # 1. Interpret attacker action
         attacker_pos = self.state.attacker_pos
-        target_node_id, target_pos, attack_type = util.interpret_attack(action, self.idsgame_config.game_config)
-        #print("target node: {}".format(target_node_id))
-        if target_node_id == self.idsgame_config.game_config.num_nodes-1:
-            print("target start node")
+        target_node_id, target_pos, attack_type = self.get_attacker_action(action)
 
-        # 2. Sample defense action
-        defense_pos, defense_type, defense_node_id = self.__defense_action()
+        # 2. Interpret defense action
+        defense_node_id, defense_pos, defense_type,  = self.get_defender_action(action)
 
         # 3. Defend
         self.state.defend(defense_node_id, defense_type, self.idsgame_config.game_config.max_value,
@@ -127,9 +121,10 @@ class IdsGameEnv(gym.Env):
             if self.steps_beyond_done is None:
                 self.steps_beyond_done = 0
             else:
-                gym.logger.warn("You are calling 'step()' even though this environment has already returned done = True. "
-                                "You should always call 'reset()' once you receive 'done = True' -- "
-                                "any further steps are undefined behavior.")
+                gym.logger.warn(
+                    "You are calling 'step()' even though this environment has already returned done = True. "
+                    "You should always call 'reset()' once you receive 'done = True' -- "
+                    "any further steps are undefined behavior.")
                 self.steps_beyond_done += 1
         self.state.game_step += 1
         observation = self.state.get_attacker_observation(self.idsgame_config.game_config.network_config)
@@ -223,6 +218,15 @@ class IdsGameEnv(gym.Env):
         """
         return util.is_attack_id_legal(attack_action, self.idsgame_config.game_config, self.state.attacker_pos)
 
+
+    @abstractmethod
+    def get_attacker_action(self, action) -> Union[int, Union[int, int], int]:
+        pass
+
+    @abstractmethod
+    def get_defender_action(self, action) -> Union[Union[int, int], int, int]:
+        pass
+
     # -------- Private methods ------------
 
     def __setup_viewer(self):
@@ -237,17 +241,6 @@ class IdsGameEnv(gym.Env):
         self.viewer = Viewer(idsgame_config=self.idsgame_config)
         self.viewer.agent_start()
 
-    def __defense_action(self) -> Union[Union[int, int], int, int]:
-        """
-        Utility method that samples an action from a defender strategy
-
-        :return: position of the node to defend, defense-type, defense-node-id
-        """
-        defense_row, defense_col, defense_type, defense_node_id = self.defender.action(self.state)
-        defense_pos = (defense_row, defense_col)
-        return defense_pos, defense_type, defense_node_id
-
-# -------- Abstract Envs ------------
 class AttackerEnv(IdsGameEnv, ABC):
 
     def __init__(self, idsgame_config: IdsGameConfig):
@@ -257,6 +250,19 @@ class AttackerEnv(IdsGameEnv, ABC):
             raise ValueError("Cannot instantiate attacker-env without a defender agent")
         super().__init__(idsgame_config=idsgame_config)
 
+    def get_attacker_action(self, action) -> Union[int, Union[int, int], int]:
+        return util.interpret_action(action, self.idsgame_config.game_config)
+
+    def get_defender_action(self, action) -> Union[Union[int, int], int, int]:
+        """
+        Utility method that samples an action from a defender strategy
+
+        :return: position of the node to defend, defense-type, defense-node-id
+        """
+        defend_id = self.idsgame_config.defender_agent.action(self.state.attacker_pos)
+        defend_node_id, defend_node_pos, defend_type = util.interpret_action(
+            defend_id, self.idsgame_config.game_config)
+        return defend_node_id, defend_node_pos, defend_type,
 
 class DefenderEnv(IdsGameEnv, ABC):
 
@@ -267,6 +273,19 @@ class DefenderEnv(IdsGameEnv, ABC):
             raise ValueError("Cannot instantiate defender-env without an attacker agent")
         super().__init__(idsgame_config=idsgame_config)
 
+    def get_defender_action(self, action) -> Union[int, Union[int, int], int]:
+        return util.interpret_action(action, self.idsgame_config.game_config)
+
+    def get_attacker_action(self, action) -> Union[Union[int, int], int, int]:
+        """
+        Utility method that samples an action from a defender strategy
+
+        :return: position of the node to defend, defense-type, defense-node-id
+        """
+        attack_id = self.attacker_agent.action(self.game_state.attacker_pos)
+        attack_node_id, attack_node_pos, attack_type = util.interpret_action(attack_id, self.idsgame_config.game_config)
+        return attack_node_id, attack_node_pos, attack_type
+
 
 class AttackDefenseEnv(IdsGameEnv, ABC):
 
@@ -274,6 +293,19 @@ class AttackDefenseEnv(IdsGameEnv, ABC):
         if idsgame_config is None:
             raise ValueError("Cannot instantiate env without configuration")
         super().__init__(idsgame_config=idsgame_config)
+
+    def get_defender_action(self, action: Union[int, int]) -> Union[int, Union[int, int], int]:
+        _, defender_action = action
+        return util.interpret_action(defender_action, self.idsgame_config.game_config)
+
+    def get_attacker_action(self, action: Union[int, int]) -> Union[Union[int, int], int, int]:
+        """
+        Utility method that samples an action from a defender strategy
+
+        :return: position of the node to defend, defense-type, defense-node-id
+        """
+        attacker_action, _ = action
+        return util.interpret_action(attacker_action, self.idsgame_config.game_config)
 
 # -------- Concrete envs ------------
 class IdsGameRandomDefense1L1S10ADEnv(AttackerEnv):
