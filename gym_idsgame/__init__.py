@@ -9,6 +9,13 @@ register(
     id='idsgame-random_defense-1l-1s-10ad-v0',
     entry_point='gym_idsgame.envs:IdsGameRandomDefense1L1S10ADEnv',
 )
+
+# 1 server per layer, 10 attack-defense-values, random attacker
+register(
+    id='idsgame-random_attack-1l-1s-10ad-v0',
+    entry_point='gym_idsgame.envs:IdsGameRandomAttack1L1S10ADEnv',
+)
+
 #
 # register(
 #     id='idsgame-attack_only-2l-1s-10ad-v0',

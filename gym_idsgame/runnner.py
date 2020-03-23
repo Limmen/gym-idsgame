@@ -9,7 +9,8 @@ from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.agents.q_agent import QAgent
 from gym_idsgame.agents.train_agent import TrainAgent
 from gym_idsgame.agents.dao.train_result import TrainResult
-from gym_idsgame.agents.manual_attack_agent import ManualAttackBotAgent
+from gym_idsgame.agents.manual_attack_agent import ManualAttackAgent
+from gym_idsgame.agents.manual_defense_agent import ManualDefenseAgent
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
 
 class Runner:
@@ -79,8 +80,11 @@ class Runner:
     @staticmethod
     def manual_play_attacker(config: ClientConfig):
         env: IdsGameEnv = gym.make(config.env_name)
-        attack_agent = ManualAttackBotAgent(env.idsgame_config)
+        env.idsgame_config.game_config.manual_attacker = True
+        ManualAttackAgent(env.idsgame_config)
 
     @staticmethod
     def manual_play_defender(config: ClientConfig):
-        pass
+        env: IdsGameEnv = gym.make(config.env_name)
+        env.idsgame_config.game_config.manual_defender = True
+        ManualDefenseAgent(env.idsgame_config)

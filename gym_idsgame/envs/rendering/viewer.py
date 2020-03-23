@@ -37,13 +37,26 @@ class Viewer():
         self.idsgame_config = idsgame_config
         self.isopen = True
 
-    def manual_start(self) -> None:
+    def manual_start_attacker(self) -> None:
         """
-        Starts the IDS-game app in a manual mode where the agent is controlled with keyboard and mouse
+        Starts the IDS-game app in a manual mode where the attacker is controlled with keyboard and mouse
 
         :return: None
         """
-        self.idsgame_config.render_config.manual = True
+        self.idsgame_config.game_config.manual_attacker = True
+        self.gameframe = GameFrame(idsgame_config=self.idsgame_config)
+        self.gameframe.on_close = self.window_closed_by_user
+        self.isopen = True
+        pyglet.clock.schedule_interval(self.gameframe.update, 1 / 60.)
+        pyglet.app.run()
+
+    def manual_start_defender(self) -> None:
+        """
+        Starts the IDS-game app in a manual mode where the defender is controlled with keyboard and mouse
+
+        :return: None
+        """
+        self.idsgame_config.game_config.manual_defender = True
         self.gameframe = GameFrame(idsgame_config=self.idsgame_config)
         self.gameframe.on_close = self.window_closed_by_user
         self.isopen = True
@@ -55,7 +68,8 @@ class Viewer():
         Creates the IDS-game frame in agent-mode, where actions are taken programmatically rather than through
         moving mouse and keyboard.
         """
-        self.idsgame_config.render_config.manual = False
+        self.idsgame_config.game_config.manual_attacker = False
+        self.idsgame_config.game_config.manual_defender = False
         self.gameframe = GameFrame(idsgame_config=self.idsgame_config)
         self.gameframe.on_close = self.window_closed_by_user
         self.isopen = True

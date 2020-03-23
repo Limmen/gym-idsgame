@@ -1,0 +1,10 @@
+{
+    "attacker_type": 0,
+    "defender_type": 4,
+    "env_name": "idsgame-random_attack-1l-1s-10ad-v0",
+    "logger": null,
+    "mode": 4,
+    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/random_attack-1l-1s-10ad-v0/manual_defense",
+    "py/object": "gym_idsgame.config.client_config.ClientConfig",
+    "q_agent_config": null
+}

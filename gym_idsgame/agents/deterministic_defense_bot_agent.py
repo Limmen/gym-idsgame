@@ -30,12 +30,13 @@ class DeterministicDefenseBotAgent(BotAgent):
             raise ValueError("defend_row cannot be None for a Deterministic Defense Policy")
         if defend_col is None:
             raise ValueError("defend_row cannot be None for a Deterministic Defense Policy")
+        self.defende_node_id = self.game_config.network_config.get_node_id((self.defend_row, self.defend_col))
 
-    def action(self, render_state: GameState) -> Union[int, int, int]:
+    def action(self, render_state: GameState) -> Union[int, int, int, int]:
         """
         Returns the action from the deterministic policy
 
         :param render_state: the current render state
-        :return: (row, col, defend_type)
+        :return: (row, col, defend_type, defend_node_id)
         """
-        return self.defend_row, self.defend_col, self.defend_type
+        return self.defend_row, self.defend_col, self.defend_type, self.defende_node_id

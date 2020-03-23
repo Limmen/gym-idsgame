@@ -20,6 +20,17 @@ def validate_config(idsgame_config: IdsGameConfig) -> None:
     if idsgame_config.game_config.max_value < 3:
         raise AssertionError("The max attack/defense value cannot be less than 3")
 
+
+def is_defense_id_legal(defense_id: int) -> bool:
+    """
+    Check if a given defense is legal or not.
+
+    :param defense_id: the defense to verify
+    :return: True if legal otherwise False
+    """
+    return True
+
+
 def is_attack_legal(target_pos: Union[int, int], attacker_pos: Union[int, int], num_cols: int,
                     adjacency_matrix: np.ndarray) -> bool:
     """

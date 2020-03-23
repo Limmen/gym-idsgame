@@ -5,7 +5,7 @@ from gym_idsgame.envs.rendering.viewer import Viewer
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.dao.render_config import RenderConfig
-from gym_idsgame.agents.random_defense_agent import RandomDefenseBotAgent
+from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
 
 # Program entry point, uses the gym-idsgame environment for manual play
 if __name__ == '__main__':
@@ -16,4 +16,4 @@ if __name__ == '__main__':
     idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_policy,
                                    render_config=render_config)
     viewer = Viewer(idsgame_config)
-    viewer.manual_start()
+    viewer.manual_start_attacker()

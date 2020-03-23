@@ -99,7 +99,7 @@ class GamePanel:
         :param game_state: the state to reflect in the labels
         :return: None
         """
-        self.attack_type_label.text = str(game_state.attack_type)
+        self.attack_type_label.text = str(game_state.attack_defense_type)
         self.a_reward_label.text = str(game_state.attacker_cumulative_reward)
         self.d_reward_label.text = str(game_state.defender_cumulative_reward)
         self.step_label.text = str(game_state.game_step)

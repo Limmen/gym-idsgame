@@ -1,5 +1,5 @@
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
-from gym_idsgame.agents.random_defense_agent import RandomDefenseBotAgent
+from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.dao.render_config import RenderConfig

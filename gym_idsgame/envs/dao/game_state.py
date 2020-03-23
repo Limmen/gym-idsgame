@@ -52,7 +52,7 @@ class GameState():
         self.defense_events = defense_events
         self.done = done
         self.detected = detected
-        self.attack_type = attack_type
+        self.attack_defense_type = attack_type
         self.num_hacks = num_hacks
         self.hacked = hacked
         self.action_descriptors = ["Injection", "Authentication", "CrossSite", "References", "Misssconfiguration",
@@ -91,7 +91,7 @@ class GameState():
         self.defense_events = []
         self.done = False
         self.detected = False
-        self.attack_type = 0
+        self.attack_defense_type = 0
         self.num_hacks = 0
         self.hacked = False
 
@@ -104,7 +104,7 @@ class GameState():
         """
         self.game_step = 0
         self.done = False
-        self.attack_type = 0
+        self.attack_defense_type = 0
         self.num_games += 1
         self.attack_events = []
         self.defense_events = []
@@ -141,7 +141,7 @@ class GameState():
         new_state.defense_events = self.defense_events
         new_state.done = self.done
         new_state.detected = self.detected
-        new_state.attack_type = self.attack_type
+        new_state.attack_defense_type = self.attack_defense_type
         new_state.num_hacks = self.num_hacks
         new_state.hacked = self.hacked
         return new_state

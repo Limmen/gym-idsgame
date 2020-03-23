@@ -11,21 +11,23 @@ class GameConfig():
     """
     DTO with game configuration parameters
     """
-    def __init__(self, network_config: NetworkConfig = None, manual: bool = True, num_layers: int = 1,
+    def __init__(self, network_config: NetworkConfig = None, manual_attacker: bool = True, num_layers: int = 1,
                  num_servers_per_layer: int = 2, num_attack_types: int = 10, max_value: int = 9,
-                 initial_state: bool = None):
+                 initial_state: bool = None, manual_defender: bool = False):
         """
         Class constructor, initializes the DTO
 
         :param network_config: the network configuration of the game (e.g. number of nodes and their connectivity)
-        :param manual: whether the game is played manually or by an agent
+        :param manual_attacker: whether the attacker is controlled manually or by an agent
+        :param manual_attacker: whether the defender is controlled manually or by an agent
         :param num_layers: the number of layers in the network
         :param num_servers_per_layer: the number of servers per layer in the network
         :param num_attack_types: the number of attack types
         :param max_value: max value for a defense/attack attribute
         :param initial_state: the initial state
         """
-        self.manual = manual
+        self.manual_attacker = manual_attacker
+        self.manual_defender = manual_defender
         self.num_layers = num_layers
         self.num_servers_per_layer = num_servers_per_layer
         self.num_attack_types = num_attack_types

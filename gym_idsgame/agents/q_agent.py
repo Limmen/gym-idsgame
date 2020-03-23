@@ -80,7 +80,8 @@ class QAgent(TrainAgent):
                     self.env.render(mode="human")
                 attacker_node_id = self.env.get_attacker_node_from_observation(obs)
                 action = self.get_action(attacker_node_id)
-                while action >= (self.env.idsgame_config.game_config.num_nodes-1)*self.env.idsgame_config.game_config.num_attack_types:
+                while action >= ((self.env.idsgame_config.game_config.num_nodes-1)*
+                                 self.env.idsgame_config.game_config.num_attack_types):
                     action = self.get_action(attacker_node_id)
                 obs_prime, reward, done, info = self.env.step(action)
                 episode_reward += reward

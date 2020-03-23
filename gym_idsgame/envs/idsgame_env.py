@@ -6,7 +6,8 @@ import numpy as np
 import gym
 import os
 from gym_idsgame.envs.dao.game_config import GameConfig
-from gym_idsgame.agents.random_defense_agent import RandomDefenseBotAgent
+from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
+from gym_idsgame.agents.random_attack_bot_agent import RandomAttackBotAgent
 from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 import gym_idsgame.envs.util.idsgame_util as util
@@ -240,15 +241,22 @@ class IdsGameEnv(gym.Env):
 
         :return: position of the node to defend, defense-type, defense-node-id
         """
-        defense_row, defense_col, defense_type = self.defender.action(self.state)
+        defense_row, defense_col, defense_type, defense_node_id = self.defender.action(self.state)
         defense_pos = (defense_row, defense_col)
-        defense_node_id = self.idsgame_config.game_config.network_config.get_node_id(defense_pos)
         return defense_pos, defense_type, defense_node_id
 
 # -------- Concrete envs ------------
 class IdsGameRandomDefense1L1S10ADEnv(IdsGameEnv):
     def __init__(self):
         game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
-        defender_policy = RandomDefenseBotAgent(game_config)
-        idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_policy)
+        defender_agent = RandomDefenseBotAgent(game_config)
+        idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
+        super().__init__(idsgame_config=idsgame_config)
+
+
+class IdsGameRandomAttack1L1S10ADEnv(IdsGameEnv):
+    def __init__(self):
+        game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
+        attacker_agent = RandomAttackBotAgent(game_config)
+        idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
         super().__init__(idsgame_config=idsgame_config)
