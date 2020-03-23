@@ -178,6 +178,7 @@ class IdsGameEnv(gym.Env):
             raise NotImplemented("mode: {} is not supported".format(mode))
         if self.viewer is None:
             self.__setup_viewer()
+            self.viewer.gameframe.set_state(self.state)
         arr = self.viewer.render(return_rgb_array = mode=='rgb_array')
         self.state.attack_events = []
         self.state.defense_events = []
