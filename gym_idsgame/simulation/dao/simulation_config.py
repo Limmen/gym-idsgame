@@ -1,8 +1,12 @@
-from gym_idsgame.agents.agent import Agent
+from typing import TYPE_CHECKING
+
+# Avoid circular imports... Python -_-
+if TYPE_CHECKING:
+    from gym_idsgame.agents.agent import Agent
 
 class SimulationConfig:
 
-    def __init__(self, attacker_agent: Agent = None, defender_agent: Agent = None, num_episodes: int = 10, video_fps=5,
+    def __init__(self, attacker_agent: 'Agent' = None, defender_agent: 'Agent' = None, num_episodes: int = 10, video_fps=5,
                  video=False, gif_dir=None, video_dir=None, gifs=False, render=False, eval_sleep=0.35,
                  log_frequency = 1):
         self.attacker_agent = attacker_agent

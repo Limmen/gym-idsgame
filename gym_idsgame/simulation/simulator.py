@@ -42,7 +42,7 @@ class Simulator:
 
         # Simulate
         obs = self.env.reset()
-        for episode in range(self.config.eval_episodes):
+        for episode in range(self.config.num_episodes):
             i = 0
             episode_reward = 0
             episode_step = 0

@@ -5,6 +5,7 @@ from typing import Union
 import numpy as np
 import gym
 import os
+from abc import ABC
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
 from gym_idsgame.agents.random_attack_bot_agent import RandomAttackBotAgent
@@ -246,18 +247,51 @@ class IdsGameEnv(gym.Env):
         defense_pos = (defense_row, defense_col)
         return defense_pos, defense_type, defense_node_id
 
+# -------- Abstract Envs ------------
+class AttackerEnv(IdsGameEnv, ABC):
+
+    def __init__(self, idsgame_config: IdsGameConfig):
+        if idsgame_config is None:
+            raise ValueError("Cannot instantiate env without configuration")
+        if idsgame_config.defender_agent is None:
+            raise ValueError("Cannot instantiate attacker-env without a defender agent")
+        super().__init__(idsgame_config=idsgame_config)
+
+
+class DefenderEnv(IdsGameEnv, ABC):
+
+    def __init__(self, idsgame_config: IdsGameConfig):
+        if idsgame_config is None:
+            raise ValueError("Cannot instantiate env without configuration")
+        if idsgame_config.attacker_agent is None:
+            raise ValueError("Cannot instantiate defender-env without an attacker agent")
+        super().__init__(idsgame_config=idsgame_config)
+
+
+class AttackDefenseEnv(IdsGameEnv, ABC):
+
+    def __init__(self, idsgame_config: IdsGameConfig):
+        if idsgame_config is None:
+            raise ValueError("Cannot instantiate env without configuration")
+        super().__init__(idsgame_config=idsgame_config)
+
 # -------- Concrete envs ------------
-class IdsGameRandomDefense1L1S10ADEnv(IdsGameEnv):
+class IdsGameRandomDefense1L1S10ADEnv(AttackerEnv):
     def __init__(self):
         game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
         defender_agent = RandomDefenseBotAgent(game_config)
         idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
         super().__init__(idsgame_config=idsgame_config)
 
-
-class IdsGameRandomAttack1L1S10ADEnv(IdsGameEnv):
+class IdsGameRandomAttack1L1S10ADEnv(DefenderEnv):
     def __init__(self):
         game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
         attacker_agent = RandomAttackBotAgent(game_config)
         idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
+        super().__init__(idsgame_config=idsgame_config)
+
+class IdsGame1L1S10ADEnv(AttackDefenseEnv):
+    def __init__(self):
+        game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
+        idsgame_config = IdsGameConfig(game_config=game_config)
         super().__init__(idsgame_config=idsgame_config)
