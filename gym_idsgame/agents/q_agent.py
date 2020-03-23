@@ -8,7 +8,7 @@ import logging
 from gym_idsgame.envs.rendering.video.idsgame_monitor import IdsGameMonitor
 from gym_idsgame.agents.dao.q_agent_config import QAgentConfig
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
-from gym_idsgame.agents.dao.train_result import TrainResult
+from gym_idsgame.agents.dao.experiment_result import ExperimentResult
 from gym_idsgame.agents.train_agent import TrainAgent
 
 class QAgent(TrainAgent):
@@ -24,11 +24,11 @@ class QAgent(TrainAgent):
         self.env = env
         self.config = config
         self.Q = np.zeros((self.env.num_states, self.env.num_actions))
-        self.train_result = TrainResult()
-        self.eval_result = TrainResult()
+        self.train_result = ExperimentResult()
+        self.eval_result = ExperimentResult()
         self.outer = tqdm.tqdm(total=self.config.num_episodes, desc='Episode', position=0)
         if self.config.logger is None:
-            self.logger = logging.getLogger('QAgent')
+            self.config.logger = logging.getLogger('QAgent')
 
     def get_action(self, s, eval=False):
         """
@@ -120,7 +120,7 @@ class QAgent(TrainAgent):
         self.log_state_values()
         return self.train_result
 
-    def log_metrics(self, result: TrainResult, episode_rewards:list, episode_steps:list) -> None:
+    def log_metrics(self, result: ExperimentResult, episode_rewards:list, episode_steps:list) -> None:
         """
         Logs average metrics for the last <self.config.log_frequency> episodes
 
@@ -157,7 +157,7 @@ class QAgent(TrainAgent):
 
         if len(self.eval_result.avg_episode_steps) > 0:
             self.config.logger.warning("starting eval with non-empty result object")
-        if(self.config.eval_episodes < 1):
+        if self.config.eval_episodes < 1:
             return
         done = False
 

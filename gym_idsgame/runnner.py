@@ -8,7 +8,7 @@ from gym_idsgame.config.runner_mode import RunnerMode
 from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.agents.q_agent import QAgent
 from gym_idsgame.agents.train_agent import TrainAgent
-from gym_idsgame.agents.dao.train_result import TrainResult
+from gym_idsgame.agents.dao.experiment_result import ExperimentResult
 from gym_idsgame.agents.manual_attack_agent import ManualAttackAgent
 from gym_idsgame.agents.manual_defense_agent import ManualDefenseAgent
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
@@ -40,7 +40,7 @@ class Runner:
             raise AssertionError("Runner mode not recognized: {}".format(config.mode))
 
     @staticmethod
-    def train_attacker(config: ClientConfig) -> Union[TrainResult, TrainResult]:
+    def train_attacker(config: ClientConfig) -> Union[ExperimentResult, ExperimentResult]:
         """
         Trains an attacker agent in the environment
 

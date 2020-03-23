@@ -1,17 +1,19 @@
 """
-Training/Eval results
+Experiment results
 """
 from typing import List
 import csv
 
-class TrainResult:
+class ExperimentResult:
     """
-    DTO with training/eval result from an experiment in the IDSGameEnvironment
+    DTO with experiment result from an experiment in the IDSGameEnvironment
     """
 
     def __init__(self, avg_episode_rewards: List[float] = None, avg_episode_steps: List[int] = None,
                  epsilon_values: List[float] = None, hack_probability: List[float] = None,
-                 attacker_cumulative_reward: List[int] = None, defender_cumulative_reward: List[int] = None):
+                 attacker_cumulative_reward: List[int] = None, defender_cumulative_reward: List[int] = None,
+                 attacker_wins: List[int] = None, defender_wins: List[int] = None
+                 ):
         """
         Constructor, initializes the DTO
 
@@ -21,6 +23,8 @@ class TrainResult:
         :param hack_probability: list of hack probabilities
         :param attacker_cumulative_reward: list of attacker cumulative rewards
         :param defender_cumulative_reward: list of defender cumulative rewards
+        :param attacker_wins: num episodes won by the attacker
+        :param defender_wins: num episodes won by the defender
         """
         self.avg_episode_rewards = avg_episode_rewards
         self.avg_episode_steps = avg_episode_steps
@@ -28,7 +32,8 @@ class TrainResult:
         self.hack_probability = hack_probability
         self.attacker_cumulative_reward = attacker_cumulative_reward
         self.defender_cumulative_reward = defender_cumulative_reward
-
+        self.attacker_wins = attacker_wins
+        self.defender_wins = defender_wins
         if avg_episode_steps is None:
             self.avg_episode_steps = []
         if avg_episode_rewards is None:
@@ -41,14 +46,20 @@ class TrainResult:
             self.attacker_cumulative_reward = []
         if defender_cumulative_reward is None:
             self.defender_cumulative_reward = []
+        if attacker_wins is None:
+            self.attacker_wins = []
+        if defender_wins is None:
+            self.defender_wins = []
 
 
     def to_csv(self, file_path):
         rows = zip(self.avg_episode_rewards, self.avg_episode_steps, self.epsilon_values, self.hack_probability,
-                   self.attacker_cumulative_reward, self.defender_cumulative_reward)
+                   self.attacker_cumulative_reward, self.defender_cumulative_reward, self.attacker_wins,
+                   self.defender_wins)
         with open(file_path, "w") as f:
             writer = csv.writer(f)
             writer.writerow(["avg_episode_rewards", "avg_episode_steps", "epsilon_values", "hack_probability",
-                             "attacker_cumulative_reward", "defender_cumulative_reward"])
+                             "attacker_cumulative_reward", "defender_cumulative_reward","attacker_wins",
+                             "defender_wins"])
             for row in rows:
                 writer.writerow(row)
