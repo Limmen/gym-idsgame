@@ -35,8 +35,7 @@ class GamePanel:
                     self.idsgame_config.render_config.height - constants.RENDERING.PANEL_TOP_MARGIN * 2,
                     constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
                     self.idsgame_config.render_config.batch, self.idsgame_config.render_config.second_foreground)
-
-        batch_label("Attack Type: ", constants.RENDERING.PANEL_LEFT_MARGIN * 4,
+        batch_label("A/D Type: ", constants.RENDERING.PANEL_LEFT_MARGIN * 4,
                     self.idsgame_config.render_config.height - constants.RENDERING.PANEL_TOP_MARGIN * 2,
                     constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
                     self.idsgame_config.render_config.batch, self.idsgame_config.render_config.second_foreground)
