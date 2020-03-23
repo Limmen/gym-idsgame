@@ -6,8 +6,6 @@ from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.runnner import Runner
 from experiments.util import plotting_util, util
-from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
-from gym_idsgame.agents.random_attack_bot_agent import RandomAttackBotAgent
 
 def default_output_dir() -> str:
     """
@@ -52,26 +50,21 @@ def write_default_config(path:str = None) -> None:
     util.write_config_file(config, path)
 
 
-def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str) -> None:
+def plot_csv(config: ClientConfig, csv_path:str) -> None:
     """
     Plot results from csv files
 
     :param config: client config
-    :param eval_csv_path: path to the csv file with evaluation results
-    :param train_csv_path: path to the csv file with training results
+    :param csv_path: path to the csv file with results
     :return: None
     """
-    eval_df, train_df = plotting_util.read_data(eval_csv_path, train_csv_path)
-    plotting_util.plot_results(train_df["avg_episode_rewards"].values, train_df["avg_episode_steps"].values,
-                               train_df["epsilon_values"], train_df["hack_probability"],
-                               train_df["attacker_cumulative_reward"], train_df["defender_cumulative_reward"],
-                               config.simulation_config.log_frequency,
-                               config.output_dir, eval=False)
-    plotting_util.plot_results(eval_df["avg_episode_rewards"].values, eval_df["avg_episode_steps"].values,
-                               eval_df["epsilon_values"], eval_df["hack_probability"],
-                               eval_df["attacker_cumulative_reward"], eval_df["defender_cumulative_reward"],
-                               config.simulation_config.log_frequency,
-                               config.output_dir, eval=True)
+    df = plotting_util.read_data(csv_path)
+    plotting_util.plot_results(avg_episode_rewards=None, avg_episode_steps=df["avg_episode_steps"].values,
+                               epsilon_values=None, hack_probability=df["hack_probability"],
+                               attacker_cumulative_reward=df["attacker_cumulative_reward"],
+                               defender_cumulative_reward=df["defender_cumulative_reward"],
+                               log_frequency=config.simulation_config.log_frequency,
+                               output_dir=config.output_dir, eval=False, sim=True)
 
 
 # Program entrypoint
@@ -89,15 +82,11 @@ if __name__ == '__main__':
                                time_str=time_str)
     config.logger = logger
     config.simulation_config.logger = logger
+    config.simulation_config.to_csv(config.output_dir + "/hyperparameters/" + time_str + ".csv")
     result = Runner.run(config)
-    # config.q_agent_config.logger = logger
-    # config.q_agent_config.to_csv(config.output_dir + "/hyperparameters/" + time_str + ".csv")
-    # train_result, eval_result = Runner.run(config)
-    # train_csv_path = config.output_dir + "/data/" + time_str + "_train" + ".csv"
-    # train_result.to_csv(train_csv_path)
-    # eval_csv_path = config.output_dir + "/data/" + time_str + "_eval" + ".csv"
-    # eval_result.to_csv(eval_csv_path)
-    # plot_csv(config, eval_csv_path, train_csv_path)
+    csv_path = config.output_dir + "/data/" + time_str + "_simulation" + ".csv"
+    result.to_csv(csv_path)
+    plot_csv(config, csv_path)
 
 
 

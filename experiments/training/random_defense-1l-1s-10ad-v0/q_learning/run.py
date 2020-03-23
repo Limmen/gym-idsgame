@@ -63,7 +63,8 @@ def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str) -> No
     :param train_csv_path: path to the csv file with training results
     :return: None
     """
-    eval_df, train_df = plotting_util.read_data(eval_csv_path, train_csv_path)
+    eval_df = plotting_util.read_data(eval_csv_path)
+    train_df = plotting_util.read_data(train_csv_path)
     plotting_util.plot_results(train_df["avg_episode_rewards"].values, train_df["avg_episode_steps"].values,
                                train_df["epsilon_values"], train_df["hack_probability"],
                                train_df["attacker_cumulative_reward"], train_df["defender_cumulative_reward"],

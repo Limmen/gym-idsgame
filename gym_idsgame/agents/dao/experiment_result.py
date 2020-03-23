@@ -53,13 +53,21 @@ class ExperimentResult:
 
 
     def to_csv(self, file_path):
-        rows = zip(self.avg_episode_rewards, self.avg_episode_steps, self.epsilon_values, self.hack_probability,
+        metrics = [self.avg_episode_rewards, self.avg_episode_steps, self.epsilon_values, self.hack_probability,
                    self.attacker_cumulative_reward, self.defender_cumulative_reward, self.attacker_wins,
-                   self.defender_wins)
+                   self.defender_wins]
+        metric_labels = ["avg_episode_rewards", "avg_episode_steps", "epsilon_values", "hack_probability",
+                             "attacker_cumulative_reward", "defender_cumulative_reward","attacker_wins",
+                             "defender_wins"]
+        filtered_metric_labels = []
+        filtered_metrics = []
+        for i in range(len(metrics)):
+            if len(metrics[i]) > 0:
+                filtered_metrics.append(metrics[i])
+                filtered_metric_labels.append(metric_labels[i])
+        rows = zip(*filtered_metrics)
         with open(file_path, "w") as f:
             writer = csv.writer(f)
-            writer.writerow(["avg_episode_rewards", "avg_episode_steps", "epsilon_values", "hack_probability",
-                             "attacker_cumulative_reward", "defender_cumulative_reward","attacker_wins",
-                             "defender_wins"])
+            writer.writerow(filtered_metric_labels)
             for row in rows:
                 writer.writerow(row)
