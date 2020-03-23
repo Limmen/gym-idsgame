@@ -175,7 +175,6 @@ class QAgent(TrainAgent):
 
         # Eval
         obs = self.env.reset()
-        self.env.state.restart()
         for episode in range(self.config.eval_episodes):
             i = 0
             episode_reward = 0
