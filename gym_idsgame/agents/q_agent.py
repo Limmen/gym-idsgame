@@ -19,6 +19,7 @@ class QAgent(TrainAgent):
     def __init__(self, env:IdsGameEnv, config: QAgentConfig):
         """
         Initialize environment and hyperparameters
+
         :param config: the configuration
         """
         self.env = env
@@ -62,7 +63,7 @@ class QAgent(TrainAgent):
         if len(self.train_result.avg_episode_steps) > 0:
             self.config.logger.warning("starting training with non-empty result object")
         done = False
-        obs = self.env.reset()
+        obs = self.env.reset(update_stats=False)
 
         # Tracking metrics
         episode_rewards = []
@@ -108,13 +109,13 @@ class QAgent(TrainAgent):
             if episode % self.config.eval_frequency == 0 and episode > 0:
                 self.eval()
 
+            # Reset environment for the next episode and update game stats
+            done = False
+            obs = self.env.reset(update_stats=True)
+            self.outer.update(1)
+
             # Anneal epsilon linearly
             self.anneal_epsilon()
-
-            # Reset environment for the next episode
-            done=False
-            obs = self.env.reset()
-            self.outer.update(1)
 
         self.config.logger.info("Training Complete")
 
@@ -181,7 +182,7 @@ class QAgent(TrainAgent):
         episode_steps = []
 
         # Eval
-        obs = self.env.reset()
+        obs = self.env.reset(update_stats=False)
         for episode in range(self.config.eval_episodes):
             i = 0
             episode_reward = 0
@@ -213,7 +214,8 @@ class QAgent(TrainAgent):
                                       + time_str + ".gif", self.config.video_fps)
 
             done = False
-            obs = self.env.reset()
+            obs = self.env.reset(update_stats=False)
+
         self.env.close()
         self.config.logger.info("Evaluation Complete")
         return self.eval_result

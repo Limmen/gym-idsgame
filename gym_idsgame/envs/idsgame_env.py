@@ -131,14 +131,15 @@ class IdsGameEnv(gym.Env, ABC):
             self.viewer.gameframe.set_state(self.state)
         return observation, reward, self.state.done, info
 
-    def reset(self) -> np.ndarray:
+    def reset(self, update_stats = False) -> np.ndarray:
         """
         Resets the environment and returns the initial state
 
+        :param update_stats: whether the game count should be incremented or not
         :return: the initial state
         """
         self.steps_beyond_done = None
-        self.state.new_game(self.idsgame_config.game_config.initial_state)
+        self.state.new_game(self.idsgame_config.game_config.initial_state, update_stats=update_stats)
         if self.viewer is not None:
             self.viewer.gameframe.reset()
         observation = self.state.get_attacker_observation(self.idsgame_config.game_config.network_config)

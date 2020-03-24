@@ -95,31 +95,32 @@ class GameState():
         self.num_hacks = 0
         self.hacked = False
 
-    def new_game(self, init_state: "GameState") -> None:
+    def new_game(self, init_state: "GameState", update_stats = True) -> None:
         """
         Updates the current state for a new game
 
         :param init_state: the initial state of the first game
         :return: None
         """
-        self.game_step = 0
+        if update_stats:
+            self.num_games += 1
+            if self.detected:
+                self.attacker_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
+                self.defender_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
+            if self.hacked:
+                self.attacker_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
+                self.defender_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
+                self.num_hacks += 1
         self.done = False
         self.attack_defense_type = 0
-        self.num_games += 1
+        self.game_step = 0
         self.attack_events = []
         self.defense_events = []
         self.attacker_pos = init_state.attacker_pos
         self.attack_values = np.copy(init_state.attack_values)
         self.defense_values = np.copy(init_state.defense_values)
         self.defense_det = np.copy(init_state.defense_det)
-        if self.detected:
-            self.attacker_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
-            self.defender_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
         self.detected = False
-        if self.hacked:
-            self.attacker_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
-            self.defender_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
-            self.num_hacks += 1
         self.hacked = False
 
     def copy(self) -> "GameState":

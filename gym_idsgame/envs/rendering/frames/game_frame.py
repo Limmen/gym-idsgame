@@ -360,7 +360,7 @@ class GameFrame(pyglet.window.Window):
 
         :return: None
         """
-        self.game_state.new_game(self.idsgame_config.game_config.initial_state)
+        self.game_state.new_game(self.idsgame_config.game_config.initial_state, update_stats=False)
         self.set_state(self.game_state)
         self.reset_events()
         self.unschedule_events()
