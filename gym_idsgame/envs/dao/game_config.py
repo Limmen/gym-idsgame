@@ -46,6 +46,24 @@ class GameConfig():
             self.initial_state.default_state(self.network_config.node_list, self.network_config.start_pos,
                                              self.num_attack_types)
 
+
+    def set_initial_state(self, defense_val=2, attack_val=0,
+                  num_vulnerabilities_per_node=1, det_val=2, vulnerability_val=0):
+        """
+        Utility function for setting the initial game state
+
+        :param defense_val: defense value for defense types that are not vulnerable
+        :param attack_val: attack value for attack types
+        :param num_vulnerabilities_per_node: number of vulnerabilities per node
+        :param det_val: detection value per node
+        :param vulnerability_val: defense value for defense types that are vulnerable
+        :return:
+        """
+        self.initial_state = GameState()
+        self.initial_state.set_state(self.network_config.node_list, self.num_attack_types, defense_val=defense_val,
+                                     attack_val=attack_val, num_vulnerabilities_per_node=num_vulnerabilities_per_node,
+                                     det_val=det_val, vulnerability_val=vulnerability_val)
+
     def get_attacker_observation_space(self) -> gym.spaces.Box:
         """
         Creates an OpenAI-Gym Space for the game observation

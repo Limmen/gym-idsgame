@@ -296,6 +296,8 @@ class AttackDefenseEnv(IdsGameEnv, ABC):
 class IdsGameRandomDefense1L1S10ADEnv(AttackerEnv):
     def __init__(self):
         game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
+        game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+                                      vulnerability_val=0)
         defender_agent = RandomDefenseBotAgent(game_config)
         idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
         super().__init__(idsgame_config=idsgame_config)

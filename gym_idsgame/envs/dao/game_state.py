@@ -85,6 +85,18 @@ class GameState():
 
     def set_state(self, node_list, num_attack_types, defense_val=2, attack_val=0,
                   num_vulnerabilities_per_node=1, det_val=2, vulnerability_val=0):
+        """
+        Sets the state
+
+        :param node_list: list of nodes
+        :param num_attack_types:  number of attack types
+        :param defense_val: defense value for defense types that are not vulnerable
+        :param attack_val: attack value for attack types
+        :param num_vulnerabilities_per_node: number of vulnerabilities per node
+        :param det_val: detection value per node
+        :param vulnerability_val: defense value for defense types that are vulnerable
+        :return:
+        """
         num_nodes = len(node_list)
         attack_values = np.zeros((num_nodes, num_attack_types))
         defense_values = np.zeros((num_nodes, num_attack_types))
