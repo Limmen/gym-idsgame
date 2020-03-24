@@ -28,17 +28,17 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    q_agent_config = QAgentConfig(gamma=0.9, alpha=0.3, epsilon=1, render=False, eval_sleep=0.9,
-                                  min_epsilon=0.1, eval_episodes=3, train_log_frequency=1,
-                                  epsilon_decay=0.99, video=True, eval_log_frequency=1,
-                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=1000,
-                                  eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                                  eval_frequency=100, attacker=True, defender=False)
-    env_name = "idsgame-random_defense-v0"
-    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.Q_AGENT.value,
-                                 mode=RunnerMode.TRAIN_ATTACKER.value,
+    q_agent_config = QAgentConfig(gamma=0.99, alpha=0.2, epsilon=1, render=False, eval_sleep=0.9,
+                                  min_epsilon=0.1, eval_episodes=5, train_log_frequency=100,
+                                  epsilon_decay=0.9999, video=False, eval_log_frequency=1,
+                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=10000,
+                                  eval_render=False, gifs=False, gif_dir=default_output_dir() + "/gifs",
+                                  eval_frequency=1000, attacker=False, defender=True)
+    env_name = "idsgame-random_attack-v0"
+    client_config = ClientConfig(env_name=env_name, defender_type=AgentType.Q_AGENT.value,
+                                 mode=RunnerMode.TRAIN_DEFENDER.value,
                                  q_agent_config=q_agent_config, output_dir=default_output_dir(),
-                                 title="TrainingQAgent vs RandomDefender")
+                                 title="RandomAttacker vs TrainingQAgent")
     return client_config
 
 

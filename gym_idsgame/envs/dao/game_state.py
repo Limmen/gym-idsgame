@@ -274,8 +274,19 @@ class GameState():
         defense_event = AttackDefenseEvent(target_pos, defense_type)
         self.defense_events.append(defense_event)
 
-    def get_defender_observation(self):
-        pass
+    def get_defender_observation(self, network_config: NetworkConfig):
+        """
+        Converts the state of the dynamical system into an observation for the defender. As the environment
+        is a partially observed markov decision process, the defender observation is only a subset of the game state
+
+        :param network_config: the network configuration of the game
+        :return: An observation of the environment
+        """
+        # +1 for the detection value
+        defense_observation = np.zeros((len(network_config.node_list), self.defense_values.shape[1] + 1))
+        for node_id in range(len(network_config.node_list)):
+            defense_observation[node_id] = np.append(self.defense_values[node_id], self.defense_det[node_id])
+        return defense_observation
 
     def restart(self) -> None:
         """

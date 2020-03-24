@@ -8,6 +8,8 @@
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
         "alpha": 0.3,
+        "attacker": true,
+        "defender": false,
         "epsilon": 1,
         "epsilon_decay": 0.99,
         "eval_episodes": 3,

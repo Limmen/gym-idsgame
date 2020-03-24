@@ -46,7 +46,7 @@ class IdsGameEnv(gym.Env, ABC):
         self.idsgame_config: IdsGameConfig = idsgame_config
         self.state: GameState = self.idsgame_config.game_config.initial_state.copy()
         self.observation_space = self.idsgame_config.game_config.get_attacker_observation_space()
-        self.action_space = self.idsgame_config.game_config.get_attacker_action_space()
+        self.action_space = self.idsgame_config.game_config.get_action_space()
         self.viewer = None
         self.steps_beyond_done = None
         self.metadata = {
@@ -79,7 +79,7 @@ class IdsGameEnv(gym.Env, ABC):
         self.state.defense_events = []
 
         if self.state.game_step > constants.GAME_CONFIG.MAX_GAME_STEPS:
-            return self.state.get_attacker_observation(self.idsgame_config.game_config.network_config), 0, True, info
+            return self.get_observation(), 0, True, info
 
         # 1. Interpret attacker action
         attacker_pos = self.state.attacker_pos
@@ -109,13 +109,13 @@ class IdsGameEnv(gym.Env, ABC):
                 if target_pos == self.idsgame_config.game_config.network_config.data_pos:
                     self.state.done = True
                     self.state.hacked = True
-                    reward = constants.GAME_CONFIG.POSITIVE_REWARD
+                    reward = self.get_hack_reward()
             else:
                 detected = self.state.simulate_detection(target_node_id)
                 if detected:
                     self.state.done = True
                     self.state.detected = True
-                    reward = -constants.GAME_CONFIG.POSITIVE_REWARD
+                    reward = self.get_detect_reward()
         if self.state.done:
             if self.steps_beyond_done is None:
                 self.steps_beyond_done = 0
@@ -126,7 +126,7 @@ class IdsGameEnv(gym.Env, ABC):
                     "any further steps are undefined behavior.")
                 self.steps_beyond_done += 1
         self.state.game_step += 1
-        observation = self.state.get_attacker_observation(self.idsgame_config.game_config.network_config)
+        observation = self.get_observation()
         if self.viewer is not None:
             self.viewer.gameframe.set_state(self.state)
         return observation, reward, self.state.done, info
@@ -142,7 +142,7 @@ class IdsGameEnv(gym.Env, ABC):
         self.state.new_game(self.idsgame_config.game_config.initial_state, update_stats=update_stats)
         if self.viewer is not None:
             self.viewer.gameframe.reset()
-        observation = self.state.get_attacker_observation(self.idsgame_config.game_config.network_config)
+        observation = self.get_observation()
         return observation
 
     def restart(self) -> np.ndarray:
@@ -218,6 +218,14 @@ class IdsGameEnv(gym.Env, ABC):
         """
         return util.is_attack_id_legal(attack_action, self.idsgame_config.game_config, self.state.attacker_pos)
 
+    def is_defense_legal(self, defense_action: int) -> bool:
+        """
+        Check if a given defense is legal or not.
+
+        :param defense_action: the defense action to verify
+        :return: True if legal otherwise False
+        """
+        return util.is_defense_id_legal(defense_action)
 
     @abstractmethod
     def get_attacker_action(self, action) -> Union[int, Union[int, int], int]:
@@ -225,6 +233,18 @@ class IdsGameEnv(gym.Env, ABC):
 
     @abstractmethod
     def get_defender_action(self, action) -> Union[Union[int, int], int, int]:
+        pass
+
+    @abstractmethod
+    def get_observation(self) -> np.ndarray:
+        pass
+
+    @abstractmethod
+    def get_hack_reward(self) -> np.ndarray:
+        pass
+
+    @abstractmethod
+    def get_detect_reward(self) -> np.ndarray:
         pass
 
     # -------- Private methods ------------
@@ -255,6 +275,7 @@ class AttackerEnv(IdsGameEnv, ABC):
         if idsgame_config.defender_agent is None:
             raise ValueError("Cannot instantiate attacker-env without a defender agent")
         super().__init__(idsgame_config=idsgame_config)
+        self.observation_space = self.idsgame_config.game_config.get_attacker_observation_space()
 
     def get_attacker_action(self, action) -> Union[int, Union[int, int], int]:
         return util.interpret_action(action, self.idsgame_config.game_config)
@@ -263,7 +284,16 @@ class AttackerEnv(IdsGameEnv, ABC):
         defend_id = self.idsgame_config.defender_agent.action(self.state)
         defend_node_id, defend_node_pos, defend_type = util.interpret_action(
             defend_id, self.idsgame_config.game_config)
-        return defend_node_id, defend_node_pos, defend_type,
+        return defend_node_id, defend_node_pos, defend_type
+
+    def get_observation(self) -> np.ndarray:
+        return self.state.get_attacker_observation(self.idsgame_config.game_config.network_config)
+
+    def get_hack_reward(self) -> int:
+        return constants.GAME_CONFIG.POSITIVE_REWARD
+
+    def get_detect_reward(self) -> int:
+        return -constants.GAME_CONFIG.POSITIVE_REWARD
 
 class DefenderEnv(IdsGameEnv, ABC):
     """
@@ -278,14 +308,24 @@ class DefenderEnv(IdsGameEnv, ABC):
         if idsgame_config.attacker_agent is None:
             raise ValueError("Cannot instantiate defender-env without an attacker agent")
         super().__init__(idsgame_config=idsgame_config)
+        self.observation_space = self.idsgame_config.game_config.get_defender_observation_space()
 
     def get_defender_action(self, action) -> Union[int, Union[int, int], int]:
         return util.interpret_action(action, self.idsgame_config.game_config)
 
     def get_attacker_action(self, action) -> Union[Union[int, int], int, int]:
-        attack_id = self.attacker_agent.action(self.game_state.attacker_pos)
+        attack_id = self.idsgame_config.attacker_agent.action(self.state)
         attack_node_id, attack_node_pos, attack_type = util.interpret_action(attack_id, self.idsgame_config.game_config)
         return attack_node_id, attack_node_pos, attack_type
+
+    def get_observation(self) -> np.ndarray:
+        return self.state.get_defender_observation(self.idsgame_config.game_config.network_config)
+
+    def get_hack_reward(self) -> int:
+        return -constants.GAME_CONFIG.POSITIVE_REWARD
+
+    def get_detect_reward(self) -> int:
+        return constants.GAME_CONFIG.POSITIVE_REWARD
 
 
 class AttackDefenseEnv(IdsGameEnv, ABC):
@@ -306,6 +346,17 @@ class AttackDefenseEnv(IdsGameEnv, ABC):
     def get_attacker_action(self, action: Union[int, int]) -> Union[Union[int, int], int, int]:
         attacker_action, _ = action
         return util.interpret_action(attacker_action, self.idsgame_config.game_config)
+
+    def get_observation(self) -> Union[np.ndarray, np.ndarray]:
+        attacker_obs = self.state.get_attacker_observation(self.idsgame_config.game_config.network_config)
+        defender_obs = self.state.get_defender_observation(self.idsgame_config.game_config.network_config)
+        return attacker_obs, defender_obs
+
+    def get_hack_reward(self) -> Union[int, int]:
+        return constants.GAME_CONFIG.POSITIVE_REWARD, -constants.GAME_CONFIG.POSITIVE_REWARD
+
+    def get_detect_reward(self) -> Union[int, int]:
+        return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
 
 # -------- Concrete envs ------------
 

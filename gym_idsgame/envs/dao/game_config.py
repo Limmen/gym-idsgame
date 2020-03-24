@@ -75,7 +75,19 @@ class GameConfig():
         observation_space = gym.spaces.Box(low=low, high=high, dtype=np.int32)
         return observation_space
 
-    def get_attacker_action_space(self) -> gym.spaces.Discrete:
+    def get_defender_observation_space(self) -> gym.spaces.Box:
+        """
+        Creates an OpenAI-Gym Space for the game observation
+
+        :return: observation space
+        """
+        high_row = np.array([self.max_value] * (self.num_attack_types + 1))
+        high = np.array([high_row] * 1)
+        low = np.zeros((1, self.num_attack_types + 1))
+        observation_space = gym.spaces.Box(low=low, high=high, dtype=np.int32)
+        return observation_space
+
+    def get_action_space(self) -> gym.spaces.Discrete:
         """
         Creates an OpenAi-Gym space for the actions in the environment
 

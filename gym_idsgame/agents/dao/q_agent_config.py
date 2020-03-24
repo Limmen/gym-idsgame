@@ -13,7 +13,8 @@ class QAgentConfig:
     def __init__(self, gamma=0.8, alpha=0.1, epsilon=0.9, render=False, eval_sleep=0.35,
                  epsilon_decay=0.999, min_epsilon=0.1, eval_episodes=1, train_log_frequency=100,
                  eval_log_frequency=1, video=False, video_fps=5, video_dir=None, num_episodes=5000,
-                 eval_render=False, gifs=False, gif_dir=None, eval_frequency=1000, video_frequency = 1):
+                 eval_render=False, gifs=False, gif_dir=None, eval_frequency=1000, video_frequency = 1,
+                 attacker = True, defender = False):
         """
         Initialize environment and hyperparameters
 
@@ -36,6 +37,8 @@ class QAgentConfig:
         :param gifs: boolean flag whether to save gifs during evaluation or not
         :param eval_frequency: the frequency (episodes) when running evaluation
         :param video_frequency: the frequency (eval episodes) to record video and gif
+        :param attacker: True if the QAgent is an attacker
+        :param attacker: True if the QAgent is a defender
         """
         self.gamma = gamma
         self.alpha = alpha
@@ -57,6 +60,9 @@ class QAgentConfig:
         self.eval_frequency = eval_frequency
         self.logger = None
         self.video_frequency = video_frequency
+        self.attacker = attacker
+        self.defender = defender
+        assert not (self.attacker and self.defender)
 
     def to_str(self) -> str:
         """
@@ -66,11 +72,11 @@ class QAgentConfig:
                "epsilon_decay:{5},min_epsilon:{6},eval_episodes:{7},train_log_frequency:{8}," \
                "eval_log_frequency:{9},video:{10},video_fps:{11}," \
                "video_dir:{12},num_episodes:{13},eval_render:{14},gifs:{15}," \
-               "gifdir:{16},eval_frequency:{17},video_frequency:{18}".format(
+               "gifdir:{16},eval_frequency:{17},video_frequency:{18},attacker{19},defender:{20}".format(
             self.gamma, self.alpha, self.epsilon, self.render, self.eval_sleep, self.epsilon_decay,
             self.min_epsilon, self.eval_episodes, self.train_log_frequency, self.eval_log_frequency, self.video,
             self.video_fps, self.video_dir, self.num_episodes, self.eval_render, self.gifs, self.gif_dir,
-            self.eval_frequency, self.video_frequency)
+            self.eval_frequency, self.video_frequency, self.attacker, self.defender)
 
     def to_csv(self, file_path: str) -> None:
         """
@@ -101,3 +107,5 @@ class QAgentConfig:
             writer.writerow(["gifdir", str(self.gif_dir)])
             writer.writerow(["eval_frequency", str(self.eval_frequency)])
             writer.writerow(["video_frequency", str(self.video_frequency)])
+            writer.writerow(["attacker", str(self.attacker)])
+            writer.writerow(["defender", str(self.defender)])

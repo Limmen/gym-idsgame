@@ -81,6 +81,9 @@ class Runner:
             pass
         else:
             raise AssertionError("Defender type not recognized: {}".format(config.defender_type))
+        train_result = defender.train()
+        eval_result = defender.eval()
+        return train_result, eval_result
 
     @staticmethod
     def simulate(config: ClientConfig):

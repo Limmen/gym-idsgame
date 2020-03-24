@@ -33,7 +33,7 @@ def default_config() -> ClientConfig:
                                   epsilon_decay=0.99, video=True, eval_log_frequency=1,
                                   video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=1000,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                                  eval_frequency=100)
+                                  eval_frequency=100, attacker=True, defender=False)
     env_name = "idsgame-random_defense-v1"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.Q_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,

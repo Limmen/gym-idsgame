@@ -24,7 +24,10 @@ class QAgent(TrainAgent):
         """
         self.env = env
         self.config = config
-        self.Q = np.random.rand(self.env.num_states, self.env.num_actions)
+        if self.config.attacker:
+            self.Q = np.random.rand(self.env.num_states, self.env.num_actions)
+        else:
+            self.Q = np.random.rand(1, self.env.num_actions)
         self.train_result = ExperimentResult()
         self.eval_result = ExperimentResult()
         self.outer = tqdm.tqdm(total=self.config.num_episodes, desc='Episode', position=0)
@@ -39,7 +42,10 @@ class QAgent(TrainAgent):
         :return: a sampled action
         """
         actions = list(range(self.env.num_actions))
-        legal_actions = list(filter(lambda action: self.env.is_attack_legal(action), actions))
+        if self.config.attacker:
+            legal_actions = list(filter(lambda action: self.env.is_attack_legal(action), actions))
+        elif self.config.defender:
+            legal_actions = list(filter(lambda action: self.env.is_defense_legal(action), actions))
         if np.random.rand() < self.config.epsilon and not eval:
             return np.random.choice(legal_actions)
         max_legal_action_value = float("-inf")
@@ -79,21 +85,24 @@ class QAgent(TrainAgent):
             while not done:
                 if self.config.render:
                     self.env.render(mode="human")
-                attacker_node_id = self.env.get_attacker_node_from_observation(obs)
-                action = self.get_action(attacker_node_id)
-                while action >= ((self.env.idsgame_config.game_config.num_nodes-1)*
-                                 self.env.idsgame_config.game_config.num_attack_types):
-                    action = self.get_action(attacker_node_id)
+                if self.config.attacker:
+                    state_node_id = self.env.get_attacker_node_from_observation(obs)
+                elif self.config.defender:
+                    state_node_id = 0
+                action = self.get_action(state_node_id)
                 obs_prime, reward, done, info = self.env.step(action)
                 episode_reward += reward
                 episode_step += 1
-                attacker_node_id_prime = self.env.get_attacker_node_from_observation(obs_prime)
+                if self.config.attacker:
+                    state_prime_node_id = self.env.get_attacker_node_from_observation(obs_prime)
+                elif self.config.defender:
+                    state_prime_node_id = 0
                 # Q-learning update
-                self.Q[attacker_node_id, action] = self.Q[attacker_node_id, action] + \
+                self.Q[state_node_id, action] = self.Q[state_node_id, action] + \
                                                    self.config.alpha*(
                                                            reward +
-                                                           self.config.gamma*np.max(self.Q[attacker_node_id_prime])
-                                                           - self.Q[attacker_node_id,action])
+                                                           self.config.gamma*np.max(self.Q[state_prime_node_id])
+                                                           - self.Q[state_node_id,action])
                 obs = obs_prime
 
             episode_rewards.append(episode_reward)
@@ -192,8 +201,11 @@ class QAgent(TrainAgent):
                     self.env.render()
                     time.sleep(self.config.eval_sleep)
                 i = i+1
-                attacker_node_id = self.env.get_attacker_node_from_observation(obs)
-                action = self.get_action(attacker_node_id, eval=True)
+                if self.config.attacker:
+                    s_node_id = self.env.get_attacker_node_from_observation(obs)
+                elif self.config.defender:
+                    s_node_id = 0
+                action = self.get_action(s_node_id, eval=True)
                 obs, reward, done, _ = self.env.step(action)
                 episode_reward += reward
                 episode_step += 1
