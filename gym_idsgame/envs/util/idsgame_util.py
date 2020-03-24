@@ -79,6 +79,19 @@ def interpret_action(action: int, game_config: GameConfig) -> Union[int, Union[i
     return server_id, server_pos, attack_defense_type
 
 
+def get_action_id(server_id, attack_defense_type, game_config: GameConfig):
+    """
+    Gets the action id from a given server position, attack_defense_type, and game config
+
+    :param server_id: id of the server
+    :param attack_defense_type: attack/defense type
+    :param game_config: game config
+    :return: attack id
+    """
+    action_id = server_id*game_config.num_attack_types + attack_defense_type
+    return action_id
+
+
 def get_attack_defense_type(action: int, game_config: GameConfig) -> int:
     """
     Utility method for getting the type of action-id

@@ -254,7 +254,7 @@ class AttackerEnv(IdsGameEnv, ABC):
         return util.interpret_action(action, self.idsgame_config.game_config)
 
     def get_defender_action(self, action) -> Union[Union[int, int], int, int]:
-        defend_id = self.idsgame_config.defender_agent.action(self.state.attacker_pos)
+        defend_id = self.idsgame_config.defender_agent.action(self.state)
         defend_node_id, defend_node_pos, defend_type = util.interpret_action(
             defend_id, self.idsgame_config.game_config)
         return defend_node_id, defend_node_pos, defend_type,

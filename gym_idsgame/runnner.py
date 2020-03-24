@@ -16,6 +16,7 @@ from gym_idsgame.envs.idsgame_env import IdsGameEnv, AttackDefenseEnv, AttackerE
 from gym_idsgame.simulation.simulator import Simulator
 from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
 from gym_idsgame.agents.random_attack_bot_agent import RandomAttackBotAgent
+from gym_idsgame.agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
 
 class Runner:
     """
@@ -87,8 +88,8 @@ class Runner:
         defender: BotAgent = None
         if config.defender_type == AgentType.RANDOM.value:
             defender = RandomDefenseBotAgent(env.idsgame_config.game_config)
-        elif config.defender_type == AgentType.DETERMINISTIC.value:
-            pass
+        elif config.defender_type == AgentType.DEFEND_MINIMAL_VALUE_DEFENSE.value:
+            defender = DefendMinimalValueBotAgent(env.idsgame_config.game_config)
         elif config.defender_type == AgentType.Q_AGENT.value:
             pass
         else:
@@ -99,8 +100,6 @@ class Runner:
             pass
         elif config.attacker_type == AgentType.RANDOM.value:
             attacker = RandomAttackBotAgent(env.idsgame_config.game_config)
-        elif config.attacker_type == AgentType.DETERMINISTIC.value:
-            pass
         else:
             raise AssertionError("Attacker type not recognized: {}".format(config.attacker_type))
         env.idsgame_config.defender_agent = defender

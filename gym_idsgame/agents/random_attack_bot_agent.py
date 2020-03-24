@@ -23,16 +23,16 @@ class RandomAttackBotAgent(BotAgent):
         super(RandomAttackBotAgent, self).__init__(game_config)
 
 
-    def action(self, attacker_pos: Union[int, int]) -> int:
+    def action(self, game_state: GameState) -> int:
         """
         Samples an action from the policy
 
-        :param attacker_pos: attacker position
-        :return: (row, col, attack_type)
+        :param game_state: the game state
+        :return: action_id
         """
         actions = list(range(self.game_config.num_actions))
         legal_actions = list(filter(lambda action: idsgame_util.is_attack_id_legal(action,
                                                                                    self.game_config,
-                                                                                   attacker_pos), actions))
+                                                                                   game_state.attacker_pos), actions))
         action = np.random.choice(legal_actions)
         return action

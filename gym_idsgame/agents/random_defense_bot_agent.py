@@ -23,12 +23,12 @@ class RandomDefenseBotAgent(BotAgent):
         super(RandomDefenseBotAgent, self).__init__(game_config)
 
 
-    def action(self, attacker_pos: Union[int, int]) -> int:
+    def action(self, game_state: GameState) -> int:
         """
-        Samples an action_id from the policy
+        Samples an action from the policy
 
-        :param attacker_pos: attacker position
-        :return: (row, col, defense_type, target_node_id)
+        :param game_state: the game state
+        :return: action_id
         """
         actions = list(range(self.game_config.num_actions))
         legal_actions = list(filter(lambda action: idsgame_util.is_defense_id_legal(action), actions))

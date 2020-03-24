@@ -51,11 +51,10 @@ class Simulator:
                     self.env.render()
                     time.sleep(self.config.sleep)
                 i = i + 1
-                attacker_node_id = self.env.get_attacker_node_from_observation(obs)
-                attacker_node_pos = self.env.idsgame_config.game_config.network_config.get_node_pos(attacker_node_id)
-                defense_id = self.defender.action(attacker_node_pos)
-                attack_id = self.attacker.action(attacker_node_pos)
-                obs, _, done, _ = self.env.step((attack_id, defense_id))
+                defense_id = self.defender.action(self.env.state)
+                attack_id = self.attacker.action(self.env.state)
+                action = (attack_id, defense_id)
+                obs, _, done, _ = self.env.step(action)
                 episode_step += 1
             if self.config.render:
                 self.env.render()
