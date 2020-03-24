@@ -34,8 +34,7 @@ def default_config() -> ClientConfig:
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.RANDOM.value,
                                  defender_type=AgentType.RANDOM.value, mode=RunnerMode.SIMULATE.value,
                                  simulation_config=simulation_config, output_dir=default_output_dir(),
-                                 title="RandomAttacker vs RandomDefender"
-                                 )
+                                 title="RandomAttacker vs RandomDefender")
     return client_config
 
 

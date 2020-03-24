@@ -144,7 +144,7 @@ class GameFrame(pyglet.window.Window):
                                                    self.idsgame_config.game_config.network_config)
 
                             # 3. Update attack state
-                            attack_id = self.attacker_agent.action(self.game_state.attacker_pos)
+                            attack_id = self.attacker_agent.action(self.game_state)
                             attack_node_id, attack_node_pos, attack_type = util.interpret_action(
                                 attack_id, self.idsgame_config.game_config)
                             attack_row, attack_col = attack_node_pos
@@ -266,7 +266,7 @@ class GameFrame(pyglet.window.Window):
             elif symbol == pyglet.window.key._0:
                 self.game_state.attack_defense_type = 0
             elif symbol == pyglet.window.key.SPACE:
-                self.reset()
+                self.reset(update_stats=True)
 
 
     def update(self, dt) -> None:
@@ -354,13 +354,14 @@ class GameFrame(pyglet.window.Window):
                 if node is not None:
                     node.unschedule()
 
-    def reset(self) -> None:
+    def reset(self, update_stats=False) -> None:
         """
         Resets the agent state without closing the screen
 
+        :param update_stats: boolean flag whether to update the game statistics
         :return: None
         """
-        self.game_state.new_game(self.idsgame_config.game_config.initial_state, update_stats=False)
+        self.game_state.new_game(self.idsgame_config.game_config.initial_state, update_stats=update_stats)
         self.set_state(self.game_state)
         self.reset_events()
         self.unschedule_events()

@@ -1,6 +1,5 @@
 import os
 from gym_idsgame.config.runner_mode import RunnerMode
-from gym_idsgame.agents.dao.q_agent_config import QAgentConfig
 from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.runnner import Runner
@@ -26,9 +25,10 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    env_name = "idsgame-1l-1s-10ad-v0"
-    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.MANUAL_ATTACK.value,
-                                 mode=RunnerMode.MANUAL_ATTACKER.value, output_dir=default_output_dir())
+    env_name = "idsgame-random_attack-1l-1s-10ad-v0"
+    client_config = ClientConfig(env_name=env_name, defender_type=AgentType.MANUAL_DEFENSE.value,
+                                 mode=RunnerMode.MANUAL_DEFENDER.value, output_dir=default_output_dir(),
+                                 title="RandomAttacker vs ManualDefender")
     return client_config
 
 

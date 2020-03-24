@@ -68,20 +68,7 @@ class GameState():
         :param num_attack_types: the number of attack types
         :return: None
         """
-        num_nodes = len(node_list)
-        attack_values = np.zeros((num_nodes, num_attack_types))
-        defense_values = np.zeros((num_nodes, num_attack_types))
-        det_values = np.zeros(num_nodes)
-        for node_id in range(num_nodes):
-            # if node_list[node_id] == NodeType.START.value:
-            #     det_values[node_id] = 2
-            if node_list[node_id] == NodeType.DATA.value or node_list[node_id] == NodeType.SERVER.value:
-                defense_values[node_id] = [2] * num_attack_types
-                defense_values[node_id][0] = 0 # vulnerability
-                det_values[node_id] = 2
-        self.attack_values = attack_values.astype(np.int32)
-        self.defense_values = defense_values.astype(np.int32)
-        self.defense_det = det_values.astype(np.int32)
+        self.set_state(node_list, num_attack_types)
         self.attacker_pos = attacker_pos
         self.game_step = 0
         self.attacker_cumulative_reward = 0
@@ -94,6 +81,27 @@ class GameState():
         self.attack_defense_type = 0
         self.num_hacks = 0
         self.hacked = False
+
+
+    def set_state(self, node_list, num_attack_types, defense_val=2, attack_val=0,
+                  num_vulnerabilities_per_node=1, det_val=2, vulnerability_val=0):
+        num_nodes = len(node_list)
+        attack_values = np.zeros((num_nodes, num_attack_types))
+        defense_values = np.zeros((num_nodes, num_attack_types))
+        det_values = np.zeros(num_nodes)
+        for node_id in range(num_nodes):
+            num_vuln = min(num_vulnerabilities_per_node, num_attack_types)
+            vulnerabilities = np.random.choice(num_attack_types, size=num_vuln) # random vulnerability per node
+            if node_list[node_id] == NodeType.DATA.value or node_list[node_id] == NodeType.SERVER.value:
+                defense_values[node_id] = [defense_val] * num_attack_types
+                det_values[node_id] = det_val
+                attack_values[node_id] = [attack_val] * num_attack_types
+                for vuln_id in vulnerabilities:
+                    defense_values[node_id][vuln_id] = vulnerability_val  # vulnerability (lower defense)
+        self.attack_values = attack_values.astype(np.int32)
+        self.defense_values = defense_values.astype(np.int32)
+        self.defense_det = det_values.astype(np.int32)
+
 
     def new_game(self, init_state: "GameState", update_stats = True) -> None:
         """
