@@ -22,7 +22,6 @@ class RandomAttackBotAgent(BotAgent):
         """
         super(RandomAttackBotAgent, self).__init__(game_config)
 
-
     def action(self, game_state: GameState) -> int:
         """
         Samples an action from the policy

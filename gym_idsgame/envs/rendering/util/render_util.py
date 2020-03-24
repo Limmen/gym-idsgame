@@ -7,6 +7,17 @@ import pyglet
 import math
 
 def create_circle(x, y, radius, batch, group, color):
+    """
+    Creates a circle that can be rendered in OpenGL batch mode
+
+    :param x: the x-coordinate of the circle center
+    :param y: the y-coordinate of the circle center
+    :param radius: the radius of the circle
+    :param batch: the batch to render the circle in
+    :param group: the group (e.g foreground or background)
+    :param color: the color to fill the circle with
+    :return: None
+    """
     circle, indices = create_indexed_vertices(x, y, radius)
     vertex_count = len(circle) // 2
     batch.add_indexed(vertex_count, pyglet.gl.GL_TRIANGLES, group,
@@ -14,7 +25,17 @@ def create_circle(x, y, radius, batch, group, color):
                       ('v2f', circle),
                       ('c3B', color * vertex_count))
 
+
 def create_indexed_vertices(x, y, radius, sides=24):
+    """
+    Utility function  that generates a vertex list for rendering a circle with openGL
+
+    :param x: the x coordinate of the circle center
+    :param y: the y coordinate of the circle center
+    :param radius: the radius of the circle
+    :param sides: the number of sides for the circle
+    :return: the vertex list and their indices
+    """
     vertices = [x, y]
     for side in range(sides):
         angle = side * 2.0 * math.pi / sides
@@ -31,26 +52,28 @@ def create_indexed_vertices(x, y, radius, sides=24):
         indices.append(side + 1)
     return vertices, indices
 
-def batch_circle(numPoints, batch, group, color):
-    verts = []
-    color_list = []
-    for i in range(numPoints):
-        angle = math.radians(float(i) / numPoints * 360.0)
-        x = 100 * math.cos(angle) + 300
-        y = 100 * math.sin(angle) + 200
-        verts += [x, y]
-        color_list.append(list(color))
-    #global circle
-    batch.add(numPoints, pyglet.gl.GL_POINTS, group, ('v2f', verts), ('c3B', tuple(color_list)))
-    #circle = pyglet.graphics.vertex_list(numPoints, )
 
 def batch_line(x1, y1, x2, y2, color, batch, group, line_width):
+    """
+    Creates a line that can be rendered in OpenGL batch mode
+
+    :param x1: the starting x coordinate of the line
+    :param y1: the starting y coordinate of the line
+    :param x2: the ending x coordinate of the line
+    :param y2: the ending y coordinate of the line
+    :param color: the color of the line
+    :param batch: the batch to render the line in
+    :param group: the group (e.g foreground or background)
+    :param line_width: the width of the line
+    :return: vertexlist of the created line
+    """
     color_list = list(color) + list(color)
     pyglet.gl.glLineWidth(line_width)
     return batch.add(2, pyglet.gl.GL_LINES, group,
         ('v2f', (x1, y1, x2, y2)),
         ('c3B', tuple(color_list))
     )
+
 
 def batch_label(text, x, y, font_size, color, batch, group, font_name='Times New Roman', multiline=False,
                 width= None, bold=False):
@@ -83,6 +106,7 @@ def batch_label(text, x, y, font_size, color, batch, group, font_name='Times New
                           bold = bold)
     return label
 
+
 def batch_rect_fill(x, y, width, height, color, batch, group):
     """
     Method for rendering a filled rectangle in batch mode
@@ -106,6 +130,7 @@ def batch_rect_fill(x, y, width, height, color, batch, group):
     batch.add(4, pyglet.gl.GL_QUADS, group, ('v2i', (x, y, x+width, y, x+width, y+height, x, y+height)),
               ('c3B', tuple(color_list)))
 
+
 def batch_rect_border(x, y, width, height, color, batch, group):
     """
     Method for rendering a the border of a rectangle in batch mode
@@ -119,7 +144,6 @@ def batch_rect_border(x, y, width, height, color, batch, group):
     :param group: the batch group (e.g. foreground or background)
     :return: None
     """
-
 
     color_list = list(color) + list(color) + list(color) + list(color)
     # Renders the lines of a rectangle
@@ -139,6 +163,7 @@ def batch_rect_border(x, y, width, height, color, batch, group):
               ('v2i', (x, y, x+width, y, x, y + height, x + width, y+height)),
               ('c3B', tuple(color_list)))
 
+
 def draw_and_fill_rect(x, y, width, height, color):
     """
     Draws and fills a rectangle
@@ -152,6 +177,7 @@ def draw_and_fill_rect(x, y, width, height, color):
     """
     __rect(x, y, width, height, color, fill=True)
 
+
 def draw_rect_border(x, y, width, height, color):
     """
     Draws a rectangle with a border
@@ -164,6 +190,7 @@ def draw_rect_border(x, y, width, height, color):
     :return: None
     """
     __rect(x,y,width,height,color)
+
 
 def __rect(x, y, width, height, color, fill=False):
     """
@@ -193,6 +220,7 @@ def __rect(x, y, width, height, color, fill=False):
     __rect_vertices(x, y, width, height)
     # Delimits the vertices of a primitive or group of primitives
     gl.glEnd()
+
 
 def __rect_vertices(x, y, width, height):
     """

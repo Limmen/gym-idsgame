@@ -17,6 +17,7 @@ from gym_idsgame.simulation.simulator import Simulator
 from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
 from gym_idsgame.agents.random_attack_bot_agent import RandomAttackBotAgent
 from gym_idsgame.agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
+from gym_idsgame.agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
 
 class Runner:
     """
@@ -85,7 +86,6 @@ class Runner:
     def simulate(config: ClientConfig):
         env: IdsGameEnv = None
         env = gym.make(config.env_name)
-        print(config.title)
         env.idsgame_config.render_config.title = config.title
         if not issubclass(type(env), AttackDefenseEnv):
             raise AssertionError("Simulations can only be run for Attack-Defense environments")
@@ -93,7 +93,7 @@ class Runner:
         defender: BotAgent = None
         if config.defender_type == AgentType.RANDOM.value:
             defender = RandomDefenseBotAgent(env.idsgame_config.game_config)
-        elif config.defender_type == AgentType.DEFEND_MINIMAL_VALUE_DEFENSE.value:
+        elif config.defender_type == AgentType.DEFEND_MINIMAL_VALUE.value:
             defender = DefendMinimalValueBotAgent(env.idsgame_config.game_config)
         elif config.defender_type == AgentType.Q_AGENT.value:
             pass
@@ -105,6 +105,8 @@ class Runner:
             pass
         elif config.attacker_type == AgentType.RANDOM.value:
             attacker = RandomAttackBotAgent(env.idsgame_config.game_config)
+        elif config.attacker_type == AgentType.ATTACK_MAXIMAL_VALUE.value:
+            attacker = AttackMaximalValueBotAgent(env.idsgame_config.game_config)
         else:
             raise AssertionError("Attacker type not recognized: {}".format(config.attacker_type))
         env.idsgame_config.defender_agent = defender

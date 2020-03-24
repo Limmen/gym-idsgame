@@ -32,7 +32,7 @@ def default_config() -> ClientConfig:
                                          gifs=False, gif_dir=default_output_dir() + "/gifs", video_frequency = 100)
     env_name = "idsgame-1l-1s-10ad-v0"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.RANDOM.value,
-                                 defender_type=AgentType.DEFEND_MINIMAL_VALUE_DEFENSE.value, mode=RunnerMode.SIMULATE.value,
+                                 defender_type=AgentType.DEFEND_MINIMAL_VALUE.value, mode=RunnerMode.SIMULATE.value,
                                  simulation_config=simulation_config, output_dir=default_output_dir(),
                                  title="RandomAttacker vs DefendMinimalDefender")
     return client_config
@@ -85,9 +85,10 @@ if __name__ == '__main__':
     config.simulation_config.logger = logger
     config.simulation_config.to_csv(config.output_dir + "/hyperparameters/" + time_str + ".csv")
     result = Runner.run(config)
-    csv_path = config.output_dir + "/data/" + time_str + "_simulation" + ".csv"
-    result.to_csv(csv_path)
-    plot_csv(config, csv_path)
+    if len(result.avg_episode_steps) > 0:
+        csv_path = config.output_dir + "/data/" + time_str + "_simulation" + ".csv"
+        result.to_csv(csv_path)
+        plot_csv(config, csv_path)
 
 
 

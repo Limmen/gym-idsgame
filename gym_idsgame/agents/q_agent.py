@@ -18,7 +18,7 @@ class QAgent(TrainAgent):
     """
     def __init__(self, env:IdsGameEnv, config: QAgentConfig):
         """
-        Initalize environment and hyperparameters
+        Initialize environment and hyperparameters
         :param config: the configuration
         """
         self.env = env
