@@ -98,8 +98,6 @@ class Network:
             n2.add_in_edges(edges)
         elif n1.node_type == NodeType.SERVER and n2.node_type == NodeType.DATA:
             edges = self.__connect_server_and_data_nodes(n1, n2)
-            if n1.col == n2.col:
-                pass
             n1.add_out_edges(edges)
             n2.add_in_edges(edges)
         else:

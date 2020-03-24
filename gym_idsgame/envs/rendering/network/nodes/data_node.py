@@ -138,7 +138,6 @@ class DataNode(ResourceNode):
         assert not (upper and lower)
         x = self.col * self.idsgame_config.render_config.rect_size + \
             self.idsgame_config.render_config.rect_size / 2
-        y = (self.row + 1) * (self.idsgame_config.render_config.rect_size / 1.5) - \
-            self.idsgame_config.render_config.rect_size / 15
+        y = (self.row + 1) * (self.idsgame_config.render_config.rect_size / 1.5)
         return x, y, self.col, self.row
 
