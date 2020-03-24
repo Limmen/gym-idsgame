@@ -103,7 +103,6 @@ class IdsGameEnv(gym.Env, ABC):
             # 5. Simulate attack outcome
             attack_successful = self.state.simulate_attack(target_node_id, attack_type,
                                                            self.idsgame_config.game_config.network_config)
-
             # 6. Update state based on attack outcome
             if attack_successful:
                 self.state.attacker_pos = target_pos
@@ -111,12 +110,12 @@ class IdsGameEnv(gym.Env, ABC):
                     self.state.done = True
                     self.state.hacked = True
                     reward = constants.GAME_CONFIG.POSITIVE_REWARD
-                else:
-                    detected = self.state.simulate_detection(target_node_id)
-                    if detected:
-                        self.state.done = True
-                        self.state.detected = True
-                        reward = -constants.GAME_CONFIG.POSITIVE_REWARD
+            else:
+                detected = self.state.simulate_detection(target_node_id)
+                if detected:
+                    self.state.done = True
+                    self.state.detected = True
+                    reward = -constants.GAME_CONFIG.POSITIVE_REWARD
         if self.state.done:
             if self.steps_beyond_done is None:
                 self.steps_beyond_done = 0

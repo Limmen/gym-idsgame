@@ -78,7 +78,7 @@ if __name__ == '__main__':
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir)
-    logger = util.setup_logger("idsgame-1l-1s-10ad-v0-random_vs_random", config.output_dir + "/logs/",
+    logger = util.setup_logger("idsgame-1l-1s-10ad-v0-random_vs_defend_minimal", config.output_dir + "/logs/",
                                time_str=time_str)
     config.logger = logger
     config.simulation_config.logger = logger
