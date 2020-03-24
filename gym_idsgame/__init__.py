@@ -1,25 +1,30 @@
 """
-Naming convention:
-idsgame-type-num_layers-num_servers_per_layerl-num_attack_defense_values-version
+Register OpenAI Envs
 """
 from gym.envs.registration import register
 
 # [AttackEnv] 1 server per layer, 10 attack-defense-values, random defender
+# [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+# [Version] 0
 register(
-    id='idsgame-random_defense-1l-1s-10ad-v0',
-    entry_point='gym_idsgame.envs:IdsGameRandomDefense1L1S10ADEnv',
+    id='idsgame-random_defense-v0',
+    entry_point='gym_idsgame.envs:IdsGameRandomDefenseV0Env',
 )
 
 # [DefenseEnv] 1 server per layer, 10 attack-defense-values, random attacker
+# [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+# [Version] 0
 register(
-    id='idsgame-random_attack-1l-1s-10ad-v0',
-    entry_point='gym_idsgame.envs:IdsGameRandomAttack1L1S10ADEnv',
+    id='idsgame-random_attack-v0',
+    entry_point='gym_idsgame.envs:IdsGameRandomAttackV0Env',
 )
 
 # [AttackDefenseEnv] 1 server per layer, 10 attack-defense-values
+# [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+# [Version] 0
 register(
-    id='idsgame-1l-1s-10ad-v0',
-    entry_point='gym_idsgame.envs:IdsGame1L1S10ADEnv',
+    id='idsgame-v0',
+    entry_point='gym_idsgame.envs:IdsGameV0Env',
 )
 
 #

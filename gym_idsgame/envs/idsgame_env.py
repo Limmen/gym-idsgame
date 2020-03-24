@@ -242,6 +242,12 @@ class IdsGameEnv(gym.Env, ABC):
         self.viewer.agent_start()
 
 class AttackerEnv(IdsGameEnv, ABC):
+    """
+    Abstract AttackerEnv of the IdsGameEnv.
+
+    Environments where the defender is part of the environment and the environment is designed to be used by an
+    attacker-agent should inherit this class
+    """
 
     def __init__(self, idsgame_config: IdsGameConfig):
         if idsgame_config is None:
@@ -260,7 +266,12 @@ class AttackerEnv(IdsGameEnv, ABC):
         return defend_node_id, defend_node_pos, defend_type,
 
 class DefenderEnv(IdsGameEnv, ABC):
+    """
+    Abstract DefenderEnv of the IdsGameEnv.
 
+    Environments where the attacker is part of the environment and the environment is designed to be used by a
+    defender-agent should inherit this class
+    """
     def __init__(self, idsgame_config: IdsGameConfig):
         if idsgame_config is None:
             raise ValueError("Cannot instantiate env without configuration")
@@ -278,7 +289,11 @@ class DefenderEnv(IdsGameEnv, ABC):
 
 
 class AttackDefenseEnv(IdsGameEnv, ABC):
+    """
+    Abstract AttacKDefenseEnv of the IdsGameEnv.
 
+    Environments where both the attacker and defender are external to the environment should inherit this class.
+    """
     def __init__(self, idsgame_config: IdsGameConfig):
         if idsgame_config is None:
             raise ValueError("Cannot instantiate env without configuration")
@@ -293,7 +308,7 @@ class AttackDefenseEnv(IdsGameEnv, ABC):
         return util.interpret_action(attacker_action, self.idsgame_config.game_config)
 
 # -------- Concrete envs ------------
-class IdsGameRandomDefense1L1S10ADEnv(AttackerEnv):
+class IdsGameRandomDefenseV0Env(AttackerEnv):
     def __init__(self):
         game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
         game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -302,15 +317,19 @@ class IdsGameRandomDefense1L1S10ADEnv(AttackerEnv):
         idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
         super().__init__(idsgame_config=idsgame_config)
 
-class IdsGameRandomAttack1L1S10ADEnv(DefenderEnv):
+class IdsGameRandomAttackV0Env(DefenderEnv):
     def __init__(self):
         game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
+        game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+                                      vulnerability_val=0)
         attacker_agent = RandomAttackBotAgent(game_config)
         idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
         super().__init__(idsgame_config=idsgame_config)
 
-class IdsGame1L1S10ADEnv(AttackDefenseEnv):
+class IdsGameV0Env(AttackDefenseEnv):
     def __init__(self):
         game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
+        game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+                                      vulnerability_val=0)
         idsgame_config = IdsGameConfig(game_config=game_config)
         super().__init__(idsgame_config=idsgame_config)

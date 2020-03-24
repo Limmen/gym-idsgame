@@ -25,10 +25,10 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    env_name = "idsgame-random_attack-1l-1s-10ad-v0"
-    client_config = ClientConfig(env_name=env_name, defender_type=AgentType.MANUAL_DEFENSE.value,
-                                 mode=RunnerMode.MANUAL_DEFENDER.value, output_dir=default_output_dir(),
-                                 title="RandomAttacker vs ManualDefender")
+    env_name = "idsgame-random_defense-v0"
+    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.MANUAL_ATTACK.value,
+                                 mode=RunnerMode.MANUAL_ATTACKER.value, output_dir=default_output_dir(),
+                                 title="ManualAttacker vs RandomDefender")
     return client_config
 
 

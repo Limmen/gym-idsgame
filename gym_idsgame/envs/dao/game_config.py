@@ -59,7 +59,6 @@ class GameConfig():
         :param vulnerability_val: defense value for defense types that are vulnerable
         :return:
         """
-        self.initial_state = GameState()
         self.initial_state.set_state(self.network_config.node_list, self.num_attack_types, defense_val=defense_val,
                                      attack_val=attack_val, num_vulnerabilities_per_node=num_vulnerabilities_per_node,
                                      det_val=det_val, vulnerability_val=vulnerability_val)
