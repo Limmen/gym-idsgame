@@ -3,7 +3,9 @@ Register OpenAI Envs
 """
 from gym.envs.registration import register
 
-# [AttackEnv] 1 server per layer, 10 attack-defense-values, random defender
+# -------- Version 0 ------------
+
+# [AttackerEnv] 1 server per layer, 10 attack-defense-values, random defender
 # [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
 # [Version] 0
 register(
@@ -25,6 +27,32 @@ register(
 register(
     id='idsgame-v0',
     entry_point='gym_idsgame.envs:IdsGameV0Env',
+)
+
+# -------- Version 1 ------------
+
+# [AttackerEnv] 1 server per layer, 10 attack-defense-values, random defender
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Version] 1
+register(
+    id='idsgame-random_defense-v1',
+    entry_point='gym_idsgame.envs:IdsGameRandomDefenseV1Env',
+)
+
+# [DefenseEnv] 1 server per layer, 10 attack-defense-values, random attacker
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Version] 1
+register(
+    id='idsgame-random_attack-v1',
+    entry_point='gym_idsgame.envs:IdsGameRandomAttackV1Env',
+)
+
+# [AttackDefenseEnv] 1 server per layer, 10 attack-defense-values
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Version] 1
+register(
+    id='idsgame-v1',
+    entry_point='gym_idsgame.envs:IdsGameV1Env',
 )
 
 #

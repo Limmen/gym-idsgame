@@ -308,7 +308,14 @@ class AttackDefenseEnv(IdsGameEnv, ABC):
         return util.interpret_action(attacker_action, self.idsgame_config.game_config)
 
 # -------- Concrete envs ------------
+
+# -------- Version 0 ------------
 class IdsGameRandomDefenseV0Env(AttackerEnv):
+    """
+    [AttackerEnv] 1 server per layer, 10 attack-defense-values, random defender
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Version] 0
+    """
     def __init__(self):
         game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
         game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -318,6 +325,11 @@ class IdsGameRandomDefenseV0Env(AttackerEnv):
         super().__init__(idsgame_config=idsgame_config)
 
 class IdsGameRandomAttackV0Env(DefenderEnv):
+    """
+    [DefenderEnv] 1 server per layer, 10 attack-defense-values, random attacker
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Version] 0
+    """
     def __init__(self):
         game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
         game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -327,9 +339,56 @@ class IdsGameRandomAttackV0Env(DefenderEnv):
         super().__init__(idsgame_config=idsgame_config)
 
 class IdsGameV0Env(AttackDefenseEnv):
+    """
+    [AttackDefenseEnv] 1 server per layer, 10 attack-defense-values
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Version] 0
+    """
     def __init__(self):
         game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
         game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+                                      vulnerability_val=0)
+        idsgame_config = IdsGameConfig(game_config=game_config)
+        super().__init__(idsgame_config=idsgame_config)
+
+# -------- Version 1 ------------
+class IdsGameRandomDefenseV1Env(AttackerEnv):
+    """
+    [AttackerEnv] 1 server per layer, 10 attack-defense-values, random defender
+    [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+    [Version] 1
+    """
+    def __init__(self):
+        game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
+        game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=4, det_val=3,
+                                      vulnerability_val=0)
+        defender_agent = RandomDefenseBotAgent(game_config)
+        idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
+        super().__init__(idsgame_config=idsgame_config)
+
+class IdsGameRandomAttackV1Env(DefenderEnv):
+    """
+    [DefenderEnv] 1 server per layer, 10 attack-defense-values, random attacker
+    [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+    [Version] 1
+    """
+    def __init__(self):
+        game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
+        game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=4, det_val=3,
+                                      vulnerability_val=0)
+        attacker_agent = RandomAttackBotAgent(game_config)
+        idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
+        super().__init__(idsgame_config=idsgame_config)
+
+class IdsGameV1Env(AttackDefenseEnv):
+    """
+    [AttackDefenseEnv] 1 server per layer, 10 attack-defense-values
+    [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+    [Version] 1
+    """
+    def __init__(self):
+        game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
+        game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=4, det_val=3,
                                       vulnerability_val=0)
         idsgame_config = IdsGameConfig(game_config=game_config)
         super().__init__(idsgame_config=idsgame_config)
