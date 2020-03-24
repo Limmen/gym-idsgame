@@ -10,7 +10,7 @@ class RenderConfig:
     """
     def __init__(self, resources_dir: str = constants.RENDERING.RESOURCES_DIR,
                  blink_interval: float = constants.RENDERING.AGENT_BLINK_INTERVAL,
-                 num_blinks: int = constants.RENDERING.AGENT_NUM_BLINKS):
+                 num_blinks: int = constants.RENDERING.AGENT_NUM_BLINKS, title="IdsGame"):
         """
         Constructor, initializes the DTO
 
@@ -38,6 +38,7 @@ class RenderConfig:
         self.new_window()
         self.height = constants.RENDERING.DEFAULT_HEIGHT
         self.width = constants.RENDERING.MIN_WIDTH
+        self.title=title
 
 
     def new_window(self):

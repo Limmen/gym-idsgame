@@ -52,11 +52,13 @@ def batch_line(x1, y1, x2, y2, color, batch, group, line_width):
         ('c3B', tuple(color_list))
     )
 
-def batch_label(text, x, y, font_size, color, batch, group, font_name='Times New Roman', multiline=False, width= None):
+def batch_label(text, x, y, font_size, color, batch, group, font_name='Times New Roman', multiline=False,
+                width= None, bold=False):
     """
     Creates a text-label that can be rendered in OpenGL batch mode
 
     :param text: the text of the label
+    :param bold: boolean flag whether to render the text as bold or not
     :param x: the x coordinate
     :param y: the y coordinate
     :param font_size: the font size
@@ -77,7 +79,8 @@ def batch_label(text, x, y, font_size, color, batch, group, font_name='Times New
                           batch=batch,
                           group=group,
                           multiline=multiline,
-                          width=width)
+                          width=width,
+                          bold = bold)
     return label
 
 def batch_rect_fill(x, y, width, height, color, batch, group):

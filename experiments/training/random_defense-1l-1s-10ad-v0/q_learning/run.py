@@ -37,7 +37,8 @@ def default_config() -> ClientConfig:
     env_name = "idsgame-random_defense-1l-1s-10ad-v0"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.Q_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
-                                 q_agent_config=q_agent_config, output_dir=default_output_dir())
+                                 q_agent_config=q_agent_config, output_dir=default_output_dir(),
+                                 title="TrainingQAgent vs RandomDefender")
     return client_config
 
 

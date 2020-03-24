@@ -20,5 +20,6 @@
         "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/1l-1s-10ad-v0/random_vs_random/videos",
         "video_fps": 5,
         "video_frequency": 100
-    }
+    },
+    "title": "RandomAttacker vs RandomDefender"
 }
