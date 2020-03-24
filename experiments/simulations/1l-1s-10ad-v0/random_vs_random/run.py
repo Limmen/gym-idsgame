@@ -27,9 +27,9 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    simulation_config = SimulationConfig(render=False, sleep=0.5, video=True, log_frequency=100,
+    simulation_config = SimulationConfig(render=True, sleep=0.8, video=False, log_frequency=1,
                                          video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=1000,
-                                         gifs=True, gif_dir=default_output_dir() + "/gifs", video_frequency = 100)
+                                         gifs=False, gif_dir=default_output_dir() + "/gifs", video_frequency = 100)
     env_name = "idsgame-1l-1s-10ad-v0"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.RANDOM.value,
                                  defender_type=AgentType.RANDOM.value, mode=RunnerMode.SIMULATE.value,

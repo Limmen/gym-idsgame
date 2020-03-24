@@ -1,14 +1,14 @@
 {
     "attacker_type": 1,
-    "defender_type": 2,
+    "defender_type": 1,
     "env_name": "idsgame-1l-1s-10ad-v0",
     "logger": null,
     "mode": 2,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/1l-1s-10ad-v0/random_vs_defend_minimal",
+    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/1l-1s-10ad-v0/random_vs_random",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": null,
     "simulation_config": {
-        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/1l-1s-10ad-v0/random_vs_defend_minimal/gifs",
+        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/1l-1s-10ad-v0/random_vs_random/gifs",
         "gifs": false,
         "log_frequency": 1,
         "logger": null,
@@ -17,7 +17,7 @@
         "render": true,
         "sleep": 0.8,
         "video": false,
-        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/1l-1s-10ad-v0/random_vs_defend_minimal/videos",
+        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/1l-1s-10ad-v0/random_vs_random/videos",
         "video_fps": 5,
         "video_frequency": 100
     }
