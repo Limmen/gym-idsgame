@@ -29,11 +29,11 @@ def default_config() -> ClientConfig:
     :return: Default configuration for the experiment
     """
     q_agent_config = QAgentConfig(gamma=0.9, alpha=0.3, epsilon=1, render=False, eval_sleep=0.5,
-                                  min_epsilon=0.1, eval_episodes=2, train_log_frequency=100,
-                                  epsilon_decay=0.999, video=True, eval_log_frequency=1,
-                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=10000,
-                                  eval_render=True, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                                  eval_frequency= 1000)
+                                  min_epsilon=0.1, eval_episodes=3, train_log_frequency=1,
+                                  epsilon_decay=0.99, video=True, eval_log_frequency=1,
+                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=1000,
+                                  eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
+                                  eval_frequency=100)
     env_name = "idsgame-random_defense-1l-1s-10ad-v0"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.Q_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
@@ -94,11 +94,12 @@ if __name__ == '__main__':
     config.q_agent_config.logger = logger
     config.q_agent_config.to_csv(config.output_dir + "/hyperparameters/" + time_str + ".csv")
     train_result, eval_result = Runner.run(config)
-    train_csv_path = config.output_dir + "/data/" + time_str + "_train" + ".csv"
-    train_result.to_csv(train_csv_path)
-    eval_csv_path = config.output_dir + "/data/" + time_str + "_eval" + ".csv"
-    eval_result.to_csv(eval_csv_path)
-    plot_csv(config, eval_csv_path, train_csv_path)
+    if len(train_result.avg_episode_steps) > 0 and len(eval_result.avg_episode_steps) > 0:
+        train_csv_path = config.output_dir + "/data/" + time_str + "_train" + ".csv"
+        train_result.to_csv(train_csv_path)
+        eval_csv_path = config.output_dir + "/data/" + time_str + "_eval" + ".csv"
+        eval_result.to_csv(eval_csv_path)
+        plot_csv(config, eval_csv_path, train_csv_path)
 
 
 

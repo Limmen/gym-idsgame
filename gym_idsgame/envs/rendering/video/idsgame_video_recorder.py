@@ -99,23 +99,25 @@ class IdsGameVideoRecorder(object):
 
         render_mode = 'ansi' if self.ansi_mode else 'rgb_array'
         frames = self.env.render(mode=render_mode)
-
-        for frame in frames: # multiple frames
-            if frame is None:
-                if self._async:
-                    return
+        if isinstance(frames, np.ndarray):
+            for frame in frames: # multiple frames
+                if frame is None:
+                    if self._async:
+                        return
+                    else:
+                        # Indicates a bug in the environment: don't want to raise
+                        # an error here.
+                        logger.warn('Env returned None on render(). Disabling further rendering for video recorder by marking as disabled: path=%s metadata_path=%s', self.path, self.metadata_path)
+                        self.broken = True
                 else:
-                    # Indicates a bug in the environment: don't want to raise
-                    # an error here.
-                    logger.warn('Env returned None on render(). Disabling further rendering for video recorder by marking as disabled: path=%s metadata_path=%s', self.path, self.metadata_path)
-                    self.broken = True
-            else:
-                self.last_frame = frame
-                if self.ansi_mode:
-                    self._encode_ansi_frame(frame)
-                else:
-                    self._encode_image_frame(frame)
-        return frames
+                    self.last_frame = frame
+                    if self.ansi_mode:
+                        self._encode_ansi_frame(frame)
+                    else:
+                        self._encode_image_frame(frame)
+            return frames
+        else:
+            return np.array([])
 
     def close(self):
         """Make sure to manually close, or else you'll leak the encoder process"""

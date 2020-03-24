@@ -22,6 +22,7 @@ except ImportError as e:
     ''')
 import numpy as np
 import time
+import sys
 from gym_idsgame.envs.rendering.frames.game_frame import GameFrame
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 
@@ -82,6 +83,8 @@ class Viewer():
         """
         self.isopen = False
         self.gameframe.close()
+        print("Window closed, exiting")
+        sys.exit(0)
 
     def close(self) -> None:
         """

@@ -23,7 +23,7 @@ class QAgent(TrainAgent):
         """
         self.env = env
         self.config = config
-        self.Q = np.zeros((self.env.num_states, self.env.num_actions))
+        self.Q = np.random.rand(self.env.num_states, self.env.num_actions)
         self.train_result = ExperimentResult()
         self.eval_result = ExperimentResult()
         self.outer = tqdm.tqdm(total=self.config.num_episodes, desc='Episode', position=0)
@@ -99,7 +99,7 @@ class QAgent(TrainAgent):
             episode_steps.append(episode_step)
 
             # Log average metrics every <self.config.train_log_frequency> episodes
-            if episode % self.config.train_log_frequency == 0:
+            if episode % self.config.train_log_frequency == 0 and episode > 0:
                 self.log_metrics(self.train_result, episode_rewards, episode_steps)
                 episode_rewards = []
                 episode_steps = []
@@ -117,7 +117,13 @@ class QAgent(TrainAgent):
             self.outer.update(1)
 
         self.config.logger.info("Training Complete")
+
+        # Final evaluation
+        self.eval()
+
+        # Log and return
         self.log_state_values()
+
         return self.train_result
 
     def log_metrics(self, result: ExperimentResult, episode_rewards:list, episode_steps:list) -> None:
