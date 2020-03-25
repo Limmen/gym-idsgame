@@ -6,7 +6,7 @@ it is intended for 2-agent simulations or RL training.
 
 In this experiment, the attacker is implemented with the policy `attack_maximal`.
 The `attack_maximal` policy entails that the attacker will always attack the attribute with
-the maximum value out of all of its neighbors. Similarly, the defender is implemented with a
+the maximum value out of all of its neighbors. The defender is implemented with a
 random defense policy.
 
 The network configuration of the environment is as follows:
