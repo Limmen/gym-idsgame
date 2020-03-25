@@ -98,13 +98,13 @@ After the experiment has finished, the results are written to the following sub-
 ### Evaluation after 100 Training Episodes
 
 <p align="center">
-<img src="./docs/episode_100.gif">
+<img src="./docs/episode_100.gif" width="400">
 </p>
 
 ### Evaluation after 200 Training Episodes
 
 <p align="center">
-<img src="./docs/episode_200.gif">
+<img src="./docs/episode_200.gif" width="400">
 </p>  
 
 ## Commands
