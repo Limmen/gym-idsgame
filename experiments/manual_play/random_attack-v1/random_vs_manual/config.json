@@ -1,0 +1,12 @@
+{
+    "attacker_type": 0,
+    "defender_type": 4,
+    "env_name": "idsgame-random_attack-v1",
+    "logger": null,
+    "mode": 4,
+    "output_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/manual_play/random_attack-v1/random_vs_manual",
+    "py/object": "gym_idsgame.config.client_config.ClientConfig",
+    "q_agent_config": null,
+    "simulation_config": null,
+    "title": "RandomAttacker vs ManualDefender"
+}
