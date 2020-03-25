@@ -2,9 +2,27 @@
 
 This is an experiment in the `random_defense-v0` environment. 
 An environment where the defender is following a random defense policy. 
-
 This experiment trains an attacker agent using tabular q-learning to act optimally in the given
-environment and against the random defender 
+environment and defeat the random defender.
+
+The network configuration of the environment is as follows:
+
+- `num_layers=1` (number of layers between the start and end nodes)
+- `num_servers_per_layer=1`
+- `num_attack_types=10`
+- `max_value=9`  
+
+<p align="center">
+<img src="./docs/env.png" width="400">
+</p>
+
+The starting state for each node in the environment is initialized as follows (with some randomness for where the vulnerabilities are placed).
+
+- `defense_val=2`
+- `attack_val=0`
+- `num_vulnerabilities_per_node=1` (which type of defense at the node that is vulnerable is selected randomly when the environment is initialized)
+- `det_val=2`
+- `vulnerability_val=0` 
 
 ## Environment 
 
@@ -121,8 +139,6 @@ After the experiment has finished, the results are written to the following sub-
 <p align="center">
 <img src="./docs/epsilon_train.png" width="800">
 </p>
-
-#### Train Metrics
 
 ### Policy Inspection
 
