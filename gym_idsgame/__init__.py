@@ -47,6 +47,14 @@ register(
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV1Env',
 )
 
+# [AttackerEnv] 1 server per layer, 10 attack-defense-values, defender following the "defend minimal strategy"
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Version] 1
+register(
+    id='idsgame-minimal_defense-v1',
+    entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV1Env',
+)
+
 # [DefenseEnv] 1 server per layer, 10 attack-defense-values, random attacker
 # [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
 # [Version] 1

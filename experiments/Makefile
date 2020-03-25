@@ -25,6 +25,9 @@ v0: attack_maximal_vs_defend_minimal-v0 attack_maximal_vs_random-v0 random_attac
 tabular_q_learning_vs_random_defense-v1: training/random_defense-v1/tabular_q_learning training/random_defense-v1/tabular_q_learning
 	cd training/random_defense-v1/tabular_q_learning/ && $(MAKE) run
 
+tabular_q_learning_vs_minimal_defense-v1: training/minimal_defense-v1/tabular_q_learning training/minimal_defense-v1/tabular_q_learning
+	cd training/minimal_defense-v1/tabular_q_learning/ && $(MAKE) run
+
 random_attack_vs_tabular_fq_learning-v1: training/random_attack-v1/tabular_q_learning training/random_attack-v1/tabular_q_learning
 	cd training/random_attack-v1/tabular_q_learning/ && $(MAKE) run
 
@@ -54,6 +57,7 @@ clean:
 	cd simulations/v0/attack_maximal_vs_defend_minimal/ && $(MAKE) clean
 	cd simulations/v0/attack_maximal_vs_random/ && $(MAKE) clean
 	cd ./training/random_defense-v1/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/minimal_defense-v1/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/random_attack-v1/tabular_q_learning/ && $(MAKE) clean
 	cd simulations/v1/random_vs_random/ && $(MAKE) clean
 	cd simulations/v1/random_vs_defend_minimal/ && $(MAKE) clean

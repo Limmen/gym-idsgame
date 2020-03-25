@@ -431,6 +431,20 @@ class IdsGameRandomDefenseV1Env(AttackerEnv):
         idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
         super().__init__(idsgame_config=idsgame_config)
 
+class IdsGameMinimalDefenseV1Env(AttackerEnv):
+    """
+    [AttackerEnv] 1 server per layer, 10 attack-defense-values, defender following the "defend minimal strategy"
+    [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+    [Version] 1
+    """
+    def __init__(self):
+        game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
+        game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=4, det_val=3,
+                                      vulnerability_val=0)
+        defender_agent = DefendMinimalValueBotAgent(game_config)
+        idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
+        super().__init__(idsgame_config=idsgame_config)
+
 class IdsGameRandomAttackV1Env(DefenderEnv):
     """
     [DefenderEnv] 1 server per layer, 10 attack-defense-values, random attacker

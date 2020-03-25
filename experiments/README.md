@@ -66,6 +66,14 @@
        This experiment trains an attacker agent using tabular q-learning to act optimally in the given
        environment and defeat the random defender.
        
+    - [tabular_q_learning_vs_minimal_defense-v1](training/minimal_defense-v1/tabular_q_learning/)
+       * This is an experiment in the `minimal_defense-v1` environment.  
+       An environment where the defender is following the `defend_minimal` defense policy. 
+       The `defend_minimal` policy entails that the defender will always 
+       defend the attribute with the minimal value out of all of its neighbors.
+       This experiment trains an attacker agent using tabular q-learning to act optimally in the given 
+       environment and defeat the defender.              
+       
     - [random_attack_vs_tabular_q_learning-v1](training/random_attack-v1/tabular_q_learning/)
        * This is an experiment in the `random_attack-v1` environment.  
        An environment where the attack is following a random attack policy.  
