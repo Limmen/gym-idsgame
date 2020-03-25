@@ -71,7 +71,7 @@ class Simulator:
                                       + time_str + ".gif", self.config.video_fps)
 
             done = False
-            obs = self.env.reset()
+            obs = self.env.reset(update_stats=True)
             self.outer.update(1)
 
         self.env.close()

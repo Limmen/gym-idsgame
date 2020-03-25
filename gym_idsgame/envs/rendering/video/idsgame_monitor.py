@@ -2,10 +2,11 @@ from gym import Wrapper
 from gym import error, version, logger
 import os, json, numpy as np, six
 from gym.wrappers.monitoring import stats_recorder
-from gym_idsgame.envs.rendering.video import idsgame_video_recorder
 from gym.utils import atomic_write, closer
 from gym.utils.json_utils import json_encode_np
 import imageio
+from gym_idsgame.envs.rendering.video import idsgame_video_recorder
+from gym_idsgame.envs.rendering.video import idsgame_stats_recorder
 
 FILE_PREFIX = 'openaigym'
 MANIFEST_PREFIX = FILE_PREFIX + '.manifest'
@@ -102,7 +103,7 @@ class IdsGameMonitor(Wrapper):
         self.file_prefix = FILE_PREFIX
         self.file_infix = '{}.{}'.format(self._monitor_id, uid if uid else os.getpid())
 
-        self.stats_recorder = stats_recorder.StatsRecorder(directory, '{}.episode_batch.{}'.format(self.file_prefix, self.file_infix), autoreset=self.env_semantics_autoreset, env_id=env_id)
+        self.stats_recorder = idsgame_stats_recorder.StatsRecorder(directory, '{}.episode_batch.{}'.format(self.file_prefix, self.file_infix), autoreset=self.env_semantics_autoreset, env_id=env_id)
 
         if not os.path.exists(directory): os.mkdir(directory)
         self.write_upon_reset = write_upon_reset

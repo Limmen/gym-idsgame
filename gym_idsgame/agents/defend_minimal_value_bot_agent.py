@@ -30,7 +30,7 @@ class DefendMinimalValueBotAgent(BotAgent):
         :return: action_id
         """
         actions = list(range(self.game_config.num_actions))
-        legal_actions = list(filter(lambda action: idsgame_util.is_defense_id_legal(action), actions))
+        legal_actions = list(filter(lambda action: idsgame_util.is_defense_id_legal(action, self.game_config), actions))
         min_node_value = float("inf")
         min_action_id = -1
         for id, node in enumerate(self.game_config.network_config.node_list):
