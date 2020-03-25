@@ -10,6 +10,7 @@ from gym_idsgame.agents.dao.q_agent_config import QAgentConfig
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
 from gym_idsgame.agents.train_agent import TrainAgent
+from gym_idsgame.envs.constants import constants
 
 class TabularQAgent(TrainAgent):
     """
@@ -33,6 +34,11 @@ class TabularQAgent(TrainAgent):
         self.outer = tqdm.tqdm(total=self.config.num_episodes, desc='Episode', position=0)
         if self.config.logger is None:
             self.config.logger = logging.getLogger('QAgent')
+        self.num_eval_games = 0
+        self.num_eval_hacks = 0
+        self.eval_hack_probability = 0.0
+        self.eval_attacker_cumulative_reward = 0
+        self.eval_defender_cumulative_reward = 0
 
     def get_action(self, s, eval=False):
         """
@@ -138,31 +144,38 @@ class TabularQAgent(TrainAgent):
 
         return self.train_result
 
-    def log_metrics(self, result: ExperimentResult, episode_rewards:list, episode_steps:list) -> None:
+    def log_metrics(self, result: ExperimentResult, episode_rewards:list, episode_steps:list, eval:bool = False) \
+            -> None:
         """
         Logs average metrics for the last <self.config.log_frequency> episodes
 
         :param result: the result object to add the results to
         :param episode_rewards: list of episode rewards for the last <self.config.log_frequency> episodes
         :param episode_steps: list of episode steps for the last <self.config.log_frequency> episodes
+        :param eval: boolean flag whether the metrics are logged in an evaluation context.
         :return: None
         """
         avg_episode_reward = np.mean(episode_rewards)
         avg_episode_steps = np.mean(episode_steps)
+        hack_probability = self.env.hack_probability() if not eval else self.eval_hack_probability
+        attacker_cumulative_reward = self.env.state.attacker_cumulative_reward if not eval \
+            else self.eval_attacker_cumulative_reward
+        defender_cumulative_reward = self.env.state.defender_cumulative_reward if not eval \
+            else self.eval_defender_cumulative_reward
         log_str = "epsilon:{:.2f},avg_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
                   "acc_D_R:{:.2f}".format(self.config.epsilon, avg_episode_reward,
                                           avg_episode_steps,
-                                          self.env.hack_probability(),
-                                          self.env.state.attacker_cumulative_reward,
-                                          self.env.state.defender_cumulative_reward)
+                                          hack_probability,
+                                          attacker_cumulative_reward,
+                                          defender_cumulative_reward)
         self.outer.set_description_str(log_str)
         self.config.logger.info(log_str)
         result.avg_episode_steps.append(avg_episode_steps)
         result.avg_episode_rewards.append(avg_episode_reward)
         result.epsilon_values.append(self.config.epsilon)
-        result.hack_probability.append(self.env.hack_probability())
-        result.attacker_cumulative_reward.append(self.env.state.attacker_cumulative_reward)
-        result.defender_cumulative_reward.append(self.env.state.defender_cumulative_reward)
+        result.hack_probability.append(hack_probability)
+        result.attacker_cumulative_reward.append(attacker_cumulative_reward)
+        result.defender_cumulative_reward.append(defender_cumulative_reward)
 
     def eval(self):
         """
@@ -218,9 +231,22 @@ class TabularQAgent(TrainAgent):
             episode_rewards.append(episode_reward)
             episode_steps.append(episode_step)
 
+            # Update eval stats
+            self.num_eval_games +=1
+            if self.env.state.detected:
+                self.eval_attacker_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
+                self.eval_defender_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
+            if self.env.state.hacked:
+                self.eval_attacker_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
+                self.eval_defender_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
+                self.num_eval_hacks += 1
+
             # Log average metrics every <self.config.eval_log_frequency> episodes
             if episode % self.config.eval_log_frequency == 0:
-                self.log_metrics(self.eval_result, episode_rewards, episode_steps)
+                if self.num_eval_hacks > 0:
+                    self.eval_hack_probability = float(self.num_eval_hacks) / float(self.num_eval_games)
+                self.log_metrics(self.eval_result, episode_rewards, episode_steps,
+                                 eval = True)
                 episode_rewards = []
                 episode_steps = []
             if self.config.gifs and self.config.video:
