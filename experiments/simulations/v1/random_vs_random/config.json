@@ -4,22 +4,22 @@
     "env_name": "idsgame-v0",
     "logger": null,
     "mode": 2,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/v1/random_vs_random",
+    "output_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/simulations/v1/random_vs_random",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": null,
     "simulation_config": {
-        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/v1/random_vs_random/gifs",
-        "gifs": false,
+        "gif_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/simulations/v1/random_vs_random/gifs",
+        "gifs": true,
         "log_frequency": 1,
         "logger": null,
         "num_episodes": 1000,
         "py/object": "gym_idsgame.simulation.dao.simulation_config.SimulationConfig",
-        "render": true,
+        "render": false,
         "sleep": 0.8,
-        "video": false,
-        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/v1/random_vs_random/videos",
+        "video": true,
+        "video_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/simulations/v1/random_vs_random/videos",
         "video_fps": 5,
-        "video_frequency": 100
+        "video_frequency": 1
     },
     "title": "RandomAttacker vs RandomDefender"
 }

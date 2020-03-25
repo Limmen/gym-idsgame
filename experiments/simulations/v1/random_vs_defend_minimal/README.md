@@ -1,4 +1,4 @@
-# Experiment `attack_maximal`_vs_`random`
+# Experiment `random`_vs_`defend_minimal`
 
 This is an experiment in the `idsgame-v1` environment. 
 An environment where neither the attacker nor defender is part of the environment, i.e.
