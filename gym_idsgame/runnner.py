@@ -55,7 +55,8 @@ class Runner:
         """
         env: IdsGameEnv = None
         env = gym.make(config.env_name)
-        env.idsgame_config.render_config.title = config.title
+        if config.title is not None:
+            env.idsgame_config.render_config.title = config.title
         attacker: TrainAgent = None
         if config.attacker_type == AgentType.TABULAR_Q_AGENT.value:
             attacker = TabularQAgent(env, config.q_agent_config)
@@ -72,7 +73,8 @@ class Runner:
     @staticmethod
     def train_defender(config: ClientConfig):
         env = gym.make(config.env_name)
-        env.idsgame_config.render_config.title = config.title
+        if config.title is not None:
+            env.idsgame_config.render_config.title = config.title
         if config.defender_type == AgentType.TABULAR_Q_AGENT.value:
             defender = TabularQAgent(env, config.q_agent_config)
         elif config.defender_type == AgentType.RANDOM.value:
@@ -89,7 +91,8 @@ class Runner:
     def simulate(config: ClientConfig):
         env: IdsGameEnv = None
         env = gym.make(config.env_name)
-        env.idsgame_config.render_config.title = config.title
+        if config.title is not None:
+            env.idsgame_config.render_config.title = config.title
         if not issubclass(type(env), AttackDefenseEnv):
             raise AssertionError("Simulations can only be run for Attack-Defense environments")
 
@@ -120,7 +123,8 @@ class Runner:
     @staticmethod
     def manual_play_attacker(config: ClientConfig):
         env: IdsGameEnv = gym.make(config.env_name)
-        env.idsgame_config.render_config.title = config.title
+        if config.title is not None:
+            env.idsgame_config.render_config.title = config.title
         if not issubclass(type(env), AttackerEnv):
             raise AssertionError("Manual attacker play is only supported for attacker-envs")
         env.idsgame_config.game_config.manual_attacker = True
@@ -129,7 +133,8 @@ class Runner:
     @staticmethod
     def manual_play_defender(config: ClientConfig):
         env: IdsGameEnv = gym.make(config.env_name)
-        env.idsgame_config.render_config.title = config.title
+        if config.title is not None:
+            env.idsgame_config.render_config.title = config.title
         if not issubclass(type(env), DefenderEnv):
             raise AssertionError("Manual defender play is only supported for defender-envs")
         env.idsgame_config.game_config.manual_defender = True

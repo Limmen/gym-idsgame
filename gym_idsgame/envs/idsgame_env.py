@@ -373,6 +373,7 @@ class IdsGameRandomDefenseV0Env(AttackerEnv):
                                       vulnerability_val=0)
         defender_agent = RandomDefenseBotAgent(game_config)
         idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
+        idsgame_config.render_config.caption = "idsgame-random_defense-v0"
         super().__init__(idsgame_config=idsgame_config)
 
 class IdsGameMinimalDefenseV0Env(AttackerEnv):
@@ -387,6 +388,7 @@ class IdsGameMinimalDefenseV0Env(AttackerEnv):
                                       vulnerability_val=0)
         defender_agent = DefendMinimalValueBotAgent(game_config)
         idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
+        idsgame_config.render_config.caption = "idsgame-minimal_defense-v0"
         super().__init__(idsgame_config=idsgame_config)
 
 class IdsGameRandomAttackV0Env(DefenderEnv):
@@ -401,6 +403,7 @@ class IdsGameRandomAttackV0Env(DefenderEnv):
                                       vulnerability_val=0)
         attacker_agent = RandomAttackBotAgent(game_config)
         idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
+        idsgame_config.render_config.caption = "idsgame-random_attack-v0"
         super().__init__(idsgame_config=idsgame_config)
 
 class IdsGameV0Env(AttackDefenseEnv):
@@ -414,6 +417,7 @@ class IdsGameV0Env(AttackDefenseEnv):
         game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
                                       vulnerability_val=0)
         idsgame_config = IdsGameConfig(game_config=game_config)
+        idsgame_config.render_config.caption = "idsgame-v0"
         super().__init__(idsgame_config=idsgame_config)
 
 # -------- Version 1 ------------
@@ -429,6 +433,7 @@ class IdsGameRandomDefenseV1Env(AttackerEnv):
                                       vulnerability_val=0)
         defender_agent = RandomDefenseBotAgent(game_config)
         idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
+        idsgame_config.render_config.caption = "idsgame-random_defense-v1"
         super().__init__(idsgame_config=idsgame_config)
 
 class IdsGameMinimalDefenseV1Env(AttackerEnv):
@@ -443,6 +448,7 @@ class IdsGameMinimalDefenseV1Env(AttackerEnv):
                                       vulnerability_val=0)
         defender_agent = DefendMinimalValueBotAgent(game_config)
         idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
+        idsgame_config.render_config.caption = "idsgame-random_defense-v1"
         super().__init__(idsgame_config=idsgame_config)
 
 class IdsGameRandomAttackV1Env(DefenderEnv):
@@ -457,6 +463,7 @@ class IdsGameRandomAttackV1Env(DefenderEnv):
                                       vulnerability_val=0)
         attacker_agent = RandomAttackBotAgent(game_config)
         idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
+        idsgame_config.render_config.caption = "idsgame-random_attack-v1"
         super().__init__(idsgame_config=idsgame_config)
 
 class IdsGameV1Env(AttackDefenseEnv):
@@ -470,4 +477,5 @@ class IdsGameV1Env(AttackDefenseEnv):
         game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=4, det_val=3,
                                       vulnerability_val=0)
         idsgame_config = IdsGameConfig(game_config=game_config)
+        idsgame_config.render_config.caption = "idsgame-v1"
         super().__init__(idsgame_config=idsgame_config)

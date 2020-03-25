@@ -33,5 +33,3 @@ class ClientConfig:
         self.output_dir = output_dir
         self.simulation_config = simulation_config
         self.title = title
-        if title is None:
-            self.title = "IdsGame"
