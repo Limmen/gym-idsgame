@@ -128,8 +128,7 @@ class GameFrame(pyglet.window.Window):
                             # 1.5 Special case: if it is the start node, let the attacker move there without making
                             # any attack or risk to be detected
                             if node.node_type == NodeType.START and util.is_attack_legal(
-                                    self.attacker_sprite.pos, node.pos, self.idsgame_config.game_config.num_cols,
-                                    self.idsgame_config.game_config.network_config.adjacency_matrix):
+                                    node.pos, self.attacker_sprite.pos, self.idsgame_config.game_config.network_config):
                                 self.game_state.attacker_pos = node.pos
                                 self.game_state.game_step += 1
                                 return
@@ -187,8 +186,8 @@ class GameFrame(pyglet.window.Window):
                         elif self.idsgame_config.game_config.manual_attacker:
                             # 2. Check that the selected node can be attacked (there is a link to it from the current
                             # position of the attacker)
-                            if util.is_attack_legal(self.attacker_sprite.pos, node.pos, self.idsgame_config.game_config.num_cols,
-                                                    self.idsgame_config.game_config.network_config.adjacency_matrix):
+                            if util.is_attack_legal(node.pos, self.attacker_sprite.pos,
+                                                    self.idsgame_config.game_config.network_config):
 
                                 # 3. Update defense state
                                 defend_id = self.defender_agent.action(self.game_state.attacker_pos)

@@ -11,7 +11,7 @@ from gym_idsgame.envs.idsgame_env import IdsGameEnv
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
 from gym_idsgame.agents.train_agent import TrainAgent
 
-class QAgent(TrainAgent):
+class TabularQAgent(TrainAgent):
     """
     A simple implementation of the Q(0)-learning algorithm (Sutton & Barto).
     Q-learning is a one-step off-policy algorithm
@@ -89,6 +89,8 @@ class QAgent(TrainAgent):
                     state_node_id = self.env.get_attacker_node_from_observation(obs)
                 elif self.config.defender:
                     state_node_id = 0
+                else:
+                    raise AssertionError("Must specify whether training an attacker agent or defender agent")
                 action = self.get_action(state_node_id)
                 obs_prime, reward, done, info = self.env.step(action)
                 episode_reward += reward

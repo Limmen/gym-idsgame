@@ -2,13 +2,13 @@
 
 * Experiments in **Version 0** Environments 
 
-    - [q_learning_vs_random_defense-v0](training/random_defense-v0/q_learning/)
+    - [q_learning_vs_random_defense-v0](training/random_defense-v0/tabular_q_learning/)
        * This is an experiment in the `random_defense-v0` environment. 
        An environment where the defender is following a random defense policy. 
        This experiment trains an attacker agent using tabular q-learning to act optimally in the given
        environment and defeat the random defender.
        
-    - [random_attack_vs_q_learning-v0](training/random_attack-v0/q_learning/)
+    - [random_attack_vs_q_learning-v0](training/random_attack-v0/tabular_q_learning/)
        * This is an experiment in the `random_attack-v0` environment.  
        An environment where the attack is following a random attack policy.  
        This experiment trains a defender agent using tabular q-learning to act optimally in the given
@@ -52,13 +52,13 @@
    
 * Experiments in **Version 1** Environments 
 
-    - [q_learning_vs_random_defense-v1](training/random_defense-v1/q_learning/)
+    - [q_learning_vs_random_defense-v1](training/random_defense-v1/tabular_q_learning/)
        * This is an experiment in the `random_defense-v1` environment. 
        An environment where the defender is following a random defense policy. 
        This experiment trains an attacker agent using tabular q-learning to act optimally in the given
        environment and defeat the random defender.
        
-    - [random_attack_vs_q_learning-v1](training/random_attack-v1/q_learning/)
+    - [random_attack_vs_q_learning-v1](training/random_attack-v1/tabular_q_learning/)
        * This is an experiment in the `random_attack-v1` environment.  
        An environment where the attack is following a random attack policy.  
        This experiment trains a defender agent using tabular q-learning to act optimally in the given

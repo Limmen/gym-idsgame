@@ -28,17 +28,17 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    q_agent_config = QAgentConfig(gamma=0.99, alpha=0.3, epsilon=1, render=False, eval_sleep=0.9,
-                                  min_epsilon=0.1, eval_episodes=1, train_log_frequency=100,
+    q_agent_config = QAgentConfig(gamma=0.9, alpha=0.3, epsilon=1, render=False, eval_sleep=0.9,
+                                  min_epsilon=0.1, eval_episodes=1, train_log_frequency=1,
                                   epsilon_decay=0.99, video=True, eval_log_frequency=1,
                                   video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=1000,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                                  eval_frequency=100, attacker=False, defender=True)
-    env_name = "idsgame-random_attack-v0"
-    client_config = ClientConfig(env_name=env_name, defender_type=AgentType.Q_AGENT.value,
-                                 mode=RunnerMode.TRAIN_DEFENDER.value,
+                                  eval_frequency=100, attacker=True, defender=False)
+    env_name = "idsgame-random_defense-v0"
+    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.TABULAR_Q_AGENT.value,
+                                 mode=RunnerMode.TRAIN_ATTACKER.value,
                                  q_agent_config=q_agent_config, output_dir=default_output_dir(),
-                                 title="RandomAttacker vs TrainingQAgent")
+                                 title="TrainingQAgent vs RandomDefender")
     return client_config
 
 
@@ -70,11 +70,15 @@ def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str) -> No
                                train_df["epsilon_values"], train_df["hack_probability"],
                                train_df["attacker_cumulative_reward"], train_df["defender_cumulative_reward"],
                                config.q_agent_config.train_log_frequency,
+                               config.q_agent_config.eval_frequency,
+                               config.q_agent_config.eval_log_frequency,
                                config.output_dir, eval=False, sim=False)
     plotting_util.plot_results(eval_df["avg_episode_rewards"].values, eval_df["avg_episode_steps"].values,
                                eval_df["epsilon_values"], eval_df["hack_probability"],
                                eval_df["attacker_cumulative_reward"], eval_df["defender_cumulative_reward"],
                                config.q_agent_config.train_log_frequency,
+                               config.q_agent_config.eval_frequency,
+                               config.q_agent_config.eval_log_frequency,
                                config.output_dir, eval=True, sim=False)
 
 

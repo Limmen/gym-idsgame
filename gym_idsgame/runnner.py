@@ -6,7 +6,7 @@ import gym
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.config.runner_mode import RunnerMode
 from gym_idsgame.agents.dao.agent_type import AgentType
-from gym_idsgame.agents.q_agent import QAgent
+from gym_idsgame.agents.tabular_q_agent import TabularQAgent
 from gym_idsgame.agents.train_agent import TrainAgent
 from gym_idsgame.agents.bot_agent import BotAgent
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
@@ -57,8 +57,8 @@ class Runner:
         env = gym.make(config.env_name)
         env.idsgame_config.render_config.title = config.title
         attacker: TrainAgent = None
-        if config.attacker_type == AgentType.Q_AGENT.value:
-            attacker = QAgent(env, config.q_agent_config)
+        if config.attacker_type == AgentType.TABULAR_Q_AGENT.value:
+            attacker = TabularQAgent(env, config.q_agent_config)
         elif config.attacker_type == AgentType.RANDOM.value:
             pass
         elif config.attacker_type == AgentType.DETERMINISTIC.value:
@@ -73,8 +73,8 @@ class Runner:
     def train_defender(config: ClientConfig):
         env = gym.make(config.env_name)
         env.idsgame_config.render_config.title = config.title
-        if config.defender_type == AgentType.Q_AGENT.value:
-            defender = QAgent(env, config.q_agent_config)
+        if config.defender_type == AgentType.TABULAR_Q_AGENT.value:
+            defender = TabularQAgent(env, config.q_agent_config)
         elif config.defender_type == AgentType.RANDOM.value:
             pass
         elif config.defender_type == AgentType.DETERMINISTIC.value:
@@ -98,13 +98,13 @@ class Runner:
             defender = RandomDefenseBotAgent(env.idsgame_config.game_config)
         elif config.defender_type == AgentType.DEFEND_MINIMAL_VALUE.value:
             defender = DefendMinimalValueBotAgent(env.idsgame_config.game_config)
-        elif config.defender_type == AgentType.Q_AGENT.value:
+        elif config.defender_type == AgentType.TABULAR_Q_AGENT.value:
             pass
         else:
             raise AssertionError("Defender type not recognized: {}".format(config.defender_type))
 
         attacker: BotAgent = None
-        if config.attacker_type == AgentType.Q_AGENT.value:
+        if config.attacker_type == AgentType.TABULAR_Q_AGENT.value:
             pass
         elif config.attacker_type == AgentType.RANDOM.value:
             attacker = RandomAttackBotAgent(env.idsgame_config.game_config)

@@ -9,6 +9,7 @@ from abc import ABC, abstractmethod
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
 from gym_idsgame.agents.random_attack_bot_agent import RandomAttackBotAgent
+from gym_idsgame.agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
 from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 import gym_idsgame.envs.util.idsgame_util as util
@@ -93,8 +94,7 @@ class IdsGameEnv(gym.Env, ABC):
                           self.idsgame_config.game_config.network_config)
         self.state.add_defense_event(defense_pos, defense_type)
 
-        if util.is_attack_legal(attacker_pos, target_pos, self.idsgame_config.game_config.num_cols,
-                                self.idsgame_config.game_config.network_config.adjacency_matrix):
+        if util.is_attack_legal(target_pos, attacker_pos, self.idsgame_config.game_config.network_config):
             # 4. Attack
             self.state.attack(target_node_id, attack_type, self.idsgame_config.game_config.max_value,
                               self.idsgame_config.game_config.network_config)
@@ -372,6 +372,20 @@ class IdsGameRandomDefenseV0Env(AttackerEnv):
         game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
                                       vulnerability_val=0)
         defender_agent = RandomDefenseBotAgent(game_config)
+        idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
+        super().__init__(idsgame_config=idsgame_config)
+
+class IdsGameMinimalDefenseV0Env(AttackerEnv):
+    """
+    [AttackerEnv] 1 server per layer, 10 attack-defense-values, defender following the "defend minimal strategy"
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Version] 0
+    """
+    def __init__(self):
+        game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
+        game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+                                      vulnerability_val=0)
+        defender_agent = DefendMinimalValueBotAgent(game_config)
         idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
         super().__init__(idsgame_config=idsgame_config)
 

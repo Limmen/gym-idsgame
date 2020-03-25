@@ -3,7 +3,7 @@ from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.dao.render_config import RenderConfig
-from gym_idsgame.agents.q_agent import QAgent
+from gym_idsgame.agents.tabular_q_agent import TabularQAgent
 from gym_idsgame.agents.dao.q_agent_config import QAgentConfig
 
 # Program entrypoint
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     q_agent_config = QAgentConfig(gamma=0.9, alpha=0.3, epsilon=1, render=False, eval_sleep=0.5,
                      min_epsilon=0.1, eval_episodes=3, train_log_frequency=100, epsilon_decay=0.999, video=True,
                      video_fps=5, video_dir="./videos", num_episodes=100)
-    q_agent = QAgent(env, q_agent_config)
+    q_agent = TabularQAgent(env, q_agent_config)
     result = q_agent.train()
     #q_agent.log_state_values()
     #episode_rewards, episode_steps, epsilon_values = q_agent.run(40000)

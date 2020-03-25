@@ -1,9 +1,9 @@
-# Experiment `random_defense-v0`_`q_learning`
+# Experiment `random_attack-v0`_`tabular_q_learning`
 
-This is an experiment in the `random_defense-v0` environment. 
-An environment where the defender is following a random defense policy. 
-This experiment trains an attacker agent using tabular q-learning to act optimally in the given
-environment and defeat the random defender.
+This is an experiment in the `random_attack-v0` environment. 
+An environment where the attack is following a random attack policy. 
+This experiment trains a defender agent using tabular q-learning to act optimally in the given
+environment and defeat the random attacker.
 
 The network configuration of the environment is as follows:
 
@@ -26,7 +26,7 @@ The starting state for each node in the environment is initialized as follows (w
 
 ## Environment 
 
-- Env: `random_defense-v0`
+- Env: `random_attack-v0`
 
 ## Algorithm
 
@@ -43,16 +43,16 @@ Example configuration in `config.json`:
 ```json
 {
     "attacker_type": 0,
-    "defender_type": 1,
-    "env_name": "idsgame-random_defense-v0",
+    "defender_type": 0,
+    "env_name": "idsgame-random_attack-v0",
     "logger": null,
-    "mode": 0,
-    "output_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/random_defense-v0/q_learning",
+    "mode": 1,
+    "output_dir": tabular_q_learning,
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
         "alpha": 0.3,
-        "attacker": true,
-        "defender": false,
+        "attacker": false,
+        "defender": true,
         "epsilon": 1,
         "epsilon_decay": 0.99,
         "eval_episodes": 1,
@@ -60,39 +60,39 @@ Example configuration in `config.json`:
         "eval_log_frequency": 1,
         "eval_render": false,
         "eval_sleep": 0.9,
-        "gamma": 0.9,
-        "gif_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/random_defense-v0/q_learning/gifs",
+        "gamma": 0.99,
+        "gif_dir": tabular_q_learning,
         "gifs": true,
         "logger": null,
         "min_epsilon": 0.1,
         "num_episodes": 1000,
         "py/object": "gym_idsgame.agents.dao.q_agent_config.QAgentConfig",
         "render": false,
-        "train_log_frequency": 1,
+        "train_log_frequency": 100,
         "video": true,
-        "video_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/random_defense-v0/q_learning/videos",
+        "video_dir": tabular_q_learning,
         "video_fps": 5,
         "video_frequency": 1
     },
     "simulation_config": null,
-    "title": "TrainingQAgent vs RandomDefender"
+    "title": "RandomAttacker vs TrainingQAgent"
 }
 ```
 
 Example configuration in `run.py`:
 
 ```python
-q_agent_config = QAgentConfig(gamma=0.9, alpha=0.3, epsilon=1, render=False, eval_sleep=0.9,
-                                  min_epsilon=0.1, eval_episodes=1, train_log_frequency=1,
-                                  epsilon_decay=0.99, video=True, eval_log_frequency=1,
-                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=1000,
-                                  eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                                  eval_frequency=100, attacker=True, defender=False)
-env_name = "idsgame-random_defense-v0"
-client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.Q_AGENT.value,
-                             mode=RunnerMode.TRAIN_ATTACKER.value,
+q_agent_config = QAgentConfig(gamma=0.99, alpha=0.3, epsilon=1, render=False, eval_sleep=0.9,
+                              min_epsilon=0.1, eval_episodes=1, train_log_frequency=100,
+                              epsilon_decay=0.99, video=True, eval_log_frequency=1,
+                              video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=1000,
+                              eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
+                              eval_frequency=100, attacker=False, defender=True)
+env_name = "idsgame-random_attack-v0"
+client_config = ClientConfig(env_name=env_name, defender_type=AgentType.Q_AGENT.value,
+                             mode=RunnerMode.TRAIN_DEFENDER.value,
                              q_agent_config=q_agent_config, output_dir=default_output_dir(),
-                             title="TrainingQAgent vs RandomDefender")
+                             title="RandomAttacker vs TrainingQAgent")
 ```
 
 After the experiment has finished, the results are written to the following sub-directories:

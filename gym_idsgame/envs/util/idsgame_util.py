@@ -2,10 +2,10 @@
 Utility functions for the gym-idsgame environment
 """
 from typing import Union
-import numpy as np
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.envs.dao.node_type import NodeType
+from gym_idsgame.envs.dao.network_config import NetworkConfig
 
 def validate_config(idsgame_config: IdsGameConfig) -> None:
     """
@@ -36,25 +36,26 @@ def is_defense_id_legal(defense_id: int, game_config: GameConfig) -> bool:
     return False
 
 
-def is_attack_legal(target_pos: Union[int, int], attacker_pos: Union[int, int], num_cols: int,
-                    adjacency_matrix: np.ndarray) -> bool:
+def is_attack_legal(target_pos: Union[int, int], attacker_pos: Union[int, int], network_config: NetworkConfig) -> bool:
     """
     Checks whether an attack is legal. That is, can the attacker reach the target node from its current
     position in 1 step given the network configuration?
 
     :param attacker_pos: the position of the attacker
     :param target_pos: the position of the target node
-    :param num_cols: number of columns in the grid
-    :param adjacency_matrix: the adjacency matrix
+    :param network_config: the network configuration
     :return: True if the attack is legal, otherwise False
     """
     if target_pos == attacker_pos:
         return False
+    target_node_id = network_config.get_node_id(target_pos)
+    if network_config.node_list[target_node_id] == NodeType.START.value:
+        return False
     attacker_row, attacker_col = attacker_pos
-    attacker_adjacency_matrix_id = attacker_row * num_cols + attacker_col
+    attacker_adjacency_matrix_id = attacker_row * network_config.num_cols + attacker_col
     target_row, target_col = target_pos
-    target_adjacency_matrix_id = target_row * num_cols + target_col
-    return adjacency_matrix[attacker_adjacency_matrix_id][target_adjacency_matrix_id] == int(1)
+    target_adjacency_matrix_id = target_row * network_config.num_cols + target_col
+    return network_config.adjacency_matrix[attacker_adjacency_matrix_id][target_adjacency_matrix_id] == int(1)
 
 
 def is_attack_id_legal(attack_id: int, game_config: GameConfig, attacker_pos) -> bool:
@@ -67,7 +68,7 @@ def is_attack_id_legal(attack_id: int, game_config: GameConfig, attacker_pos) ->
     :return: True if legal otherwise False
     """
     server_id, server_pos, attack_type = interpret_action(attack_id, game_config)
-    return is_attack_legal(server_pos, attacker_pos, game_config.num_cols, game_config.network_config.adjacency_matrix)
+    return is_attack_legal(server_pos, attacker_pos, game_config.network_config)
 
 
 def interpret_action(action: int, game_config: GameConfig) -> Union[int, Union[int, int], int]:

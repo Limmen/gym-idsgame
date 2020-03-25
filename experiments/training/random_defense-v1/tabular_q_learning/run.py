@@ -35,7 +35,7 @@ def default_config() -> ClientConfig:
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
                                   eval_frequency=100, attacker=True, defender=False)
     env_name = "idsgame-random_defense-v1"
-    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.Q_AGENT.value,
+    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.TABULAR_Q_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
                                  q_agent_config=q_agent_config, output_dir=default_output_dir(),
                                  title="TrainingQAgent vs RandomDefender")
@@ -70,11 +70,15 @@ def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str) -> No
                                train_df["epsilon_values"], train_df["hack_probability"],
                                train_df["attacker_cumulative_reward"], train_df["defender_cumulative_reward"],
                                config.q_agent_config.train_log_frequency,
+                               config.q_agent_config.eval_frequency,
+                               config.q_agent_config.eval_log_frequency,
                                config.output_dir, eval=False, sim=False)
     plotting_util.plot_results(eval_df["avg_episode_rewards"].values, eval_df["avg_episode_steps"].values,
                                eval_df["epsilon_values"], eval_df["hack_probability"],
                                eval_df["attacker_cumulative_reward"], eval_df["defender_cumulative_reward"],
                                config.q_agent_config.train_log_frequency,
+                               config.q_agent_config.eval_frequency,
+                               config.q_agent_config.eval_log_frequency,
                                config.output_dir, eval=True, sim=False)
 
 
