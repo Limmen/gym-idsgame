@@ -30,6 +30,6 @@ class RandomDefenseBotAgent(BotAgent):
         :return: action_id
         """
         actions = list(range(self.game_config.num_actions))
-        legal_actions = list(filter(lambda action: idsgame_util.is_defense_id_legal(action), actions))
+        legal_actions = list(filter(lambda action: idsgame_util.is_defense_id_legal(action, self.game_config), actions))
         action_id = np.random.choice(legal_actions)
         return action_id

@@ -115,7 +115,7 @@ class QAgent(TrainAgent):
                 episode_steps = []
 
             # Run evaluation every <self.config.eval_frequency> episodes
-            if episode % self.config.eval_frequency == 0 and episode > 0:
+            if episode % self.config.eval_frequency == 0:
                 self.eval()
 
             # Reset environment for the next episode and update game stats
