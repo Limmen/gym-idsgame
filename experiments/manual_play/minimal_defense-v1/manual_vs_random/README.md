@@ -1,7 +1,9 @@
-# Experiment `random_defense-v1`_`manual_attacker`
+# Experiment `minimal_defense-v1`_`manual_attacker`
 
-This is an experiment in the `random_defense-v1` environment. 
-An environment where the defender is following a random defense policy.
+This is an experiment in the `minimal_defense-v1` environment. 
+An environment where the defender is following the `defend_minimal` defense policy. 
+The `defend_minimal` policy entails that the defender will always 
+defend the attribute with the minimal value out of all of its neighbors.
 The experiment gives the control of the attacker to the user that can control the attacker
 using the keyboard and mouse. 
 
@@ -44,24 +46,24 @@ Example configuration in `config.json`:
 {
     "attacker_type": 3,
     "defender_type": 1,
-    "env_name": "idsgame-random_defense-v1",
+    "env_name": "idsgame-minimal_defense-v1",
     "logger": null,
     "mode": 3,
-    "output_dir": manual_vs_minimal_defense,
+    "output_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/manual_play/minimal_defense-v1/manual_vs_random",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": null,
     "simulation_config": null,
-    "title": "ManualAttacker vs RandomDefender"
+    "title": "ManualAttacker vs DefendMinimalDefender"
 }
 ```
 
 Example configuration in `run.py`:
 
 ```python
-env_name = "idsgame-random_defense-v1"
+env_name = "idsgame-minimal_defense-v1"
 client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.MANUAL_ATTACK.value,
                              mode=RunnerMode.MANUAL_ATTACKER.value, output_dir=default_output_dir(),
-                             title="ManualAttacker vs RandomDefender")
+                             title="ManualAttacker vs DefendMinimalDefender")
 ```
 
 ## Commands

@@ -188,9 +188,8 @@ class GameFrame(pyglet.window.Window):
                             # position of the attacker)
                             if util.is_attack_legal(node.pos, self.attacker_sprite.pos,
                                                     self.idsgame_config.game_config.network_config):
-
                                 # 3. Update defense state
-                                defend_id = self.defender_agent.action(self.game_state.attacker_pos)
+                                defend_id = self.defender_agent.action(self.game_state)
                                 defend_node_id, defend_node_pos, defend_type = util.interpret_action(
                                     defend_id, self.idsgame_config.game_config)
                                 defense_row, defense_col = defend_node_pos

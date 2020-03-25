@@ -47,7 +47,7 @@ Example configuration in `config.json`:
     "env_name": "idsgame-random_defense-v0",
     "logger": null,
     "mode": 3,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/random_defense-v0/manual_vs_random",
+    "output_dir": manual_vs_minimal_defense,
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": null,
     "simulation_config": null,

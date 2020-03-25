@@ -1,0 +1,12 @@
+{
+    "attacker_type": 3,
+    "defender_type": 1,
+    "env_name": "idsgame-minimal_defense-v0",
+    "logger": null,
+    "mode": 3,
+    "output_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/manual_play/minimal_defense-v0/manual_vs_minimal_defense",
+    "py/object": "gym_idsgame.config.client_config.ClientConfig",
+    "q_agent_config": null,
+    "simulation_config": null,
+    "title": "ManualAttacker vs DefendMinimalDefender"
+}
