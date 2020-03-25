@@ -86,6 +86,27 @@ After the experiment has finished, the results are written to the following sub-
 - **/plots**: Basic plots of the results
 - **/videos**: If the video configuration-flag is set to true, the experiment will render the game during evaluation and save video files to this directory. You can control the frequency of evaluation with the configuration parameter `eval_frequency` and the frequency of video/gif recording during evaluation with the parameter `video_frequency`
   
+
+## Example Results
+
+### Evaluation after 0 Training Episodes
+
+<p align="center">
+<img src="./docs/episode_0.gif">
+</p> 
+
+### Evaluation after 100 Training Episodes
+
+<p align="center">
+<img src="./docs/episode_100.gif">
+</p>
+
+### Evaluation after 200 Training Episodes
+
+<p align="center">
+<img src="./docs/episode_200.gif">
+</p>  
+
 ## Commands
 
 Below is a list of commands for running the experiment
