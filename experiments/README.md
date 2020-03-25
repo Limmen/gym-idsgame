@@ -3,41 +3,98 @@
 * Experiments in **Version 0** Environments 
 
     - [q_learning_vs_random_defense-v0](training/random_defense-v0/q_learning/)
-       * TODO
+       * This is an experiment in the `random_defense-v0` environment. 
+       An environment where the defender is following a random defense policy. 
+       This experiment trains an attacker agent using tabular q-learning to act optimally in the given
+       environment and defeat the random defender.
        
     - [random_attack_vs_q_learning-v0](training/random_attack-v0/q_learning/)
-       * TODO
+       * This is an experiment in the `random_attack-v0` environment.  
+       An environment where the attack is following a random attack policy.  
+       This experiment trains a defender agent using tabular q-learning to act optimally in the given
+       environment and defeat the random attacker.
        
     - [random_vs_random-v0](simulations/v0/random_vs_random/)
-       * TODO
+       * This is an experiment in the `idsgame-v0` environment.  
+       An environment where neither the attacker nor defender is part of the environment, i.e.
+       it is intended for 2-agent simulations or RL training.
+       In this experiment, the attacker is implemented with a random attack policy.
+       Similarly, the defender is implemented with a random defense policy. 
        
     - [random_vs_defend_minimal-v0](simulations/1l-1s-10ad-v0/random_vs_defend_minimal/)
-       * TODO   
+       * This is an experiment in the `idsgame-v0` environment. 
+       An environment where neither the attacker nor defender is part of the environment, i.e.
+       it is intended for 2-agent simulations or RL training. 
+       In this experiment, the attacker is implemented with a random attack policy.
+       The defender is implemented with the  policy `defend_minimal`. 
+       The `defend_minimal` policy entails that the defender will always
+       defend the attribute with the minimal value out of all of its neighbors.   
        
     - [attack_maximal_vs_defend_minimal-v0](simulations/v0/attack_maximal_vs_defend_minimal/)
-       * TODO   
+       * This is an experiment in the `idsgame-v0` environment.  
+       An environment where neither the attacker nor defender is part of the environment, i.e. 
+       it is intended for 2-agent simulations or RL training. 
+       In this experiment, the attacker is implemented with the policy `attack_maximal`.
+       The `attack_maximal` policy entails that the attacker will always attack the attribute with
+       the maximum value out of all of its neighbors. Similarly, the defender is implemented with the
+       policy `defend_minimal`. The `defend_minimal` policy entails that the defender will always
+       defend the attribute with the minimal value out of all of its neighbors.   
        
     - [attack_maximal_vs_random-v0](simulations/v0/attack_maximal_vs_random/)
-       * TODO   
+       * This is an experiment in the `idsgame-v0` environment.  
+       An environment where neither the attacker nor defender is part of the environment, i.e.
+       it is intended for 2-agent simulations or RL training.
+       In this experiment, the attacker is implemented with the policy `attack_maximal`.
+       The `attack_maximal` policy entails that the attacker will always attack the attribute with
+       the maximum value out of all of its neighbors. The defender is implemented with a
+       random defense policy.
    
    
 * Experiments in **Version 1** Environments 
 
     - [q_learning_vs_random_defense-v1](training/random_defense-v1/q_learning/)
-       * TODO
+       * This is an experiment in the `random_defense-v1` environment. 
+       An environment where the defender is following a random defense policy. 
+       This experiment trains an attacker agent using tabular q-learning to act optimally in the given
+       environment and defeat the random defender.
        
     - [random_attack_vs_q_learning-v1](training/random_attack-v1/q_learning/)
-       * TODO
+       * This is an experiment in the `random_attack-v1` environment.  
+       An environment where the attack is following a random attack policy.  
+       This experiment trains a defender agent using tabular q-learning to act optimally in the given
+       environment and defeat the random attacker.
        
     - [random_vs_random-v1](simulations/v1/random_vs_random/)
-       * TODO
+       * This is an experiment in the `idsgame-v1` environment.  
+       An environment where neither the attacker nor defender is part of the environment, i.e.
+       it is intended for 2-agent simulations or RL training.
+       In this experiment, the attacker is implemented with a random attack policy.
+       Similarly, the defender is implemented with a random defense policy. 
        
     - [random_vs_defend_minimal-v1](simulations/1l-1s-10ad-v1/random_vs_defend_minimal/)
-       * TODO   
+       * This is an experiment in the `idsgame-v1` environment. 
+       An environment where neither the attacker nor defender is part of the environment, i.e.
+       it is intended for 2-agent simulations or RL training. 
+       In this experiment, the attacker is implemented with a random attack policy.
+       The defender is implemented with the  policy `defend_minimal`. 
+       The `defend_minimal` policy entails that the defender will always
+       defend the attribute with the minimal value out of all of its neighbors.   
        
     - [attack_maximal_vs_defend_minimal-v1](simulations/v1/attack_maximal_vs_defend_minimal/)
-       * TODO   
+       * This is an experiment in the `idsgame-v1` environment.  
+       An environment where neither the attacker nor defender is part of the environment, i.e. 
+       it is intended for 2-agent simulations or RL training. 
+       In this experiment, the attacker is implemented with the policy `attack_maximal`.
+       The `attack_maximal` policy entails that the attacker will always attack the attribute with
+       the maximum value out of all of its neighbors. Similarly, the defender is implemented with the
+       policy `defend_minimal`. The `defend_minimal` policy entails that the defender will always
+       defend the attribute with the minimal value out of all of its neighbors.   
        
     - [attack_maximal_vs_random-v1](simulations/v1/attack_maximal_vs_random/)
-       * TODO   
-      
+       * This is an experiment in the `idsgame-v1` environment.  
+       An environment where neither the attacker nor defender is part of the environment, i.e.
+       it is intended for 2-agent simulations or RL training.
+       In this experiment, the attacker is implemented with the policy `attack_maximal`.
+       The `attack_maximal` policy entails that the attacker will always attack the attribute with
+       the maximum value out of all of its neighbors. The defender is implemented with a
+       random defense policy.
