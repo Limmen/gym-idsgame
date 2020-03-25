@@ -92,7 +92,7 @@ After the experiment has finished, the results are written to the following sub-
 ### Evaluation after 0 Training Episodes
 
 <p align="center">
-<img src="./docs/episode_0.gif">
+<img src="./docs/episode_0.gif" width="200">
 </p> 
 
 ### Evaluation after 100 Training Episodes
