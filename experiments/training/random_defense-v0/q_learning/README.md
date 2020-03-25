@@ -119,7 +119,7 @@ After the experiment has finished, the results are written to the following sub-
 ### Exploration Rate
 
 <p align="center">
-<img src="./docs/epsilon_train.png.png" width="800">
+<img src="./docs/epsilon_train.png" width="800">
 </p>
 
 #### Train Metrics
