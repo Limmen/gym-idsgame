@@ -8,7 +8,7 @@ environment and against the random defender
 
 ## Environment 
 
-- Env: `random_defense-1l-1s-10ad-v0`
+- Env: `random_defense-v0`
 
 ## Algorithm
 
@@ -101,6 +101,25 @@ After the experiment has finished, the results are written to the following sub-
 
 <p align="center">
 <img src="./docs/hack_probability_eval.png" width="800">
+</p>
+
+### Episode lengths
+
+#### Train
+<p align="center">
+<img src="./docs/avg_episode_lengths_train.png" width="800">
+</p>
+
+#### Eval
+
+<p align="center">
+<img src="./docs/avg_episode_lengths_eval.png" width="800">
+</p>
+
+### Exploration Rate
+
+<p align="center">
+<img src="./docs/epsilon_train.png.png" width="800">
 </p>
 
 #### Train Metrics
