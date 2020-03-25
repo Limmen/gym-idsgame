@@ -22,6 +22,9 @@ v0: attack_maximal_vs_defend_minimal-v0 attack_maximal_vs_random-v0 random_attac
 q_learning_vs_random_defense-v1: training/random_defense-v1/q_learning/run.py training/random_defense-v1/q_learning/run.sh
 	cd training/random_defense-v1/q_learning/ && $(MAKE) run
 
+random_attack_vs_q_learning-v1: training/random_attack-v1/q_learning/run.py training/random_attack-v1/q_learning/run.sh
+	cd training/random_attack-v1/q_learning/ && $(MAKE) run
+
 random_vs_random-v1: simulations/v1/random_vs_random/run.py simulations/v1/random_vs_random/run.sh
 	cd simulations/v1/random_vs_random/ && $(MAKE) run
 
@@ -35,7 +38,7 @@ attack_maximal_vs_random-v1: simulations/v1/attack_maximal_vs_random/run.py simu
 	cd simulations/v1/attack_maximal_vs_random/ && $(MAKE) run
 
 v1: q_learning_vs_random_defense-v1 random_vs_random-v1 random_vs_defend_minimal-v1
-v1: attack_maximal_vs_defend_minimal-v1 attack_maximal_vs_random-v1
+v1: attack_maximal_vs_defend_minimal-v1 attack_maximal_vs_random-v1 random_attack_vs_q_learning-v1
 
 all: v0 v1
 
@@ -47,6 +50,7 @@ clean:
 	cd simulations/v0/attack_maximal_vs_defend_minimal/ && $(MAKE) clean
 	cd simulations/v0/attack_maximal_vs_random/ && $(MAKE) clean
 	cd ./training/random_defense-v1/q_learning/ && $(MAKE) clean
+	cd ./training/random_attack-v1/q_learning/ && $(MAKE) clean
 	cd simulations/v1/random_vs_random/ && $(MAKE) clean
 	cd simulations/v1/random_vs_defend_minimal/ && $(MAKE) clean
 	cd simulations/v1/attack_maximal_vs_defend_minimal/ && $(MAKE) clean

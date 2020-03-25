@@ -225,7 +225,7 @@ class IdsGameEnv(gym.Env, ABC):
         :param defense_action: the defense action to verify
         :return: True if legal otherwise False
         """
-        return util.is_defense_id_legal(defense_action)
+        return util.is_defense_id_legal(defense_action, self.idsgame_config.game_config)
 
     @abstractmethod
     def get_attacker_action(self, action) -> Union[int, Union[int, int], int]:

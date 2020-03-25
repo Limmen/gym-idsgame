@@ -5,6 +5,7 @@ from typing import Union
 import numpy as np
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.dao.game_config import GameConfig
+from gym_idsgame.envs.dao.node_type import NodeType
 
 def validate_config(idsgame_config: IdsGameConfig) -> None:
     """
@@ -21,14 +22,18 @@ def validate_config(idsgame_config: IdsGameConfig) -> None:
         raise AssertionError("The max attack/defense value cannot be less than 3")
 
 
-def is_defense_id_legal(defense_id: int) -> bool:
+def is_defense_id_legal(defense_id: int, game_config: GameConfig) -> bool:
     """
     Check if a given defense is legal or not.
 
     :param defense_id: the defense to verify
     :return: True if legal otherwise False
     """
-    return True
+    server_id, server_pos, attack_type = interpret_action(defense_id, game_config)
+    if (game_config.network_config.node_list[server_id] == NodeType.SERVER.value
+        or game_config.network_config.node_list[server_id] == NodeType.DATA.value):
+        return True
+    return False
 
 
 def is_attack_legal(target_pos: Union[int, int], attacker_pos: Union[int, int], num_cols: int,
