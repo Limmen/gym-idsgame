@@ -89,22 +89,46 @@ After the experiment has finished, the results are written to the following sub-
 
 ## Example Results
 
-### Evaluation after 0 Training Episodes
+### Hack probability
+
+#### Train
+
+<p align="center">
+<img src="./docs/hack_probability_train.png" width="800">
+</p>
+
+#### Eval
+
+<p align="center">
+<img src="./docs/hack_probability_eval.png" width="800">
+</p>
+
+#### Train Metrics
+
+### Policy Inspection
+
+#### Evaluation after 0 Training Episodes
 
 <p align="center">
 <img src="./docs/episode_0.gif" width="400">
 </p> 
 
-### Evaluation after 100 Training Episodes
+#### Evaluation after 100 Training Episodes
 
 <p align="center">
 <img src="./docs/episode_100.gif" width="400">
 </p>
 
-### Evaluation after 200 Training Episodes
+#### Evaluation after 200 Training Episodes
 
 <p align="center">
 <img src="./docs/episode_200.gif" width="400">
+</p>  
+
+#### Evaluation after 1000 Training Episodes
+
+<p align="center">
+<img src="./docs/episode_1000.gif" width="400">
 </p>  
 
 ## Commands
