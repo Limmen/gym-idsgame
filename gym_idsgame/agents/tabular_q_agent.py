@@ -40,7 +40,7 @@ class TabularQAgent(TrainAgent):
         self.eval_attacker_cumulative_reward = 0
         self.eval_defender_cumulative_reward = 0
 
-    def get_action(self, s, eval=False):
+    def get_action(self, s, eval=False) -> int:
         """
         Sample an action using an epsilon-greedy policy with respect to the current Q-values
 
@@ -64,7 +64,7 @@ class TabularQAgent(TrainAgent):
             raise AssertionError("Error when selecting action greedily according to the Q-function")
         return max_legal_action
 
-    def train(self):
+    def train(self) -> ExperimentResult:
         """
         Runs the Q(0)-learning algorithm for estimating the state values under a given policy for a specific MDP
 
@@ -142,6 +142,9 @@ class TabularQAgent(TrainAgent):
         # Log and return
         self.log_state_values()
 
+        # Save Q Table
+        self.save_q_table()
+
         return self.train_result
 
     def log_metrics(self, result: ExperimentResult, episode_rewards:list, episode_steps:list, eval:bool = False) \
@@ -186,7 +189,7 @@ class TabularQAgent(TrainAgent):
         result.attacker_cumulative_reward.append(attacker_cumulative_reward)
         result.defender_cumulative_reward.append(defender_cumulative_reward)
 
-    def eval(self):
+    def eval(self) -> ExperimentResult:
         """
         Performs evaluation with the greedy policy with respect to the learned Q-values
 
@@ -275,7 +278,7 @@ class TabularQAgent(TrainAgent):
         self.config.logger.info("Evaluation Complete")
         return self.eval_result
 
-    def anneal_epsilon(self):
+    def anneal_epsilon(self) -> None:
         """
         Anneals the exploration rate slightly until it reaches the minimum value
 
@@ -284,7 +287,7 @@ class TabularQAgent(TrainAgent):
         if self.config.epsilon > self.config.min_epsilon:
             self.config.epsilon = self.config.epsilon*self.config.epsilon_decay
 
-    def log_state_values(self):
+    def log_state_values(self) -> None:
         """
         Utility function for printing the state-values according to the learned Q-function
         :return:
@@ -295,3 +298,15 @@ class TabularQAgent(TrainAgent):
             node_id = i
             self.config.logger.info("s:{},V(s):{}".format(node_id, state_value))
         self.config.logger.info("--------------------")
+
+    def save_q_table(self) -> None:
+        """
+        Saves Q table to disk in binary npy format
+
+        :return: None
+        """
+        if self.config.save_dir is not None:
+            self.config.logger.info("Saving Q-table to: {}".format(self.config.save_dir + "/q_table.npy"))
+            np.save(self.config.save_dir + "/q_table.npy", self.Q)
+        else:
+            self.config.logger.warning("Save path not defined, not saving Q table to disk")

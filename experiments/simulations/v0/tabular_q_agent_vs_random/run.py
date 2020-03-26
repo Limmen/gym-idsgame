@@ -5,6 +5,7 @@ from gym_idsgame.simulation.dao.simulation_config import SimulationConfig
 from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.runnner import Runner
+from gym_idsgame.agents.dao.q_agent_config import QAgentConfig
 from experiments.util import plotting_util, util
 
 def default_output_dir() -> str:
@@ -30,11 +31,13 @@ def default_config() -> ClientConfig:
     simulation_config = SimulationConfig(render=True, sleep=0.8, video=True, log_frequency=1,
                                          video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=1000,
                                          gifs=True, gif_dir=default_output_dir() + "/gifs", video_frequency = 1)
+    q_agent_config = QAgentConfig(load_path=default_output_dir() + "/q_table/q_table.npy")
     env_name = "idsgame-v0"
-    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.ATTACK_MAXIMAL_VALUE.value,
+    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.TABULAR_Q_AGENT.value,
                                  defender_type=AgentType.RANDOM.value, mode=RunnerMode.SIMULATE.value,
                                  simulation_config=simulation_config, output_dir=default_output_dir(),
-                                 title="AttackMaximalAttacker vs RandomDefender")
+                                 title="TabularQAgentAttacker vs RandomDefender",
+                                 q_agent_config=q_agent_config)
     return client_config
 
 
@@ -79,7 +82,7 @@ if __name__ == '__main__':
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir)
-    logger = util.setup_logger("idsgame-v0-attack_maximal_vs_defend_random", config.output_dir + "/logs/",
+    logger = util.setup_logger("idsgame-v0-tabular_q_agent_vs_random_defender", config.output_dir + "/logs/",
                                time_str=time_str)
     config.logger = logger
     config.simulation_config.logger = logger

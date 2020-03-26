@@ -2,19 +2,21 @@
 Configuratin for QAgent
 """
 import csv
-import logging
-
 
 class QAgentConfig:
     """
     DTO with configuration for QAgent
     """
 
-    def __init__(self, gamma=0.8, alpha=0.1, epsilon=0.9, render=False, eval_sleep=0.35,
-                 epsilon_decay=0.999, min_epsilon=0.1, eval_episodes=1, train_log_frequency=100,
-                 eval_log_frequency=1, video=False, video_fps=5, video_dir=None, num_episodes=5000,
-                 eval_render=False, gifs=False, gif_dir=None, eval_frequency=1000, video_frequency = 1,
-                 attacker = True, defender = False):
+    def __init__(self, gamma :float = 0.8, alpha:float = 0.1, epsilon :float =0.9, render :bool =False,
+                 eval_sleep :float = 0.35,
+                 epsilon_decay :float = 0.999, min_epsilon :float = 0.1, eval_episodes :int = 1,
+                 train_log_frequency :int =100,
+                 eval_log_frequency :int =1, video :bool = False, video_fps :int = 5, video_dir :bool = None,
+                 num_episodes :int = 5000,
+                 eval_render :bool = False, gifs :bool = False, gif_dir: str = None, eval_frequency :int =1000,
+                 video_frequency :int = 1, attacker :bool = True, defender :bool = False,
+                 save_dir :str = None, load_path :str = None):
         """
         Initialize environment and hyperparameters
 
@@ -39,6 +41,8 @@ class QAgentConfig:
         :param video_frequency: the frequency (eval episodes) to record video and gif
         :param attacker: True if the QAgent is an attacker
         :param attacker: True if the QAgent is a defender
+        :param save_dir: dir to save Q-table
+        :param load_path: path to load a saved Q-table
         """
         self.gamma = gamma
         self.alpha = alpha
@@ -63,6 +67,8 @@ class QAgentConfig:
         self.attacker = attacker
         self.defender = defender
         assert not (self.attacker and self.defender)
+        self.save_dir = save_dir
+        self.load_path = load_path
 
     def to_str(self) -> str:
         """

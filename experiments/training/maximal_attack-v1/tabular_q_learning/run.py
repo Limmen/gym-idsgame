@@ -33,7 +33,8 @@ def default_config() -> ClientConfig:
                                   epsilon_decay=0.999, video=False, eval_log_frequency=1,
                                   video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=10000,
                                   eval_render=False, gifs=False, gif_dir=default_output_dir() + "/gifs",
-                                  eval_frequency=1000, attacker=False, defender=True)
+                                  eval_frequency=1000, attacker=False, defender=True,
+                                  save_dir=default_output_dir() + "/data")
     env_name = "idsgame-maximal_attack-v1"
     client_config = ClientConfig(env_name=env_name, defender_type=AgentType.TABULAR_Q_AGENT.value,
                                  mode=RunnerMode.TRAIN_DEFENDER.value,
@@ -93,7 +94,7 @@ if __name__ == '__main__':
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir)
-    logger = util.setup_logger("v0-Q_learning", config.output_dir + "/logs/",
+    logger = util.setup_logger("maximal_attack_vs_tabular_q_learning-v1", config.output_dir + "/logs/",
                                time_str=time_str)
     config.logger = logger
     config.q_agent_config.logger = logger

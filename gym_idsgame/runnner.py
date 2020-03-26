@@ -18,6 +18,7 @@ from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
 from gym_idsgame.agents.random_attack_bot_agent import RandomAttackBotAgent
 from gym_idsgame.agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
 from gym_idsgame.agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
+from gym_idsgame.agents.tabular_q_attacker_bot_agent import TabularQAttackerBotAgent
 
 class Runner:
     """
@@ -108,7 +109,10 @@ class Runner:
 
         attacker: BotAgent = None
         if config.attacker_type == AgentType.TABULAR_Q_AGENT.value:
-            pass
+            if config.q_agent_config is None or config.q_agent_config.load_path is None:
+                raise ValueError("To run a simulation with a tabular Q-agent, the path to the saved "
+                                 "Q-table must be specified")
+            attacker = TabularQAttackerBotAgent(env.idsgame_config.game_config, config.q_agent_config.load_path)
         elif config.attacker_type == AgentType.RANDOM.value:
             attacker = RandomAttackBotAgent(env.idsgame_config.game_config)
         elif config.attacker_type == AgentType.ATTACK_MAXIMAL_VALUE.value:

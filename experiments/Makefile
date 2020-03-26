@@ -21,11 +21,15 @@ random_vs_defend_minimal-v0: simulations/1l-1s-10ad-v0/random_vs_defend_minimal/
 attack_maximal_vs_defend_minimal-v0: simulations/v0/attack_maximal_vs_defend_minimal/run.py simulations/v0/attack_maximal_vs_defend_minimal/run.sh
 	cd simulations/v0/attack_maximal_vs_defend_minimal/ && $(MAKE) run
 
-attack_maximal_vs_random-v0: simulations/v0/attack_maximal_vs_random/run.py simulations/1l-1s-10ad-v0/attack_maximal_vs_random/run.sh
+attack_maximal_vs_random-v0: simulations/v0/attack_maximal_vs_random/run.py simulations/v0/attack_maximal_vs_random/run.sh
 	cd simulations/v0/attack_maximal_vs_random/ && $(MAKE) run
+
+tabular_q_agent_vs_random-v0: simulations/v0/tabular_q_agent_vs_random/run.py simulations/v0/tabular_q_agent_vs_random/run.sh
+	cd simulations/v0/tabular_q_agent_vs_random/ && $(MAKE) run
 
 v0: tabular_q_learning_vs_random_defense-v0 random_vs_random-v0 random_vs_defend_minimal-v0
 v0: attack_maximal_vs_defend_minimal-v0 attack_maximal_vs_random-v0 random_attack_vs_tabular_q_learning-v0
+v0: maximal_attack_vs_tabular_q_learning-v0 tabular_q_agent_vs_random-v0
 
 # V1 Experiments
 
@@ -55,6 +59,7 @@ attack_maximal_vs_random-v1: simulations/v1/attack_maximal_vs_random/run.py simu
 
 v1: tabular_q_learning_vs_random_defense-v1 random_vs_random-v1 random_vs_defend_minimal-v1
 v1: attack_maximal_vs_defend_minimal-v1 attack_maximal_vs_random-v1 random_attack_vs_tabular_q_learning-v1
+v1: maximal_attack_vs_tabular_q_learning-v1
 
 # All
 
@@ -73,6 +78,7 @@ clean:
 	cd simulations/v0/random_vs_defend_minimal/ && $(MAKE) clean
 	cd simulations/v0/attack_maximal_vs_defend_minimal/ && $(MAKE) clean
 	cd simulations/v0/attack_maximal_vs_random/ && $(MAKE) clean
+	cd simulations/v0/tabular_q_agent_vs_random/ && $(MAKE) clean
 
 	# V1
 	cd ./training/random_defense-v1/tabular_q_learning/ && $(MAKE) clean
