@@ -22,6 +22,15 @@
        This experiment trains a defender agent using tabular q-learning to act optimally in the given
        environment and defeat the random attacker.
        
+    - [maximal_attack_vs_tabular_q_learning-v0](training/maximal_attack-v0/tabular_q_learning/)
+       * This is an experiment in the `random_attack-v0` environment.
+       An environment where the attack is following the `attack_maximal` attack policy.
+       The `attack_maximal` policy entails that the attacker will always attack the attribute with
+       the maximum value out of all of its neighbors. The defender is implemented with a
+       random defense policy.
+       This experiment trains a defender agent using tabular q-learning to act optimally in the given
+       environment and detect the attacker.       
+       
     - [random_vs_random-v0](simulations/v0/random_vs_random/)
        * This is an experiment in the `idsgame-v0` environment.  
        An environment where neither the attacker nor defender is part of the environment, i.e.
