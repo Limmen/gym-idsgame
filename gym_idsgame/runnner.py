@@ -19,6 +19,7 @@ from gym_idsgame.agents.random_attack_bot_agent import RandomAttackBotAgent
 from gym_idsgame.agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
 from gym_idsgame.agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
 from gym_idsgame.agents.tabular_q_attacker_bot_agent import TabularQAttackerBotAgent
+from gym_idsgame.agents.tabular_q_defender_bot_agent import TabularQDefenderBotAgent
 
 class Runner:
     """
@@ -61,12 +62,8 @@ class Runner:
         attacker: TrainAgent = None
         if config.attacker_type == AgentType.TABULAR_Q_AGENT.value:
             attacker = TabularQAgent(env, config.q_agent_config)
-        elif config.attacker_type == AgentType.RANDOM.value:
-            pass
-        elif config.attacker_type == AgentType.DETERMINISTIC.value:
-            pass
         else:
-            raise AssertionError("Attacker type not recognized: {}".format(config.attacker_type))
+            raise AssertionError("Attacker train agent type not recognized: {}".format(config.attacker_type))
         train_result = attacker.train()
         eval_result = attacker.eval()
         return train_result, eval_result
@@ -78,12 +75,8 @@ class Runner:
             env.idsgame_config.render_config.title = config.title
         if config.defender_type == AgentType.TABULAR_Q_AGENT.value:
             defender = TabularQAgent(env, config.q_agent_config)
-        elif config.defender_type == AgentType.RANDOM.value:
-            pass
-        elif config.defender_type == AgentType.DETERMINISTIC.value:
-            pass
         else:
-            raise AssertionError("Defender type not recognized: {}".format(config.defender_type))
+            raise AssertionError("Defender train agent type not recognized: {}".format(config.defender_type))
         train_result = defender.train()
         eval_result = defender.eval()
         return train_result, eval_result
@@ -103,7 +96,10 @@ class Runner:
         elif config.defender_type == AgentType.DEFEND_MINIMAL_VALUE.value:
             defender = DefendMinimalValueBotAgent(env.idsgame_config.game_config)
         elif config.defender_type == AgentType.TABULAR_Q_AGENT.value:
-            pass
+            if config.q_agent_config is None or config.q_agent_config.load_path is None:
+                raise ValueError("To run a simulation with a tabular Q-agent, the path to the saved "
+                                 "Q-table must be specified")
+            defender = TabularQDefenderBotAgent(env.idsgame_config.game_config, config.q_agent_config.load_path)
         else:
             raise AssertionError("Defender type not recognized: {}".format(config.defender_type))
 
