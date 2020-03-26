@@ -1,6 +1,6 @@
-# Experiment `maximal_attack-v0`_`tabular_q_learning`
+# Experiment `maximal_attack-v1`_`tabular_q_learning`
 
-This is an experiment in the `maximal_attack-v0` environment.
+This is an experiment in the `maximal_attack-v1` environment.
 An environment where the attack is following the `attack_maximal` attack policy.
 The `attack_maximal` policy entails that the attacker will always attack the attribute with
 the maximum value out of all of its neighbors. The defender is implemented with a
@@ -22,15 +22,15 @@ The network configuration of the environment is as follows:
 
 The starting state for each node in the environment is initialized as follows (with some randomness for where the vulnerabilities are placed).
 
-- `defense_val=2`
+- `defense_val=4`
 - `attack_val=0`
-- `num_vulnerabilities_per_node=1` (which type of defense at the node that is vulnerable is selected randomly when the environment is initialized)
-- `det_val=2`
+- `num_vulnerabilities_per_node=4` (which type of defenses at the node that are vulnerable is selected randomly when the environment is initialized)
+- `det_val=3`
 - `vulnerability_val=0` 
 
 ## Environment 
 
-- Env: `random_attack-v0`
+- Env: `random_attack-v1`
 
 ## Algorithm
 
@@ -48,10 +48,10 @@ Example configuration in `config.json`:
 {
     "attacker_type": 0,
     "defender_type": 0,
-    "env_name": "idsgame-maximal_attack-v0",
+    "env_name": "idsgame-maximal_attack-v1",
     "logger": null,
     "mode": 1,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/maximal_attack-v0/tabular_q_learning",
+    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/maximal_attack-v1/tabular_q_learning",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
         "alpha": 0.2,
@@ -65,7 +65,7 @@ Example configuration in `config.json`:
         "eval_render": false,
         "eval_sleep": 0.9,
         "gamma": 0.999,
-        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/maximal_attack-v0/tabular_q_learning/gifs",
+        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/maximal_attack-v1/tabular_q_learning/gifs",
         "gifs": true,
         "logger": null,
         "min_epsilon": 0.1,
@@ -74,7 +74,7 @@ Example configuration in `config.json`:
         "render": false,
         "train_log_frequency": 100,
         "video": true,
-        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/maximal_attack-v0/tabular_q_learning/videos",
+        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/maximal_attack-v1/tabular_q_learning/videos",
         "video_fps": 5,
         "video_frequency": 1
     },
@@ -92,7 +92,7 @@ q_agent_config = QAgentConfig(gamma=0.999, alpha=0.2, epsilon=1, render=False, e
                               video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=10000,
                               eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
                               eval_frequency=1000, attacker=False, defender=True)
-env_name = "idsgame-maximal_attack-v0"
+env_name = "idsgame-maximal_attack-v1"
 client_config = ClientConfig(env_name=env_name, defender_type=AgentType.TABULAR_Q_AGENT.value,
                              mode=RunnerMode.TRAIN_DEFENDER.value,
                              q_agent_config=q_agent_config, output_dir=default_output_dir(),
@@ -142,6 +142,18 @@ After the experiment has finished, the results are written to the following sub-
 
 <p align="center">
 <img src="./docs/epsilon_train.png" width="800">
+</p>
+
+### Cumulative Rewards
+
+#### Attacker (Train)
+<p align="center">
+<img src="./docs/attacker_cumulative_reward_train.png" width="800">
+</p>
+
+#### Defender (Train)
+<p align="center">
+<img src="./docs/defender_cumulative_reward_train.png" width="800">
 </p>
 
 ### Policy Inspection
