@@ -10,6 +10,7 @@ from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
 from gym_idsgame.agents.random_attack_bot_agent import RandomAttackBotAgent
 from gym_idsgame.agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
+from gym_idsgame.agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
 from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 import gym_idsgame.envs.util.idsgame_util as util
@@ -361,6 +362,8 @@ class AttackDefenseEnv(IdsGameEnv, ABC):
 # -------- Concrete envs ------------
 
 # -------- Version 0 ------------
+
+
 class IdsGameRandomDefenseV0Env(AttackerEnv):
     """
     [AttackerEnv] 1 server per layer, 10 attack-defense-values, random defender
@@ -375,6 +378,7 @@ class IdsGameRandomDefenseV0Env(AttackerEnv):
         idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
         idsgame_config.render_config.caption = "idsgame-random_defense-v0"
         super().__init__(idsgame_config=idsgame_config)
+
 
 class IdsGameMinimalDefenseV0Env(AttackerEnv):
     """
@@ -391,6 +395,7 @@ class IdsGameMinimalDefenseV0Env(AttackerEnv):
         idsgame_config.render_config.caption = "idsgame-minimal_defense-v0"
         super().__init__(idsgame_config=idsgame_config)
 
+
 class IdsGameRandomAttackV0Env(DefenderEnv):
     """
     [DefenderEnv] 1 server per layer, 10 attack-defense-values, random attacker
@@ -406,6 +411,23 @@ class IdsGameRandomAttackV0Env(DefenderEnv):
         idsgame_config.render_config.caption = "idsgame-random_attack-v0"
         super().__init__(idsgame_config=idsgame_config)
 
+
+class IdsGameMaximalAttackV0Env(DefenderEnv):
+    """
+    [DefenderEnv] 1 server per layer, 10 attack-defense-values, attacker following the "attack maximal strategy"
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Version] 0
+    """
+    def __init__(self):
+        game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
+        game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+                                      vulnerability_val=0)
+        attacker_agent = AttackMaximalValueBotAgent(game_config)
+        idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
+        idsgame_config.render_config.caption = "idsgame-maximal_attack-v0"
+        super().__init__(idsgame_config=idsgame_config)
+
+
 class IdsGameV0Env(AttackDefenseEnv):
     """
     [AttackDefenseEnv] 1 server per layer, 10 attack-defense-values
@@ -420,7 +442,10 @@ class IdsGameV0Env(AttackDefenseEnv):
         idsgame_config.render_config.caption = "idsgame-v0"
         super().__init__(idsgame_config=idsgame_config)
 
+
 # -------- Version 1 ------------
+
+
 class IdsGameRandomDefenseV1Env(AttackerEnv):
     """
     [AttackerEnv] 1 server per layer, 10 attack-defense-values, random defender
@@ -435,6 +460,7 @@ class IdsGameRandomDefenseV1Env(AttackerEnv):
         idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
         idsgame_config.render_config.caption = "idsgame-random_defense-v1"
         super().__init__(idsgame_config=idsgame_config)
+
 
 class IdsGameMinimalDefenseV1Env(AttackerEnv):
     """
@@ -451,6 +477,7 @@ class IdsGameMinimalDefenseV1Env(AttackerEnv):
         idsgame_config.render_config.caption = "idsgame-random_defense-v1"
         super().__init__(idsgame_config=idsgame_config)
 
+
 class IdsGameRandomAttackV1Env(DefenderEnv):
     """
     [DefenderEnv] 1 server per layer, 10 attack-defense-values, random attacker
@@ -465,6 +492,23 @@ class IdsGameRandomAttackV1Env(DefenderEnv):
         idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
         idsgame_config.render_config.caption = "idsgame-random_attack-v1"
         super().__init__(idsgame_config=idsgame_config)
+
+
+class IdsGameMaximalAttackV1Env(DefenderEnv):
+    """
+    [DefenderEnv] 1 server per layer, 10 attack-defense-values, attacker following the "attack maximal strategy"
+    [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+    [Version] 1
+    """
+    def __init__(self):
+        game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
+        game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=4, det_val=3,
+                                      vulnerability_val=0)
+        attacker_agent = AttackMaximalValueBotAgent(game_config)
+        idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
+        idsgame_config.render_config.caption = "idsgame-maximal_attack-v1"
+        super().__init__(idsgame_config=idsgame_config)
+
 
 class IdsGameV1Env(AttackDefenseEnv):
     """

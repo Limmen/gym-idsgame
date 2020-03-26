@@ -7,6 +7,9 @@ tabular_q_learning_vs_minimal_defense-v0: training/minimal_defense-v0/tabular_q_
 random_attack_vs_tabular_q_learning-v0: training/random_attack-v0/tabular_q_learning training/random_attack-v0/tabular_q_learning
 	cd training/random_attack-v0/tabular_q_learning/ && $(MAKE) run
 
+maximal_attack_vs_tabular_q_learning-v0: training/maximal_attack-v0/tabular_q_learning training/maximal_attack-v0/tabular_q_learning
+	cd training/maximal_attack-v0/tabular_q_learning/ && $(MAKE) run
+
 random_vs_random-v0: simulations/v0/random_vs_random/run.py simulations/v0/random_vs_random/run.sh
 	cd simulations/v0/random_vs_random/ && $(MAKE) run
 
@@ -52,6 +55,7 @@ clean:
 	cd ./training/random_defense-v0/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/minimal_defense-v0/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/random_attack-v0/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/maximal_attack-v0/tabular_q_learning/ && $(MAKE) clean
 	cd simulations/v0/random_vs_random/ && $(MAKE) clean
 	cd simulations/v0/random_vs_defend_minimal/ && $(MAKE) clean
 	cd simulations/v0/attack_maximal_vs_defend_minimal/ && $(MAKE) clean
