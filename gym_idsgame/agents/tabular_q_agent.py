@@ -31,7 +31,7 @@ class TabularQAgent(TrainAgent):
             self.Q = np.random.rand(1, self.env.num_actions)
         self.train_result = ExperimentResult()
         self.eval_result = ExperimentResult()
-        self.outer = tqdm.tqdm(total=self.config.num_episodes, desc='Episode', position=0)
+        self.outer_train = tqdm.tqdm(total=self.config.num_episodes, desc='Train Episode', position=0)
         if self.config.logger is None:
             self.config.logger = logging.getLogger('QAgent')
         self.num_eval_games = 0
@@ -82,7 +82,7 @@ class TabularQAgent(TrainAgent):
         episode_steps = []
 
         # Logging
-        self.outer.set_description_str("epsilon:{:.2f},avg_R:{:.2f},avg_t:{:.2f}".format(self.config.epsilon, 0.0, 0.0))
+        self.outer_train.set_description_str("[Train] epsilon:{:.2f},avg_R:{:.2f},avg_t:{:.2f}".format(self.config.epsilon, 0.0, 0.0))
 
         # Training
         for episode in range(self.config.num_episodes):
@@ -129,7 +129,7 @@ class TabularQAgent(TrainAgent):
             # Reset environment for the next episode and update game stats
             done = False
             obs = self.env.reset(update_stats=True)
-            self.outer.update(1)
+            self.outer_train.update(1)
 
             # Anneal epsilon linearly
             self.anneal_epsilon()
@@ -162,13 +162,22 @@ class TabularQAgent(TrainAgent):
             else self.eval_attacker_cumulative_reward
         defender_cumulative_reward = self.env.state.defender_cumulative_reward if not eval \
             else self.eval_defender_cumulative_reward
-        log_str = "epsilon:{:.2f},avg_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
-                  "acc_D_R:{:.2f}".format(self.config.epsilon, avg_episode_reward,
-                                          avg_episode_steps,
-                                          hack_probability,
-                                          attacker_cumulative_reward,
-                                          defender_cumulative_reward)
-        self.outer.set_description_str(log_str)
+        if eval:
+            log_str = "[Eval] avg_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
+                      "acc_D_R:{:.2f}".format(avg_episode_reward,
+                                              avg_episode_steps,
+                                              hack_probability,
+                                              attacker_cumulative_reward,
+                                              defender_cumulative_reward)
+            self.outer_eval.set_description_str(log_str)
+        else:
+            log_str = "[Train] epsilon:{:.2f},avg_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
+                      "acc_D_R:{:.2f}".format(self.config.epsilon, avg_episode_reward,
+                                              avg_episode_steps,
+                                              hack_probability,
+                                              attacker_cumulative_reward,
+                                              defender_cumulative_reward)
+            self.outer_train.set_description_str(log_str)
         self.config.logger.info(log_str)
         result.avg_episode_steps.append(avg_episode_steps)
         result.avg_episode_rewards.append(avg_episode_reward)
@@ -204,6 +213,12 @@ class TabularQAgent(TrainAgent):
         # Tracking metrics
         episode_rewards = []
         episode_steps = []
+
+        # Logging
+        self.outer_eval = tqdm.tqdm(total=self.config.eval_episodes, desc='Eval Episode', position=1)
+        self.outer_eval.set_description_str(
+            "[Eval] avg_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
+            "acc_D_R:{:.2f}".format(0.0, 0.0,0.0,0.0,0.0))
 
         # Eval
         obs = self.env.reset(update_stats=False)
@@ -252,9 +267,9 @@ class TabularQAgent(TrainAgent):
             if self.config.gifs and self.config.video:
                 self.env.generate_gif(self.config.gif_dir + "/episode_" + str(episode) + "_"
                                       + time_str + ".gif", self.config.video_fps)
-
             done = False
             obs = self.env.reset(update_stats=False)
+            self.outer_eval.update(1)
 
         self.env.close()
         self.config.logger.info("Evaluation Complete")
