@@ -5,7 +5,7 @@ An environment where neither the attacker nor defender is part of the environmen
 it is intended for 2-agent simulations or RL training.
 
 In this experiment, the attacker is implemented with a greedy policy 
-based on a save Q-table.The defender is implemented with a random defense policy.
+based on a save Q-table. The defender is implemented with a random defense policy.
 
 **NOTE** By default the pre-configured environments will create vulnerabilities at random
 locations in the network in order to make sure that a pre-programmed policy cannot be the

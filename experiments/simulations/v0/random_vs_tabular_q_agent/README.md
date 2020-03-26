@@ -1,13 +1,20 @@
-# Experiment `random`_vs_`defend_minimal`
+# Experiment `random`_vs_`tabular_q_learning`
 
 This is an experiment in the `idsgame-v0` environment. 
 An environment where neither the attacker nor defender is part of the environment, i.e.
 it is intended for 2-agent simulations or RL training.
 
-In this experiment, the attacker is implemented with a random attack policy.
-The defender is implemented with the  policy `defend_minimal`. 
-The `defend_minimal` policy entails that the defender will always
-defend the attribute with the minimal value out of all of its neighbors.
+In this experiment, the defender is implemented with a greedy policy 
+based on a save Q-table. The attacker is implemented with a random attack policy.
+
+**NOTE** By default the pre-configured environments will create vulnerabilities at random
+locations in the network in order to make sure that a pre-programmed policy cannot be the
+optimal. Therefore, when you run simulation with a pre-trained Q-agent and with a pre-configured
+environment, it is likely that the environment will be different (have vulnerabilities at different locations)
+than the environment for which the Q-agent was trained to act optimally in. Thus,
+if you want to simulate a trained Q-agent with the exact same environment as when it was
+trained you'll need to manually use the configuration APIs to make the environment 
+be identical. 
 
 The network configuration of the environment is as follows:
 
@@ -47,15 +54,41 @@ Example configuration in `config.json`:
 ```json
 {
     "attacker_type": 1,
-    "defender_type": 2,
+    "defender_type": 0,
     "env_name": "idsgame-v0",
     "logger": null,
     "mode": 2,
-    "output_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/simulations/v0/random_vs_defend_minimal",
+    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/v0/random_vs_tabular_q_agent",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
-    "q_agent_config": null,
+    "q_agent_config": {
+        "alpha": 0.1,
+        "attacker": true,
+        "defender": false,
+        "epsilon": 0.9,
+        "epsilon_decay": 0.999,
+        "eval_episodes": 1,
+        "eval_frequency": 1000,
+        "eval_log_frequency": 1,
+        "eval_render": false,
+        "eval_sleep": 0.35,
+        "gamma": 0.8,
+        "gif_dir": null,
+        "gifs": false,
+        "load_path": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/v0/random_vs_tabular_q_agent/q_table/q_table.npy",
+        "logger": null,
+        "min_epsilon": 0.1,
+        "num_episodes": 5000,
+        "py/object": "gym_idsgame.agents.dao.q_agent_config.QAgentConfig",
+        "render": false,
+        "save_dir": null,
+        "train_log_frequency": 100,
+        "video": false,
+        "video_dir": null,
+        "video_fps": 5,
+        "video_frequency": 1
+    },
     "simulation_config": {
-        "gif_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/simulations/v0/random_vs_defend_minimal/gifs",
+        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/v0/random_vs_tabular_q_agent/gifs",
         "gifs": true,
         "log_frequency": 1,
         "logger": null,
@@ -64,11 +97,11 @@ Example configuration in `config.json`:
         "render": false,
         "sleep": 0.8,
         "video": true,
-        "video_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/simulations/v0/random_vs_defend_minimal/videos",
+        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/v0/random_vs_tabular_q_agent/videos",
         "video_fps": 5,
         "video_frequency": 1
     },
-    "title": "RandomAttacker vs DefendMinimalDefender"
+    "title": "RandomAttacker vs TabularQAgentDefender"
 }
 ```
 
@@ -78,18 +111,14 @@ Example configuration in `run.py`:
 simulation_config = SimulationConfig(render=False, sleep=0.8, video=True, log_frequency=1,
                                      video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=1000,
                                      gifs=True, gif_dir=default_output_dir() + "/gifs", video_frequency = 1)
+q_agent_config = QAgentConfig(load_path=default_output_dir() + "/q_table/q_table.npy")
 env_name = "idsgame-v0"
 client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.RANDOM.value,
-                             defender_type=AgentType.DEFEND_MINIMAL_VALUE.value, mode=RunnerMode.SIMULATE.value,
+                             defender_type=AgentType.TABULAR_Q_AGENT.value, mode=RunnerMode.SIMULATE.value,
                              simulation_config=simulation_config, output_dir=default_output_dir(),
-                             title="RandomAttacker vs DefendMinimalDefender")
+                             title="RandomAttacker vs TabularQAgentDefender",
+                             q_agent_config=q_agent_config)
 ```
-
-## Example Simulation
-
-<p align="center">
-<img src="./docs/simulation.gif" width="400">
-</p>
 
 ## Commands
 

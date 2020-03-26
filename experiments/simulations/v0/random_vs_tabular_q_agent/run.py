@@ -34,9 +34,9 @@ def default_config() -> ClientConfig:
     q_agent_config = QAgentConfig(load_path=default_output_dir() + "/q_table/q_table.npy")
     env_name = "idsgame-v0"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.RANDOM.value,
-                                 defender_type=AgentType.DEFEND_MINIMAL_VALUE.value, mode=RunnerMode.SIMULATE.value,
+                                 defender_type=AgentType.TABULAR_Q_AGENT.value, mode=RunnerMode.SIMULATE.value,
                                  simulation_config=simulation_config, output_dir=default_output_dir(),
-                                 title="RandomAttacker vs DefendMinimalDefender",
+                                 title="RandomAttacker vs TabularQAgentDefender",
                                  q_agent_config=q_agent_config)
     return client_config
 
