@@ -30,11 +30,11 @@ def default_config() -> ClientConfig:
     simulation_config = SimulationConfig(render=False, sleep=0.8, video=True, log_frequency=1,
                                          video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=1000,
                                          gifs=True, gif_dir=default_output_dir() + "/gifs", video_frequency = 1)
-    env_name = "idsgame-v1"
+    env_name = "idsgame-v2"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.RANDOM.value,
-                                 defender_type=AgentType.DEFEND_MINIMAL_VALUE.value, mode=RunnerMode.SIMULATE.value,
+                                 defender_type=AgentType.RANDOM.value, mode=RunnerMode.SIMULATE.value,
                                  simulation_config=simulation_config, output_dir=default_output_dir(),
-                                 title="RandomAttacker vs DefendMinimalDefender")
+                                 title="RandomAttacker vs RandomDefender")
     return client_config
 
 
@@ -79,7 +79,7 @@ if __name__ == '__main__':
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir)
-    logger = util.setup_logger("idsgame-v0-random_vs_defend_minimal", config.output_dir + "/logs/",
+    logger = util.setup_logger("idsgame-v0-random_vs_random", config.output_dir + "/logs/",
                                time_str=time_str)
     config.logger = logger
     config.simulation_config.logger = logger

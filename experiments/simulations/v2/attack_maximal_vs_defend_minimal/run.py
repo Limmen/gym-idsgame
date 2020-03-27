@@ -30,11 +30,11 @@ def default_config() -> ClientConfig:
     simulation_config = SimulationConfig(render=False, sleep=0.8, video=True, log_frequency=1,
                                          video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=1000,
                                          gifs=True, gif_dir=default_output_dir() + "/gifs", video_frequency = 1)
-    env_name = "idsgame-v1"
-    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.RANDOM.value,
+    env_name = "idsgame-v2"
+    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.ATTACK_MAXIMAL_VALUE.value,
                                  defender_type=AgentType.DEFEND_MINIMAL_VALUE.value, mode=RunnerMode.SIMULATE.value,
                                  simulation_config=simulation_config, output_dir=default_output_dir(),
-                                 title="RandomAttacker vs DefendMinimalDefender")
+                                 title="AttackMaximalAttacker vs DefendMinimalDefender")
     return client_config
 
 

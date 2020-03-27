@@ -48,14 +48,14 @@ Example configuration in `config.json`:
 {
     "attacker_type": 1,
     "defender_type": 2,
-    "env_name": "idsgame-v0",
+    "env_name": "idsgame-v1",
     "logger": null,
     "mode": 2,
-    "output_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/simulations/v1/random_vs_defend_minimal",
+    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/v1/random_vs_defend_minimal",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": null,
     "simulation_config": {
-        "gif_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/simulations/v1/random_vs_defend_minimal/gifs",
+        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/v1/random_vs_defend_minimal/gifs",
         "gifs": true,
         "log_frequency": 1,
         "logger": null,
@@ -64,12 +64,12 @@ Example configuration in `config.json`:
         "render": false,
         "sleep": 0.8,
         "video": true,
-        "video_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/simulations/v1/random_vs_defend_minimal/videos",
+        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/v1/random_vs_defend_minimal/videos",
         "video_fps": 5,
         "video_frequency": 1
     },
     "title": "RandomAttacker vs DefendMinimalDefender"
-}
+} 
 ```
 
 Example configuration in `run.py`:
@@ -78,7 +78,7 @@ Example configuration in `run.py`:
 simulation_config = SimulationConfig(render=False, sleep=0.8, video=True, log_frequency=1,
                                      video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=1000,
                                      gifs=True, gif_dir=default_output_dir() + "/gifs", video_frequency = 1)
-env_name = "idsgame-v0"
+env_name = "idsgame-v1"
 client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.RANDOM.value,
                              defender_type=AgentType.DEFEND_MINIMAL_VALUE.value, mode=RunnerMode.SIMULATE.value,
                              simulation_config=simulation_config, output_dir=default_output_dir(),
