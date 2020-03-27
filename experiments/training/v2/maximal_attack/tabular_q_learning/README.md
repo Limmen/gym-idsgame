@@ -1,9 +1,13 @@
-# Experiment `random_attack-v2`_`tabular_q_learning`
+# Experiment `maximal_attack-v2`_`tabular_q_learning`
 
-This is an experiment in the `random_attack-v2` environment. 
-An environment where the attack is following a random attack policy. 
+This is an experiment in the `maximal_attack-v2` environment.
+An environment where the attack is following the `attack_maximal` attack policy.
+The `attack_maximal` policy entails that the attacker will always attack the attribute with
+the maximum value out of all of its neighbors. The defender is implemented with a
+random defense policy.
+ 
 This experiment trains a defender agent using tabular q-learning to act optimally in the given
-environment and defeat the random attacker.
+environment and detect the attacker.
 
 The network configuration of the environment is as follows:
 
@@ -44,58 +48,58 @@ Example configuration in `config.json`:
 {
     "attacker_type": 0,
     "defender_type": 0,
-    "env_name": "idsgame-random_attack-v2",
+    "env_name": "idsgame-maximal_attack-v2",
     "logger": null,
     "mode": 1,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v2/random_attack/tabular_q_learning",
+    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v2/maximal_attack/tabular_q_learning",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
-        "alpha": 0.3,
+        "alpha": 0.2,
         "attacker": false,
         "defender": true,
         "epsilon": 1,
-        "epsilon_decay": 0.99,
+        "epsilon_decay": 0.999,
         "eval_episodes": 1,
-        "eval_frequency": 100,
+        "eval_frequency": 1000,
         "eval_log_frequency": 1,
         "eval_render": false,
         "eval_sleep": 0.9,
-        "gamma": 0.99,
-        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v2/random_attack/tabular_q_learning/gifs",
+        "gamma": 0.999,
+        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v2/maximal_attack/tabular_q_learning/gifs",
         "gifs": true,
         "load_path": null,
         "logger": null,
         "min_epsilon": 0.1,
-        "num_episodes": 1000,
+        "num_episodes": 5000,
         "py/object": "gym_idsgame.agents.dao.q_agent_config.QAgentConfig",
         "render": false,
-        "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v2/random_attack/tabular_q_learning/data",
+        "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v2/maximal_attack/tabular_q_learning/data",
         "train_log_frequency": 100,
         "video": true,
-        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v2/random_attack/tabular_q_learning/videos",
+        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v2/maximal_attack/tabular_q_learning/videos",
         "video_fps": 5,
         "video_frequency": 1
     },
     "simulation_config": null,
-    "title": "RandomAttacker vs TrainingQAgent"
+    "title": "AttackMaximalAttacker vs TrainingQAgent"
 }
 ```
 
 Example configuration in `run.py`:
 
 ```python
-q_agent_config = QAgentConfig(gamma=0.99, alpha=0.3, epsilon=1, render=False, eval_sleep=0.9,
+q_agent_config = QAgentConfig(gamma=0.999, alpha=0.2, epsilon=1, render=False, eval_sleep=0.9,
                               min_epsilon=0.1, eval_episodes=1, train_log_frequency=100,
-                              epsilon_decay=0.99, video=True, eval_log_frequency=1,
-                              video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=1000,
+                              epsilon_decay=0.999, video=True, eval_log_frequency=1,
+                              video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5000,
                               eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                              eval_frequency=100, attacker=False, defender=True,
+                              eval_frequency=1000, attacker=False, defender=True,
                               save_dir=default_output_dir() + "/data")
-env_name = "idsgame-random_attack-v2"
+env_name = "idsgame-maximal_attack-v2"
 client_config = ClientConfig(env_name=env_name, defender_type=AgentType.TABULAR_Q_AGENT.value,
                              mode=RunnerMode.TRAIN_DEFENDER.value,
                              q_agent_config=q_agent_config, output_dir=default_output_dir(),
-                             title="RandomAttacker vs TrainingQAgent")
+                             title="AttackMaximalAttacker vs TrainingQAgent")
 ```
 
 After the experiment has finished, the results are written to the following sub-directories:
@@ -151,23 +155,24 @@ After the experiment has finished, the results are written to the following sub-
 <img src="docs/episode_0.gif" width="400">
 </p> 
 
-#### Evaluation after 100 Training Episodes
-
-<p align="center">
-<img src="docs/episode_100.gif" width="400">
-</p>
-
-#### Evaluation after 200 Training Episodes
-
-<p align="center">
-<img src="docs/episode_200.gif" width="400">
-</p>  
-
 #### Evaluation after 1000 Training Episodes
 
 <p align="center">
 <img src="docs/episode_1000.gif" width="400">
+</p>
+
+#### Evaluation after 2000 Training Episodes
+
+<p align="center">
+<img src="docs/episode_2000.gif" width="400">
 </p>  
+
+#### Evaluation after 4000 Training Episodes
+
+<p align="center">
+<img src="docs/episode_4000.gif" width="400">
+</p>  
+
 
 ## Commands
 
