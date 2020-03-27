@@ -186,3 +186,9 @@
    defend the attribute with the minimal value out of all of its neighbors.
    This experiment trains an attacker agent using tabular q-learning to act optimally in the given 
    environment and defeat the defender.   
+   
+- [random_attack_vs_tabular_q_learning-v2](training/v2/random_attack/tabular_q_learning/)
+   * This is an experiment in the `random_attack-v2` environment.  
+   An environment where the attack is following a random attack policy.  
+   This experiment trains a defender agent using tabular q-learning to act optimally in the given
+   environment and defeat the random attacker.   
