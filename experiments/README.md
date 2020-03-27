@@ -171,8 +171,18 @@
 ## Experiments in Version 2 Environments 
 
 ### Training Experiments
+
 - [tabular_q_learning_vs_random_defense-v2](training/v2/random_defense/tabular_q_learning/)
    * This is an experiment in the `random_defense-v2` environment. 
    An environment where the defender is following a random defense policy. 
    This experiment trains an attacker agent using tabular q-learning to act optimally in the given
    environment and defeat the random defender.
+   
+   
+- [tabular_q_learning_vs_minimal_defense-v2](training/v2/minimal_defense/tabular_q_learning/)
+   * This is an experiment in the `minimal_defense-v2` environment.  
+   An environment where the defender is following the `defend_minimal` defense policy. 
+   The `defend_minimal` policy entails that the defender will always 
+   defend the attribute with the minimal value out of all of its neighbors.
+   This experiment trains an attacker agent using tabular q-learning to act optimally in the given 
+   environment and defeat the defender.   

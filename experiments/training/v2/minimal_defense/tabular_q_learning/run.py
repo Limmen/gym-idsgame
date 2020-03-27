@@ -35,7 +35,7 @@ def default_config() -> ClientConfig:
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
                                   eval_frequency=5000, attacker=True, defender=False,
                                   save_dir=default_output_dir() + "/data")
-    env_name = "idsgame-minimal_defense-v0"
+    env_name = "idsgame-minimal_defense-v2"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.TABULAR_Q_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
                                  q_agent_config=q_agent_config, output_dir=default_output_dir(),

@@ -69,7 +69,10 @@ v1: maximal_attack_vs_tabular_q_learning-v1
 tabular_q_learning_vs_random_defense-v2: training/v2/random_defense/tabular_q_learning training/v2/random_defense/tabular_q_learning
 	cd training/v2/random_defense/tabular_q_learning/ && $(MAKE) run
 
-v2: tabular_q_learning_vs_random_defense-v2
+tabular_q_learning_vs_minimal_defense-v2: training/v2/minimal_defense/tabular_q_learning training/v2/minimal_defense/tabular_q_learning
+	cd training/v2/minimal_defense/tabular_q_learning/ && $(MAKE) run
+
+v2: tabular_q_learning_vs_random_defense-v2 tabular_q_learning_vs_minimal_defense-v2
 
 # All
 
@@ -103,3 +106,4 @@ clean:
 
 	# V2
 	cd ./training/v2/random_defense/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v2/minimal_defense/tabular_q_learning/ && $(MAKE) clean
