@@ -1,6 +1,7 @@
 """
 Abstract resource node in the network of the gym-idsgame environment
 """
+from typing import Union
 from abc import ABC, abstractmethod
 import pyglet
 from pyglet import clock
@@ -152,18 +153,20 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         else:
             self.blink_black_defense(0, detect=detect)
 
-    def manual_blink_attack(self, i: int, edges: list = None) -> None:
+    def manual_blink_attack(self, i: int, attacker_pos: Union[int, int], edges: list = None) -> None:
         """
         Manual attack blink, when not using the clock to schedule blinks but rather ticking the clock manually.
         Used when the agent plays the game and not a human.
 
         :param i: the blink number
+        :param attacker_pos: the attackers position
+        :param edges: list of edges for visualizatio
         :return: None
        """
         if i % 2 == 0:
-            self.blink_red_attack(0, edges_list=edges)
+            self.blink_red_attack(0, attacker_pos, edges_list=edges)
         else:
-            self.blink_black_attack(0, edges_list=edges)
+            self.blink_black_attack(0, attacker_pos, edges_list=edges)
 
     def create_labels(self, attack_label_x: int, attack_label_y: int, defense_label_x: int, defense_label_y: int,
                       det_label_x: int, det_label_y: int) -> None:
@@ -228,7 +231,7 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         pass
 
     @abstractmethod
-    def visualize_attack(self, attack_type, edges_list=None):
+    def visualize_attack(self, attack_type, attacker_pos, edges_list=None):
         pass
 
     @abstractmethod

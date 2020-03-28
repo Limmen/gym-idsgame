@@ -1,3 +1,7 @@
+"""
+Integration test, runs 10 episodes of each experiment to verify that its basic functionality is OK.
+Good to run whenever changes is made to the pre-implemented agents or environment.
+"""
 import os
 from gym_idsgame.config.runner_mode import RunnerMode
 from gym_idsgame.simulation.dao.simulation_config import SimulationConfig
@@ -8,14 +12,11 @@ from gym_idsgame.runnner import Runner
 
 
 def default_output_dir() -> str:
-    """
-    :return: the default output dir
-    """
     script_dir = os.path.dirname(__file__)
     return script_dir
 
 
-def test_sim_attack_maximal_vs_defend_minimal(version) -> ClientConfig:
+def test_sim_attack_maximal_vs_defend_minimal(version):
     simulation_config = SimulationConfig(log_frequency=1, num_episodes=10)
     env_name = "idsgame-v" + str(version)
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.ATTACK_MAXIMAL_VALUE.value,

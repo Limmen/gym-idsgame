@@ -164,7 +164,7 @@ class GameFrame(pyglet.window.Window):
                                 edges = self.resource_network.get(self.attacker_sprite.pos).outgoing_edges
 
                             self.resource_network.grid[attack_row][attack_col].visualize_attack(
-                                attack_type, edges)
+                                attack_type, self.game_state.attacker_pos, edges)
 
                             # 7. Simulate attack outcome
                             attack_successful = self.game_state.simulate_attack(
@@ -216,7 +216,8 @@ class GameFrame(pyglet.window.Window):
                                 if node.node_type == NodeType.DATA:
                                     edges = self.resource_network.get(self.attacker_sprite.pos).outgoing_edges
 
-                                node.visualize_attack(self.game_state.attack_defense_type, edges)
+                                node.visualize_attack(self.game_state.attack_defense_type, self.game_state.attacker_pos,
+                                                      edges)
 
                                 # 7. Simulate attack outcome
                                 attack_successful = self.game_state.simulate_attack(
@@ -329,7 +330,8 @@ class GameFrame(pyglet.window.Window):
             edges = []
             if target_node.node_type == NodeType.DATA:
                 edges = self.resource_network.get(self.attacker_sprite.pos).outgoing_edges
-            self.resource_network.grid[attack.target_row][attack.target_col].manual_blink_attack(i, edges)
+            self.resource_network.grid[attack.target_row][attack.target_col].manual_blink_attack(
+                i, self.game_state.attacker_pos, edges)
 
     def simulate_defense_events(self, defense_events: List[AttackDefenseEvent], i:int) -> None:
         """

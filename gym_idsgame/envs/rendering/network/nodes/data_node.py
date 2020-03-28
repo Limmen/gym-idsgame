@@ -66,27 +66,29 @@ class DataNode(ResourceNode):
                            defense_label_x=defense_label_x, defense_label_y=defense_label_y,
                            det_label_x=det_label_x, det_label_y=det_label_y)
 
-    def visualize_attack(self, attack_type: int, edges_list: list = None) -> None:
+    def visualize_attack(self, attack_type: int, attacker_pos: Union[int, int], edges_list: list = None) -> None:
         """
         Simulates an attack against the node.
 
         :param attack_type: the type of the attack
+        :param attacker_pos: the current position of the attacker
         :param edges_list: edges list for visualization (blinking)
         :return: None
         """
         for i in range(0, self.idsgame_config.render_config.num_blinks):
             if i % 2 == 0:
                 clock.schedule_once(self.blink_red_attack,
-                                    self.idsgame_config.render_config.blink_interval * i, edges_list)
+                                    self.idsgame_config.render_config.blink_interval * i, attacker_pos, edges_list)
             else:
                 clock.schedule_once(self.blink_black_attack,
-                                    self.idsgame_config.render_config.blink_interval * i, edges_list)
+                                    self.idsgame_config.render_config.blink_interval * i, attacker_pos, edges_list)
 
-    def blink_red_attack(self, dt, edges_list: list) -> None:
+    def blink_red_attack(self, dt, attacker_pos: Union[int, int], edges_list: list) -> None:
         """
         Makes the node and its links blink red to visualize an attack
 
         :param dt: the time since the last scheduled blink
+        :param attacker_pos: the attackers position
         :param edges_list: list of edges to blink
         :return: None
         """
@@ -99,11 +101,12 @@ class DataNode(ResourceNode):
         self.attack_label.color = lbl_color
         self.color = constants.RENDERING.RED
 
-    def blink_black_attack(self, dt, edges_list: list) -> None:
+    def blink_black_attack(self, dt, attacker_pos: Union[int, int], edges_list: list) -> None:
         """
         Makes the node and its links blink black to visualize an attack
 
         :param dt: the time since the last scheduled blink
+        :param attacker_pos: the attackers position
         :param edges_list: list of edges to blink
         :return: None
         """

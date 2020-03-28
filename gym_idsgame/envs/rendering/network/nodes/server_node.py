@@ -67,51 +67,68 @@ class ServerNode(ResourceNode):
                            defense_label_x=defense_label_x, defense_label_y=defense_label_y,
                            det_label_x=det_label_x, det_label_y=det_label_y)
 
-    def visualize_attack(self, attack_type:int, edges_list:list=None) -> None:
+    def visualize_attack(self, attack_type:int, attacker_pos: Union[int, int], edges_list:list=None) -> None:
         """
         Simulates an attack against the node.
 
         :param attack_type: the type of the attack
+        :param attacker_pos: the current position of the attacker
         :param edges_list: edges list for visualization (blinking)
         :return: None
         """
         for i in range(0, self.idsgame_config.render_config.num_blinks):
             if i % 2 == 0:
-                clock.schedule_once(self.blink_red_attack, self.idsgame_config.render_config.blink_interval * i)
+                clock.schedule_once(self.blink_red_attack, self.idsgame_config.render_config.blink_interval * i,
+                                    attacker_pos)
             else:
-                clock.schedule_once(self.blink_black_attack, self.idsgame_config.render_config.blink_interval * i)
+                clock.schedule_once(self.blink_black_attack, self.idsgame_config.render_config.blink_interval * i,
+                                    attacker_pos)
 
-    def blink_red_attack(self, dt, edges_list: list = None) -> None:
+    def blink_red_attack(self, dt, attacker_pos: Union[int, int], edges_list: list = None) -> None:
         """
         Makes the node and its links blink red to visualize an attack
 
         :param dt: the time since the last scheduled blink
+        :param attacker_pos: the attackers position
         :param edges_list: list of edges to blink
         :return: None
         """
         color = constants.RENDERING.RED
         color_list = list(color) + list(color)
-        for edges in self.incoming_edges:
-            for e1 in edges:
-                e1.colors = color_list
+        attacker_row, attacker_col = attacker_pos
+        if attacker_row > self.row:
+            for edges in self.incoming_edges:
+                for e1 in edges:
+                    e1.colors = color_list
+        elif attacker_row < self.row:
+            for edges in self.outgoing_edges:
+                for e1 in edges:
+                    e1.colors = color_list
         lbl_color = constants.RENDERING.RED_ALPHA
         self.attack_label.color = lbl_color
         self.color = constants.RENDERING.RED
 
 
-    def blink_black_attack(self, dt, edges_list: list = None) -> None:
+    def blink_black_attack(self, dt, attacker_pos: Union[int, int], edges_list: list = None) -> None:
         """
         Makes the node and its links blink black to visualize an attack
 
         :param dt: the time since the last scheduled blink
+        :param attacker_pos: the attackers position
         :param edges_list: list of edges to blink
         :return: None
         """
         color = constants.RENDERING.BLACK
         color_list = list(color) + list(color)
-        for edges in self.incoming_edges:
-            for e1 in edges:
-                e1.colors = color_list
+        attacker_row, attacker_col = attacker_pos
+        if attacker_row > self.row:
+            for edges in self.incoming_edges:
+                for e1 in edges:
+                    e1.colors = color_list
+        elif attacker_row < self.row:
+            for edges in self.outgoing_edges:
+                for e1 in edges:
+                    e1.colors = color_list
         lbl_color = constants.RENDERING.BLACK_ALPHA
         self.attack_label.color = lbl_color
         self.color = constants.RENDERING.WHITE

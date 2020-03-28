@@ -51,8 +51,8 @@ def is_attack_legal(target_pos: Union[int, int], attacker_pos: Union[int, int], 
     if target_pos == attacker_pos:
         return False
     target_node_id = network_config.get_node_id(target_pos)
-    if network_config.node_list[target_node_id] == NodeType.START.value:
-        return False
+    # if network_config.node_list[target_node_id] == NodeType.START.value:
+    #     return False
     if past_moves is not None and len(past_moves) >=4:
         middle_node = past_moves[-1]
         target_row, target_col = target_pos

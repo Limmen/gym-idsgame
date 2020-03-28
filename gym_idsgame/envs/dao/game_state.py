@@ -17,8 +17,8 @@ class GameState():
                  defense_det: np.ndarray = None,
                  attacker_pos: Union[int, int] = (0, 0), game_step: int = 0, attacker_cumulative_reward: int = 0,
                  defender_cumulative_reward: int = 0,
-                 num_games: int = 0, attack_events: List[AttackDefenseEvent] = [],
-                 defense_events: List[AttackDefenseEvent] = [],
+                 num_games: int = 0, attack_events: List[AttackDefenseEvent] = None,
+                 defense_events: List[AttackDefenseEvent] = None,
                  done: bool = False, detected: bool = False, attack_type: int = 0, num_hacks: int = 0,
                  hacked: bool = False):
         """
@@ -50,6 +50,10 @@ class GameState():
         self.num_games = num_games
         self.attack_events = attack_events
         self.defense_events = defense_events
+        if self.attack_events is None:
+            self.attack_events = []
+        if self.defense_events is None:
+            self.defense_events = []
         self.done = done
         self.detected = detected
         self.attack_defense_type = attack_type
