@@ -104,8 +104,12 @@ tabular_q_learning_vs_random_defense-v3: training/v3/random_defense/tabular_q_le
 tabular_q_learning_vs_minimal_defense-v3: training/v3/minimal_defense/tabular_q_learning training/v3/minimal_defense/tabular_q_learning
 	cd training/v3/minimal_defense/tabular_q_learning/ && $(MAKE) run
 
+random_attack_vs_tabular_fq_learning-v3: training/v3/random_attack/tabular_q_learning training/v3/random_attack/tabular_q_learning
+	cd training/v3/random_attack/tabular_q_learning/ && $(MAKE) run
+
 
 v3: tabular_q_learning_vs_random_defense-v3 tabular_q_learning_vs_minimal_defense-v3
+v3: random_attack_vs_tabular_fq_learning-v3
 
 # All
 
@@ -150,3 +154,4 @@ clean:
 	# V3
 	cd ./training/v3/random_defense/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/v3/minimal_defense/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v3/random_attack/tabular_q_learning/ && $(MAKE) clean
