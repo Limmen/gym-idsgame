@@ -52,6 +52,9 @@ class TabularQAgent(TrainAgent):
             legal_actions = list(filter(lambda action: self.env.is_attack_legal(action), actions))
         elif self.config.defender:
             legal_actions = list(filter(lambda action: self.env.is_defense_legal(action), actions))
+        if len(legal_actions) == 0:
+            print("Current state: {}, past moves: {}".format(s, self.env.past_moves))
+            #raise AssertionError("Found no valid action from this state")
         if np.random.rand() < self.config.epsilon and not eval:
             return np.random.choice(legal_actions)
         max_legal_action_value = float("-inf")

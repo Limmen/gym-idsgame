@@ -58,6 +58,7 @@ class IdsGameEnv(gym.Env, ABC):
         self.reward_range = (float(constants.GAME_CONFIG.NEGATIVE_REWARD), float(constants.GAME_CONFIG.POSITIVE_REWARD))
         self.num_states = self.idsgame_config.game_config.num_nodes
         self.num_actions = self.idsgame_config.game_config.num_actions
+        self.past_moves = []
 
     # -------- API ------------
     def step(self, action: int) -> Union[np.ndarray, int, bool, dict]:
@@ -95,7 +96,9 @@ class IdsGameEnv(gym.Env, ABC):
                           self.idsgame_config.game_config.network_config)
         self.state.add_defense_event(defense_pos, defense_type)
 
-        if util.is_attack_legal(target_pos, attacker_pos, self.idsgame_config.game_config.network_config):
+        if util.is_attack_legal(target_pos, attacker_pos, self.idsgame_config.game_config.network_config,
+                                past_moves=self.past_moves):
+            self.past_moves.append(target_node_id)
             # 4. Attack
             self.state.attack(target_node_id, attack_type, self.idsgame_config.game_config.max_value,
                               self.idsgame_config.game_config.network_config)
@@ -139,6 +142,7 @@ class IdsGameEnv(gym.Env, ABC):
         :param update_stats: whether the game count should be incremented or not
         :return: the initial state
         """
+        self.past_moves = []
         self.steps_beyond_done = None
         self.state.new_game(self.idsgame_config.game_config.initial_state, update_stats=update_stats)
         if self.viewer is not None:
@@ -217,7 +221,8 @@ class IdsGameEnv(gym.Env, ABC):
         :param attack_action: the attack to verify
         :return: True if legal otherwise False
         """
-        return util.is_attack_id_legal(attack_action, self.idsgame_config.game_config, self.state.attacker_pos)
+        return util.is_attack_id_legal(attack_action, self.idsgame_config.game_config, self.state.attacker_pos,
+                                       self.past_moves)
 
     def is_defense_legal(self, defense_action: int) -> bool:
         """
