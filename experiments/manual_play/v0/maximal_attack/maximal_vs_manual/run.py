@@ -54,7 +54,7 @@ if __name__ == '__main__':
         config = util.read_config(args.configpath)
     else:
         config = default_config()
-    Runner.run(config)
+    env = Runner.run(config)
 
 
 

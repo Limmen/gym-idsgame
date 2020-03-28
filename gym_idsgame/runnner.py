@@ -121,7 +121,7 @@ class Runner:
         return simulator.simulate()
 
     @staticmethod
-    def manual_play_attacker(config: ClientConfig):
+    def manual_play_attacker(config: ClientConfig) -> IdsGameEnv:
         env: IdsGameEnv = gym.make(config.env_name)
         if config.title is not None:
             env.idsgame_config.render_config.title = config.title
@@ -129,9 +129,10 @@ class Runner:
             raise AssertionError("Manual attacker play is only supported for attacker-envs")
         env.idsgame_config.game_config.manual_attacker = True
         ManualAttackAgent(env.idsgame_config)
+        return env
 
     @staticmethod
-    def manual_play_defender(config: ClientConfig):
+    def manual_play_defender(config: ClientConfig) -> IdsGameEnv:
         env: IdsGameEnv = gym.make(config.env_name)
         if config.title is not None:
             env.idsgame_config.render_config.title = config.title
@@ -139,3 +140,4 @@ class Runner:
             raise AssertionError("Manual defender play is only supported for defender-envs")
         env.idsgame_config.game_config.manual_defender = True
         ManualDefenseAgent(env.idsgame_config)
+        return env
