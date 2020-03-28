@@ -35,7 +35,8 @@ class GameConfig():
         self.num_rows = self.num_layers + 2
         self.num_nodes = self.num_layers * self.num_servers_per_layer + 2  # +2 for Start and Data Nodes
         self.num_cols = self.num_servers_per_layer
-        self.num_actions = self.num_attack_types * self.num_nodes
+        self.num_attack_actions = self.num_attack_types * self.num_nodes
+        self.num_defense_actions = (self.num_attack_types+1) * self.num_nodes
         self.num_states = self.num_nodes
         self.network_config = network_config
         if network_config is None:
@@ -87,10 +88,14 @@ class GameConfig():
         observation_space = gym.spaces.Box(low=low, high=high, dtype=np.int32)
         return observation_space
 
-    def get_action_space(self) -> gym.spaces.Discrete:
+    def get_action_space(self, defender :bool = False) -> gym.spaces.Discrete:
         """
         Creates an OpenAi-Gym space for the actions in the environment
 
+        :param defender: boolean flag if defender or not
         :return: action space
         """
-        return gym.spaces.Discrete(self.num_actions)
+        if defender:
+            return gym.spaces.Discrete(self.num_defense_actions)
+        else:
+            return gym.spaces.Discrete(self.num_attack_actions)

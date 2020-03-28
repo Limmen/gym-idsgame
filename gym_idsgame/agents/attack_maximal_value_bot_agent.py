@@ -29,7 +29,7 @@ class AttackMaximalValueBotAgent(BotAgent):
         :param game_state: the game state
         :return: action_id
         """
-        actions = list(range(self.game_config.num_actions))
+        actions = list(range(self.game_config.num_attack_actions))
         legal_actions = list(filter(lambda action: idsgame_util.is_attack_id_legal(action, self.game_config,
                                                                                    game_state.attacker_pos), actions))
         attacker_row, attacker_col = game_state.attacker_pos
@@ -38,7 +38,7 @@ class AttackMaximalValueBotAgent(BotAgent):
         for id, node in enumerate(self.game_config.network_config.node_list):
             if node == NodeType.SERVER.value or node == NodeType.DATA.value:
                 max_idx = np.argmax(game_state.attack_values[id])
-                action_id = idsgame_util.get_action_id(id, max_idx, self.game_config)
+                action_id = idsgame_util.get_attack_action_id(id, max_idx, self.game_config)
                 node_row, node_col = self.game_config.network_config.get_node_pos(id)
                 if game_state.attack_values[id][max_idx] > max_node_value and action_id in legal_actions and \
                         node_row < attacker_row:

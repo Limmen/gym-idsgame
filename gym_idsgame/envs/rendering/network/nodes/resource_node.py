@@ -31,18 +31,20 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         self.incoming_edges = []
         self.initialize_state()
 
-    def visualize_defense(self, defend_type: int) -> None:
+    def visualize_defense(self, detect: bool = False) -> None:
         """
         Simulates defense of the node
 
-        :param defend_type: the type of defense
+        :param detect: whether it is a detection defense or not
         :return: None
         """
         for i in range(0, self.idsgame_config.render_config.num_blinks):
             if i % 2 == 0:
-                clock.schedule_once(self.blink_green_defense, self.idsgame_config.render_config.blink_interval * i)
+                clock.schedule_once(self.blink_green_defense, self.idsgame_config.render_config.blink_interval * i,
+                                    detect=detect)
             else:
-                clock.schedule_once(self.blink_black_defense, self.idsgame_config.render_config.blink_interval * i)
+                clock.schedule_once(self.blink_black_defense, self.idsgame_config.render_config.blink_interval * i,
+                                    detect=detect)
 
     def set_labels(self) -> None:
         """
@@ -84,26 +86,34 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         self.defense_values = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
         self.det = 2
 
-    def blink_green_defense(self, dt) -> None:
+    def blink_green_defense(self, dt, detect :bool = False) -> None:
         """
         Visualizes a defense action by blinking green
 
         :param dt: the time since the last blink
+        :param detect: whether it is a detection type of defense or not
         :return: None
         """
         color = constants.RENDERING.GREEN_ALPHA
-        self.defense_label.color = color
+        if detect:
+            self.det_label.color = color
+        else:
+            self.defense_label.color = color
         self.color = constants.RENDERING.GREEN
 
-    def blink_black_defense(self, dt) -> None:
+    def blink_black_defense(self, dt, detect :bool = False) -> None:
         """
         Visualizes a defense action by blinking black
 
         :param dt: time since the last blink
+        :param detect: whether it is a detection type of defense or not
         :return: None
         """
         color = constants.RENDERING.BLACK_ALPHA
-        self.defense_label.color = color
+        if detect:
+            self.det_label.color = color
+        else:
+            self.defense_label.color = color
         self.color = constants.RENDERING.WHITE
 
     def unschedule(self) -> None:
@@ -128,18 +138,19 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         self.det = det_value
         self.set_labels()
 
-    def manual_blink_defense(self, i: int) -> None:
+    def manual_blink_defense(self, i: int, detect :bool = False) -> None:
         """
         Manual defense blink, when not using the clock to schedule blinks but rather ticking the clock manually.
         Used when the agent plays the game and not a human.
 
         :param i: the blink number
+        :param detect: whether it is a detection defense or not
         :return: None
         """
         if i % 2 == 0:
-            self.blink_green_defense(0)
+            self.blink_green_defense(0, detect=detect)
         else:
-            self.blink_black_defense(0)
+            self.blink_black_defense(0, detect=detect)
 
     def manual_blink_attack(self, i: int, edges: list = None) -> None:
         """

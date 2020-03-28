@@ -29,7 +29,7 @@ class RandomAttackBotAgent(BotAgent):
         :param game_state: the game state
         :return: action_id
         """
-        actions = list(range(self.game_config.num_actions))
+        actions = list(range(self.game_config.num_attack_actions))
         legal_actions = list(filter(lambda action: idsgame_util.is_attack_id_legal(action,
                                                                                    self.game_config,
                                                                                    game_state.attacker_pos), actions))

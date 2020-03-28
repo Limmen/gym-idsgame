@@ -51,7 +51,7 @@ class EmptyNode(Node):
     def set_state(self, attack_values, defense_values, det_value):
         pass
 
-    def visualize_defense(self, defense_type):
+    def visualize_defense(self, detect):
         pass
 
     def reset(self):

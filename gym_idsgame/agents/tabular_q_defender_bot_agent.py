@@ -31,7 +31,7 @@ class TabularQDefenderBotAgent(BotAgent):
         :param game_state: the game state
         :return: action_id
         """
-        actions = list(range(self.game_config.num_actions))
+        actions = list(range(self.game_config.num_defense_actions))
         legal_actions = list(filter(lambda action: util.is_defense_id_legal(action,
                                                                             self.game_config), actions))
         s = 0

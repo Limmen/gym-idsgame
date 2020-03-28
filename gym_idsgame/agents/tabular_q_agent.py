@@ -26,9 +26,9 @@ class TabularQAgent(TrainAgent):
         self.env = env
         self.config = config
         if self.config.attacker:
-            self.Q = np.random.rand(self.env.num_states, self.env.num_actions)
+            self.Q = np.random.rand(self.env.num_states, self.env.num_attack_actions)
         else:
-            self.Q = np.random.rand(1, self.env.num_actions)
+            self.Q = np.random.rand(1, self.env.num_attack_actions+1)
         self.train_result = ExperimentResult()
         self.eval_result = ExperimentResult()
         self.outer_train = tqdm.tqdm(total=self.config.num_episodes, desc='Train Episode', position=0)
@@ -47,7 +47,7 @@ class TabularQAgent(TrainAgent):
         :param s:  the state to sample an action for
         :return: a sampled action
         """
-        actions = list(range(self.env.num_actions))
+        actions = list(range(self.env.num_attack_actions))
         if self.config.attacker:
             legal_actions = list(filter(lambda action: self.env.is_attack_legal(action), actions))
         elif self.config.defender:

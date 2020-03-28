@@ -32,7 +32,7 @@ def default_config() -> ClientConfig:
                                   min_epsilon=0.1, eval_episodes=1, train_log_frequency=100,
                                   epsilon_decay=0.999, video=False, eval_log_frequency=1,
                                   video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=1000,
-                                  eval_render=False, gifs=False, gif_dir=default_output_dir() + "/gifs",
+                                  eval_render=True, gifs=False, gif_dir=default_output_dir() + "/gifs",
                                   eval_frequency=1000, attacker=False, defender=True,
                                   save_dir=default_output_dir() + "/data")
     env_name = "idsgame-maximal_attack-v0"

@@ -137,14 +137,17 @@ class GameFrame(pyglet.window.Window):
 
                         # Manual Defender
                         if self.idsgame_config.game_config.manual_defender:
+
+                            detect = modifiers & pyglet.window.key.MOD_SHIFT
+
                             # 2. Update defense state
                             self.game_state.defend(node.id, self.game_state.attack_defense_type,
                                                    self.idsgame_config.game_config.max_value,
-                                                   self.idsgame_config.game_config.network_config)
+                                                   self.idsgame_config.game_config.network_config, detect=detect)
 
                             # 3. Update attack state
                             attack_id = self.attacker_agent.action(self.game_state)
-                            attack_node_id, attack_node_pos, attack_type = util.interpret_action(
+                            attack_node_id, attack_node_pos, attack_type = util.interpret_attack_action(
                                 attack_id, self.idsgame_config.game_config)
                             attack_row, attack_col = attack_node_pos
 
@@ -153,8 +156,7 @@ class GameFrame(pyglet.window.Window):
                                                    self.idsgame_config.game_config.network_config)
 
                             # 4. Visualize defense
-                            self.resource_network.grid[node.row][node.col].visualize_defense(
-                                self.game_state.attack_defense_type)
+                            self.resource_network.grid[node.row][node.col].visualize_defense(detect=detect)
 
                             # 6. Visualize attack
                             edges = []
@@ -190,15 +192,16 @@ class GameFrame(pyglet.window.Window):
                                                     self.idsgame_config.game_config.network_config):
                                 # 3. Update defense state
                                 defend_id = self.defender_agent.action(self.game_state)
-                                defend_node_id, defend_node_pos, defend_type = util.interpret_action(
+                                defend_node_id, defend_node_pos, defend_type = util.interpret_defense_action(
                                     defend_id, self.idsgame_config.game_config)
                                 defense_row, defense_col = defend_node_pos
+                                detect = defend_type == self.idsgame_config.game_config.max_value+1
 
                                 defend_node_id = self.idsgame_config.game_config.network_config.get_node_id(
                                     (defense_row, defense_col))
                                 self.game_state.defend(defend_node_id, defend_type,
                                                        self.idsgame_config.game_config.max_value,
-                                                       self.idsgame_config.game_config.network_config)
+                                                       self.idsgame_config.game_config.network_config, detect=detect)
 
                                 # 4. Update attack state
                                 self.game_state.attack(node.id, self.game_state.attack_defense_type,
@@ -206,7 +209,7 @@ class GameFrame(pyglet.window.Window):
                                                        self.idsgame_config.game_config.network_config)
 
                                 # 5. Visualize defense
-                                self.resource_network.grid[defense_row][defense_col].visualize_defense(defend_type)
+                                self.resource_network.grid[defense_row][defense_col].visualize_defense(detect)
 
                                 # 6. Visualize attack
                                 edges = []
@@ -337,7 +340,8 @@ class GameFrame(pyglet.window.Window):
         :return: None
         """
         for defense in defense_events:
-            self.resource_network.grid[defense.target_row][defense.target_col].manual_blink_defense(i)
+            detect = defense.attack_defense_type == self.idsgame_config.game_config.num_attack_types
+            self.resource_network.grid[defense.target_row][defense.target_col].manual_blink_defense(i, detect=detect)
 
     def unschedule_events(self) -> None:
         """

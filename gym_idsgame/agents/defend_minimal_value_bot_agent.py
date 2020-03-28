@@ -29,17 +29,24 @@ class DefendMinimalValueBotAgent(BotAgent):
         :param game_state: the game state
         :return: action_id
         """
-        actions = list(range(self.game_config.num_actions))
+        actions = list(range(self.game_config.num_defense_actions))
         legal_actions = list(filter(lambda action: idsgame_util.is_defense_id_legal(action, self.game_config), actions))
         min_node_value = float("inf")
         min_action_id = -1
         for id, node in enumerate(self.game_config.network_config.node_list):
             if node == NodeType.SERVER.value or node == NodeType.DATA.value:
                 min_idx = np.argmin(game_state.defense_values[id])
-                action_id = idsgame_util.get_action_id(id, min_idx, self.game_config)
-                if game_state.defense_values[id][min_idx] < min_node_value and action_id in legal_actions:
-                    min_node_value = game_state.defense_values[id][min_idx]
-                    min_action_id = action_id
+                if game_state.defense_det[id] < game_state.defense_values[id][min_idx]:
+                    action_id = idsgame_util.get_defense_action_id(id, self.game_config.num_attack_types,
+                                                                   self.game_config)
+                    if game_state.defense_det[id] < min_node_value and action_id in legal_actions:
+                        min_node_value = game_state.defense_det[id]
+                        min_action_id = action_id
+                else:
+                    action_id = idsgame_util.get_defense_action_id(id, min_idx, self.game_config)
+                    if game_state.defense_values[id][min_idx] < min_node_value and action_id in legal_actions:
+                        min_node_value = game_state.defense_values[id][min_idx]
+                        min_action_id = action_id
         if min_action_id == -1:
             min_action_id = np.random.choice(legal_actions)
         return min_action_id

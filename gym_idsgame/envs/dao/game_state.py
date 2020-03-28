@@ -180,7 +180,8 @@ class GameState():
         if network_config.node_list[node_id] != NodeType.START and self.attack_values[node_id][attack_type] < max_value:
             self.attack_values[node_id][attack_type] += 1
 
-    def defend(self, node_id: int, defense_type: int, max_value: int, network_config: NetworkConfig) -> None:
+    def defend(self, node_id: int, defense_type: int, max_value: int, network_config: NetworkConfig,
+               detect : bool = False) -> None:
         """
         Increments the defense value of the specified node and defense type
 
@@ -188,11 +189,17 @@ class GameState():
         :param defense_type: the type of defense attribute to increment
         :param max_value: the maximum defense value
         :param network_config: NetworkConfig
+        :param detect: True if it is a detect action otherwise False
         :return: None
         """
-        if network_config.node_list[node_id] != NodeType.START and \
-                self.defense_values[node_id][defense_type] < max_value:
-            self.defense_values[node_id][defense_type] += 1
+        if detect or defense_type >= self.defense_values.shape[1]:
+            if network_config.node_list[node_id] != NodeType.START and self.defense_det[node_id] < max_value:
+                self.defense_det[node_id] += 1
+                return
+        else:
+            if network_config.node_list[node_id] != NodeType.START and \
+                    self.defense_values[node_id][defense_type] < max_value:
+                self.defense_values[node_id][defense_type] += 1
 
     def simulate_attack(self, attacked_node_id: int, attack_type: int, network_config: NetworkConfig) -> bool:
         """

@@ -48,7 +48,8 @@ class IdsGameEnv(gym.Env, ABC):
         self.idsgame_config: IdsGameConfig = idsgame_config
         self.state: GameState = self.idsgame_config.game_config.initial_state.copy()
         self.observation_space = self.idsgame_config.game_config.get_attacker_observation_space()
-        self.action_space = self.idsgame_config.game_config.get_action_space()
+        self.attacker_action_space = self.idsgame_config.game_config.get_action_space(defender=False)
+        self.defender_action_space = self.idsgame_config.game_config.get_action_space(defender=True)
         self.viewer = None
         self.steps_beyond_done = None
         self.metadata = {
@@ -57,7 +58,8 @@ class IdsGameEnv(gym.Env, ABC):
         }
         self.reward_range = (float(constants.GAME_CONFIG.NEGATIVE_REWARD), float(constants.GAME_CONFIG.POSITIVE_REWARD))
         self.num_states = self.idsgame_config.game_config.num_nodes
-        self.num_actions = self.idsgame_config.game_config.num_actions
+        self.num_attack_actions = self.idsgame_config.game_config.num_attack_actions
+        self.num_defense_actions = self.idsgame_config.game_config.num_defense_actions
         self.past_moves = []
 
     # -------- API ------------
@@ -92,8 +94,9 @@ class IdsGameEnv(gym.Env, ABC):
         defense_node_id, defense_pos, defense_type,  = self.get_defender_action(action)
 
         # 3. Defend
+        detect = defense_type == self.idsgame_config.game_config.num_attack_types
         self.state.defend(defense_node_id, defense_type, self.idsgame_config.game_config.max_value,
-                          self.idsgame_config.game_config.network_config)
+                          self.idsgame_config.game_config.network_config, detect=detect)
         self.state.add_defense_event(defense_pos, defense_type)
 
         if util.is_attack_legal(target_pos, attacker_pos, self.idsgame_config.game_config.network_config,
@@ -284,11 +287,11 @@ class AttackerEnv(IdsGameEnv, ABC):
         self.observation_space = self.idsgame_config.game_config.get_attacker_observation_space()
 
     def get_attacker_action(self, action) -> Union[int, Union[int, int], int]:
-        return util.interpret_action(action, self.idsgame_config.game_config)
+        return util.interpret_attack_action(action, self.idsgame_config.game_config)
 
     def get_defender_action(self, action) -> Union[Union[int, int], int, int]:
         defend_id = self.idsgame_config.defender_agent.action(self.state)
-        defend_node_id, defend_node_pos, defend_type = util.interpret_action(
+        defend_node_id, defend_node_pos, defend_type = util.interpret_defense_action(
             defend_id, self.idsgame_config.game_config)
         return defend_node_id, defend_node_pos, defend_type
 
@@ -317,11 +320,11 @@ class DefenderEnv(IdsGameEnv, ABC):
         self.observation_space = self.idsgame_config.game_config.get_defender_observation_space()
 
     def get_defender_action(self, action) -> Union[int, Union[int, int], int]:
-        return util.interpret_action(action, self.idsgame_config.game_config)
+        return util.interpret_defense_action(action, self.idsgame_config.game_config)
 
     def get_attacker_action(self, action) -> Union[Union[int, int], int, int]:
         attack_id = self.idsgame_config.attacker_agent.action(self.state)
-        attack_node_id, attack_node_pos, attack_type = util.interpret_action(attack_id, self.idsgame_config.game_config)
+        attack_node_id, attack_node_pos, attack_type = util.interpret_attack_action(attack_id, self.idsgame_config.game_config)
         return attack_node_id, attack_node_pos, attack_type
 
     def get_observation(self) -> np.ndarray:
@@ -347,11 +350,11 @@ class AttackDefenseEnv(IdsGameEnv, ABC):
 
     def get_defender_action(self, action: Union[int, int]) -> Union[int, Union[int, int], int]:
         _, defender_action = action
-        return util.interpret_action(defender_action, self.idsgame_config.game_config)
+        return util.interpret_defense_action(defender_action, self.idsgame_config.game_config)
 
     def get_attacker_action(self, action: Union[int, int]) -> Union[Union[int, int], int, int]:
         attacker_action, _ = action
-        return util.interpret_action(attacker_action, self.idsgame_config.game_config)
+        return util.interpret_attack_action(attacker_action, self.idsgame_config.game_config)
 
     def get_observation(self) -> Union[np.ndarray, np.ndarray]:
         attacker_obs = self.state.get_attacker_observation(self.idsgame_config.game_config.network_config)
