@@ -10,8 +10,8 @@ environment and defeat the defender.
 
 The network configuration of the environment is as follows:
 
-- `num_layers=1` (number of layers between the start and end nodes)
-- `num_servers_per_layer=2`
+- `num_layers=2` (number of layers between the start and end nodes)
+- `num_servers_per_layer=3`
 - `num_attack_types=10`
 - `max_value=9`  
 
