@@ -34,6 +34,7 @@ class Network:
         """
         root_row, root_col = self.idsgame_config.game_config.network_config.start_pos
         root_edge = self.__root_edge(self.grid[root_row][root_col])
+        leaf_edge = None
         for i in range(self.idsgame_config.game_config.network_config.adjacency_matrix.shape[0]-1, -1, -1):
             for j in range(i-1, -1,-1):
                 if self.idsgame_config.game_config.network_config.adjacency_matrix[i][j] == int(1):
@@ -41,7 +42,16 @@ class Network:
                     n1 = self.grid[row_1][col_1]
                     row_2, col_2 = self.idsgame_config.game_config.network_config.get_coords_of_adjacency_matrix_id(j)
                     n2 = self.grid[row_2][col_2]
-                    self.__create_link(n1, n2, root_edge)
+                    result = self.__create_link(n1, n2, root_edge)
+                    if result is not None:
+                        leaf_edge = result
+
+        # add leaf edge to servers on last layer
+        for j in range(self.idsgame_config.game_config.num_servers_per_layer):
+            row = 1
+            col = j
+            if not self.grid[0][col].node_type == NodeType.DATA:
+                self.grid[row][col].outgoing_edges[0].append(leaf_edge)
 
 
     def set_node_states(self, game_state: GameState) -> None:
@@ -97,9 +107,10 @@ class Network:
             n1.add_out_edges(edges)
             n2.add_in_edges(edges)
         elif n1.node_type == NodeType.SERVER and n2.node_type == NodeType.DATA:
-            edges = self.__connect_server_and_data_nodes(n1, n2)
+            edges, leaf_edge = self.__connect_server_and_data_nodes(n1, n2)
             n1.add_out_edges(edges)
             n2.add_in_edges(edges)
+            return leaf_edge
         else:
             raise AssertionError("Linktype not recognized")
 
@@ -177,9 +188,10 @@ class Network:
                         self.idsgame_config.render_config.background, self.idsgame_config.render_config.line_width)
         edges.append(e1)
         edges.append(e2)
+        leaf_edge = None
         if col1 == col2:
-            e3 = batch_line(x2, y2, x2, y2-self.idsgame_config.render_config.rect_size/3, constants.RENDERING.BLACK,
+            leaf_edge = batch_line(x2, y2, x2, y2-self.idsgame_config.render_config.rect_size/3, constants.RENDERING.BLACK,
                             self.idsgame_config.render_config.batch, self.idsgame_config.render_config.background,
                             self.idsgame_config.render_config.line_width)
-            edges.append(e3)
-        return edges
+            edges.append(leaf_edge)
+        return edges, leaf_edge
