@@ -23,7 +23,7 @@
         "load_path": null,
         "logger": null,
         "min_epsilon": 0.1,
-        "num_episodes": 1000,
+        "num_episodes": 10000,
         "py/object": "gym_idsgame.agents.dao.q_agent_config.QAgentConfig",
         "render": false,
         "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/maximal_attack/tabular_q_learning/data",
