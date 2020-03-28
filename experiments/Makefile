@@ -95,9 +95,18 @@ v2: random_attack_vs_tabular_fq_learning-v2 maximal_attack_vs_tabular_q_learning
 v2: random_vs_random-v2 random_vs_defend_minimal-v2 attack_maximal_vs_defend_minimal-v2
 v2: attack_maximal_vs_random-v2
 
+
+# V3 Experiments
+
+tabular_q_learning_vs_random_defense-v3: training/v3/random_defense/tabular_q_learning training/v3/random_defense/tabular_q_learning
+	cd training/v3/random_defense/tabular_q_learning/ && $(MAKE) run
+
+
+v3: tabular_q_learning_vs_random_defense-v3
+
 # All
 
-all: v0 v1 v2
+all: v0 v1 v2 v3
 
 # Clean
 
