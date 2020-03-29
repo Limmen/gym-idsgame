@@ -1,14 +1,14 @@
-# Experiment `random_defense-v3`_`manual_attacker`
+# Experiment `random_defense-v4`_`manual_attacker`
 
-This is an experiment in the `random_defense-v3` environment. 
+This is an experiment in the `random_defense-v4` environment. 
 An environment where the defender is following a random defense policy.
 The experiment gives the control of the attacker to the user that can control the attacker
 using the keyboard and mouse. 
 
 The network configuration of the environment is as follows:
 
-- `num_layers=2` (number of layers between the start and end nodes)
-- `num_servers_per_layer=3`
+- `num_layers=4` (number of layers between the start and end nodes)
+- `num_servers_per_layer=5`
 - `num_attack_types=10`
 - `max_value=9`  
 
@@ -26,7 +26,7 @@ The starting state for each node in the environment is initialized as follows (w
 
 ## Environment 
 
-- Env: `random_defense-v3`
+- Env: `random_defense-v4`
 
 ## Algorithm
 
@@ -44,10 +44,10 @@ Example configuration in `config.json`:
 {
     "attacker_type": 3,
     "defender_type": 1,
-    "env_name": "idsgame-random_defense-v3",
+    "env_name": "idsgame-random_defense-v4",
     "logger": null,
     "mode": 3,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v3/random_defense/manual_vs_random",
+    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v4/random_defense/manual_vs_random",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": null,
     "simulation_config": null,
@@ -58,7 +58,7 @@ Example configuration in `config.json`:
 Example configuration in `run.py`:
 
 ```python
-env_name = "idsgame-random_defense-v3"
+env_name = "idsgame-random_defense-v4"
 client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.MANUAL_ATTACK.value,
                              mode=RunnerMode.MANUAL_ATTACKER.value, output_dir=default_output_dir(),
                              title="ManualAttacker vs RandomDefender")

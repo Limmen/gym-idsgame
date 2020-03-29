@@ -1,6 +1,6 @@
-# Experiment `minimal_defense-v3`_`manual_attacker`
+# Experiment `minimal_defense-v4`_`manual_attacker`
 
-This is an experiment in the `minimal_defense-v3` environment. 
+This is an experiment in the `minimal_defense-v4` environment. 
 An environment where the defender is following the `defend_minimal` defense policy. 
 The `defend_minimal` policy entails that the defender will always 
 defend the attribute with the minimal value out of all of its neighbors.
@@ -9,8 +9,8 @@ using the keyboard and mouse.
 
 The network configuration of the environment is as follows:
 
-- `num_layers=2` (number of layers between the start and end nodes)
-- `num_servers_per_layer=3`
+- `num_layers=4` (number of layers between the start and end nodes)
+- `num_servers_per_layer=5`
 - `num_attack_types=10`
 - `max_value=9`  
 
@@ -20,15 +20,15 @@ The network configuration of the environment is as follows:
 
 The starting state for each node in the environment is initialized as follows (with some randomness for where the vulnerabilities are placed).
 
-- `defense_val=4`
+- `defense_val=2`
 - `attack_val=0`
-- `num_vulnerabilities_per_node=4` (which type of defenses at the node that are vulnerable is selected randomly when the environment is initialized)
-- `det_val=3`
-- `vulnerability_val=0`
+- `num_vulnerabilities_per_node=1` (which type of defense at the node that is vulnerable is selected randomly when the environment is initialized)
+- `det_val=2`
+- `vulnerability_val=0`  
 
 ## Environment 
 
-- Env: `random_defense-v3`
+- Env: `random_defense-v4`
 
 ## Algorithm
 
@@ -46,10 +46,10 @@ Example configuration in `config.json`:
 {
     "attacker_type": 3,
     "defender_type": 1,
-    "env_name": "idsgame-minimal_defense-v3",
+    "env_name": "idsgame-minimal_defense-v4",
     "logger": null,
     "mode": 3,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v3/minimal_defense/manual_vs_random",
+    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v4/minimal_defense/manual_vs_random",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": null,
     "simulation_config": null,
@@ -60,7 +60,7 @@ Example configuration in `config.json`:
 Example configuration in `run.py`:
 
 ```python
-env_name = "idsgame-minimal_defense-v3"
+env_name = "idsgame-minimal_defense-v4"
 client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.MANUAL_ATTACK.value,
                              mode=RunnerMode.MANUAL_ATTACKER.value, output_dir=default_output_dir(),
                              title="ManualAttacker vs DefendMinimalDefender")

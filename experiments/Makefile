@@ -127,6 +127,14 @@ v3: random_attack_vs_tabular_fq_learning-v3 maximal_attack_vs_tabular_q_learning
 v3: random_vs_random-v3 random_vs_defend_minimal-v3 attack_maximal_vs_defend_minimal-v3
 v3: attack_maximal_vs_random-v3
 
+# V4 Experiments
+
+tabular_q_learning_vs_random_defense-v4: training/v4/random_defense/tabular_q_learning training/v4/random_defense/tabular_q_learning
+	cd training/v4/random_defense/tabular_q_learning/ && $(MAKE) run
+
+
+v3: tabular_q_learning_vs_random_defense-v4
+
 # Tests
 
 tests: it_tests/run.py it_tests/run.sh
@@ -134,7 +142,7 @@ tests: it_tests/run.py it_tests/run.sh
 
 # All
 
-all: v0 v1 v2 v3 tests
+all: v0 v1 v2 v3 v4 tests
 
 # Clean
 
@@ -181,6 +189,9 @@ clean:
 	cd simulations/v3/random_vs_defend_minimal/ && $(MAKE) clean
 	cd simulations/v3/attack_maximal_vs_defend_minimal/ && $(MAKE) clean
 	cd simulations/v3/attack_maximal_vs_random/ && $(MAKE) clean
+
+	# V4
+	cd ./training/v4/random_defense/tabular_q_learning/ && $(MAKE) clean
 
 	# Tests
 	cd ./it_tests/ && $(MAKE) clean
