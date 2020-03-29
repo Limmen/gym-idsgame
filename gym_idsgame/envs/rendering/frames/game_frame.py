@@ -350,7 +350,7 @@ class GameFrame(pyglet.window.Window):
 
     def unschedule_events(self) -> None:
         """
-        Utilitym method for unscheduling events. When the user triggers an action before the last action completed,
+        Utility method for unscheduling events. When the user triggers an action before the last action completed,
         this method will be called to avoid getting spam-visualizations in the UI.
 
         :return: None

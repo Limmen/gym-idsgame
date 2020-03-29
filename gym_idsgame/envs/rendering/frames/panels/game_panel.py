@@ -32,70 +32,79 @@ class GamePanel:
 
         :return: None
         """
-        batch_label(self.idsgame_config.render_config.title, constants.RENDERING.PANEL_LEFT_MARGIN*4,
+        batch_label(self.idsgame_config.render_config.title, self.idsgame_config.render_config.width//2,
                     self.idsgame_config.render_config.height - constants.RENDERING.PANEL_TOP_MARGIN,
                     constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
                     self.idsgame_config.render_config.batch,
                     self.idsgame_config.render_config.second_foreground, bold=True)
-        batch_label("Attack Reward: ", constants.RENDERING.PANEL_LEFT_MARGIN,
+        batch_label("Attack Reward: ", self.idsgame_config.render_config.width//2
+                    - 2.7*constants.RENDERING.PANEL_LEFT_MARGIN,
                     self.idsgame_config.render_config.height - constants.RENDERING.PANEL_TOP_MARGIN*2,
                     constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
                     self.idsgame_config.render_config.batch,
                     self.idsgame_config.render_config.second_foreground)
-        batch_label("Time-step: ", constants.RENDERING.PANEL_LEFT_MARGIN,
+        batch_label("Time-step: ", self.idsgame_config.render_config.width//2
+                    - 2.7*constants.RENDERING.PANEL_LEFT_MARGIN,
                     self.idsgame_config.render_config.height - constants.RENDERING.PANEL_TOP_MARGIN * 3,
                     constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
                     self.idsgame_config.render_config.batch, self.idsgame_config.render_config.second_foreground)
-        batch_label("A/D Type: ", constants.RENDERING.PANEL_LEFT_MARGIN * 4,
+        batch_label("A/D Type: ", self.idsgame_config.render_config.width//2,
                     self.idsgame_config.render_config.height - constants.RENDERING.PANEL_TOP_MARGIN * 3,
                     constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
                     self.idsgame_config.render_config.batch, self.idsgame_config.render_config.second_foreground)
-        batch_label("Defense Reward: ", constants.RENDERING.PANEL_LEFT_MARGIN * 4,
+        batch_label("Defense Reward: ", self.idsgame_config.render_config.width//2,
                     self.idsgame_config.render_config.height - constants.RENDERING.PANEL_TOP_MARGIN*2,
                     constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
                     self.idsgame_config.render_config.batch, self.idsgame_config.render_config.second_foreground)
-        batch_label("Num Games: ", constants.RENDERING.PANEL_LEFT_MARGIN * 6.5,
+        batch_label("Num Games: ", self.idsgame_config.render_config.width//2
+                    + constants.RENDERING.PANEL_LEFT_MARGIN * 2.7,
                     self.idsgame_config.render_config.height - constants.RENDERING.PANEL_TOP_MARGIN*2,
                     constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
                     self.idsgame_config.render_config.batch, self.idsgame_config.render_config.second_foreground)
-        batch_label("P(breached): ", constants.RENDERING.PANEL_LEFT_MARGIN * 6.5,
+        batch_label("P(breached): ", self.idsgame_config.render_config.width//2
+                    + constants.RENDERING.PANEL_LEFT_MARGIN * 2.7,
                     self.idsgame_config.render_config.height - constants.RENDERING.PANEL_TOP_MARGIN*3,
                     constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
                     self.idsgame_config.render_config.batch, self.idsgame_config.render_config.second_foreground)
-        self.attack_type_label = batch_label("0", constants.RENDERING.PANEL_LEFT_MARGIN * 5.2,
+        self.attack_type_label = batch_label("0", self.idsgame_config.render_config.width//2 +
+                                          1.2*constants.RENDERING.PANEL_LEFT_MARGIN,
                                              self.idsgame_config.render_config.height
                                              - constants.RENDERING.PANEL_TOP_MARGIN * 3,
                                              constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
                                              self.idsgame_config.render_config.batch,
                                              self.idsgame_config.render_config.second_foreground)
-        self.a_reward_label = batch_label("0",
-                                          constants.RENDERING.PANEL_LEFT_MARGIN * 2.2,
+        self.a_reward_label = batch_label("0", self.idsgame_config.render_config.width//2
+                    - 1.6*constants.RENDERING.PANEL_LEFT_MARGIN,
                                           self.idsgame_config.render_config.height -
                                           constants.RENDERING.PANEL_TOP_MARGIN*2,
                                           constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
                                           self.idsgame_config.render_config.batch,
                                           self.idsgame_config.render_config.second_foreground)
         self.d_reward_label = batch_label("0",
-                                          constants.RENDERING.PANEL_LEFT_MARGIN * 5.2,
+                                          self.idsgame_config.render_config.width//2 +
+                                          1.2*constants.RENDERING.PANEL_LEFT_MARGIN,
                                           self.idsgame_config.render_config.height -
                                           constants.RENDERING.PANEL_TOP_MARGIN*2,
                                           constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
                                           self.idsgame_config.render_config.batch,
                                           self.idsgame_config.render_config.second_foreground)
-        self.step_label = batch_label("0", constants.RENDERING.PANEL_LEFT_MARGIN * 2.2,
+        self.step_label = batch_label("0", self.idsgame_config.render_config.width//2
+                    - 1.6*constants.RENDERING.PANEL_LEFT_MARGIN,
                                       self.idsgame_config.render_config.height -
                                       constants.RENDERING.PANEL_TOP_MARGIN * 3,
                                       constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
                                       self.idsgame_config.render_config.batch,
                                       self.idsgame_config.render_config.second_foreground)
         self.num_games_label = batch_label("0",
-                                           constants.RENDERING.PANEL_LEFT_MARGIN * 7.5,
+                                          self.idsgame_config.render_config.width//2 +
+                                           3.7*constants.RENDERING.PANEL_LEFT_MARGIN,
                                            self.idsgame_config.render_config.height -
                                            constants.RENDERING.PANEL_TOP_MARGIN*2,
                                            constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,
                                            self.idsgame_config.render_config.batch,
                                            self.idsgame_config.render_config.second_foreground)
-        self.hack_probability = batch_label("0.0", constants.RENDERING.PANEL_LEFT_MARGIN * 7.5,
+        self.hack_probability = batch_label("0.0", self.idsgame_config.render_config.width//2 +
+                                            3.7*constants.RENDERING.PANEL_LEFT_MARGIN,
                                             self.idsgame_config.render_config.height -
                                             constants.RENDERING.PANEL_TOP_MARGIN*3,
                                             constants.RENDERING.PANEL_FONT_SIZE, constants.RENDERING.BLACK_ALPHA,

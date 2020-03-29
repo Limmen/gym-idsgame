@@ -124,6 +124,7 @@ class Viewer():
 
         :return: RGB array or bool
         """
+        self.gameframe.unschedule_events()
         frames = []
         arr = self.render_frame(return_rgb_array)
         frames.append(arr)
