@@ -143,6 +143,18 @@ After the experiment has finished, the results are written to the following sub-
 <img src="docs/epsilon_train.png" width="800">
 </p>
 
+### Cumulative Rewards
+
+#### Attacker (Train)
+<p align="center">
+<img src="docs/attacker_cumulative_reward_train.png" width="800">
+</p>
+
+#### Defender (Train)
+<p align="center">
+<img src="docs/defender_cumulative_reward_train.png" width="800">
+</p>
+
 ### Policy Inspection
 
 #### Evaluation after 0 Training Episodes
