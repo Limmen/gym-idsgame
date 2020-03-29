@@ -48,11 +48,11 @@ class Node(ABC):
         pass
 
     @abstractmethod
-    def add_in_edges(self, edges):
+    def add_in_edge(self, edge):
         pass
 
     @abstractmethod
-    def add_out_edges(self, edges):
+    def add_out_edge(self, edge):
         pass
 
     @abstractmethod

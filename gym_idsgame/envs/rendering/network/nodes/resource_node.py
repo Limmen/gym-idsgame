@@ -197,23 +197,23 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
                                      self.idsgame_config.render_config.background, multiline=False,
                                      width=self.idsgame_config.render_config.rect_size)
 
-    def add_out_edges(self, edges: list) -> None:
+    def add_out_edge(self, edge) -> None:
         """
         Adds a list of outgoing edge from the node
 
-        :param edges: edges to add
+        :param edge: edge to add
         :return: None
         """
-        self.outgoing_edges.append(edges)
+        self.outgoing_edges.append(edge)
 
-    def add_in_edges(self, edges: list) -> None:
+    def add_in_edge(self, edge) -> None:
         """
         Adds a list of ingoing edges to the node
 
-        :param edges: edges to add
+        :param edge: edge to add
         :return: None
         """
-        self.incoming_edges.append(edges)
+        self.incoming_edges.append(edge)
 
     def reset(self) -> None:
         """

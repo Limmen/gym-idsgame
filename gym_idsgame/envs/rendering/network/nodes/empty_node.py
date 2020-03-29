@@ -58,10 +58,10 @@ class EmptyNode(Node):
     def reset(self):
         pass
 
-    def add_in_edges(self, edges):
+    def add_in_edge(self, edge):
         pass
 
-    def add_out_edges(self, edges):
+    def add_out_edge(self, edge):
         pass
 
     def get_link_coords(self, upper=True, lower=False):

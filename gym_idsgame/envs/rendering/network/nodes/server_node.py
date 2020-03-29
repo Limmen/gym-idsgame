@@ -97,13 +97,11 @@ class ServerNode(ResourceNode):
         color_list = list(color) + list(color)
         attacker_row, attacker_col = attacker_pos
         if attacker_row > self.row:
-            for edges in self.incoming_edges:
-                for e1 in edges:
-                    e1.colors = color_list
+            for edge in self.incoming_edges:
+                edge.colors = color_list
         elif attacker_row < self.row:
-            for edges in self.outgoing_edges:
-                for e1 in edges:
-                    e1.colors = color_list
+            for edge in self.outgoing_edges:
+                edge.colors = color_list
         else:
             raise AssertionError("Invalid rendering request")
         lbl_color = constants.RENDERING.RED_ALPHA
@@ -124,13 +122,11 @@ class ServerNode(ResourceNode):
         color_list = list(color) + list(color)
         attacker_row, attacker_col = attacker_pos
         if attacker_row > self.row:
-            for edges in self.incoming_edges:
-                for e1 in edges:
-                    e1.colors = color_list
+            for edge in self.incoming_edges:
+                edge.colors = color_list
         elif attacker_row < self.row:
-            for edges in self.outgoing_edges:
-                for e1 in edges:
-                    e1.colors = color_list
+            for edge in self.outgoing_edges:
+                edge.colors = color_list
         else:
             raise AssertionError("Invalid rendering request")
         lbl_color = constants.RENDERING.BLACK_ALPHA

@@ -48,7 +48,7 @@ class DataNode(ResourceNode):
         """
         Initializes labels of the node
 
-        :return: Noneg
+        :return: None
         """
         attack_label_x = self.col * self.idsgame_config.render_config.rect_size + \
                          self.idsgame_config.render_config.rect_size / 2
@@ -94,9 +94,8 @@ class DataNode(ResourceNode):
         """
         color = constants.RENDERING.RED
         color_list = list(color) + list(color)
-        for edges in edges_list:
-            for e1 in edges:
-                e1.colors = color_list
+        for edge in edges_list:
+            edge.colors = color_list
         lbl_color = constants.RENDERING.RED_ALPHA
         self.attack_label.color = lbl_color
         self.color = constants.RENDERING.RED
@@ -112,9 +111,8 @@ class DataNode(ResourceNode):
         """
         color = constants.RENDERING.BLACK
         color_list = list(color) + list(color)
-        for edges in edges_list:
-            for e1 in edges:
-                e1.colors = color_list
+        for edge in edges_list:
+            edge.colors = color_list
         lbl_color = constants.RENDERING.BLACK_ALPHA
         self.attack_label.color = lbl_color
         self.color = constants.RENDERING.WHITE

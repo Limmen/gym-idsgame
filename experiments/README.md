@@ -87,10 +87,8 @@
    * This is an experiment in the `idsgame-v0` environment. 
    An environment where neither the attacker nor defender is part of the environment, i.e.
    it is intended for 2-agent simulations or RL training.
-   
    In this experiment, the defender is implemented with a greedy policy 
    based on a save Q-table. The attacker is implemented with a random attack policy.
-   
    **NOTE** By default the pre-configured environments will create vulnerabilities at random
    locations in the network in order to make sure that a pre-programmed policy cannot be the
    optimal. Therefore, when you run simulation with a pre-trained Q-agent and with a pre-configured
