@@ -91,7 +91,7 @@ register(
 
 # [AttackerEnv] 1 layer, 2 servers per layer, 10 attack-defense-values, random defender
 # [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
-# [Version] 1
+# [Version] 2
 register(
     id='idsgame-random_defense-v2',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV2Env',
@@ -99,7 +99,7 @@ register(
 
 # [AttackerEnv] 1 layer, 2 servers per layer, 10 attack-defense-values, defender following the "defend minimal strategy"
 # [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
-# [Version] 1
+# [Version] 2
 register(
     id='idsgame-minimal_defense-v2',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV2Env',
@@ -107,7 +107,7 @@ register(
 
 # [DefenseEnv] 1 layer, 2 servers per layer, 10 attack-defense-values, random attacker
 # [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
-# [Version] 1
+# [Version] 2
 register(
     id='idsgame-random_attack-v2',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV2Env',
@@ -115,7 +115,7 @@ register(
 
 # [DefenseEnv] 1 layer, 2 servers per layer, 10 attack-defense-values, attacker following the "attack maximal strategy"
 # [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
-# [Version] 1
+# [Version] 2
 register(
     id='idsgame-maximal_attack-v2',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV2Env',
@@ -123,7 +123,7 @@ register(
 
 # [AttackDefenseEnv] 1 layer, 2 servers per layer, 10 attack-defense-values
 # [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
-# [Version] 1
+# [Version] 2
 register(
     id='idsgame-v2',
     entry_point='gym_idsgame.envs:IdsGameV2Env',
@@ -133,7 +133,7 @@ register(
 
 # [AttackerEnv] 2 layers, 3 servers per layer, 10 attack-defense-values, random defender
 # [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
-# [Version] 1
+# [Version] 3
 register(
     id='idsgame-random_defense-v3',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV3Env',
@@ -141,7 +141,7 @@ register(
 
 # [AttackerEnv] 2 layer, 3 servers per layer, 10 attack-defense-values, defender following the "defend minimal strategy"
 # [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
-# [Version] 1
+# [Version] 3
 register(
     id='idsgame-minimal_defense-v3',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV3Env',
@@ -149,7 +149,7 @@ register(
 
 # [DefenseEnv] 2 layers, 3 servers per layer, 10 attack-defense-values, random attacker
 # [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
-# [Version] 1
+# [Version] 3
 register(
     id='idsgame-random_attack-v3',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV3Env',
@@ -157,7 +157,7 @@ register(
 
 # [DefenseEnv] 2 layers, 3 servers per layer, 10 attack-defense-values, attacker following the "attack maximal strategy"
 # [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
-# [Version] 1
+# [Version] 3
 register(
     id='idsgame-maximal_attack-v3',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV3Env',
@@ -165,8 +165,50 @@ register(
 
 # [AttackDefenseEnv] 2 layers, 3 servers per layer, 10 attack-defense-values
 # [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
-# [Version] 1
+# [Version] 3
 register(
     id='idsgame-v3',
     entry_point='gym_idsgame.envs:IdsGameV3Env',
+)
+
+# -------- Version 4 ------------
+
+# [AttackerEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, random defender
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Version] 4
+register(
+    id='idsgame-random_defense-v4',
+    entry_point='gym_idsgame.envs:IdsGameRandomDefenseV4Env',
+)
+
+# [AttackerEnv] 4 layer, 5 servers per layer, 10 attack-defense-values, defender following the "defend minimal strategy"
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Version] 4
+register(
+    id='idsgame-minimal_defense-v4',
+    entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV4Env',
+)
+
+# [DefenseEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, random attacker
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Version] 3
+register(
+    id='idsgame-random_attack-v4',
+    entry_point='gym_idsgame.envs:IdsGameRandomAttackV4Env',
+)
+
+# [DefenseEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, attacker following the "attack maximal strategy"
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Version] 3
+register(
+    id='idsgame-maximal_attack-v4',
+    entry_point='gym_idsgame.envs:IdsGameMaximalAttackV4Env',
+)
+
+# [AttackDefenseEnv] 4 layers, 5 servers per layer, 10 attack-defense-values
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Version] 3
+register(
+    id='idsgame-v4',
+    entry_point='gym_idsgame.envs:IdsGameV4Env',
 )

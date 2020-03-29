@@ -539,7 +539,7 @@ class IdsGameRandomDefenseV2Env(AttackerEnv):
     """
     [AttackerEnv] 1 layer, 2 servers per layer, 10 attack-defense-values, random defender
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
-    [Version] 0
+    [Version] 2
     """
     def __init__(self):
         game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=9)
@@ -555,7 +555,7 @@ class IdsGameMinimalDefenseV2Env(AttackerEnv):
     """
     [AttackerEnv] 1 layer, 2 servers per layer, 10 attack-defense-values, defender following the "defend minimal strategy"
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
-    [Version] 0
+    [Version] 2
     """
     def __init__(self):
         game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=9)
@@ -571,7 +571,7 @@ class IdsGameRandomAttackV2Env(DefenderEnv):
     """
     [DefenderEnv] 1 layer, 2 servers per layer, 10 attack-defense-values, random attacker
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
-    [Version] 0
+    [Version] 2
     """
     def __init__(self):
         game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=9)
@@ -587,7 +587,7 @@ class IdsGameMaximalAttackV2Env(DefenderEnv):
     """
     [DefenderEnv] 1 layer, 2 servers per layer, 10 attack-defense-values, attacker following the "attack maximal strategy"
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
-    [Version] 0
+    [Version] 2
     """
     def __init__(self):
         game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=9)
@@ -603,7 +603,7 @@ class IdsGameV2Env(AttackDefenseEnv):
     """
     [AttackDefenseEnv] 1 layer, 2 servers per layer, 10 attack-defense-values
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
-    [Version] 0
+    [Version] 2
     """
     def __init__(self):
         game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=9)
@@ -614,14 +614,13 @@ class IdsGameV2Env(AttackDefenseEnv):
         super().__init__(idsgame_config=idsgame_config)
 
 
-
 # -------- Version 3 ------------
 
 class IdsGameRandomDefenseV3Env(AttackerEnv):
     """
     [AttackerEnv] 2 layers, 3 servers per layer, 10 attack-defense-values, random defender
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
-    [Version] 0
+    [Version] 3
     """
     def __init__(self):
         game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
@@ -637,7 +636,7 @@ class IdsGameMinimalDefenseV3Env(AttackerEnv):
     """
     [AttackerEnv] 2 layers, 3 servers per layer, 10 attack-defense-values, defender following the "defend minimal strategy"
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
-    [Version] 0
+    [Version] 3
     """
     def __init__(self):
         game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
@@ -653,7 +652,7 @@ class IdsGameRandomAttackV3Env(DefenderEnv):
     """
     [DefenderEnv] 2 layers, 3 servers per layer, 10 attack-defense-values, random attacker
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
-    [Version] 0
+    [Version] 3
     """
     def __init__(self):
         game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
@@ -669,7 +668,7 @@ class IdsGameMaximalAttackV3Env(DefenderEnv):
     """
     [DefenderEnv] 2 layers, 3 servers per layer, 10 attack-defense-values, attacker following the "attack maximal strategy"
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
-    [Version] 0
+    [Version] 3
     """
     def __init__(self):
         game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
@@ -685,7 +684,7 @@ class IdsGameV3Env(AttackDefenseEnv):
     """
     [AttackDefenseEnv] 2 layer, 3 servers per layer, 10 attack-defense-values
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
-    [Version] 0
+    [Version] 3
     """
     def __init__(self):
         game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
@@ -693,4 +692,84 @@ class IdsGameV3Env(AttackDefenseEnv):
                                       vulnerability_val=0)
         idsgame_config = IdsGameConfig(game_config=game_config)
         idsgame_config.render_config.caption = "idsgame-v3"
+        super().__init__(idsgame_config=idsgame_config)
+
+
+# -------- Version 4 ------------
+
+class IdsGameRandomDefenseV4Env(AttackerEnv):
+    """
+    [AttackerEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, random defender
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Version] 0
+    """
+    def __init__(self):
+        game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
+        game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+                                      vulnerability_val=0)
+        defender_agent = RandomDefenseBotAgent(game_config)
+        idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
+        idsgame_config.render_config.caption = "idsgame-random_defense-v4"
+        super().__init__(idsgame_config=idsgame_config)
+
+class IdsGameMinimalDefenseV4Env(AttackerEnv):
+    """
+    [AttackerEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, defender following the "defend minimal strategy"
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Version] 3
+    """
+    def __init__(self):
+        game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
+        game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+                                      vulnerability_val=0)
+        defender_agent = DefendMinimalValueBotAgent(game_config)
+        idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
+        idsgame_config.render_config.caption = "idsgame-minimal_defense-v4"
+        super().__init__(idsgame_config=idsgame_config)
+
+
+class IdsGameRandomAttackV4Env(DefenderEnv):
+    """
+    [DefenderEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, random attacker
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Version] 3
+    """
+    def __init__(self):
+        game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
+        game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+                                      vulnerability_val=0)
+        attacker_agent = RandomAttackBotAgent(game_config)
+        idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
+        idsgame_config.render_config.caption = "idsgame-random_attack-v4"
+        super().__init__(idsgame_config=idsgame_config)
+
+
+class IdsGameMaximalAttackV4Env(DefenderEnv):
+    """
+    [DefenderEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, attacker following the "attack maximal strategy"
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Version] 3
+    """
+    def __init__(self):
+        game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
+        game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+                                      vulnerability_val=0)
+        attacker_agent = AttackMaximalValueBotAgent(game_config)
+        idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
+        idsgame_config.render_config.caption = "idsgame-maximal_attack-v4"
+        super().__init__(idsgame_config=idsgame_config)
+
+
+class IdsGameV4Env(AttackDefenseEnv):
+    """
+    [AttackDefenseEnv] 4 layer, 5 servers per layer, 10 attack-defense-values
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Version] 3
+    """
+    def __init__(self):
+        game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
+        game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+                                      vulnerability_val=0)
+        idsgame_config = IdsGameConfig(game_config=game_config)
+        idsgame_config.render_config.caption = "idsgame-v4"
         super().__init__(idsgame_config=idsgame_config)
