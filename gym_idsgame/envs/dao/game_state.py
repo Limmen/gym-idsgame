@@ -263,15 +263,16 @@ class GameState():
                 return node_id
         raise AssertionError("Could not find the node that the attacker is in")
 
-    def add_attack_event(self, target_pos: Union[int, int], attack_type: int) -> None:
+    def add_attack_event(self, target_pos: Union[int, int], attack_type: int, attacker_pos: Union[int, int]) -> None:
         """
         Adds an attack event to the state
 
         :param target_pos: position in the grid of the target node
         :param attack_type: the type of the attack
+        :param attacker_pos: position of the attacker
         :return: None
         """
-        attack_event = AttackDefenseEvent(target_pos, attack_type)
+        attack_event = AttackDefenseEvent(target_pos, attack_type, attacker_pos=attacker_pos)
         self.attack_events.append(attack_event)
 
     def add_defense_event(self, target_pos: Union[int, int], defense_type: int) -> None:

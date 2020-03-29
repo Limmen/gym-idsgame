@@ -1,7 +1,7 @@
 """
 The main gameframe for the gym-idsgame environment
 """
-from typing import List
+from typing import List, Union
 import os
 import pyglet
 import gym_idsgame.envs.util.idsgame_util as util
@@ -319,7 +319,7 @@ class GameFrame(pyglet.window.Window):
         self.game_state.attack_events = []
         self.game_state.defense_events = []
 
-    def simulate_attack_events(self, attack_events: List[AttackDefenseEvent], i:int) -> None:
+    def simulate_attack_events(self, attack_events: List[AttackDefenseEvent], i: int) -> None:
         """
         Simulate attack events manually for rendering in agent-mode
 
@@ -333,8 +333,13 @@ class GameFrame(pyglet.window.Window):
             edges = []
             if target_node.node_type == NodeType.DATA:
                 edges = self.resource_network.get(self.attacker_sprite.pos).outgoing_edges
+            if target_node.node_type == NodeType.START:
+                attack_row, attack_col = attack.attacker_pos
+                self.resource_network.grid[attack_row][attack_col].manual_blink_attack(
+                    i, target_node.pos, edges)
+                return
             self.resource_network.grid[attack.target_row][attack.target_col].manual_blink_attack(
-                i, self.game_state.attacker_pos, edges)
+                i, attack.attacker_pos, edges)
 
     def simulate_defense_events(self, defense_events: List[AttackDefenseEvent], i:int) -> None:
         """

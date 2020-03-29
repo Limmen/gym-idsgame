@@ -20,6 +20,7 @@ except ImportError as e:
     If you're running on a server, you may need a virtual frame buffer; something like this should work:
     'xvfb-run -s \"-screen 0 1400x900x24\" python <your_script.py>'
     ''')
+from typing import Union
 import numpy as np
 import time
 import sys

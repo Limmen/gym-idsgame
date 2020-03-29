@@ -104,6 +104,8 @@ class ServerNode(ResourceNode):
             for edges in self.outgoing_edges:
                 for e1 in edges:
                     e1.colors = color_list
+        else:
+            raise AssertionError("Invalid rendering request")
         lbl_color = constants.RENDERING.RED_ALPHA
         self.attack_label.color = lbl_color
         self.color = constants.RENDERING.RED
@@ -129,6 +131,8 @@ class ServerNode(ResourceNode):
             for edges in self.outgoing_edges:
                 for e1 in edges:
                     e1.colors = color_list
+        else:
+            raise AssertionError("Invalid rendering request")
         lbl_color = constants.RENDERING.BLACK_ALPHA
         self.attack_label.color = lbl_color
         self.color = constants.RENDERING.WHITE

@@ -61,6 +61,8 @@ class IdsGameEnv(gym.Env, ABC):
         self.num_attack_actions = self.idsgame_config.game_config.num_attack_actions
         self.num_defense_actions = self.idsgame_config.game_config.num_defense_actions
         self.past_moves = []
+        self.past_positions = []
+        self.past_positions.append(self.state.attacker_pos)
 
     # -------- API ------------
     def step(self, action: int) -> Union[np.ndarray, int, bool, dict]:
@@ -105,19 +107,21 @@ class IdsGameEnv(gym.Env, ABC):
             # 4. Attack
             self.state.attack(target_node_id, attack_type, self.idsgame_config.game_config.max_value,
                               self.idsgame_config.game_config.network_config)
-            self.state.add_attack_event(target_pos, attack_type)
+            self.state.add_attack_event(target_pos, attack_type, self.state.attacker_pos)
 
             # 5. Simulate attack outcome
             attack_successful = self.state.simulate_attack(target_node_id, attack_type,
                                                            self.idsgame_config.game_config.network_config)
             # 6. Update state based on attack outcome
             if attack_successful:
+                self.past_positions.append(target_pos)
                 self.state.attacker_pos = target_pos
                 if target_pos == self.idsgame_config.game_config.network_config.data_pos:
                     self.state.done = True
                     self.state.hacked = True
                     reward = self.get_hack_reward()
             else:
+                self.past_positions.append(self.state.attacker_pos)
                 detected = self.state.simulate_detection(target_node_id)
                 if detected:
                     self.state.done = True
@@ -146,11 +150,13 @@ class IdsGameEnv(gym.Env, ABC):
         :return: the initial state
         """
         self.past_moves = []
+        self.past_positions = []
         self.steps_beyond_done = None
         self.state.new_game(self.idsgame_config.game_config.initial_state, update_stats=update_stats)
         if self.viewer is not None:
             self.viewer.gameframe.reset()
         observation = self.get_observation()
+        self.past_positions.append(self.state.attacker_pos)
         return observation
 
     def restart(self) -> np.ndarray:
