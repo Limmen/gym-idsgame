@@ -45,8 +45,16 @@ class Attacker(pyglet.sprite.Sprite):
 
         :return: None
         """
-        self.x = self.col * self.idsgame_config.render_config.rect_size + \
-                 self.idsgame_config.render_config.rect_size / 2.65
+        if self.col < (self.idsgame_config.game_config.network_config.num_cols // 2):
+            self.x = self.idsgame_config.render_config.width // 2 - \
+                     (self.idsgame_config.game_config.network_config.num_cols // 2 - (self.col)) * \
+                     self.idsgame_config.render_config.rect_size - self.idsgame_config.render_config.rect_size / 20
+        elif self.col > (self.idsgame_config.game_config.network_config.num_cols // 2):
+            self.x = self.idsgame_config.render_config.width // 2 + \
+                     (self.col - (self.idsgame_config.game_config.network_config.num_cols // 2)) * \
+                     self.idsgame_config.render_config.rect_size - self.idsgame_config.render_config.rect_size / 20
+        else:
+            self.x = self.idsgame_config.render_config.width // 2 - self.idsgame_config.render_config.rect_size / 20
         self.y = int(self.idsgame_config.render_config.rect_size / 1.5) * \
                  self.row + self.idsgame_config.render_config.rect_size / 4.5
 

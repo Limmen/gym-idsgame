@@ -26,8 +26,16 @@ class StartNode(Node):
         self.row = row
         self.col = col
         self._id = id
-        self.x = self.col * self.idsgame_config.render_config.rect_size \
-                 + self.idsgame_config.render_config.rect_size / 2
+        if self.col < (self.idsgame_config.game_config.network_config.num_cols // 2):
+            self.x = self.idsgame_config.render_config.width // 2 - \
+                     (self.idsgame_config.game_config.network_config.num_cols // 2 - (self.col)) * \
+                     self.idsgame_config.render_config.rect_size + self.idsgame_config.render_config.rect_size / 14
+        elif self.col > (self.idsgame_config.game_config.network_config.num_cols // 2):
+            self.x = self.idsgame_config.render_config.width // 2 + \
+                     (self.col - (self.idsgame_config.game_config.network_config.num_cols // 2)) * \
+                     self.idsgame_config.render_config.rect_size + self.idsgame_config.render_config.rect_size / 14
+        else:
+            self.x = self.idsgame_config.render_config.width // 2 + self.idsgame_config.render_config.rect_size / 14
         self.y = self.row * int(self.idsgame_config.render_config.rect_size / 1.5) \
                  + (self.idsgame_config.render_config.rect_size / 1.5) / 2
         self.radius = self.idsgame_config.render_config.rect_size / 7
@@ -64,8 +72,9 @@ class StartNode(Node):
         :param lower: if False, returns the lower endpoint
         :return: (x-coordinate, y-coordinate, grid-column, grid-row)
         """
-        x = self.col * self.idsgame_config.render_config.rect_size + \
-            self.idsgame_config.render_config.rect_size / 2
+        # x = self.col * self.idsgame_config.render_config.rect_size + \
+        #     self.idsgame_config.render_config.rect_size / 2
+        x = self.x
         y = (self.row + 1) * (self.idsgame_config.render_config.rect_size / 1.5) - \
             self.idsgame_config.render_config.rect_size / 1.75
         return x, y, self.col, self.row

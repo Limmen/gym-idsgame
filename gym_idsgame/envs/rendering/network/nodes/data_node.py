@@ -50,16 +50,13 @@ class DataNode(ResourceNode):
 
         :return: None
         """
-        attack_label_x = self.col * self.idsgame_config.render_config.rect_size + \
-                         self.idsgame_config.render_config.rect_size / 2
+        attack_label_x = self.x +self.idsgame_config.render_config.rect_size / 14
         attack_label_y = self.row * int((self.idsgame_config.render_config.rect_size) / 1.5) + \
                          self.idsgame_config.render_config.rect_size / 4
-        defense_label_x = self.col * self.idsgame_config.render_config.rect_size + \
-                          self.idsgame_config.render_config.rect_size / 2
+        defense_label_x = self.x + self.idsgame_config.render_config.rect_size / 14
         defense_label_y = self.row * int((self.idsgame_config.render_config.rect_size) / 1.5) + \
                           self.idsgame_config.render_config.rect_size / 7
-        det_label_x = self.col * self.idsgame_config.render_config.rect_size + \
-                      self.idsgame_config.render_config.rect_size / 3.5
+        det_label_x = self.x - self.idsgame_config.render_config.rect_size / 12
         det_label_y = self.row * int((self.idsgame_config.render_config.rect_size) / 1.5) + \
                       self.idsgame_config.render_config.rect_size / 3
         self.create_labels(attack_label_x=attack_label_x, attack_label_y=attack_label_y,
@@ -123,8 +120,17 @@ class DataNode(ResourceNode):
 
         :return: None
         """
-        self.x = self.col*self.idsgame_config.render_config.rect_size + \
-                 self.idsgame_config.render_config.rect_size/2.5
+        if self.col < (self.idsgame_config.game_config.network_config.num_cols // 2):
+            self.x = self.idsgame_config.render_config.width // 2 - \
+                     (self.idsgame_config.game_config.network_config.num_cols // 2 - (self.col)) * \
+                     self.idsgame_config.render_config.rect_size - self.idsgame_config.render_config.rect_size / 25
+        elif self.col > (self.idsgame_config.game_config.network_config.num_cols // 2):
+            self.x = self.idsgame_config.render_config.width // 2 + \
+                     (self.col - (self.idsgame_config.game_config.network_config.num_cols // 2)) * \
+                     self.idsgame_config.render_config.rect_size - self.idsgame_config.render_config.rect_size / 25
+        else:
+            self.x = self.idsgame_config.render_config.width // 2 - self.idsgame_config.render_config.rect_size / 25
+
         self.y = int((self.idsgame_config.render_config.rect_size/1.5))*self.row + \
                  self.idsgame_config.render_config.rect_size/3.5
 
@@ -137,8 +143,7 @@ class DataNode(ResourceNode):
         :return: (x-coordinate, y-coordinate, grid-column, grid-row)
         """
         assert not (upper and lower)
-        x = self.col * self.idsgame_config.render_config.rect_size + \
-            self.idsgame_config.render_config.rect_size / 2
+        x = self.x + self.idsgame_config.render_config.rect_size / 9
         y = (self.row + 1) * (self.idsgame_config.render_config.rect_size / 1.5)
         return x, y, self.col, self.row
 
