@@ -21,11 +21,11 @@ The network configuration of the environment is as follows:
 
 The starting state for each node in the environment is initialized as follows (with some randomness for where the vulnerabilities are placed).
 
-- `defense_val=2`
+- `defense_val=4`
 - `attack_val=0`
-- `num_vulnerabilities_per_node=1` (which type of defense at the node that is vulnerable is selected randomly when the environment is initialized)
-- `det_val=2`
-- `vulnerability_val=0` 
+- `num_vulnerabilities_per_node=4` (which type of defenses at the node that are vulnerable is selected randomly when the environment is initialized)
+- `det_val=3`
+- `vulnerability_val=0`  
 
 ## Environment 
 
