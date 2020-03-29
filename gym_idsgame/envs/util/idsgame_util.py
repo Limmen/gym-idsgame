@@ -51,8 +51,10 @@ def is_attack_legal(target_pos: Union[int, int], attacker_pos: Union[int, int], 
     if target_pos == attacker_pos:
         return False
     target_node_id = network_config.get_node_id(target_pos)
-    # if network_config.node_list[target_node_id] == NodeType.START.value:
-    #     return False
+    target_row, target_col = target_pos
+    attacker_row, attacker_col = attacker_pos
+    if target_row > attacker_row:
+        return False
     if past_moves is not None and len(past_moves) >=4:
         middle_node = past_moves[-1]
         target_row, target_col = target_pos
@@ -60,9 +62,7 @@ def is_attack_legal(target_pos: Union[int, int], attacker_pos: Union[int, int], 
         if target_node_id == past_moves[-2] and target_node_id != middle_node and middle_node == past_moves[-3] \
                 and target_node_id == past_moves[-4] and target_row > attacker_row:
             return False
-    attacker_row, attacker_col = attacker_pos
     attacker_adjacency_matrix_id = attacker_row * network_config.num_cols + attacker_col
-    target_row, target_col = target_pos
     target_adjacency_matrix_id = target_row * network_config.num_cols + target_col
     return network_config.adjacency_matrix[attacker_adjacency_matrix_id][target_adjacency_matrix_id] == int(1)
 
