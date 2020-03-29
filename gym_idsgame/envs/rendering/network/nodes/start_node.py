@@ -76,7 +76,7 @@ class StartNode(Node):
     def manual_blink_defense(self, i):
         pass
 
-    def manual_blink_attack(self, i, edges=None):
+    def manual_blink_attack(self, i, attacker_pos: Union[int, int], edges=None):
         pass
 
     def set_state(self, attack_values, defense_values, det_value):

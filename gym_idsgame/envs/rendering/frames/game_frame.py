@@ -129,6 +129,9 @@ class GameFrame(pyglet.window.Window):
                             # any attack or risk to be detected
                             if node.node_type == NodeType.START and util.is_attack_legal(
                                     node.pos, self.attacker_sprite.pos, self.idsgame_config.game_config.network_config):
+                                attack_row, attack_col = self.game_state.attacker_pos
+                                self.resource_network.grid[attack_row][attack_col].visualize_attack(
+                                    self.game_state.attack_defense_type, node.pos, [])
                                 self.game_state.attacker_pos = node.pos
                                 self.game_state.game_step += 1
                                 return

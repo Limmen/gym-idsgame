@@ -2,6 +2,7 @@
 Abstract node in the network of the gym-idsgame environment
 """
 from abc import ABC, abstractmethod
+from typing import Union
 
 class Node(ABC):
     """
@@ -27,7 +28,7 @@ class Node(ABC):
         pass
 
     @abstractmethod
-    def manual_blink_attack(self, i, edges=None):
+    def manual_blink_attack(self, i, attacker_pos: Union[int, int], edges=None):
         pass
 
     @abstractmethod

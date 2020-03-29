@@ -1,6 +1,7 @@
 """
 Represents an empty node in the gym-idsgame environment
 """
+from typing import Union
 from gym_idsgame.envs.rendering.network.nodes.node import Node
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.dao.node_type import NodeType
@@ -45,7 +46,7 @@ class EmptyNode(Node):
     def manual_blink_defense(self, i):
         pass
 
-    def manual_blink_attack(self, i, edges=None):
+    def manual_blink_attack(self, i, attacker_pos: Union[int, int], edges=None):
         pass
 
     def set_state(self, attack_values, defense_values, det_value):
