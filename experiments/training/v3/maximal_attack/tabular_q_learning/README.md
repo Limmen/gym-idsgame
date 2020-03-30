@@ -54,13 +54,13 @@ Example configuration in `config.json`:
     "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v3/maximal_attack/tabular_q_learning",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
-        "alpha": 0.2,
+        "alpha": 0.05,
         "attacker": false,
         "defender": true,
         "epsilon": 1,
-        "epsilon_decay": 0.999,
-        "eval_episodes": 1,
-        "eval_frequency": 1000,
+        "epsilon_decay": 0.9999,
+        "eval_episodes": 100,
+        "eval_frequency": 5000,
         "eval_log_frequency": 1,
         "eval_render": false,
         "eval_sleep": 0.9,
@@ -69,16 +69,16 @@ Example configuration in `config.json`:
         "gifs": true,
         "load_path": null,
         "logger": null,
-        "min_epsilon": 0.1,
-        "num_episodes": 5000,
-        "py/object": "gym_idsgame.agents.dao.q_agent_config.QAgentConfig",
+        "min_epsilon": 0.01,
+        "num_episodes": 40000,
+        "py/object": "gym_idsgame.agents.tabular_q_learning.q_agent_config.QAgentConfig",
         "render": false,
         "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v3/maximal_attack/tabular_q_learning/data",
         "train_log_frequency": 100,
         "video": true,
         "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v3/maximal_attack/tabular_q_learning/videos",
         "video_fps": 5,
-        "video_frequency": 1
+        "video_frequency": 101
     },
     "simulation_config": null,
     "title": "AttackMaximalAttacker vs TrainingQAgent"
@@ -88,12 +88,12 @@ Example configuration in `config.json`:
 Example configuration in `run.py`:
 
 ```python
-q_agent_config = QAgentConfig(gamma=0.999, alpha=0.2, epsilon=1, render=False, eval_sleep=0.9,
-                              min_epsilon=0.1, eval_episodes=1, train_log_frequency=100,
-                              epsilon_decay=0.999, video=True, eval_log_frequency=1,
-                              video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5000,
+q_agent_config = QAgentConfig(gamma=0.999, alpha=0.05, epsilon=1, render=False, eval_sleep=0.9,
+                              min_epsilon=0.01, eval_episodes=100, train_log_frequency=100,
+                              epsilon_decay=0.9999, video=True, eval_log_frequency=1,
+                              video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=40000,
                               eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                              eval_frequency=1000, attacker=False, defender=True,
+                              eval_frequency=5000, attacker=False, defender=True, video_frequency=101,
                               save_dir=default_output_dir() + "/data")
 env_name = "idsgame-maximal_attack-v3"
 client_config = ClientConfig(env_name=env_name, defender_type=AgentType.TABULAR_Q_AGENT.value,
@@ -173,10 +173,10 @@ After the experiment has finished, the results are written to the following sub-
 <img src="docs/episode_5000.gif" width="600">
 </p>  
 
-#### Evaluation after 45000 Training Episodes
+#### Evaluation after 40000 Training Episodes
 
 <p align="center">
-<img src="docs/episode_45000.gif" width="600">
+<img src="docs/episode_40000.gif" width="600">
 </p>  
 
 
