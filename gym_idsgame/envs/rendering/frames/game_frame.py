@@ -330,11 +330,11 @@ class GameFrame(pyglet.window.Window):
         for attack in attack_events:
             self.attack_type = attack.attack_defense_type
             target_node: Node = self.resource_network.grid[attack.target_row][attack.target_col]
+            attack_row, attack_col = attack.attacker_pos
             edges = []
             if target_node.node_type == NodeType.DATA:
-                edges = self.resource_network.get(self.attacker_sprite.pos).outgoing_edges
+                edges = self.resource_network.get(attack.attacker_pos).outgoing_edges
             if target_node.node_type == NodeType.START:
-                attack_row, attack_col = attack.attacker_pos
                 self.resource_network.grid[attack_row][attack_col].manual_blink_attack(
                     i, target_node.pos, edges)
                 return

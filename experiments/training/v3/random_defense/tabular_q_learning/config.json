@@ -24,7 +24,7 @@
         "logger": null,
         "min_epsilon": 0.1,
         "num_episodes": 1000,
-        "py/object": "gym_idsgame.agents.dao.q_agent_config.QAgentConfig",
+        "py/object": "gym_idsgame.agents.tabular_q_learning.q_agent_config.QAgentConfig",
         "render": false,
         "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v3/random_defense/tabular_q_learning/data",
         "train_log_frequency": 1,
