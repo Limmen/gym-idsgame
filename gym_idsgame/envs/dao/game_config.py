@@ -40,7 +40,7 @@ class GameConfig():
         self.num_states = self.num_nodes
         self.network_config = network_config
         if network_config is None:
-            self.network_config = NetworkConfig(self.num_rows, self.num_cols)
+            self.network_config = NetworkConfig(self.num_rows, self.num_cols, link_between_layers=False)
         self.initial_state = initial_state
         if self.initial_state is None:
             self.initial_state = GameState()
