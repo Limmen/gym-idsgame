@@ -17,7 +17,7 @@ The network configuration of the environment is as follows:
 - `max_value=9`  
 
 <p align="center">
-<img src="./docs/env.png" width="400">
+<img src="./docs/env.png" width="600">
 </p>
 
 The starting state for each node in the environment is initialized as follows (with some randomness for where the vulnerabilities are placed).
@@ -89,7 +89,7 @@ client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.RANDOM.v
 ## Example Simulation
 
 <p align="center">
-<img src="./docs/simulation.gif" width="400">
+<img src="./docs/simulation.gif" width="600">
 </p>
 
 ## Commands
