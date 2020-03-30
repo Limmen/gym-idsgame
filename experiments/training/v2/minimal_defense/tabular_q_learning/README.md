@@ -29,7 +29,7 @@ The starting state for each node in the environment is initialized as follows (w
 
 ## Environment 
 
-- Env: `minimal_defense-v0`
+- Env: `minimal_defense-v2`
 
 ## Algorithm
 
@@ -53,13 +53,13 @@ Example configuration in `config.json`:
     "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v2/minimal_defense/tabular_q_learning",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
-        "alpha": 0.2,
+        "alpha": 0.05,
         "attacker": true,
         "defender": false,
         "epsilon": 1,
-        "epsilon_decay": 0.9999,
-        "eval_episodes": 1,
-        "eval_frequency": 5000,
+        "epsilon_decay": 0.999,
+        "eval_episodes": 100,
+        "eval_frequency": 1000,
         "eval_log_frequency": 1,
         "eval_render": false,
         "eval_sleep": 0.9,
@@ -68,16 +68,16 @@ Example configuration in `config.json`:
         "gifs": true,
         "load_path": null,
         "logger": null,
-        "min_epsilon": 0.1,
-        "num_episodes": 60000,
-        "py/object": "gym_idsgame.agents.dao.q_agent_config.QAgentConfig",
+        "min_epsilon": 0.01,
+        "num_episodes": 5000,
+        "py/object": "gym_idsgame.agents.tabular_q_learning.q_agent_config.QAgentConfig",
         "render": false,
         "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v2/minimal_defense/tabular_q_learning/data",
         "train_log_frequency": 1,
         "video": true,
         "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v2/minimal_defense/tabular_q_learning/videos",
         "video_fps": 5,
-        "video_frequency": 1
+        "video_frequency": 101
     },
     "simulation_config": null,
     "title": "TrainingQAgent vs DefendMinimalDefender"
@@ -87,12 +87,12 @@ Example configuration in `config.json`:
 Example configuration in `run.py`:
 
 ```python
-q_agent_config = QAgentConfig(gamma=0.99, alpha=0.2, epsilon=1, render=False, eval_sleep=0.9,
-                              min_epsilon=0.1, eval_episodes=1, train_log_frequency=1,
-                              epsilon_decay=0.9999, video=True, eval_log_frequency=1,
-                              video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=60000,
+q_agent_config = QAgentConfig(gamma=0.99, alpha=0.05, epsilon=1, render=False, eval_sleep=0.9,
+                              min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
+                              epsilon_decay=0.999, video=True, eval_log_frequency=1,
+                              video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5000,
                               eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                              eval_frequency=5000, attacker=True, defender=False,
+                              eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
                               save_dir=default_output_dir() + "/data")
 env_name = "idsgame-minimal_defense-v2"
 client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.TABULAR_Q_AGENT.value,
@@ -164,19 +164,20 @@ After the experiment has finished, the results are written to the following sub-
 
 <p align="center">
 <img src="docs/episode_0.gif" width="600">
+</p>
+
+#### Evaluation after 1000 Training Episodes
+
+<p align="center">
+<img src="docs/episode_1000.gif" width="600">
 </p> 
+ 
 
 #### Evaluation after 5000 Training Episodes
 
 <p align="center">
 <img src="docs/episode_5000.gif" width="600">
 </p>
-
-#### Evaluation after 60000 Training Episodes
-
-<p align="center">
-<img src="docs/episode_60000.gif" width="600">
-</p>  
 
 ## Commands
 

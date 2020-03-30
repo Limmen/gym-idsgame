@@ -155,25 +155,24 @@ After the experiment has finished, the results are written to the following sub-
 <img src="docs/defender_cumulative_reward_train.png" width="800">
 </p>
 
-
 ### Policy Inspection
 
 #### Evaluation after 0 Training Episodes
 
 <p align="center">
-<img src="docs/episode_0.gif" width="400">
+<img src="docs/episode_0.gif" width="600">
 </p> 
 
 #### Evaluation after 1000 Training Episodes
 
 <p align="center">
-<img src="docs/episode_1000.gif" width="400">
+<img src="docs/episode_1000.gif" width="600">
 </p>
 
 #### Evaluation after 5000 Training Episodes
 
 <p align="center">
-<img src="docs/episode_5000.gif" width="400">
+<img src="docs/episode_5000.gif" width="600">
 </p>  
 
 ## Commands
