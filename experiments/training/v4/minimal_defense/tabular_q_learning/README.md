@@ -1,9 +1,12 @@
-# Experiment `random_defense-v4`_`tabular_q_learning`
+# Experiment `minimal_defense-v4`_`tabular_q_learning`
 
-This is an experiment in the `random_defense-v4` environment. 
-An environment where the defender is following a random defense policy. 
+This is an experiment in the `minimal_defense-v4` environment. 
+An environment where the defender is following the `defend_minimal` defense policy. 
+The `defend_minimal` policy entails that the defender will always 
+defend the attribute with the minimal value out of all of its neighbors.
+ 
 This experiment trains an attacker agent using tabular q-learning to act optimally in the given
-environment and defeat the random defender.
+environment and defeat the defender.
 
 The network configuration of the environment is as follows:
 
@@ -26,7 +29,7 @@ The starting state for each node in the environment is initialized as follows (w
 
 ## Environment 
 
-- Env: `random_defense-v4`
+- Env: `minimal_defense-v4`
 
 ## Algorithm
 
@@ -44,10 +47,10 @@ Example configuration in `config.json`:
 {
     "attacker_type": 0,
     "defender_type": 1,
-    "env_name": "idsgame-random_defense-v4",
+    "env_name": "idsgame-minimal_defense-v4",
     "logger": null,
     "mode": 0,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v4/random_defense/tabular_q_learning",
+    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v4/minimal_defense/tabular_q_learning",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
         "alpha": 0.05,
@@ -61,7 +64,7 @@ Example configuration in `config.json`:
         "eval_render": false,
         "eval_sleep": 0.9,
         "gamma": 0.99,
-        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v4/random_defense/tabular_q_learning/gifs",
+        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v4/minimal_defense/tabular_q_learning/gifs",
         "gifs": true,
         "load_path": null,
         "logger": null,
@@ -69,15 +72,15 @@ Example configuration in `config.json`:
         "num_episodes": 40000,
         "py/object": "gym_idsgame.agents.tabular_q_learning.q_agent_config.QAgentConfig",
         "render": false,
-        "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v4/random_defense/tabular_q_learning/data",
+        "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v4/minimal_defense/tabular_q_learning/data",
         "train_log_frequency": 1,
         "video": true,
-        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v4/random_defense/tabular_q_learning/videos",
+        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v4/minimal_defense/tabular_q_learning/videos",
         "video_fps": 5,
         "video_frequency": 101
     },
     "simulation_config": null,
-    "title": "TrainingQAgent vs RandomDefender"
+    "title": "TrainingQAgent vs DefendMinimalDefender"
 }
 ```
 
@@ -89,14 +92,13 @@ q_agent_config = QAgentConfig(gamma=0.99, alpha=0.05, epsilon=1, render=False, e
                               epsilon_decay=0.9999, video=True, eval_log_frequency=1,
                               video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=40000,
                               eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                              eval_frequency=5000, attacker=True, defender=False,
-                              video_frequency=101,
+                              eval_frequency=5000, attacker=True, defender=False, video_frequency=101,
                               save_dir=default_output_dir() + "/data")
-env_name = "idsgame-random_defense-v4"
+env_name = "idsgame-minimal_defense-v4"
 client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.TABULAR_Q_AGENT.value,
                              mode=RunnerMode.TRAIN_ATTACKER.value,
                              q_agent_config=q_agent_config, output_dir=default_output_dir(),
-                             title="TrainingQAgent vs RandomDefender")
+                             title="TrainingQAgent vs DefendMinimalDefender")
 ```
 
 After the experiment has finished, the results are written to the following sub-directories:
@@ -168,7 +170,7 @@ After the experiment has finished, the results are written to the following sub-
 
 <p align="center">
 <img src="docs/episode_5000.gif" width="700">
-</p>  
+</p>
 
 #### Evaluation after 40000 Training Episodes
 

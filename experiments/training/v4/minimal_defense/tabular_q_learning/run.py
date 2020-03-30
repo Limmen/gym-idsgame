@@ -33,14 +33,13 @@ def default_config() -> ClientConfig:
                                   epsilon_decay=0.9999, video=True, eval_log_frequency=1,
                                   video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=40000,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                                  eval_frequency=5000, attacker=True, defender=False,
-                                  video_frequency=101,
+                                  eval_frequency=5000, attacker=True, defender=False, video_frequency=101,
                                   save_dir=default_output_dir() + "/data")
-    env_name = "idsgame-random_defense-v4"
+    env_name = "idsgame-minimal_defense-v4"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.TABULAR_Q_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
                                  q_agent_config=q_agent_config, output_dir=default_output_dir(),
-                                 title="TrainingQAgent vs RandomDefender")
+                                 title="TrainingQAgent vs DefendMinimalDefender")
     return client_config
 
 
@@ -71,8 +70,7 @@ def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str) -> No
     plotting_util.plot_results(train_df["avg_episode_rewards"].values, train_df["avg_episode_steps"].values,
                                train_df["epsilon_values"], train_df["hack_probability"],
                                train_df["attacker_cumulative_reward"], train_df["defender_cumulative_reward"],
-                               config.q_agent_config.train_log_frequency,
-                               config.q_agent_config.eval_frequency,
+                               config.q_agent_config.train_log_frequency, config.q_agent_config.eval_frequency,
                                config.q_agent_config.eval_log_frequency,
                                config.output_dir, eval=False, sim=False)
     plotting_util.plot_results(eval_df["avg_episode_rewards"].values, eval_df["avg_episode_steps"].values,
@@ -95,7 +93,7 @@ if __name__ == '__main__':
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir)
-    logger = util.setup_logger("tabular_q_learning_vs_random_defense-v0", config.output_dir + "/logs/",
+    logger = util.setup_logger("tabular_q_learning_vs_minimal_defense-v0", config.output_dir + "/logs/",
                                time_str=time_str)
     config.logger = logger
     config.q_agent_config.logger = logger
