@@ -47,32 +47,34 @@ Example configuration in `config.json`:
     "env_name": "idsgame-random_defense-v0",
     "logger": null,
     "mode": 0,
-    "output_dir": tabular_q_learning,
+    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_defense/tabular_q_learning",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
-        "alpha": 0.3,
+        "alpha": 0.05,
         "attacker": true,
         "defender": false,
         "epsilon": 1,
-        "epsilon_decay": 0.99,
-        "eval_episodes": 1,
-        "eval_frequency": 100,
+        "epsilon_decay": 0.999,
+        "eval_episodes": 100,
+        "eval_frequency": 1000,
         "eval_log_frequency": 1,
         "eval_render": false,
         "eval_sleep": 0.9,
         "gamma": 0.9,
-        "gif_dir": tabular_q_learning,
+        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_defense/tabular_q_learning/gifs",
         "gifs": true,
+        "load_path": null,
         "logger": null,
-        "min_epsilon": 0.1,
-        "num_episodes": 1000,
-        "py/object": "gym_idsgame.agents.dao.q_agent_config.QAgentConfig",
+        "min_epsilon": 0.01,
+        "num_episodes": 5000,
+        "py/object": "gym_idsgame.agents.tabular_q_learning.q_agent_config.QAgentConfig",
         "render": false,
+        "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_defense/tabular_q_learning/data",
         "train_log_frequency": 1,
         "video": true,
-        "video_dir": tabular_q_learning,
+        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_defense/tabular_q_learning/videos",
         "video_fps": 5,
-        "video_frequency": 1
+        "video_frequency": 101
     },
     "simulation_config": null,
     "title": "TrainingQAgent vs RandomDefender"
@@ -82,14 +84,15 @@ Example configuration in `config.json`:
 Example configuration in `run.py`:
 
 ```python
-q_agent_config = QAgentConfig(gamma=0.9, alpha=0.3, epsilon=1, render=False, eval_sleep=0.9,
-                                  min_epsilon=0.1, eval_episodes=1, train_log_frequency=1,
-                                  epsilon_decay=0.99, video=True, eval_log_frequency=1,
-                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=1000,
-                                  eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                                  eval_frequency=100, attacker=True, defender=False)
+q_agent_config = QAgentConfig(gamma=0.9, alpha=0.05, epsilon=1, render=False, eval_sleep=0.9,
+                              min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
+                              epsilon_decay=0.999, video=True, eval_log_frequency=1,
+                              video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5000,
+                              eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
+                              eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
+                              save_dir=default_output_dir() + "/data")
 env_name = "idsgame-random_defense-v0"
-client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.Q_AGENT.value,
+client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.TABULAR_Q_AGENT.value,
                              mode=RunnerMode.TRAIN_ATTACKER.value,
                              q_agent_config=q_agent_config, output_dir=default_output_dir(),
                              title="TrainingQAgent vs RandomDefender")
@@ -140,6 +143,18 @@ After the experiment has finished, the results are written to the following sub-
 <img src="docs/epsilon_train.png" width="800">
 </p>
 
+### Cumulative Rewards
+
+#### Attacker (Train)
+<p align="center">
+<img src="docs/attacker_cumulative_reward_train.png" width="800">
+</p>
+
+#### Defender (Train)
+<p align="center">
+<img src="docs/defender_cumulative_reward_train.png" width="800">
+</p>
+
 ### Policy Inspection
 
 #### Evaluation after 0 Training Episodes
@@ -148,23 +163,17 @@ After the experiment has finished, the results are written to the following sub-
 <img src="docs/episode_0.gif" width="600">
 </p> 
 
-#### Evaluation after 100 Training Episodes
-
-<p align="center">
-<img src="docs/episode_100.gif" width="600">
-</p>
-
-#### Evaluation after 200 Training Episodes
-
-<p align="center">
-<img src="docs/episode_200.gif" width="600">
-</p>  
-
 #### Evaluation after 1000 Training Episodes
 
 <p align="center">
 <img src="docs/episode_1000.gif" width="600">
-</p>  
+</p>
+
+#### Evaluation after 5000 Training Episodes
+
+<p align="center">
+<img src="docs/episode_5000.gif" width="600">
+</p>    
 
 ## Commands
 
