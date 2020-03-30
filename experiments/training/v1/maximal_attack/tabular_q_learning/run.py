@@ -28,12 +28,12 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    q_agent_config = QAgentConfig(gamma=0.999, alpha=0.2, epsilon=1, render=False, eval_sleep=0.9,
+    q_agent_config = QAgentConfig(gamma=0.999, alpha=0.05, epsilon=1, render=False, eval_sleep=0.9,
                                   min_epsilon=0.1, eval_episodes=1, train_log_frequency=100,
-                                  epsilon_decay=0.99999, video=True, eval_log_frequency=1,
-                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=300000,
+                                  epsilon_decay=0.999, video=True, eval_log_frequency=1,
+                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5000,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                                  eval_frequency=20000, attacker=False, defender=True,
+                                  eval_frequency=1000, attacker=False, defender=True,
                                   save_dir=default_output_dir() + "/data")
     env_name = "idsgame-maximal_attack-v1"
     client_config = ClientConfig(env_name=env_name, defender_type=AgentType.TABULAR_Q_AGENT.value,

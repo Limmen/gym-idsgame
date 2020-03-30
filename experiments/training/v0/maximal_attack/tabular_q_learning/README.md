@@ -17,7 +17,7 @@ The network configuration of the environment is as follows:
 - `max_value=9`  
 
 <p align="center">
-<img src="docs/env.png" width="400">
+<img src="docs/env.png" width="600">
 </p>
 
 The starting state for each node in the environment is initialized as follows (with some randomness for where the vulnerabilities are placed).
@@ -51,7 +51,7 @@ Example configuration in `config.json`:
     "env_name": "idsgame-maximal_attack-v0",
     "logger": null,
     "mode": 1,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/maximal_attack-v0/tabular_q_learning",
+    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/maximal_attack/tabular_q_learning",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
         "alpha": 0.2,
@@ -65,16 +65,18 @@ Example configuration in `config.json`:
         "eval_render": false,
         "eval_sleep": 0.9,
         "gamma": 0.999,
-        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/maximal_attack-v0/tabular_q_learning/gifs",
+        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/maximal_attack/tabular_q_learning/gifs",
         "gifs": true,
+        "load_path": null,
         "logger": null,
-        "min_epsilon": 0.1,
-        "num_episodes": 10000,
-        "py/object": "gym_idsgame.agents.dao.q_agent_config.QAgentConfig",
+        "min_epsilon": 0.01,
+        "num_episodes": 5000,
+        "py/object": "gym_idsgame.agents.tabular_q_learning.q_agent_config.QAgentConfig",
         "render": false,
+        "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/maximal_attack/tabular_q_learning/data",
         "train_log_frequency": 100,
         "video": true,
-        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/maximal_attack-v0/tabular_q_learning/videos",
+        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/maximal_attack/tabular_q_learning/videos",
         "video_fps": 5,
         "video_frequency": 1
     },
@@ -144,24 +146,36 @@ After the experiment has finished, the results are written to the following sub-
 <img src="docs/epsilon_train.png" width="800">
 </p>
 
+### Cumulative Rewards
+
+#### Attacker (Train)
+<p align="center">
+<img src="docs/attacker_cumulative_reward_train.png" width="800">
+</p>
+
+#### Defender (Train)
+<p align="center">
+<img src="docs/defender_cumulative_reward_train.png" width="800">
+</p>
+
 ### Policy Inspection
 
 #### Evaluation after 0 Training Episodes
 
 <p align="center">
-<img src="docs/episode_0.gif" width="400">
+<img src="docs/episode_0.gif" width="600">
 </p> 
 
 #### Evaluation after 1000 Training Episodes
 
 <p align="center">
-<img src="docs/episode_1000.gif" width="400">
+<img src="docs/episode_1000.gif" width="600">
 </p>
 
-#### Evaluation after 9000 Training Episodes
+#### Evaluation after 5000 Training Episodes
 
 <p align="center">
-<img src="docs/episode_9000.gif" width="400">
+<img src="docs/episode_5000.gif" width="600">
 </p>  
 
 ## Commands

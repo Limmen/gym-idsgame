@@ -13,7 +13,7 @@ The network configuration of the environment is as follows:
 - `max_value=9`  
 
 <p align="center">
-<img src="docs/env.png" width="400">
+<img src="docs/env.png" width="600">
 </p>
 
 The starting state for each node in the environment is initialized as follows (with some randomness for where the vulnerabilities are placed).
@@ -160,25 +160,25 @@ After the experiment has finished, the results are written to the following sub-
 #### Evaluation after 0 Training Episodes
 
 <p align="center">
-<img src="docs/episode_0.gif" width="400">
+<img src="docs/episode_0.gif" width="600">
 </p> 
 
 #### Evaluation after 100 Training Episodes
 
 <p align="center">
-<img src="docs/episode_100.gif" width="400">
+<img src="docs/episode_100.gif" width="600">
 </p>
 
 #### Evaluation after 200 Training Episodes
 
 <p align="center">
-<img src="docs/episode_200.gif" width="400">
+<img src="docs/episode_200.gif" width="600">
 </p>  
 
 #### Evaluation after 1000 Training Episodes
 
 <p align="center">
-<img src="docs/episode_1000.gif" width="400">
+<img src="docs/episode_1000.gif" width="600">
 </p>  
 
 ## Commands

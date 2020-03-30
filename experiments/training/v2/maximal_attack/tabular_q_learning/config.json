@@ -7,7 +7,7 @@
     "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v2/maximal_attack/tabular_q_learning",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
-        "alpha": 0.2,
+        "alpha": 0.05,
         "attacker": false,
         "defender": true,
         "epsilon": 1,
@@ -24,7 +24,7 @@
         "logger": null,
         "min_epsilon": 0.1,
         "num_episodes": 5000,
-        "py/object": "gym_idsgame.agents.dao.q_agent_config.QAgentConfig",
+        "py/object": "gym_idsgame.agents.tabular_q_learning.q_agent_config.QAgentConfig",
         "render": false,
         "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v2/maximal_attack/tabular_q_learning/data",
         "train_log_frequency": 100,
