@@ -1,7 +1,12 @@
 """
 Render-configuration for the gym-idsgame environment
 """
-import pyglet
+
+# In case running on server without screen
+try:
+    import pyglet
+except:
+    pass
 from gym_idsgame.envs.constants import constants
 
 class RenderConfig:
@@ -42,10 +47,14 @@ class RenderConfig:
 
 
     def new_window(self):
-        self.batch = pyglet.graphics.Batch()
-        self.background = pyglet.graphics.OrderedGroup(0)
-        self.first_foreground = pyglet.graphics.OrderedGroup(1)
-        self.second_foreground = pyglet.graphics.OrderedGroup(2)
+        # in case on a server without pyglet
+        try:
+            self.batch = pyglet.graphics.Batch()
+            self.background = pyglet.graphics.OrderedGroup(0)
+            self.first_foreground = pyglet.graphics.OrderedGroup(1)
+            self.second_foreground = pyglet.graphics.OrderedGroup(2)
+        except:
+            pass
 
 
     def manual_default(self) -> None:

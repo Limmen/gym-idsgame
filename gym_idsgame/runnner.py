@@ -3,6 +3,14 @@ Generic runner for running experiments with idsgame environments
 """
 from typing import Union
 import gym
+
+# In case running on server without screen
+try:
+    from gym_idsgame.agents.manual_attack_agent import ManualAttackAgent
+    from gym_idsgame.agents.manual_defense_agent import ManualDefenseAgent
+except:
+    pass
+
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.config.runner_mode import RunnerMode
 from gym_idsgame.agents.dao.agent_type import AgentType
@@ -10,8 +18,6 @@ from gym_idsgame.agents.tabular_q_learning.tabular_q_agent import TabularQAgent
 from gym_idsgame.agents.train_agent import TrainAgent
 from gym_idsgame.agents.bot_agent import BotAgent
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
-from gym_idsgame.agents.manual_attack_agent import ManualAttackAgent
-from gym_idsgame.agents.manual_defense_agent import ManualDefenseAgent
 from gym_idsgame.envs.idsgame_env import IdsGameEnv, AttackDefenseEnv, AttackerEnv, DefenderEnv
 from gym_idsgame.simulation.simulator import Simulator
 from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
