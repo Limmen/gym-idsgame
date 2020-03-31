@@ -1,6 +1,6 @@
-# Experiment `random_defense-v4`_`manual_attacker`
+# Experiment `random_defense-v5`_`manual_attacker`
 
-This is an experiment in the `random_defense-v4` environment. 
+This is an experiment in the `random_defense-v5` environment. 
 An environment where the defender is following a random defense policy.
 The experiment gives the control of the attacker to the user that can control the attacker
 using the keyboard and mouse. 
@@ -18,15 +18,15 @@ The network configuration of the environment is as follows:
 
 The starting state for each node in the environment is initialized as follows (with some randomness for where the vulnerabilities are placed).
 
-- `defense_val=4`
+- `defense_val=2`
 - `attack_val=0`
-- `num_vulnerabilities_per_node=4` (which type of defenses at the node that are vulnerable is selected randomly when the environment is initialized)
-- `det_val=3`
-- `vulnerability_val=0`
+- `num_vulnerabilities_per_node=1` (which type of defense at the node that is vulnerable is selected randomly when the environment is initialized)
+- `det_val=2`
+- `vulnerability_val=0`  
 
 ## Environment 
 
-- Env: `random_defense-v4`
+- Env: `random_defense-v5`
 
 ## Algorithm
 
@@ -44,10 +44,12 @@ Example configuration in `config.json`:
 {
     "attacker_type": 3,
     "defender_type": 1,
-    "env_name": "idsgame-random_defense-v4",
+    "env_name": "idsgame-random_defense-v5",
+    "idsgame_config": null,
+    "initial_state_path": null,
     "logger": null,
     "mode": 3,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v4/random_defense/manual_vs_random",
+    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v5/random_defense/manual_vs_random",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": null,
     "simulation_config": null,
@@ -58,7 +60,7 @@ Example configuration in `config.json`:
 Example configuration in `run.py`:
 
 ```python
-env_name = "idsgame-random_defense-v4"
+env_name = "idsgame-random_defense-v5"
 client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.MANUAL_ATTACK.value,
                              mode=RunnerMode.MANUAL_ATTACKER.value, output_dir=default_output_dir(),
                              title="ManualAttacker vs RandomDefender")

@@ -213,7 +213,7 @@ register(
 
 # [DefenseEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, random attacker
 # [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
-# [Version] 3
+# [Version] 4
 register(
     id='idsgame-random_attack-v4',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV4Env',
@@ -222,7 +222,7 @@ register(
 
 # [DefenseEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, attacker following the "attack maximal strategy"
 # [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
-# [Version] 3
+# [Version] 4
 register(
     id='idsgame-maximal_attack-v4',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV4Env',
@@ -231,7 +231,7 @@ register(
 
 # [AttackDefenseEnv] 4 layers, 5 servers per layer, 10 attack-defense-values
 # [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
-# [Version] 3
+# [Version] 4
 register(
     id='idsgame-v4',
     entry_point='gym_idsgame.envs:IdsGameV4Env',
@@ -242,9 +242,47 @@ register(
 
 # [AttackerEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, random defender, connected layers
 # [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
-# [Version] 4
+# [Version] 5
 register(
     id='idsgame-random_defense-v5',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV5Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [AttackerEnv] 4 layer, 5 servers per layer, 10 attack-defense-values,
+# defender following the "defend minimal strategy", connected layers
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Version] 5
+register(
+    id='idsgame-minimal_defense-v5',
+    entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV5Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [DefenseEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, random attacker, connected layers
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Version] 5
+register(
+    id='idsgame-random_attack-v5',
+    entry_point='gym_idsgame.envs:IdsGameRandomAttackV5Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [DefenseEnv] 4 layers, 5 servers per layer, 10 attack-defense-values,
+# attacker following the "attack maximal strategy", connected layers
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Version] 5
+register(
+    id='idsgame-maximal_attack-v5',
+    entry_point='gym_idsgame.envs:IdsGameMaximalAttackV5Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [AttackDefenseEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, connected layers
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Version] 5
+register(
+    id='idsgame-v5',
+    entry_point='gym_idsgame.envs:IdsGameV5Env',
     kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
 )

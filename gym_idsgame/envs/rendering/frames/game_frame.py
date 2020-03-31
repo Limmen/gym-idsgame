@@ -273,7 +273,6 @@ class GameFrame(pyglet.window.Window):
             elif symbol == pyglet.window.key.SPACE:
                 self.reset(update_stats=True)
 
-
     def update(self, dt) -> None:
         """
         Event handler for the update-event (timer-based typically), used to update the state of the grid.

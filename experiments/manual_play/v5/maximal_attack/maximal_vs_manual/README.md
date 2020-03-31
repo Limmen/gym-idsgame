@@ -1,6 +1,6 @@
-# Experiment `maximal_attack-v4`_`manual_defender`
+# Experiment `maximal_attack-v5`_`manual_defender`
 
-This is an experiment in the `mfaximal_attack-v4` environment.
+This is an experiment in the `mfaximal_attack-v5` environment.
 An environment where the attack is following the `attack_maximal` attack policy.
 The `attack_maximal` policy entails that the attacker will always attack the attribute with
 the maximum value out of all of its neighbors. The defender is implemented with a
@@ -30,7 +30,7 @@ The starting state for each node in the environment is initialized as follows (w
 
 ## Environment 
 
-- Env: `random_attack-v4`
+- Env: `random_attack-v5`
 
 ## Algorithm
 
@@ -48,10 +48,12 @@ Example configuration in `config.json`:
 {
     "attacker_type": 0,
     "defender_type": 4,
-    "env_name": "idsgame-maximal_attack-v4",
+    "env_name": "idsgame-maximal_attack-v5",
+    "idsgame_config": null,
+    "initial_state_path": null,
     "logger": null,
     "mode": 4,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v4/maximal_attack/maximal_vs_manual",
+    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v5/maximal_attack/maximal_vs_manual",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": null,
     "simulation_config": null,
@@ -62,7 +64,7 @@ Example configuration in `config.json`:
 Example configuration in `run.py`:
 
 ```python
-env_name = "idsgame-maximal_attack-v4"
+env_name = "idsgame-maximal_attack-v5"
 client_config = ClientConfig(env_name=env_name, defender_type=AgentType.MANUAL_DEFENSE.value,
                              mode=RunnerMode.MANUAL_DEFENDER.value, output_dir=default_output_dir(),
                              title="AttackMaximalAttacker vs ManualDefender")
