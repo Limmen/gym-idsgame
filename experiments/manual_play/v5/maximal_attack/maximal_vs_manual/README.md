@@ -15,6 +15,7 @@ The network configuration of the environment is as follows:
 - `num_servers_per_layer=5`
 - `num_attack_types=10`
 - `max_value=9`    
+- `connected_layers = True`
 
 <p align="center">
 <img src="docs/env.png" width="600">

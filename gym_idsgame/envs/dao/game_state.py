@@ -63,7 +63,8 @@ class GameState():
         self.action_descriptors = ["Injection", "Authentication", "CrossSite", "References", "Misssconfiguration",
                                    "Exposure", "Access", "Forgery", "Vulnerabilities", "Redirects"]
 
-    def default_state(self, node_list: List[int], attacker_pos: Union[int, int], num_attack_types: int) -> None:
+    def default_state(self, node_list: List[int], attacker_pos: Union[int, int], num_attack_types: int,
+                      network_config: NetworkConfig) -> None:
         """
         Creates a default state
 
@@ -71,9 +72,11 @@ class GameState():
         :param num_rows: the number of rows in the grid network
         :param num_cols: the number of columns in the grid network
         :param num_attack_types: the number of attack types
+        :param network_config: network config
         :return: None
         """
-        self.set_state(node_list, num_attack_types)
+        self.set_state(node_list, num_attack_types, network_config=network_config,
+                       num_vulnerabilities_per_layer=network_config.num_cols)
         self.attacker_pos = attacker_pos
         self.game_step = 0
         self.attacker_cumulative_reward = 0
@@ -89,7 +92,9 @@ class GameState():
 
 
     def set_state(self, node_list, num_attack_types, defense_val=2, attack_val=0,
-                  num_vulnerabilities_per_node=1, det_val=2, vulnerability_val=0):
+                  num_vulnerabilities_per_node=1, det_val=2, vulnerability_val=0, num_vulnerabilities_per_layer = 1,
+                  network_config: NetworkConfig = None
+                  ):
         """
         Sets the state
 
@@ -100,15 +105,27 @@ class GameState():
         :param num_vulnerabilities_per_node: number of vulnerabilities per node
         :param det_val: detection value per node
         :param vulnerability_val: defense value for defense types that are vulnerable
-        :return:
+        :param num_vulnerabilities_per_layer: number of vulnerabilities per layer
+        :param network_config: network configuration
+        :return: None
         """
         num_nodes = len(node_list)
         attack_values = np.zeros((num_nodes, num_attack_types))
         defense_values = np.zeros((num_nodes, num_attack_types))
         det_values = np.zeros(num_nodes)
+
+        vulnerabilities_per_layer = np.zeros((network_config.num_rows, network_config.num_cols))
+        for row in range(1, network_config.num_rows-1):
+            vulnerabilities = np.random.choice(network_config.num_cols, size=num_vulnerabilities_per_layer,
+                                               replace=False)
+            vulnerabilities_per_layer[row][vulnerabilities] = 1
+
         for node_id in range(num_nodes):
+            row, col = network_config.get_node_pos(node_id)
             num_vuln = min(num_vulnerabilities_per_node, num_attack_types)
-            vulnerabilities = np.random.choice(num_attack_types, size=num_vuln) # random vulnerability per node
+            vulnerabilities = []
+            if vulnerabilities_per_layer[row][col] == 1 or node_list[node_id] == NodeType.DATA.value:
+                vulnerabilities = np.random.choice(num_attack_types, size=num_vuln) # random vulnerability per node
             if node_list[node_id] == NodeType.DATA.value or node_list[node_id] == NodeType.SERVER.value:
                 defense_values[node_id] = [defense_val] * num_attack_types
                 det_values[node_id] = det_val

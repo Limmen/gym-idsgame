@@ -104,8 +104,11 @@ class ServerNode(ResourceNode):
             if attacker_col < self.col:
                 self.horizontal_edges[0].colors = color_list
             else:
-                assert len(self.horizontal_edges) > 1
-                self.horizontal_edges[1].colors = color_list
+                if len(self.horizontal_edges) > 1:
+                    self.horizontal_edges[1].colors = color_list
+                else:
+                    self.horizontal_edges[0].colors = color_list
+
         lbl_color = constants.RENDERING.RED_ALPHA
         self.attack_label.color = lbl_color
         self.color = constants.RENDERING.RED
@@ -134,8 +137,10 @@ class ServerNode(ResourceNode):
             if attacker_col < self.col:
                 self.horizontal_edges[0].colors = color_list
             else:
-                assert len(self.horizontal_edges) > 1
-                self.horizontal_edges[1].colors = color_list
+                if len(self.horizontal_edges) > 1:
+                    self.horizontal_edges[1].colors = color_list
+                else:
+                    self.horizontal_edges[0].colors = color_list
         lbl_color = constants.RENDERING.BLACK_ALPHA
         self.attack_label.color = lbl_color
         self.color = constants.RENDERING.WHITE

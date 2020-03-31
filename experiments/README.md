@@ -370,3 +370,34 @@
    defend the attribute with the minimal value out of all of its neighbors.       
    
  
+## Experiments in Version 5 Environments
+
+### Training Experiments
+
+- [tabular_q_learning_vs_random_defense-v5](training/v5/random_defense/tabular_q_learning/)
+   * This is an experiment in the `random_defense-v5` environment. 
+   An environment where the defender is following a random defense policy. 
+   This experiment trains an attacker agent using tabular q-learning to act optimally in the given
+   environment and defeat the random defender.
+   
+- [tabular_q_learning_vs_minimal_defense-v5](training/v5/minimal_defense/tabular_q_learning/)
+   * This is an experiment in the `minimal_defense-v5` environment.  
+   An environment where the defender is following the `defend_minimal` defense policy. 
+   The `defend_minimal` policy entails that the defender will always 
+   defend the attribute with the minimal value out of all of its neighbors.
+   This experiment trains an attacker agent using tabular q-learning to act optimally in the given 
+   environment and defeat the defender.   
+   
+- [random_attack_vs_tabular_q_learning-v5](training/v5/random_attack/tabular_q_learning/)
+   * This is an experiment in the `random_attack-v5` environment.  
+   An environment where the attack is following a random attack policy.  
+   This experiment trains a defender agent using tabular q-learning to act optimally in the given
+   environment and defeat the random attacker.   
+      
+- [maximal_attack_vs_tabular_q_learning-v5](training/v5/maximal_attack/tabular_q_learning/)
+   * This is an experiment in the `maximal_attack-v5` environment.
+   An environment where the attack is following the `attack_maximal` attack policy.
+   The `attack_maximal` policy entails that the attacker will always attack the attribute with
+   the maximum value out of all of its neighbors. The defender is implemented with a
+   random defense policy. This experiment trains a defender agent using tabular q-learning to act optimally in the given
+   environment and detect the attacker.    

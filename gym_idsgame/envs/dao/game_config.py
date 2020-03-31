@@ -48,7 +48,7 @@ class GameConfig():
         if self.initial_state is None and self.initial_state_path is None:
             self.initial_state = GameState()
             self.initial_state.default_state(self.network_config.node_list, self.network_config.start_pos,
-                                             self.num_attack_types)
+                                             self.num_attack_types, network_config=self.network_config)
 
     def set_load_initial_state(self, initial_state_path: str) -> None:
         """
@@ -60,7 +60,8 @@ class GameConfig():
         self.initial_state = GameState.load(initial_state_path)
 
     def set_initial_state(self, defense_val=2, attack_val=0,
-                  num_vulnerabilities_per_node=1, det_val=2, vulnerability_val=0):
+                  num_vulnerabilities_per_node=1, det_val=2, vulnerability_val=0,
+                          num_vulnerabilities_per_layer=None):
         """
         Utility function for setting the initial game state
 
@@ -69,11 +70,16 @@ class GameConfig():
         :param num_vulnerabilities_per_node: number of vulnerabilities per node
         :param det_val: detection value per node
         :param vulnerability_val: defense value for defense types that are vulnerable
+        :param num_vulnerabilities_per_layer: number of vulnerabilities per layer
         :return:
         """
+        if num_vulnerabilities_per_layer is None:
+            num_vulnerabilities_per_layer = self.num_servers_per_layer
         self.initial_state.set_state(self.network_config.node_list, self.num_attack_types, defense_val=defense_val,
                                      attack_val=attack_val, num_vulnerabilities_per_node=num_vulnerabilities_per_node,
-                                     det_val=det_val, vulnerability_val=vulnerability_val)
+                                     det_val=det_val, vulnerability_val=vulnerability_val,
+                                     network_config=self.network_config,
+                                     num_vulnerabilities_per_layer=num_vulnerabilities_per_layer)
 
     def get_attacker_observation_space(self) -> gym.spaces.Box:
         """

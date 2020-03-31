@@ -107,7 +107,7 @@ class IdsGameEnv(gym.Env, ABC):
         self.state.add_defense_event(defense_pos, defense_type)
 
         if util.is_attack_legal(target_pos, attacker_pos, self.idsgame_config.game_config.network_config,
-                                past_moves=self.past_moves):
+                                past_positions=self.past_positions):
             self.past_moves.append(target_node_id)
             # 4. Attack
             self.state.attack(target_node_id, attack_type, self.idsgame_config.game_config.max_value,
@@ -236,7 +236,7 @@ class IdsGameEnv(gym.Env, ABC):
         :return: True if legal otherwise False
         """
         return util.is_attack_id_legal(attack_action, self.idsgame_config.game_config, self.state.attacker_pos,
-                                       self.past_moves)
+                                       self.past_positions)
 
     def is_defense_legal(self, defense_action: int) -> bool:
         """
@@ -430,7 +430,7 @@ class IdsGameRandomDefenseV0Env(AttackerEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=1)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             defender_agent = RandomDefenseBotAgent(game_config)
@@ -456,7 +456,7 @@ class IdsGameMinimalDefenseV0Env(AttackerEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=1)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             defender_agent = DefendMinimalValueBotAgent(game_config)
@@ -482,7 +482,7 @@ class IdsGameRandomAttackV0Env(DefenderEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=1)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             attacker_agent = RandomAttackBotAgent(game_config)
@@ -508,7 +508,7 @@ class IdsGameMaximalAttackV0Env(DefenderEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=1)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             attacker_agent = AttackMaximalValueBotAgent(game_config)
@@ -534,7 +534,7 @@ class IdsGameV0Env(AttackDefenseEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=1)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             idsgame_config = IdsGameConfig(game_config=game_config)
@@ -562,7 +562,7 @@ class IdsGameRandomDefenseV1Env(AttackerEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=4, det_val=3,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=1)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             defender_agent = RandomDefenseBotAgent(game_config)
@@ -588,7 +588,7 @@ class IdsGameMinimalDefenseV1Env(AttackerEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=4, det_val=3,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=1)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             defender_agent = DefendMinimalValueBotAgent(game_config)
@@ -614,7 +614,7 @@ class IdsGameRandomAttackV1Env(DefenderEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=4, det_val=3,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=1)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             attacker_agent = RandomAttackBotAgent(game_config)
@@ -640,7 +640,7 @@ class IdsGameMaximalAttackV1Env(DefenderEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=4, det_val=3,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=1)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             attacker_agent = AttackMaximalValueBotAgent(game_config)
@@ -666,7 +666,7 @@ class IdsGameV1Env(AttackDefenseEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=4, det_val=3,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=1)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             idsgame_config = IdsGameConfig(game_config=game_config)
@@ -693,7 +693,7 @@ class IdsGameRandomDefenseV2Env(AttackerEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=2)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             defender_agent = RandomDefenseBotAgent(game_config)
@@ -719,7 +719,7 @@ class IdsGameMinimalDefenseV2Env(AttackerEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=2)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             defender_agent = DefendMinimalValueBotAgent(game_config)
@@ -745,7 +745,7 @@ class IdsGameRandomAttackV2Env(DefenderEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=2)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             attacker_agent = RandomAttackBotAgent(game_config)
@@ -771,7 +771,7 @@ class IdsGameMaximalAttackV2Env(DefenderEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=2)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             attacker_agent = AttackMaximalValueBotAgent(game_config)
@@ -797,7 +797,7 @@ class IdsGameV2Env(AttackDefenseEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=2)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             idsgame_config = IdsGameConfig(game_config=game_config)
@@ -824,7 +824,7 @@ class IdsGameRandomDefenseV3Env(AttackerEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=3)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             defender_agent = RandomDefenseBotAgent(game_config)
@@ -850,7 +850,7 @@ class IdsGameMinimalDefenseV3Env(AttackerEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=3)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             defender_agent = DefendMinimalValueBotAgent(game_config)
@@ -876,7 +876,7 @@ class IdsGameRandomAttackV3Env(DefenderEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=3)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             attacker_agent = RandomAttackBotAgent(game_config)
@@ -902,7 +902,7 @@ class IdsGameMaximalAttackV3Env(DefenderEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=3)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             attacker_agent = AttackMaximalValueBotAgent(game_config)
@@ -928,7 +928,7 @@ class IdsGameV3Env(AttackDefenseEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=3)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             idsgame_config = IdsGameConfig(game_config=game_config)
@@ -955,7 +955,7 @@ class IdsGameRandomDefenseV4Env(AttackerEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=5)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             defender_agent = RandomDefenseBotAgent(game_config)
@@ -981,7 +981,7 @@ class IdsGameMinimalDefenseV4Env(AttackerEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=5)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             defender_agent = DefendMinimalValueBotAgent(game_config)
@@ -1007,7 +1007,7 @@ class IdsGameRandomAttackV4Env(DefenderEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=5)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             attacker_agent = RandomAttackBotAgent(game_config)
@@ -1033,7 +1033,7 @@ class IdsGameMaximalAttackV4Env(DefenderEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=5)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             attacker_agent = AttackMaximalValueBotAgent(game_config)
@@ -1059,7 +1059,7 @@ class IdsGameV4Env(AttackDefenseEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=5)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             idsgame_config = IdsGameConfig(game_config=game_config)
@@ -1085,7 +1085,7 @@ class IdsGameRandomDefenseV5Env(AttackerEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=2)
             game_config.network_config = NetworkConfig(game_config.num_rows, game_config.num_cols,
                                                        connected_layers=True)
             if initial_state_path is not None:
@@ -1114,7 +1114,7 @@ class IdsGameMinimalDefenseV5Env(AttackerEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=2)
             game_config.network_config = NetworkConfig(game_config.num_rows, game_config.num_cols,
                                                        connected_layers=True)
             if initial_state_path is not None:
@@ -1142,7 +1142,7 @@ class IdsGameRandomAttackV5Env(DefenderEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=2)
             game_config.network_config = NetworkConfig(game_config.num_rows, game_config.num_cols,
                                                        connected_layers=True)
             if initial_state_path is not None:
@@ -1171,7 +1171,7 @@ class IdsGameMaximalAttackV5Env(DefenderEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=2)
             game_config.network_config = NetworkConfig(game_config.num_rows, game_config.num_cols,
                                                        connected_layers=True)
             if initial_state_path is not None:
@@ -1199,7 +1199,7 @@ class IdsGameV5Env(AttackDefenseEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
-                                          vulnerability_val=0)
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=2)
             game_config.network_config = NetworkConfig(game_config.num_rows, game_config.num_cols,
                                                        connected_layers=True)
             if initial_state_path is not None:
