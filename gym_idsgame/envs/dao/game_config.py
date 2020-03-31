@@ -1,7 +1,6 @@
 """
 Game-specific configuration for the gym-idsgame environment
 """
-import math
 import gym
 import numpy as np
 from gym_idsgame.envs.dao.game_state import GameState
@@ -13,7 +12,7 @@ class GameConfig():
     """
     def __init__(self, network_config: NetworkConfig = None, manual_attacker: bool = True, num_layers: int = 1,
                  num_servers_per_layer: int = 2, num_attack_types: int = 10, max_value: int = 9,
-                 initial_state: bool = None, manual_defender: bool = False):
+                 initial_state: GameState = None, manual_defender: bool = False, initial_state_path :str = None):
         """
         Class constructor, initializes the DTO
 
@@ -25,6 +24,7 @@ class GameConfig():
         :param num_attack_types: the number of attack types
         :param max_value: max value for a defense/attack attribute
         :param initial_state: the initial state
+        :param initial_state_path: path to the initial state saved on disk
         """
         self.manual_attacker = manual_attacker
         self.manual_defender = manual_defender
@@ -39,14 +39,25 @@ class GameConfig():
         self.num_defense_actions = (self.num_attack_types+1) * self.num_nodes
         self.num_states = self.num_nodes
         self.network_config = network_config
+        self.initial_state_path = initial_state_path
         if network_config is None:
             self.network_config = NetworkConfig(self.num_rows, self.num_cols, connected_layers=False)
         self.initial_state = initial_state
-        if self.initial_state is None:
+        if self.initial_state is None and self.initial_state_path is not None:
+            self.initial_state = GameState.load(self.initial_state)
+        if self.initial_state is None and self.initial_state_path is None:
             self.initial_state = GameState()
             self.initial_state.default_state(self.network_config.node_list, self.network_config.start_pos,
                                              self.num_attack_types)
 
+    def set_load_initial_state(self, initial_state_path: str) -> None:
+        """
+        Sets the initial state by loading it from disk
+
+        :param initial_state_path:
+        :return: None
+        """
+        self.initial_state = GameState.load(initial_state_path)
 
     def set_initial_state(self, defense_val=2, attack_val=0,
                   num_vulnerabilities_per_node=1, det_val=2, vulnerability_val=0):

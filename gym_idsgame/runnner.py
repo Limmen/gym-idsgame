@@ -56,7 +56,8 @@ class Runner:
         :return: trainresult, evalresult
         """
         env: IdsGameEnv = None
-        env = gym.make(config.env_name)
+        env = gym.make(config.env_name, idsgame_config = config.idsgame_config, save_dir=config.output_dir + "/data",
+                       initial_state_path = config.initial_state_path)
         if config.title is not None:
             env.idsgame_config.render_config.title = config.title
         attacker: TrainAgent = None
@@ -70,7 +71,8 @@ class Runner:
 
     @staticmethod
     def train_defender(config: ClientConfig):
-        env = gym.make(config.env_name)
+        env = gym.make(config.env_name, idsgame_config = config.idsgame_config, save_dir=config.output_dir + "/data",
+                       initial_state_path = config.initial_state_path)
         if config.title is not None:
             env.idsgame_config.render_config.title = config.title
         if config.defender_type == AgentType.TABULAR_Q_AGENT.value:
@@ -84,7 +86,8 @@ class Runner:
     @staticmethod
     def simulate(config: ClientConfig):
         env: IdsGameEnv = None
-        env = gym.make(config.env_name)
+        env = gym.make(config.env_name, idsgame_config = config.idsgame_config, save_dir=config.output_dir + "/data",
+                       initial_state_path = config.initial_state_path)
         if config.title is not None:
             env.idsgame_config.render_config.title = config.title
         if not issubclass(type(env), AttackDefenseEnv):
@@ -122,7 +125,8 @@ class Runner:
 
     @staticmethod
     def manual_play_attacker(config: ClientConfig) -> IdsGameEnv:
-        env: IdsGameEnv = gym.make(config.env_name)
+        env: IdsGameEnv = gym.make(config.env_name, idsgame_config = config.idsgame_config,
+                                   save_dir=config.output_dir + "/data", initial_state_path = config.initial_state_path)
         if config.title is not None:
             env.idsgame_config.render_config.title = config.title
         if not issubclass(type(env), AttackerEnv):
@@ -133,7 +137,8 @@ class Runner:
 
     @staticmethod
     def manual_play_defender(config: ClientConfig) -> IdsGameEnv:
-        env: IdsGameEnv = gym.make(config.env_name)
+        env: IdsGameEnv = gym.make(config.env_name, idsgame_config = config.idsgame_config,
+                                   save_dir=config.output_dir + "/data", initial_state_path = config.initial_state_path)
         if config.title is not None:
             env.idsgame_config.render_config.title = config.title
         if not issubclass(type(env), DefenderEnv):

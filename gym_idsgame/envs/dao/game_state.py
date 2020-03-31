@@ -3,6 +3,7 @@ Stateful data of the gym-idsgame environment
 """
 from typing import Union, List
 import numpy as np
+import pickle
 from gym_idsgame.envs.dao.node_type import NodeType
 from gym_idsgame.envs.constants import constants
 from gym_idsgame.envs.dao.attack_defense_event import AttackDefenseEvent
@@ -309,3 +310,13 @@ class GameState():
         self.num_hacks = 0
         self.defender_cumulative_reward = 0
         self.attacker_cumulative_reward = 0
+
+    @staticmethod
+    def load(path):
+        filehandler = open(path, 'rb')
+        return pickle.load(filehandler)
+
+    @staticmethod
+    def save(path, state):
+        filehandler = open(path + "/initial_state.pkl", 'wb')
+        pickle.dump(state, filehandler)
