@@ -30,6 +30,7 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         super(ResourceNode, self).__init__(avatar, batch=idsgame_config.render_config.batch, group=group)
         self.outgoing_edges = []
         self.incoming_edges = []
+        self.horizontal_edges = []
         self.initialize_state()
 
     def visualize_defense(self, detect: bool = False) -> None:
@@ -199,7 +200,7 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
 
     def add_out_edge(self, edge) -> None:
         """
-        Adds a list of outgoing edge from the node
+        Add an edge to the list of outgoing edges of the node
 
         :param edge: edge to add
         :return: None
@@ -208,12 +209,21 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
 
     def add_in_edge(self, edge) -> None:
         """
-        Adds a list of ingoing edges to the node
+        Add an edge to the list of ingoing edges of the node
 
         :param edge: edge to add
         :return: None
         """
         self.incoming_edges.append(edge)
+
+    def add_horizontal_edge(self, edge) -> None:
+        """
+        Add an edge to the list of horizontal edges of the node
+
+        :param edge: edge to add
+        :return: None
+        """
+        self.horizontal_edges.append(edge)
 
     def reset(self) -> None:
         """

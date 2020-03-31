@@ -48,7 +48,7 @@ class Network:
         bottom_layer_links = self.__create_horizontal_links(data_y, 1)
         self.horizontal_links.append(bottom_layer_links)
 
-        if self.idsgame_config.game_config.network_config.link_between_layers:
+        if self.idsgame_config.game_config.network_config.connected_layers:
             for row in range(1, self.idsgame_config.game_config.num_rows-1):
                 y = self.grid[row][0].y + self.idsgame_config.render_config.rect_size/8.5
                 links = self.__create_horizontal_links(y, row)
@@ -57,7 +57,6 @@ class Network:
         self.horizontal_links.append(top_layer_links)
 
         # Add horizontal links to each node (for dynamic visualization later on)
-
         for col in range(0, self.idsgame_config.game_config.num_cols):
             if col < root_col:
                 for i in range(col, root_col):
@@ -68,18 +67,13 @@ class Network:
                     self.grid[self.idsgame_config.game_config.num_rows - 2][col].add_in_edge(top_layer_links[i])
                     self.grid[1][col].add_out_edge(bottom_layer_links[i])
 
-
-        if self.idsgame_config.game_config.network_config.link_between_layers:
+        if self.idsgame_config.game_config.network_config.connected_layers:
             for row in range(1, self.idsgame_config.game_config.num_rows - 1):
                 for col in range(0, self.idsgame_config.game_config.num_cols):
-                    if col < root_col:
-                        for i in range(col, root_col):
-                            self.grid[row][col].add_in_edge(top_layer_links[i])
-                            self.grid[row][col].add_out_edge(top_layer_links[i])
-                    if col > root_col:
-                        for i in range(root_col, col):
-                            self.grid[row][col].add_in_edge(top_layer_links[i])
-                            self.grid[row][col].add_out_edge(top_layer_links[i])
+                    if col > 0:
+                        self.grid[row][col].add_horizontal_edge(self.horizontal_links[row][col-1])
+                    if col < self.idsgame_config.game_config.num_cols-1:
+                        self.grid[row][col].add_horizontal_edge(self.horizontal_links[row][col])
 
         # Create Leaf Link and Vertical Links between servers
         for i in range(self.idsgame_config.game_config.network_config.adjacency_matrix.shape[0]-1, -1, -1):
@@ -89,7 +83,8 @@ class Network:
                     n1 = self.grid[row_1][col_1]
                     row_2, col_2 = self.idsgame_config.game_config.network_config.get_coords_of_adjacency_matrix_id(j)
                     n2 = self.grid[row_2][col_2]
-                    self.__create_link(n1, n2)
+                    if row_2 != row_1:
+                        self.__create_link(n1, n2)
 
         # add leaf edge to servers on last layer
         for j in range(self.idsgame_config.game_config.num_servers_per_layer):

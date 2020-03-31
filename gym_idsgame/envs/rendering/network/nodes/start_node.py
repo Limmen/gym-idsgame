@@ -103,5 +103,8 @@ class StartNode(Node):
     def add_out_edge(self, edge):
         pass
 
+    def add_horizontal_edge(self, edge):
+        pass
+
     def unschedule(self):
         pass

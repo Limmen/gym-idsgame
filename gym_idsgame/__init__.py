@@ -212,3 +212,13 @@ register(
     id='idsgame-v4',
     entry_point='gym_idsgame.envs:IdsGameV4Env',
 )
+
+# -------- Version 5 ------------
+
+# [AttackerEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, random defender, connected layers
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Version] 4
+register(
+    id='idsgame-random_defense-v5',
+    entry_point='gym_idsgame.envs:IdsGameRandomDefenseV5Env',
+)

@@ -13,6 +13,7 @@ from gym_idsgame.agents.defend_minimal_value_bot_agent import DefendMinimalValue
 from gym_idsgame.agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
 from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
+from gym_idsgame.envs.dao.network_config import NetworkConfig
 import gym_idsgame.envs.util.idsgame_util as util
 from gym_idsgame.envs.constants import constants
 
@@ -778,4 +779,23 @@ class IdsGameV4Env(AttackDefenseEnv):
                                       vulnerability_val=0)
         idsgame_config = IdsGameConfig(game_config=game_config)
         idsgame_config.render_config.caption = "idsgame-v4"
+        super().__init__(idsgame_config=idsgame_config)
+
+# -------- Version 5 ------------
+
+class IdsGameRandomDefenseV5Env(AttackerEnv):
+    """
+    [AttackerEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, random defender, connected layers
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Version] 0
+    """
+    def __init__(self):
+        game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
+        game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+                                      vulnerability_val=0)
+        game_config.network_config = NetworkConfig(game_config.num_rows, game_config.num_cols,
+                                                   connected_layers=True)
+        defender_agent = RandomDefenseBotAgent(game_config)
+        idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
+        idsgame_config.render_config.caption = "idsgame-random_defense-v5"
         super().__init__(idsgame_config=idsgame_config)

@@ -52,6 +52,10 @@ class Node(ABC):
         pass
 
     @abstractmethod
+    def add_horizontal_edge(self, edge):
+        pass
+
+    @abstractmethod
     def add_out_edge(self, edge):
         pass
 

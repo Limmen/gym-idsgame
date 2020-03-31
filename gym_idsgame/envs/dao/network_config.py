@@ -9,17 +9,17 @@ class NetworkConfig:
     """
     DTO with configuration of the network for the game, i.e. the servers and their connectivity
     """
-    def __init__(self, num_rows: int, num_cols: int, link_between_layers : bool = False):
+    def __init__(self, num_rows: int, num_cols: int, connected_layers : bool = False):
         """
         Constructor
 
         :param num_rows: the number of rows in the network layout (think like a grid)
         :param num_cols: the number of columns in the network layout
-        :param link_between_layers: whether layers are connected with horizontal links or not
+        :param connected_layers: whether layers are connected with horizontal links or not
         """
         self.num_rows = num_rows
         self.num_cols = num_cols
-        self.link_between_layers = link_between_layers
+        self.connected_layers = connected_layers
         self.graph_layout = self.__default_graph_layout()
         self.adjacency_matrix = self.__default_adjacency_matrix()
 
@@ -72,6 +72,10 @@ class NetworkConfig:
                 elif row_2 == (row_1 + 1) and col_1 == col_2 and row_1 != self.start_row and row_2 != self.start_row:
                     adjacency_matrix[i][j] = 1
                     adjacency_matrix[j][i] = 1
+                elif self.connected_layers:
+                    if row_2 == row_1 and col_1 == col_2+1 and row_1 != self.start_row and row_1 != self.data_row:
+                        adjacency_matrix[i][j] = 1
+                        adjacency_matrix[j][i] = 1
         return adjacency_matrix.astype(np.int32)
 
 
