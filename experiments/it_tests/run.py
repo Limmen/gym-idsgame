@@ -91,7 +91,7 @@ def test_train_random_defense_tabular_q_learning(version) -> ClientConfig:
 
 # Program entrypoint
 if __name__ == '__main__':
-    versions = list(range(5))
+    versions = list(range(6))
     for version in versions:
         test_sim_attack_maximal_vs_defend_minimal(version)
         test_sim_attack_maximal_vs_random(version)
