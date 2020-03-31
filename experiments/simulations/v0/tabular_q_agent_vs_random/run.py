@@ -37,7 +37,8 @@ def default_config() -> ClientConfig:
                                  defender_type=AgentType.RANDOM.value, mode=RunnerMode.SIMULATE.value,
                                  simulation_config=simulation_config, output_dir=default_output_dir(),
                                  title="TabularQAgentAttacker vs RandomDefender",
-                                 q_agent_config=q_agent_config)
+                                 q_agent_config=q_agent_config,
+                                 initial_state_path = default_output_dir() + "/initial_state/initial_state.pkl")
     return client_config
 
 

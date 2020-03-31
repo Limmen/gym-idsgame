@@ -5,16 +5,7 @@ An environment where neither the attacker nor defender is part of the environmen
 it is intended for 2-agent simulations or RL training.
 
 In this experiment, the defender is implemented with a greedy policy 
-based on a save Q-table. The attacker is implemented with a random attack policy.
-
-**NOTE** By default the pre-configured environments will create vulnerabilities at random
-locations in the network in order to make sure that a pre-programmed policy cannot be the
-optimal. Therefore, when you run simulation with a pre-trained Q-agent and with a pre-configured
-environment, it is likely that the environment will be different (have vulnerabilities at different locations)
-than the environment for which the Q-agent was trained to act optimally in. Thus,
-if you want to simulate a trained Q-agent with the exact same environment as when it was
-trained you'll need to manually use the configuration APIs to make the environment 
-be identical. 
+based on a save Q-table. The attacker is implemented with a random attack policy. 
 
 The network configuration of the environment is as follows:
 
@@ -56,6 +47,8 @@ Example configuration in `config.json`:
     "attacker_type": 1,
     "defender_type": 0,
     "env_name": "idsgame-v0",
+    "idsgame_config": null,
+    "initial_state_path": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/v0/random_vs_tabular_q_agent/initial_state/initial_state.pkl",
     "logger": null,
     "mode": 2,
     "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/v0/random_vs_tabular_q_agent",
@@ -78,7 +71,7 @@ Example configuration in `config.json`:
         "logger": null,
         "min_epsilon": 0.1,
         "num_episodes": 5000,
-        "py/object": "gym_idsgame.agents.dao.q_agent_config.QAgentConfig",
+        "py/object": "gym_idsgame.agents.tabular_q_learning.q_agent_config.QAgentConfig",
         "render": false,
         "save_dir": null,
         "train_log_frequency": 100,
@@ -117,8 +110,15 @@ client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.RANDOM.v
                              defender_type=AgentType.TABULAR_Q_AGENT.value, mode=RunnerMode.SIMULATE.value,
                              simulation_config=simulation_config, output_dir=default_output_dir(),
                              title="RandomAttacker vs TabularQAgentDefender",
-                             q_agent_config=q_agent_config)
+                             q_agent_config=q_agent_config,
+                             initial_state_path = default_output_dir() + "/initial_state/initial_state.pkl")
 ```
+
+## Example Simulation
+
+<p align="center">
+<img src="./docs/simulation.gif" width="600">
+</p>
 
 ## Commands
 

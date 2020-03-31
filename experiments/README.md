@@ -73,30 +73,14 @@
    An environment where neither the attacker nor defender is part of the environment, i.e.
    it is intended for 2-agent simulations or RL training.
    In this experiment, the attacker is implemented with a greedy policy 
-   based on a save Q-table.The defender is implemented with a random defense policy.
-   **NOTE** By default the pre-configured environments will create vulnerabilities at random
-   locations in the network in order to make sure that a pre-programmed policy cannot be the
-   optimal. Therefore, when you run simulation with a pre-trained Q-agent and with a pre-configured
-   environment, it is likely that the environment will be different (have vulnerabilities at different locations)
-   than the environment for which the Q-agent was trained to act optimally in. Thus,
-   if you want to simulate a trained Q-agent with the exact same environment as when it was
-   trained you'll need to manually use the configuration APIs to make the environment 
-   be identical. 
+   based on a save Q-table.The defender is implemented with a random defense policy.    
    
 - [random_vs_tabular_q_agent-v0](simulations/v0/random_vs_tabular_q_agent/)
    * This is an experiment in the `idsgame-v0` environment. 
    An environment where neither the attacker nor defender is part of the environment, i.e.
    it is intended for 2-agent simulations or RL training.
    In this experiment, the defender is implemented with a greedy policy 
-   based on a save Q-table. The attacker is implemented with a random attack policy.
-   **NOTE** By default the pre-configured environments will create vulnerabilities at random
-   locations in the network in order to make sure that a pre-programmed policy cannot be the
-   optimal. Therefore, when you run simulation with a pre-trained Q-agent and with a pre-configured
-   environment, it is likely that the environment will be different (have vulnerabilities at different locations)
-   than the environment for which the Q-agent was trained to act optimally in. Thus,
-   if you want to simulate a trained Q-agent with the exact same environment as when it was
-   trained you'll need to manually use the configuration APIs to make the environment 
-   be identical.
+   based on a save Q-table. The attacker is implemented with a random attack policy.   
    
 ## Experiments in Version 1 Environments 
 
