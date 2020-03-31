@@ -45,6 +45,8 @@ Example configuration in `config.json`:
     "attacker_type": 0,
     "defender_type": 0,
     "env_name": "idsgame-random_attack-v0",
+    "idsgame_config": null,
+    "initial_state_path": null,
     "logger": null,
     "mode": 1,
     "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_attack/tabular_q_learning",

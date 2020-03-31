@@ -50,6 +50,8 @@ Example configuration in `config.json`:
     "attacker_type": 5,
     "defender_type": 2,
     "env_name": "idsgame-v4",
+    "idsgame_config": null,
+    "initial_state_path": null,
     "logger": null,
     "mode": 2,
     "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/v4/attack_maximal_vs_defend_minimal",

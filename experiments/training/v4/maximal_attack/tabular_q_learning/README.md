@@ -49,6 +49,8 @@ Example configuration in `config.json`:
     "attacker_type": 0,
     "defender_type": 0,
     "env_name": "idsgame-maximal_attack-v4",
+    "idsgame_config": null,
+    "initial_state_path": null,
     "logger": null,
     "mode": 1,
     "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v4/maximal_attack/tabular_q_learning",

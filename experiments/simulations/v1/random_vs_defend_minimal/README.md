@@ -49,6 +49,8 @@ Example configuration in `config.json`:
     "attacker_type": 1,
     "defender_type": 2,
     "env_name": "idsgame-v1",
+    "idsgame_config": null,
+    "initial_state_path": null,
     "logger": null,
     "mode": 2,
     "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/simulations/v1/random_vs_defend_minimal",
@@ -69,7 +71,7 @@ Example configuration in `config.json`:
         "video_frequency": 1
     },
     "title": "RandomAttacker vs DefendMinimalDefender"
-} 
+}
 ```
 
 Example configuration in `run.py`:

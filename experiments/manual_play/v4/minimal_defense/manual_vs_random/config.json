@@ -2,6 +2,8 @@
     "attacker_type": 3,
     "defender_type": 1,
     "env_name": "idsgame-minimal_defense-v4",
+    "idsgame_config": null,
+    "initial_state_path": null,
     "logger": null,
     "mode": 3,
     "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v4/minimal_defense/manual_vs_random",

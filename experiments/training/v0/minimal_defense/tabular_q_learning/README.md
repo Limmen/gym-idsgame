@@ -48,6 +48,8 @@ Example configuration in `config.json`:
     "attacker_type": 0,
     "defender_type": 1,
     "env_name": "idsgame-minimal_defense-v0",
+    "idsgame_config": null,
+    "initial_state_path": null,
     "logger": null,
     "mode": 0,
     "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/minimal_defense/tabular_q_learning",

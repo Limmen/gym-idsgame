@@ -45,6 +45,8 @@ Example configuration in `config.json`:
     "attacker_type": 0,
     "defender_type": 4,
     "env_name": "idsgame-random_attack-v2",
+    "idsgame_config": null,
+    "initial_state_path": null,
     "logger": null,
     "mode": 4,
     "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v2/random_attack/random_vs_manual",

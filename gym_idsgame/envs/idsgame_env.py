@@ -253,7 +253,7 @@ class IdsGameEnv(gym.Env, ABC):
 
         :return: None
         """
-        if self.save_dir is not None:
+        if self.save_dir is not None and os.path.exists(self.save_dir):
             GameState.save(self.save_dir, self.state)
 
     @abstractmethod

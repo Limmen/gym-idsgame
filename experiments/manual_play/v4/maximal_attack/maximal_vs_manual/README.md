@@ -49,6 +49,8 @@ Example configuration in `config.json`:
     "attacker_type": 0,
     "defender_type": 4,
     "env_name": "idsgame-maximal_attack-v4",
+    "idsgame_config": null,
+    "initial_state_path": null,
     "logger": null,
     "mode": 4,
     "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v4/maximal_attack/maximal_vs_manual",
