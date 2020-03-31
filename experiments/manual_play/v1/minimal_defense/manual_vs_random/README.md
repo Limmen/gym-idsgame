@@ -25,6 +25,7 @@ The starting state for each node in the environment is initialized as follows (w
 - `num_vulnerabilities_per_node=4` (which type of defenses at the node that are vulnerable is selected randomly when the environment is initialized)
 - `det_val=3`
 - `vulnerability_val=0`
+- `num_vulnerabilities_per_layer=1`
 
 ## Environment 
 
