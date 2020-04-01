@@ -93,6 +93,18 @@ make all
 python run.py
 ```
 
+### Run Server (Without Display)
+
+**Option 1**:
+```bash
+./run_server.sh
+```
+
+**Option 2**:
+```bash
+make run_server
+```
+
 ### Clean
 
 ```bash
