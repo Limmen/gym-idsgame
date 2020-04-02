@@ -66,8 +66,8 @@ def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str) -> No
     :return: None
     """
     plotting_util.read_and_plot_results(train_csv_path, eval_csv_path, config.q_agent_config.train_log_frequency,
-                               config.q_agent_config.eval_frequency, config.q_agent_config.eval_log_frequency,
-                               config.output_dir, sim=False)
+                                        config.q_agent_config.eval_frequency, config.q_agent_config.eval_log_frequency,
+                                        config.q_agent_config.eval_episodes, config.output_dir, sim=False)
 
 
 # Program entrypoint
@@ -81,7 +81,7 @@ if __name__ == '__main__':
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir)
-    logger = util.setup_logger("tabular_q_learning_vs_minimal_defense-v0", config.output_dir + "/logs/",
+    logger = util.setup_logger("tabular_q_learning_vs_minimal_defense-v4", config.output_dir + "/logs/",
                                time_str=time_str)
     config.logger = logger
     config.q_agent_config.logger = logger

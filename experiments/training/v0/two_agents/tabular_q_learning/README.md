@@ -47,16 +47,16 @@ Example configuration in `config.json`:
 {
     "attacker_type": 0,
     "defender_type": 0,
-    "env_name": "idsgame-maximal_attack-v0",
+    "env_name": "idsgame-v0",
     "idsgame_config": null,
     "initial_state_path": null,
     "logger": null,
-    "mode": 1,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/maximal_attack/tabular_q_learning",
+    "mode": 5,
+    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/two_agents/tabular_q_learning",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
-        "alpha": 0.2,
-        "attacker": false,
+        "alpha": 0.05,
+        "attacker": true,
         "defender": true,
         "epsilon": 1,
         "epsilon_decay": 0.999,
@@ -66,23 +66,23 @@ Example configuration in `config.json`:
         "eval_render": false,
         "eval_sleep": 0.9,
         "gamma": 0.999,
-        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/maximal_attack/tabular_q_learning/gifs",
+        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/two_agents/tabular_q_learning/gifs",
         "gifs": true,
         "load_path": null,
         "logger": null,
         "min_epsilon": 0.01,
-        "num_episodes": 5000,
+        "num_episodes": 5001,
         "py/object": "gym_idsgame.agents.tabular_q_learning.q_agent_config.QAgentConfig",
         "render": false,
-        "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/maximal_attack/tabular_q_learning/data",
+        "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/two_agents/tabular_q_learning/data",
         "train_log_frequency": 100,
         "video": true,
-        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/maximal_attack/tabular_q_learning/videos",
+        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/two_agents/tabular_q_learning/videos",
         "video_fps": 5,
         "video_frequency": 1
     },
     "simulation_config": null,
-    "title": "AttackMaximalAttacker vs TrainingQAgent"
+    "title": "TrainingQAgent vs TrainingQAgent"
 }
 ```
 
@@ -92,7 +92,7 @@ Example configuration in `run.py`:
 q_agent_config = QAgentConfig(gamma=0.999, alpha=0.05, epsilon=1, render=False, eval_sleep=0.9,
                               min_epsilon=0.01, eval_episodes=1, train_log_frequency=100,
                               epsilon_decay=0.999, video=True, eval_log_frequency=1,
-                              video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5000,
+                              video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5001,
                               eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
                               eval_frequency=1000, attacker=True, defender=True,
                               save_dir=default_output_dir() + "/data")

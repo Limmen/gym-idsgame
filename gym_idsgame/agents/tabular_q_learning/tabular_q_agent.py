@@ -138,7 +138,7 @@ class TabularQAgent(TrainAgent):
             episode_steps.append(episode_step)
 
             # Log average metrics every <self.config.train_log_frequency> episodes
-            if episode % self.config.train_log_frequency == 0 and episode > 0:
+            if episode % self.config.train_log_frequency == 0:
                 self.log_metrics(self.train_result, episode_attacker_rewards, episode_defender_rewards, episode_steps)
                 episode_attacker_rewards = []
                 episode_defender_rewards = []
@@ -158,8 +158,8 @@ class TabularQAgent(TrainAgent):
 
         self.config.logger.info("Training Complete")
 
-        # Final evaluation
-        self.eval()
+        # Final evaluation (for saving Gifs etc)
+        self.eval(log=False)
 
         # Log and return
         self.log_state_values()
@@ -250,10 +250,11 @@ class TabularQAgent(TrainAgent):
         result.attacker_cumulative_reward.append(attacker_cumulative_reward)
         result.defender_cumulative_reward.append(defender_cumulative_reward)
 
-    def eval(self) -> ExperimentResult:
+    def eval(self, log=True) -> ExperimentResult:
         """
         Performs evaluation with the greedy policy with respect to the learned Q-values
 
+        :param log: whether to log the result
         :return: None
         """
         self.config.logger.info("Starting Evaluation")
@@ -345,7 +346,7 @@ class TabularQAgent(TrainAgent):
                 self.num_eval_hacks += 1
 
             # Log average metrics every <self.config.eval_log_frequency> episodes
-            if episode % self.config.eval_log_frequency == 0:
+            if episode % self.config.eval_log_frequency == 0 and log:
                 if self.num_eval_hacks > 0:
                     self.eval_hack_probability = float(self.num_eval_hacks) / float(self.num_eval_games)
                 self.log_metrics(self.eval_result, episode_attacker_rewards, episode_defender_rewards, episode_steps,

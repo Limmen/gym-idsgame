@@ -59,7 +59,7 @@ def simple_line_plot(x: np.ndarray, y: np.ndarray, title: str ="Test", xlabel: s
     #fig.savefig(file_name, format='eps', dpi=500, bbox_inches='tight', transparent=True)
 
 def read_and_plot_results(train_csv_path : str, eval_csv_path: str, train_log_frequency : int,
-                 eval_frequency : int, eval_log_frequency : int, output_dir: str, sim=False):
+                 eval_frequency : int, eval_log_frequency : int, eval_episodes: int, output_dir: str, sim=False):
     eval_df = read_data(eval_csv_path)
     train_df = read_data(train_csv_path)
     plot_results(train_df["avg_attacker_episode_rewards"].values,
@@ -67,20 +67,21 @@ def read_and_plot_results(train_csv_path : str, eval_csv_path: str, train_log_fr
                  train_df["avg_episode_steps"].values,
                  train_df["epsilon_values"], train_df["hack_probability"],
                  train_df["attacker_cumulative_reward"], train_df["defender_cumulative_reward"],
-                 train_log_frequency, eval_frequency, eval_log_frequency, output_dir, eval=False, sim=sim)
+                 train_log_frequency, eval_frequency, eval_log_frequency, eval_episodes,
+                 output_dir, eval=False, sim=sim)
     plot_results(eval_df["avg_attacker_episode_rewards"].values,
                  eval_df["avg_defender_episode_rewards"].values,
                  eval_df["avg_episode_steps"].values,
                  eval_df["epsilon_values"], eval_df["hack_probability"],
                  eval_df["attacker_cumulative_reward"], eval_df["defender_cumulative_reward"],train_log_frequency,
-                 eval_frequency, eval_log_frequency, output_dir, eval=True, sim=sim)
+                 eval_frequency, eval_log_frequency, eval_episodes, output_dir, eval=True, sim=sim)
 
 def plot_results(avg_attacker_episode_rewards: np.ndarray = None, avg_defender_episode_rewards: np.ndarray = None,
                  avg_episode_steps: np.ndarray = None,
                  epsilon_values: np.ndarray = None,
                  hack_probability: np.ndarray = None, attacker_cumulative_reward: np.ndarray = None,
                  defender_cumulative_reward: np.ndarray = None, log_frequency: int = None,
-                 eval_frequency: int = None, eval_log_frequency: int = None,
+                 eval_frequency: int = None, eval_log_frequency: int = None, eval_episodes: int = None,
                  output_dir: str = None,
                  eval: bool = False, sim:bool = False) -> None:
     """
@@ -95,6 +96,7 @@ def plot_results(avg_attacker_episode_rewards: np.ndarray = None, avg_defender_e
     :param defender_cumulative_reward: list of defender cumulative rewards recorded every <log_frequency>
     :param log_frequency: frequency that the metrics were recorded
     :param eval_frequency: frequency of evaluation
+    :param eval_frequency: number of evaluation episodes
     :param eval_log_frequency: log-frequency of evaluation
     :param output_dir: base directory to save the plots
     :param eval: if True save plots with "eval.png" suffix.
@@ -105,7 +107,7 @@ def plot_results(avg_attacker_episode_rewards: np.ndarray = None, avg_defender_e
     suffix = "train.png"
     if eval:
         suffix = "eval.png"
-        step = eval_frequency
+        step = eval_frequency/eval_episodes
     elif sim:
         suffix = "simulation.png"
     if avg_attacker_episode_rewards is not None:

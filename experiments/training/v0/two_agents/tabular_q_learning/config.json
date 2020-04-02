@@ -25,7 +25,7 @@
         "load_path": null,
         "logger": null,
         "min_epsilon": 0.01,
-        "num_episodes": 5000,
+        "num_episodes": 5001,
         "py/object": "gym_idsgame.agents.tabular_q_learning.q_agent_config.QAgentConfig",
         "render": false,
         "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/two_agents/tabular_q_learning/data",

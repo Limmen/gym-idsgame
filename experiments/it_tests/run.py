@@ -88,6 +88,15 @@ def test_train_random_defense_tabular_q_learning(version) -> ClientConfig:
                                  q_agent_config=q_agent_config, output_dir=default_output_dir())
     Runner.run(client_config)
 
+def test_train_tabular_q_learning_tabular_q_learning(version) -> ClientConfig:
+    q_agent_config = QAgentConfig(num_episodes=10, eval_frequency=100, attacker=True, defender=True)
+    env_name = "idsgame-random_defense-v" + str(version)
+    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.TABULAR_Q_AGENT.value,
+                                 defender_type=AgentType.TABULAR_Q_AGENT.value,
+                                 mode=RunnerMode.TRAIN_DEFENDER_AND_ATTACKER.value,
+                                 q_agent_config=q_agent_config, output_dir=default_output_dir())
+    Runner.run(client_config)
+
 
 # Program entrypoint
 if __name__ == '__main__':
@@ -101,6 +110,7 @@ if __name__ == '__main__':
         test_train_minimal_defense_tabular_q_learning(version)
         test_train_random_attack_tabular_q_learning(version)
         test_train_random_defense_tabular_q_learning(version)
+        test_train_tabular_q_learning_tabular_q_learning(version)
 
 
 

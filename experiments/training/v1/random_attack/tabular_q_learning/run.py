@@ -66,8 +66,8 @@ def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str) -> No
     :return: None
     """
     plotting_util.read_and_plot_results(train_csv_path, eval_csv_path, config.q_agent_config.train_log_frequency,
-                               config.q_agent_config.eval_frequency, config.q_agent_config.eval_log_frequency,
-                               config.output_dir, sim=False)
+                                        config.q_agent_config.eval_frequency, config.q_agent_config.eval_log_frequency,
+                                        config.q_agent_config.eval_episodes, config.output_dir, sim=False)
 
 
 # Program entrypoint

@@ -73,8 +73,9 @@ class Runner:
             attacker = TabularQAgent(env, config.q_agent_config)
         else:
             raise AssertionError("Attacker train agent type not recognized: {}".format(config.attacker_type))
-        train_result = attacker.train()
-        eval_result = attacker.eval()
+        attacker.train()
+        train_result = attacker.train_result
+        eval_result = attacker.eval_result
         return train_result, eval_result
 
     @staticmethod
@@ -94,8 +95,9 @@ class Runner:
             defender = TabularQAgent(env, config.q_agent_config)
         else:
             raise AssertionError("Defender train agent type not recognized: {}".format(config.defender_type))
-        train_result = defender.train()
-        eval_result = defender.eval()
+        defender.train()
+        train_result = defender.train_result
+        eval_result = defender.eval_result
         return train_result, eval_result
 
 
@@ -117,8 +119,9 @@ class Runner:
             agent = TabularQAgent(env, config.q_agent_config)
         else:
             raise AssertionError("Train agent type not recognized: {}".format(config.attacker_type))
-        train_result = agent.train()
-        eval_result = agent.eval()
+        agent.train()
+        train_result = agent.train_result
+        eval_result = agent.eval_result
         return train_result, eval_result
 
     @staticmethod

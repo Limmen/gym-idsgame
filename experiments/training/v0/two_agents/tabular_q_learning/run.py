@@ -31,7 +31,7 @@ def default_config() -> ClientConfig:
     q_agent_config = QAgentConfig(gamma=0.999, alpha=0.05, epsilon=1, render=False, eval_sleep=0.9,
                                   min_epsilon=0.01, eval_episodes=1, train_log_frequency=100,
                                   epsilon_decay=0.999, video=True, eval_log_frequency=1,
-                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5000,
+                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5001,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
                                   eval_frequency=1000, attacker=True, defender=True,
                                   save_dir=default_output_dir() + "/data")
@@ -67,8 +67,8 @@ def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str) -> No
     :return: None
     """
     plotting_util.read_and_plot_results(train_csv_path, eval_csv_path, config.q_agent_config.train_log_frequency,
-                               config.q_agent_config.eval_frequency, config.q_agent_config.eval_log_frequency,
-                               config.output_dir, sim=False)
+                                        config.q_agent_config.eval_frequency, config.q_agent_config.eval_log_frequency,
+                                        config.q_agent_config.eval_episodes, config.output_dir, sim=False)
 
 # Program entrypoint
 if __name__ == '__main__':
@@ -81,7 +81,7 @@ if __name__ == '__main__':
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir)
-    logger = util.setup_logger("maximal_attack_vs_tabular_q_learning-v0", config.output_dir + "/logs/",
+    logger = util.setup_logger("tabular_q_learning_vs_tabular_q_learning-v0", config.output_dir + "/logs/",
                                time_str=time_str)
     config.logger = logger
     config.q_agent_config.logger = logger

@@ -29,11 +29,11 @@ def default_config() -> ClientConfig:
     :return: Default configuration for the experiment
     """
     q_agent_config = QAgentConfig(gamma=0.99, alpha=0.05, epsilon=1, render=False, eval_sleep=0.9,
-                                  min_epsilon=0.01, eval_episodes=1, train_log_frequency=1,
+                                  min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
                                   epsilon_decay=0.999, video=True, eval_log_frequency=1,
-                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5000,
+                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5001,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                                  eval_frequency=1000, attacker=True, defender=False,
+                                  eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
                                   save_dir=default_output_dir() + "/data")
     env_name = "idsgame-minimal_defense-v0"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.TABULAR_Q_AGENT.value,
@@ -66,8 +66,8 @@ def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str) -> No
     :return: None
     """
     plotting_util.read_and_plot_results(train_csv_path, eval_csv_path, config.q_agent_config.train_log_frequency,
-                               config.q_agent_config.eval_frequency, config.q_agent_config.eval_log_frequency,
-                               config.output_dir, sim=False)
+                                        config.q_agent_config.eval_frequency, config.q_agent_config.eval_log_frequency,
+                                        config.q_agent_config.eval_episodes, config.output_dir, sim=False)
 
 
 # Program entrypoint
