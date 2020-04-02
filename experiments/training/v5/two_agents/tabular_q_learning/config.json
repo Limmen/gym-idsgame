@@ -11,7 +11,7 @@
     "q_agent_config": {
         "alpha": 0.05,
         "attacker": true,
-        "defender": false,
+        "defender": true,
         "epsilon": 1,
         "epsilon_decay": 0.9999,
         "eval_episodes": 100,
