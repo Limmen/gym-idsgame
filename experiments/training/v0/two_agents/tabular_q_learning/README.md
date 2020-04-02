@@ -1,13 +1,11 @@
-# Experiment `maximal_attack-v0`_`tabular_q_learning`
+# Experiment `tabular_q_learning`_`tabular_q_learning`
 
-This is an experiment in the `maximal_attack-v0` environment.
-An environment where the attack is following the `attack_maximal` attack policy.
-The `attack_maximal` policy entails that the attacker will always attack the attribute with
-the maximum value out of all of its neighbors. The defender is implemented with a
-random defense policy.
+This is an experiment in the `idsgame-v0` environment. 
+An environment where neither the attacker nor defender is part of the environment, i.e.
+it is intended for 2-agent simulations or RL training.
  
-This experiment trains a defender agent using tabular q-learning to act optimally in the given
-environment and detect the attacker.
+This experiment trains both an attacker and a defender agent simultaneously against each other 
+using tabular q-learning.
 
 The network configuration of the environment is as follows:
 
@@ -96,13 +94,14 @@ q_agent_config = QAgentConfig(gamma=0.999, alpha=0.05, epsilon=1, render=False, 
                               epsilon_decay=0.999, video=True, eval_log_frequency=1,
                               video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5000,
                               eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                              eval_frequency=1000, attacker=False, defender=True,
+                              eval_frequency=1000, attacker=True, defender=True,
                               save_dir=default_output_dir() + "/data")
-env_name = "idsgame-maximal_attack-v0"
+env_name = "idsgame-v0"
 client_config = ClientConfig(env_name=env_name, defender_type=AgentType.TABULAR_Q_AGENT.value,
-                             mode=RunnerMode.TRAIN_DEFENDER.value,
+                             attacker_type=AgentType.TABULAR_Q_AGENT.value,
+                             mode=RunnerMode.TRAIN_DEFENDER_AND_ATTACKER.value,
                              q_agent_config=q_agent_config, output_dir=default_output_dir(),
-                             title="AttackMaximalAttacker vs TrainingQAgent")
+                             title="TrainingQAgent vs TrainingQAgent")
 ```
 
 After the experiment has finished, the results are written to the following sub-directories:

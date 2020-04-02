@@ -91,7 +91,7 @@ Example configuration in `config.json`:
 Example configuration in `run.py`:
 
 ```python
-q_agent_config = QAgentConfig(gamma=0.999, alpha=0.2, epsilon=1, render=False, eval_sleep=0.9,
+q_agent_config = QAgentConfig(gamma=0.999, alpha=0.05, epsilon=1, render=False, eval_sleep=0.9,
                               min_epsilon=0.1, eval_episodes=1, train_log_frequency=100,
                               epsilon_decay=0.999, video=True, eval_log_frequency=1,
                               video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=10000,

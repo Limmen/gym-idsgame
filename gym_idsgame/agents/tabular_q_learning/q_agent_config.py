@@ -66,7 +66,6 @@ class QAgentConfig:
         self.video_frequency = video_frequency
         self.attacker = attacker
         self.defender = defender
-        assert not (self.attacker and self.defender)
         self.save_dir = save_dir
         self.load_path = load_path
 

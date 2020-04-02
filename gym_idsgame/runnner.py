@@ -44,6 +44,8 @@ class Runner:
             return Runner.train_attacker(config)
         elif config.mode == RunnerMode.TRAIN_DEFENDER.value:
             return Runner.train_defender(config)
+        elif config.mode == RunnerMode.TRAIN_DEFENDER_AND_ATTACKER.value:
+            return Runner.train_attacker_and_defender(config)
         elif config.mode == RunnerMode.SIMULATE.value:
             return Runner.simulate(config)
         elif config.mode == RunnerMode.MANUAL_ATTACKER.value:
@@ -110,18 +112,13 @@ class Runner:
                        initial_state_path = config.initial_state_path)
         if config.title is not None:
             env.idsgame_config.render_config.title = config.title
-        attacker: TrainAgent = None
+        agent: TrainAgent = None
         if config.attacker_type == AgentType.TABULAR_Q_AGENT.value:
-            attacker = TabularQAgent(env, config.q_agent_config)
+            agent = TabularQAgent(env, config.q_agent_config)
         else:
-            raise AssertionError("Attacker train agent type not recognized: {}".format(config.attacker_type))
-        defender: TrainAgent = None
-        if config.defender_type == AgentType.TABULAR_Q_AGENT.value:
-            defender = TabularQAgent(env, config.q_agent_config)
-        else:
-            raise AssertionError("Defender train agent type not recognized: {}".format(config.defender_type))
-        train_result = attacker.train()
-        eval_result = attacker.eval()
+            raise AssertionError("Train agent type not recognized: {}".format(config.attacker_type))
+        train_result = agent.train()
+        eval_result = agent.eval()
         return train_result, eval_result
 
     @staticmethod

@@ -33,13 +33,14 @@ def default_config() -> ClientConfig:
                                   epsilon_decay=0.999, video=True, eval_log_frequency=1,
                                   video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5000,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                                  eval_frequency=1000, attacker=False, defender=True,
+                                  eval_frequency=1000, attacker=True, defender=True,
                                   save_dir=default_output_dir() + "/data")
-    env_name = "idsgame-maximal_attack-v0"
+    env_name = "idsgame-v0"
     client_config = ClientConfig(env_name=env_name, defender_type=AgentType.TABULAR_Q_AGENT.value,
-                                 mode=RunnerMode.TRAIN_DEFENDER.value,
+                                 attacker_type=AgentType.TABULAR_Q_AGENT.value,
+                                 mode=RunnerMode.TRAIN_DEFENDER_AND_ATTACKER.value,
                                  q_agent_config=q_agent_config, output_dir=default_output_dir(),
-                                 title="AttackMaximalAttacker vs TrainingQAgent")
+                                 title="TrainingQAgent vs TrainingQAgent")
     return client_config
 
 

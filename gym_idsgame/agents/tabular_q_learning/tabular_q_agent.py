@@ -307,7 +307,7 @@ class TabularQAgent(TrainAgent):
                 if self.config.attacker:
                     attacker_state_node_id = self.env.get_attacker_node_from_observation(attacker_obs)
                     attacker_action = self.get_action(attacker_state_node_id, eval=True, attacker=True)
-                elif self.config.defender:
+                if self.config.defender:
                     defender_action = self.get_action(defender_state_node_id, eval=True, attacker=False)
                 action = (attacker_action, defender_action)
 
