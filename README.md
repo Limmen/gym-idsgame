@@ -31,6 +31,13 @@ pip3 install -e .
 pytest
 ```
 
+By default when cloning the repo the experiment results are not included, to fetch the experiment results, 
+install and setup `git-lfs` then run:
+```bash
+git lfs fetch --all
+git lfs pull
+```
+
 ## Requirements
 - Python 3.5+
 - OpenAI Gym
