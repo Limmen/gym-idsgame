@@ -348,7 +348,14 @@
    The `attack_maximal` policy entails that the attacker will always attack the attribute with
    the maximum value out of all of its neighbors. The defender is implemented with a
    random defense policy. This experiment trains a defender agent using tabular q-learning to act optimally in the given
-   environment and detect the attacker.   
+   environment and detect the attacker.
+   
+- [tabular_q_learning_vs_tabular_q_learning-v4](training/v4/two_agents/tabular_q_learning/)
+   * This is an experiment in the `idsgame-v4` environment. 
+   An environment where neither the attacker nor defender is part of the environment, i.e.
+   it is intended for 2-agent simulations or RL training.
+   This experiment trains both an attacker and a defender agent simultaneously against each other 
+   using tabular q-learning.       
    
 ### Simulation Experiments
    
@@ -426,7 +433,14 @@
    The `attack_maximal` policy entails that the attacker will always attack the attribute with
    the maximum value out of all of its neighbors. The defender is implemented with a
    random defense policy. This experiment trains a defender agent using tabular q-learning to act optimally in the given
-   environment and detect the attacker.    
+   environment and detect the attacker. 
+   
+- [tabular_q_learning_vs_tabular_q_learning-v5](training/v5/two_agents/tabular_q_learning/)
+   * This is an experiment in the `idsgame-v5` environment. 
+   An environment where neither the attacker nor defender is part of the environment, i.e.
+   it is intended for 2-agent simulations or RL training.
+   This experiment trains both an attacker and a defender agent simultaneously against each other 
+   using tabular q-learning.    
    
 ### Simulation Experiments
    
