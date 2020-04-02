@@ -9,7 +9,9 @@ class ExperimentResult:
     DTO with experiment result from an experiment in the IDSGameEnvironment
     """
 
-    def __init__(self, avg_episode_rewards: List[float] = None, avg_episode_steps: List[int] = None,
+    def __init__(self, avg_attacker_episode_rewards: List[float] = None,
+                 avg_defender_episode_rewards: List[float] = None,
+                 avg_episode_steps: List[int] = None,
                  epsilon_values: List[float] = None, hack_probability: List[float] = None,
                  attacker_cumulative_reward: List[int] = None, defender_cumulative_reward: List[int] = None,
                  attacker_wins: List[int] = None, defender_wins: List[int] = None
@@ -17,7 +19,8 @@ class ExperimentResult:
         """
         Constructor, initializes the DTO
 
-        :param avg_episode_rewards: list of episode rewards
+        :param avg_attacker_episode_rewards: list of episode rewards for attacker
+        :param avg_defender_episode_rewards: list of episode rewards for defender
         :param avg_episode_steps: list of episode steps
         :param epsilon_values: list of epsilon values
         :param hack_probability: list of hack probabilities
@@ -26,7 +29,8 @@ class ExperimentResult:
         :param attacker_wins: num episodes won by the attacker
         :param defender_wins: num episodes won by the defender
         """
-        self.avg_episode_rewards = avg_episode_rewards
+        self.avg_attacker_episode_rewards = avg_attacker_episode_rewards
+        self.avg_defender_episode_rewards = avg_defender_episode_rewards
         self.avg_episode_steps = avg_episode_steps
         self.epsilon_values = epsilon_values
         self.hack_probability = hack_probability
@@ -36,8 +40,10 @@ class ExperimentResult:
         self.defender_wins = defender_wins
         if avg_episode_steps is None:
             self.avg_episode_steps = []
-        if avg_episode_rewards is None:
-            self.avg_episode_rewards = []
+        if avg_attacker_episode_rewards is None:
+            self.avg_attacker_episode_rewards = []
+        if avg_defender_episode_rewards is None:
+            self.avg_defender_episode_rewards = []
         if epsilon_values is None:
             self.epsilon_values = []
         if hack_probability is None:
@@ -53,12 +59,13 @@ class ExperimentResult:
 
 
     def to_csv(self, file_path):
-        metrics = [self.avg_episode_rewards, self.avg_episode_steps, self.epsilon_values, self.hack_probability,
+        metrics = [self.avg_attacker_episode_rewards, self.avg_defender_episode_rewards,
+                   self.avg_episode_steps, self.epsilon_values, self.hack_probability,
                    self.attacker_cumulative_reward, self.defender_cumulative_reward, self.attacker_wins,
                    self.defender_wins]
-        metric_labels = ["avg_episode_rewards", "avg_episode_steps", "epsilon_values", "hack_probability",
-                             "attacker_cumulative_reward", "defender_cumulative_reward","attacker_wins",
-                             "defender_wins"]
+        metric_labels = ["avg_attacker_episode_rewards", "avg_defender_episode_rewards", "avg_episode_steps",
+                         "epsilon_values", "hack_probability", "attacker_cumulative_reward",
+                         "defender_cumulative_reward","attacker_wins", "defender_wins"]
         filtered_metric_labels = []
         filtered_metrics = []
         for i in range(len(metrics)):

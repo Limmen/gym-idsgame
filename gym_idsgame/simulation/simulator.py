@@ -1,3 +1,6 @@
+"""
+A utility class for running simulations of pre-defined policies against each other (No training involved)
+"""
 import tqdm
 import logging
 import time
@@ -8,8 +11,17 @@ from gym_idsgame.simulation.dao.simulation_config import SimulationConfig
 from gym_idsgame.envs.rendering.video.idsgame_monitor import IdsGameMonitor
 
 class Simulator:
+    """
+    A class to orchestrate simulations of pre-defined policies against each other
+    """
 
     def __init__(self, env: IdsGameEnv, config: SimulationConfig):
+        """
+        Class constructor, initializes the class with a given environment and simulation config
+
+        :param env: the openAIGym environment for the simulation
+        :param config: the simulation configuration
+        """
         self.config = config
         self.env = env
         self.experiment_result = ExperimentResult()
@@ -19,7 +31,12 @@ class Simulator:
         self.attacker = self.env.idsgame_config.attacker_agent
         self.defender = self.env.idsgame_config.defender_agent
 
-    def simulate(self):
+    def simulate(self) -> ExperimentResult:
+        """
+        Runs a simulation using the defined config and environment
+
+        :return: the simulation result
+        """
         self.config.logger.info("Starting Simulation")
         time_str = str(time.time())
 

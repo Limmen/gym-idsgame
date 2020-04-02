@@ -1,6 +1,7 @@
 """
 An agent for the IDSGameEnv that implements the tabular Q-learning algorithm.
 """
+from typing import Union
 import numpy as np
 import time
 import tqdm
@@ -25,10 +26,8 @@ class TabularQAgent(TrainAgent):
         """
         self.env = env
         self.config = config
-        if self.config.attacker:
-            self.Q = np.random.rand(self.env.num_states, self.env.num_attack_actions)
-        else:
-            self.Q = np.random.rand(1, self.env.num_attack_actions+1)
+        self.Q_attacker = np.random.rand(self.env.num_states, self.env.num_attack_actions)
+        self.Q_defender = np.random.rand(1, self.env.num_attack_actions + 1)
         self.train_result = ExperimentResult()
         self.eval_result = ExperimentResult()
         self.outer_train = tqdm.tqdm(total=self.config.num_episodes, desc='Train Episode', position=0)
@@ -40,29 +39,34 @@ class TabularQAgent(TrainAgent):
         self.eval_attacker_cumulative_reward = 0
         self.eval_defender_cumulative_reward = 0
 
-    def get_action(self, s, eval=False) -> int:
+    def get_action(self, s, eval=False, attacker=True) -> int:
         """
         Sample an action using an epsilon-greedy policy with respect to the current Q-values
 
-        :param s:  the state to sample an action for
+        :param s: the state to sample an action for
+        :param eval: whether sampling an action in eval mode (greedy without exploration)
+        :param attacker: if true, sample action from attacker, else use defender
         :return: a sampled action
         """
         actions = list(range(self.env.num_attack_actions))
-        if self.config.attacker:
+        if attacker:
             legal_actions = list(filter(lambda action: self.env.is_attack_legal(action), actions))
-        elif self.config.defender:
+        else:
             legal_actions = list(filter(lambda action: self.env.is_defense_legal(action), actions))
-        if len(legal_actions) == 0:
-            print("Current state: {}, past moves: {}".format(s, self.env.past_moves))
-            #raise AssertionError("Found no valid action from this state")
         if np.random.rand() < self.config.epsilon and not eval:
             return np.random.choice(legal_actions)
         max_legal_action_value = float("-inf")
         max_legal_action = float("-inf")
-        for i in range(len(self.Q[s])):
-            if i in legal_actions and self.Q[s][i] > max_legal_action_value:
-                max_legal_action_value = self.Q[s][i]
-                max_legal_action = i
+        if attacker:
+            for i in range(len(self.Q_attacker[s])):
+                if i in legal_actions and self.Q_attacker[s][i] > max_legal_action_value:
+                    max_legal_action_value = self.Q_attacker[s][i]
+                    max_legal_action = i
+        else:
+            for i in range(len(self.Q_defender[s])):
+                if i in legal_actions and self.Q_defender[s][i] > max_legal_action_value:
+                    max_legal_action_value = self.Q_defender[s][i]
+                    max_legal_action = i
         if max_legal_action == float("-inf") or max_legal_action_value == float("-inf"):
             raise AssertionError("Error when selecting action greedily according to the Q-function")
         return max_legal_action
@@ -78,51 +82,66 @@ class TabularQAgent(TrainAgent):
         if len(self.train_result.avg_episode_steps) > 0:
             self.config.logger.warning("starting training with non-empty result object")
         done = False
-        obs = self.env.reset(update_stats=False)
+        attacker_obs, defender_obs = self.env.reset(update_stats=False)
 
         # Tracking metrics
-        episode_rewards = []
+        episode_attacker_rewards = []
+        episode_defender_rewards = []
         episode_steps = []
 
         # Logging
-        self.outer_train.set_description_str("[Train] epsilon:{:.2f},avg_R:{:.2f},avg_t:{:.2f}".format(self.config.epsilon, 0.0, 0.0))
+        self.outer_train.set_description_str("[Train] epsilon:{:.2f},avg_a_R:{:.2f},avg_d_R:{:.2f},"
+                                             "avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
+                                             "acc_D_R:{:.2f}".format(self.config.epsilon, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
 
         # Training
         for episode in range(self.config.num_episodes):
-            episode_reward = 0
+            episode_attacker_reward = 0
+            episode_defender_reward = 0
             episode_step = 0
             while not done:
                 if self.config.render:
                     self.env.render(mode="human")
-                if self.config.attacker:
-                    state_node_id = self.env.get_attacker_node_from_observation(obs)
-                elif self.config.defender:
-                    state_node_id = 0
-                else:
-                    raise AssertionError("Must specify whether training an attacker agent or defender agent")
-                action = self.get_action(state_node_id)
-                obs_prime, reward, done, info = self.env.step(action)
-                episode_reward += reward
-                episode_step += 1
-                if self.config.attacker:
-                    state_prime_node_id = self.env.get_attacker_node_from_observation(obs_prime)
-                elif self.config.defender:
-                    state_prime_node_id = 0
-                # Q-learning update
-                self.Q[state_node_id, action] = self.Q[state_node_id, action] + \
-                                                   self.config.alpha*(
-                                                           reward +
-                                                           self.config.gamma*np.max(self.Q[state_prime_node_id])
-                                                           - self.Q[state_node_id,action])
-                obs = obs_prime
 
-            episode_rewards.append(episode_reward)
+                if not self.config.attacker and not self.config.defender:
+                    raise AssertionError("Must specify whether training an attacker agent or defender agent")
+
+                # Default initialization
+                attacker_state_node_id = 0
+                defender_state_node_id = 0
+                attacker_action = 0
+                defender_action = 0
+
+                # Get attacker and defender actions
+                if self.config.attacker:
+                    attacker_state_node_id = self.env.get_attacker_node_from_observation(attacker_obs)
+                    attacker_action = self.get_action(attacker_state_node_id, attacker=True)
+                if self.config.defender:
+                    defender_action = self.get_action(defender_state_node_id, attacker=False)
+                action = (attacker_action, defender_action)
+
+                # Take a step in the environment
+                reward, obs_prime, done = self.step_and_update(action, attacker_state_node_id, defender_state_node_id)
+
+                # Update state information and metrics
+                attacker_reward, defender_reward = reward
+                obs_prime_attacker, obs_prime_defender = obs_prime
+                episode_attacker_reward += attacker_reward
+                episode_defender_reward += defender_reward
+                episode_step += 1
+                attacker_obs = obs_prime_attacker
+                defender_obs = obs_prime_defender
+
+            # Record episode metrics
+            episode_attacker_rewards.append(episode_attacker_reward)
+            episode_defender_rewards.append(episode_defender_reward)
             episode_steps.append(episode_step)
 
             # Log average metrics every <self.config.train_log_frequency> episodes
             if episode % self.config.train_log_frequency == 0 and episode > 0:
-                self.log_metrics(self.train_result, episode_rewards, episode_steps)
-                episode_rewards = []
+                self.log_metrics(self.train_result, episode_attacker_rewards, episode_defender_rewards, episode_steps)
+                episode_attacker_rewards = []
+                episode_defender_rewards = []
                 episode_steps = []
 
             # Run evaluation every <self.config.eval_frequency> episodes
@@ -131,7 +150,7 @@ class TabularQAgent(TrainAgent):
 
             # Reset environment for the next episode and update game stats
             done = False
-            obs = self.env.reset(update_stats=True)
+            attacker_obs, defender_obs = self.env.reset(update_stats=True)
             self.outer_train.update(1)
 
             # Anneal epsilon linearly
@@ -150,18 +169,54 @@ class TabularQAgent(TrainAgent):
 
         return self.train_result
 
-    def log_metrics(self, result: ExperimentResult, episode_rewards:list, episode_steps:list, eval:bool = False) \
-            -> None:
+    def step_and_update(self, action, attacker_state_node_id, defender_state_node_id) -> Union[float, np.ndarray, bool]:
+        obs_prime, reward, done, info = self.env.step(action)
+        attacker_reward, defender_reward = reward
+        attacker_obs_prime, defender_obs_prime = obs_prime
+
+        if self.config.attacker:
+            state_prime_node_id = self.env.get_attacker_node_from_observation(attacker_obs_prime)
+            self.q_learning_update(attacker_state_node_id, action, attacker_reward, state_prime_node_id, attacker=True)
+
+        if self.config.defender:
+            state_prime_node_id = 0
+            self.q_learning_update(defender_state_node_id, action, defender_reward, state_prime_node_id, attacker=False)
+
+        return reward, obs_prime, done
+
+    def q_learning_update(self, s : int, a : int, r : float, s_prime : int, attacker=True) -> None:
+        """
+        Performs a q_learning update
+
+        :param s: the state id
+        :param a: the action id
+        :param r: the reward
+        :param s_prime: the result state id
+        :param attacker: boolean flag, if True update attacker Q, otherwise update defender Q
+        :return: None
+        """
+        if attacker:
+            self.Q_attacker[s, a] = self.Q_attacker[s, a] + self.config.alpha * (r + self.config.gamma * np.max(self.Q_attacker[s_prime])
+                                                                                 - self.Q_attacker[s, a])
+        else:
+            self.Q_defender[s, a] = self.Q_defender[s, a] + self.config.alpha * (
+                        r + self.config.gamma * np.max(self.Q_defender[s_prime])
+                        - self.Q_defender[s, a])
+
+    def log_metrics(self, result: ExperimentResult, attacker_episode_rewards : list, defender_episode_rewards : list,
+                    episode_steps:list, eval:bool = False) -> None:
         """
         Logs average metrics for the last <self.config.log_frequency> episodes
 
         :param result: the result object to add the results to
-        :param episode_rewards: list of episode rewards for the last <self.config.log_frequency> episodes
+        :param attacker_episode_rewards: list of attacker episode rewards for the last <self.config.log_frequency> episodes
+        :param defender_episode_rewards: list of defender episode rewards for the last <self.config.log_frequency> episodes
         :param episode_steps: list of episode steps for the last <self.config.log_frequency> episodes
         :param eval: boolean flag whether the metrics are logged in an evaluation context.
         :return: None
         """
-        avg_episode_reward = np.mean(episode_rewards)
+        avg_attacker_episode_rewards = np.mean(attacker_episode_rewards)
+        avg_defender_episode_rewards = np.mean(defender_episode_rewards)
         avg_episode_steps = np.mean(episode_steps)
         hack_probability = self.env.hack_probability() if not eval else self.eval_hack_probability
         attacker_cumulative_reward = self.env.state.attacker_cumulative_reward if not eval \
@@ -169,16 +224,18 @@ class TabularQAgent(TrainAgent):
         defender_cumulative_reward = self.env.state.defender_cumulative_reward if not eval \
             else self.eval_defender_cumulative_reward
         if eval:
-            log_str = "[Eval] avg_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
-                      "acc_D_R:{:.2f}".format(avg_episode_reward,
+            log_str = "[Eval] avg_a_R:{:.2f},avg_d_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
+                      "acc_D_R:{:.2f}".format(avg_attacker_episode_rewards,
+                                              avg_defender_episode_rewards,
                                               avg_episode_steps,
                                               hack_probability,
                                               attacker_cumulative_reward,
                                               defender_cumulative_reward)
             self.outer_eval.set_description_str(log_str)
         else:
-            log_str = "[Train] epsilon:{:.2f},avg_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
-                      "acc_D_R:{:.2f}".format(self.config.epsilon, avg_episode_reward,
+            log_str = "[Train] epsilon:{:.2f},avg_a_R:{:.2f},avg_d_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
+                      "acc_D_R:{:.2f}".format(self.config.epsilon, avg_attacker_episode_rewards,
+                                              avg_defender_episode_rewards,
                                               avg_episode_steps,
                                               hack_probability,
                                               attacker_cumulative_reward,
@@ -186,7 +243,8 @@ class TabularQAgent(TrainAgent):
             self.outer_train.set_description_str(log_str)
         self.config.logger.info(log_str)
         result.avg_episode_steps.append(avg_episode_steps)
-        result.avg_episode_rewards.append(avg_episode_reward)
+        result.avg_attacker_episode_rewards.append(avg_attacker_episode_rewards)
+        result.avg_defender_episode_rewards.append(avg_defender_episode_rewards)
         result.epsilon_values.append(self.config.epsilon)
         result.hack_probability.append(hack_probability)
         result.attacker_cumulative_reward.append(attacker_cumulative_reward)
@@ -217,39 +275,63 @@ class TabularQAgent(TrainAgent):
             self.env.metadata["video.frames_per_second"] = self.config.video_fps
 
         # Tracking metrics
-        episode_rewards = []
+        episode_attacker_rewards = []
+        episode_defender_rewards = []
         episode_steps = []
 
         # Logging
         self.outer_eval = tqdm.tqdm(total=self.config.eval_episodes, desc='Eval Episode', position=1)
         self.outer_eval.set_description_str(
-            "[Eval] avg_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
-            "acc_D_R:{:.2f}".format(0.0, 0.0,0.0,0.0,0.0))
+            "[Eval] avg_a_R:{:.2f},avg_d_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
+            "acc_D_R:{:.2f}".format(0.0, 0,0, 0.0, 0.0, 0.0, 0.0))
 
         # Eval
-        obs = self.env.reset(update_stats=False)
+        attacker_obs, defender_obs = self.env.reset(update_stats=False)
+
         for episode in range(self.config.eval_episodes):
-            i = 0
-            episode_reward = 0
+            episode_attacker_reward = 0
+            episode_defender_reward = 0
             episode_step = 0
             while not done:
                 if self.config.eval_render:
                     self.env.render()
                     time.sleep(self.config.eval_sleep)
-                i = i+1
+
+                # Default initialization
+                attacker_state_node_id = 0
+                defender_state_node_id = 0
+                attacker_action = 0
+                defender_action = 0
+
+                # Get attacker and defender actions
                 if self.config.attacker:
-                    s_node_id = self.env.get_attacker_node_from_observation(obs)
+                    attacker_state_node_id = self.env.get_attacker_node_from_observation(attacker_obs)
+                    attacker_action = self.get_action(attacker_state_node_id, eval=True, attacker=True)
                 elif self.config.defender:
-                    s_node_id = 0
-                action = self.get_action(s_node_id, eval=True)
-                obs, reward, done, _ = self.env.step(action)
-                episode_reward += reward
+                    defender_action = self.get_action(defender_state_node_id, eval=True, attacker=False)
+                action = (attacker_action, defender_action)
+
+                # Take a step in the environment
+                obs_prime, reward, done, _ = self.env.step(action)
+
+                # Update state information and metrics
+                attacker_reward, defender_reward = reward
+                obs_prime_attacker, obs_prime_defender = obs_prime
+                episode_attacker_reward += attacker_reward
+                episode_defender_reward += defender_reward
                 episode_step += 1
+                obs_attacker = obs_prime_attacker
+                obs_defender = obs_prime_defender
+
+            # Render final frame when game completed
             if self.config.eval_render:
                 self.env.render()
                 time.sleep(self.config.eval_sleep)
-            self.config.logger.info("Eval episode: {}, Game ended after {} steps".format(episode, i))
-            episode_rewards.append(episode_reward)
+            self.config.logger.info("Eval episode: {}, Game ended after {} steps".format(episode, episode_step))
+
+            # Record episode metrics
+            episode_attacker_rewards.append(episode_attacker_reward)
+            episode_defender_rewards.append(episode_defender_reward)
             episode_steps.append(episode_step)
 
             # Update eval stats
@@ -266,15 +348,19 @@ class TabularQAgent(TrainAgent):
             if episode % self.config.eval_log_frequency == 0:
                 if self.num_eval_hacks > 0:
                     self.eval_hack_probability = float(self.num_eval_hacks) / float(self.num_eval_games)
-                self.log_metrics(self.eval_result, episode_rewards, episode_steps,
+                self.log_metrics(self.eval_result, episode_attacker_rewards, episode_defender_rewards, episode_steps,
                                  eval = True)
-                episode_rewards = []
+                episode_attacker_rewards = []
                 episode_steps = []
+
+            # Save gifs
             if self.config.gifs and self.config.video:
                 self.env.generate_gif(self.config.gif_dir + "/episode_" + str(episode) + "_"
                                       + time_str + ".gif", self.config.video_fps)
+
+            # Reset for new eval episode
             done = False
-            obs = self.env.reset(update_stats=False)
+            attacker_obs, defender_obs = self.env.reset(update_stats=False)
             self.outer_eval.update(1)
 
         self.env.close()
@@ -295,12 +381,21 @@ class TabularQAgent(TrainAgent):
         Utility function for printing the state-values according to the learned Q-function
         :return:
         """
-        self.config.logger.info("--- State Values ---")
-        for i in range(len(self.Q)):
-            state_value = sum(self.Q[i])
-            node_id = i
-            self.config.logger.info("s:{},V(s):{}".format(node_id, state_value))
-        self.config.logger.info("--------------------")
+        if self.config.attacker:
+            self.config.logger.info("--- Attacker State Values ---")
+            for i in range(len(self.Q_attacker)):
+                state_value = sum(self.Q_attacker[i])
+                node_id = i
+                self.config.logger.info("s:{},V(s):{}".format(node_id, state_value))
+            self.config.logger.info("--------------------")
+
+        if self.config.defender:
+            self.config.logger.info("--- Defender State Values ---")
+            for i in range(len(self.Q_defender)):
+                state_value = sum(self.Q_defender[i])
+                node_id = i
+                self.config.logger.info("s:{},V(s):{}".format(node_id, state_value))
+            self.config.logger.info("--------------------")
 
     def save_q_table(self) -> None:
         """
@@ -309,7 +404,11 @@ class TabularQAgent(TrainAgent):
         :return: None
         """
         if self.config.save_dir is not None:
-            self.config.logger.info("Saving Q-table to: {}".format(self.config.save_dir + "/q_table.npy"))
-            np.save(self.config.save_dir + "/q_table.npy", self.Q)
+            if self.config.attacker:
+                self.config.logger.info("Saving Q-table to: {}".format(self.config.save_dir + "/attacker_q_table.npy"))
+                np.save(self.config.save_dir + "/attacker_q_table.npy", self.Q_attacker)
+            if self.config.defender:
+                self.config.logger.info("Saving Q-table to: {}".format(self.config.save_dir + "/defender_q_table.npy"))
+                np.save(self.config.save_dir + "/defender_q_table.npy", self.Q_defender)
         else:
             self.config.logger.warning("Save path not defined, not saving Q table to disk")

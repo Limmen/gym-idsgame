@@ -65,23 +65,9 @@ def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str) -> No
     :param train_csv_path: path to the csv file with training results
     :return: None
     """
-    eval_df = plotting_util.read_data(eval_csv_path)
-    train_df = plotting_util.read_data(train_csv_path)
-    plotting_util.plot_results(train_df["avg_episode_rewards"].values, train_df["avg_episode_steps"].values,
-                               train_df["epsilon_values"], train_df["hack_probability"],
-                               train_df["attacker_cumulative_reward"], train_df["defender_cumulative_reward"],
-                               config.q_agent_config.train_log_frequency,
-                               config.q_agent_config.eval_frequency,
-                               config.q_agent_config.eval_log_frequency,
-                               config.output_dir, eval=False, sim=False)
-    plotting_util.plot_results(eval_df["avg_episode_rewards"].values, eval_df["avg_episode_steps"].values,
-                               eval_df["epsilon_values"], eval_df["hack_probability"],
-                               eval_df["attacker_cumulative_reward"], eval_df["defender_cumulative_reward"],
-                               config.q_agent_config.train_log_frequency,
-                               config.q_agent_config.eval_frequency,
-                               config.q_agent_config.eval_log_frequency,
-                               config.output_dir, eval=True, sim=False)
-
+    plotting_util.read_and_plot_results(train_csv_path, eval_csv_path, config.q_agent_config.train_log_frequency,
+                               config.q_agent_config.eval_frequency, config.q_agent_config.eval_log_frequency,
+                               config.output_dir, sim=False)
 
 # Program entrypoint
 if __name__ == '__main__':

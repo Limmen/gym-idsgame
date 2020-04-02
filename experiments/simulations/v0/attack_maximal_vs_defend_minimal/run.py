@@ -28,7 +28,7 @@ def default_config() -> ClientConfig:
     :return: Default configuration for the experiment
     """
     simulation_config = SimulationConfig(render=True, sleep=0.8, video=True, log_frequency=1,
-                                         video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=1000,
+                                         video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=2,
                                          gifs=True, gif_dir=default_output_dir() + "/gifs", video_frequency = 1)
     env_name = "idsgame-v0"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.ATTACK_MAXIMAL_VALUE.value,
@@ -60,7 +60,7 @@ def plot_csv(config: ClientConfig, csv_path:str) -> None:
     :return: None
     """
     df = plotting_util.read_data(csv_path)
-    plotting_util.plot_results(avg_episode_rewards=None, avg_episode_steps=df["avg_episode_steps"].values,
+    plotting_util.plot_results(avg_attacker_episode_rewards=None, avg_episode_steps=df["avg_episode_steps"].values,
                                epsilon_values=None, hack_probability=df["hack_probability"],
                                attacker_cumulative_reward=df["attacker_cumulative_reward"],
                                defender_cumulative_reward=df["defender_cumulative_reward"],

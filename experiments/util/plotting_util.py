@@ -58,7 +58,25 @@ def simple_line_plot(x: np.ndarray, y: np.ndarray, title: str ="Test", xlabel: s
     fig.savefig(file_name, format="png")
     #fig.savefig(file_name, format='eps', dpi=500, bbox_inches='tight', transparent=True)
 
-def plot_results(avg_episode_rewards: np.ndarray = None, avg_episode_steps: np.ndarray = None,
+def read_and_plot_results(train_csv_path : str, eval_csv_path: str, train_log_frequency : int,
+                 eval_frequency : int, eval_log_frequency : int, output_dir: str, sim=False):
+    eval_df = read_data(eval_csv_path)
+    train_df = read_data(train_csv_path)
+    plot_results(train_df["avg_attacker_episode_rewards"].values,
+                 train_df["avg_defender_episode_rewards"].values,
+                 train_df["avg_episode_steps"].values,
+                 train_df["epsilon_values"], train_df["hack_probability"],
+                 train_df["attacker_cumulative_reward"], train_df["defender_cumulative_reward"],
+                 train_log_frequency, eval_frequency, eval_log_frequency, output_dir, eval=False, sim=sim)
+    plot_results(eval_df["avg_attacker_episode_rewards"].values,
+                 eval_df["avg_defender_episode_rewards"].values,
+                 eval_df["avg_episode_steps"].values,
+                 eval_df["epsilon_values"], eval_df["hack_probability"],
+                 eval_df["attacker_cumulative_reward"], eval_df["defender_cumulative_reward"],train_log_frequency,
+                 eval_frequency, eval_log_frequency, output_dir, eval=True, sim=sim)
+
+def plot_results(avg_attacker_episode_rewards: np.ndarray = None, avg_defender_episode_rewards: np.ndarray = None,
+                 avg_episode_steps: np.ndarray = None,
                  epsilon_values: np.ndarray = None,
                  hack_probability: np.ndarray = None, attacker_cumulative_reward: np.ndarray = None,
                  defender_cumulative_reward: np.ndarray = None, log_frequency: int = None,
@@ -68,7 +86,8 @@ def plot_results(avg_episode_rewards: np.ndarray = None, avg_episode_steps: np.n
     """
     Utility function for plotting results of an experiment in the idsgame environment
 
-    :param avg_episode_rewards: list of average episode rewards recorded every <log_frequency>
+    :param avg_attacker_episode_rewards: list of average episode rewards recorded every <log_frequency> of attacker
+    :param avg_defender_episode_rewards: list of average episode rewards recorded every <log_frequency> of defender
     :param avg_episode_steps:  list of average episode steps recorded every <log_frequency>
     :param epsilon_values: list of epsilon values recorded every <log_frequency>
     :param hack_probability: list of hack probabilities recorded every <log_frequency>
@@ -89,11 +108,16 @@ def plot_results(avg_episode_rewards: np.ndarray = None, avg_episode_steps: np.n
         step = eval_frequency
     elif sim:
         suffix = "simulation.png"
-    if avg_episode_rewards is not None:
-        simple_line_plot(np.array(list(range(len(avg_episode_rewards))))*step, avg_episode_rewards,
-                          title="Avg Episodic Returns",
-                          xlabel="Episode", ylabel="Avg Return",
-                         file_name=output_dir + "/plots/avg_episode_returns_" + suffix)
+    if avg_attacker_episode_rewards is not None:
+        simple_line_plot(np.array(list(range(len(avg_attacker_episode_rewards)))) * step, avg_attacker_episode_rewards,
+                         title="Avg Attacker Episodic Returns",
+                         xlabel="Episode", ylabel="Avg Return",
+                         file_name=output_dir + "/plots/avg_attacker_episode_returns_" + suffix)
+    if avg_defender_episode_rewards is not None:
+        simple_line_plot(np.array(list(range(len(avg_defender_episode_rewards)))) * step, avg_defender_episode_rewards,
+                         title="Avg Defender Episodic Returns",
+                         xlabel="Episode", ylabel="Avg Return",
+                         file_name=output_dir + "/plots/avg_defender_episode_returns_" + suffix)
     if avg_episode_steps is not None:
         simple_line_plot(np.array(list(range(len(avg_episode_steps))))*step, avg_episode_steps,
                          title="Avg Episode Lengths",

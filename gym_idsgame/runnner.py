@@ -76,11 +76,18 @@ class Runner:
         return train_result, eval_result
 
     @staticmethod
-    def train_defender(config: ClientConfig):
+    def train_defender(config: ClientConfig) -> Union[ExperimentResult, ExperimentResult]:
+        """
+        Trains a defender agent in the environment
+
+        :param config: the training configuration
+        :return: trainresult, evalresult
+        """
         env = gym.make(config.env_name, idsgame_config = config.idsgame_config, save_dir=config.output_dir + "/data",
                        initial_state_path = config.initial_state_path)
         if config.title is not None:
             env.idsgame_config.render_config.title = config.title
+        defender: TrainAgent = None
         if config.defender_type == AgentType.TABULAR_Q_AGENT.value:
             defender = TabularQAgent(env, config.q_agent_config)
         else:
@@ -89,8 +96,42 @@ class Runner:
         eval_result = defender.eval()
         return train_result, eval_result
 
+
     @staticmethod
-    def simulate(config: ClientConfig):
+    def train_attacker_and_defender(config: ClientConfig) -> Union[ExperimentResult, ExperimentResult]:
+        """
+        Trains an attacker agent and a defender agent simultaneously in the environment
+
+        :param config: Training configuration
+        :return: trainresult, evalresult
+        """
+        env: IdsGameEnv = None
+        env = gym.make(config.env_name, idsgame_config = config.idsgame_config, save_dir=config.output_dir + "/data",
+                       initial_state_path = config.initial_state_path)
+        if config.title is not None:
+            env.idsgame_config.render_config.title = config.title
+        attacker: TrainAgent = None
+        if config.attacker_type == AgentType.TABULAR_Q_AGENT.value:
+            attacker = TabularQAgent(env, config.q_agent_config)
+        else:
+            raise AssertionError("Attacker train agent type not recognized: {}".format(config.attacker_type))
+        defender: TrainAgent = None
+        if config.defender_type == AgentType.TABULAR_Q_AGENT.value:
+            defender = TabularQAgent(env, config.q_agent_config)
+        else:
+            raise AssertionError("Defender train agent type not recognized: {}".format(config.defender_type))
+        train_result = attacker.train()
+        eval_result = attacker.eval()
+        return train_result, eval_result
+
+    @staticmethod
+    def simulate(config: ClientConfig) -> ExperimentResult:
+        """
+        Runs a simulation with two pre-defined policies against each other
+
+        :param config: the simulation config
+        :return: experiment result
+        """
         env: IdsGameEnv = None
         env = gym.make(config.env_name, idsgame_config = config.idsgame_config, save_dir=config.output_dir + "/data",
                        initial_state_path = config.initial_state_path)
@@ -131,6 +172,12 @@ class Runner:
 
     @staticmethod
     def manual_play_attacker(config: ClientConfig) -> IdsGameEnv:
+        """
+        Starts an experiment with a manual attacker player against some bot
+
+        :param config: configuration of the experiment
+        :return: the created environment
+        """
         env: IdsGameEnv = gym.make(config.env_name, idsgame_config = config.idsgame_config,
                                    save_dir=config.output_dir + "/data", initial_state_path = config.initial_state_path)
         if config.title is not None:
@@ -143,6 +190,12 @@ class Runner:
 
     @staticmethod
     def manual_play_defender(config: ClientConfig) -> IdsGameEnv:
+        """
+        Starts an experiment with a manual defender player against some bot
+
+        :param config: the configuration of the experiment
+        :return: the created environment
+        """
         env: IdsGameEnv = gym.make(config.env_name, idsgame_config = config.idsgame_config,
                                    save_dir=config.output_dir + "/data", initial_state_path = config.initial_state_path)
         if config.title is not None:

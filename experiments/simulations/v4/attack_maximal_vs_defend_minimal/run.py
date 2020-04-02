@@ -60,7 +60,7 @@ def plot_csv(config: ClientConfig, csv_path:str) -> None:
     :return: None
     """
     df = plotting_util.read_data(csv_path)
-    plotting_util.plot_results(avg_episode_rewards=None, avg_episode_steps=df["avg_episode_steps"].values,
+    plotting_util.plot_results(avg_attacker_episode_rewards=None, avg_episode_steps=df["avg_episode_steps"].values,
                                epsilon_values=None, hack_probability=df["hack_probability"],
                                attacker_cumulative_reward=df["attacker_cumulative_reward"],
                                defender_cumulative_reward=df["defender_cumulative_reward"],

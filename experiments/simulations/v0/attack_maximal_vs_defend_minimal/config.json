@@ -14,7 +14,7 @@
         "gifs": true,
         "log_frequency": 1,
         "logger": null,
-        "num_episodes": 1000,
+        "num_episodes": 2,
         "py/object": "gym_idsgame.simulation.dao.simulation_config.SimulationConfig",
         "render": true,
         "sleep": 0.8,

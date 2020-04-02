@@ -12,3 +12,4 @@ class RunnerMode(Enum):
     SIMULATE = 2
     MANUAL_ATTACKER = 3
     MANUAL_DEFENDER = 4
+    TRAIN_DEFENDER_AND_ATTACKER = 5
