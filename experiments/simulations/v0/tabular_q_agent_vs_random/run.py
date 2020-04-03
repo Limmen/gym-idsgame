@@ -5,7 +5,7 @@ from gym_idsgame.simulation.dao.simulation_config import SimulationConfig
 from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.runnner import Runner
-from gym_idsgame.agents.tabular_q_learning.q_agent_config import QAgentConfig
+from gym_idsgame.agents.q_learning.tabular_q_learning.q_agent_config import QAgentConfig
 from experiments.util import plotting_util, util
 
 def default_output_dir() -> str:

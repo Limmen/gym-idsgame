@@ -7,3 +7,4 @@ class AgentType(Enum):
     MANUAL_ATTACK = 3
     MANUAL_DEFENSE = 4
     ATTACK_MAXIMAL_VALUE = 5
+    DQN_AGENT = 6

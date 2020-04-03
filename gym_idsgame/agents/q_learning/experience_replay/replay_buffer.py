@@ -27,10 +27,14 @@ class ReplayBuffer:
         :param state2: the state transitioned to when taking action in state1 (4 84x84 images)
         :return: None
         """
-        # Clip all positive rewards at 1 and all negative rewards at -1, leaving 0 rewards unchanged
-        reward = np.clip(reward, -1, 1)
-
-        exp_tuple = (state1, action, reward, done, state2)
+        # # Clip all positive rewards at 1 and all negative rewards at -1, leaving 0 rewards unchanged
+        # reward = np.clip(reward, -1, 1)
+        attacker_state_1, defender_state_1 = state1
+        attacker_state_2, defender_state_2 = state2
+        attacker_reward, defender_reward = reward
+        attacker_action, defender_action = action
+        exp_tuple = (attacker_state_1.flatten(), defender_state_1.flatten(), attacker_action, defender_action,
+                     attacker_reward, defender_reward, done, attacker_state_2.flatten(), defender_state_2.flatten())
         if self.count < self.BUFFER_SIZE:
             self.buffer.append(exp_tuple)
             self.count += 1
@@ -60,9 +64,11 @@ class ReplayBuffer:
 
         # 1. Unzips the list of tuples [(state1, action, reward, done, state2)] into 5 independent tuples
         # 2. Converts each tuple into numpy arrays
-        s_batch, a_batch, r_batch, d_batch, s2_batch = list(map(np.array, list(zip(*batch))))
+        s_attacker_batch, s_defender_batch, a_attacker_batch, a_defender_batch, r_attacker_batch, r_defender_batch, \
+        d_batch, s2_attacker_batch, s2_defender_batch = list(map(np.array, list(zip(*batch))))
 
-        return s_batch, a_batch, r_batch, d_batch, s2_batch
+        return s_attacker_batch, s_defender_batch, a_attacker_batch, a_defender_batch, r_attacker_batch, \
+               r_defender_batch, d_batch, s2_attacker_batch, s2_defender_batch
 
     def clear(self):
         """

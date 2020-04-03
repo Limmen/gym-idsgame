@@ -14,7 +14,8 @@ except:
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.config.runner_mode import RunnerMode
 from gym_idsgame.agents.dao.agent_type import AgentType
-from gym_idsgame.agents.tabular_q_learning.tabular_q_agent import TabularQAgent
+from gym_idsgame.agents.q_learning.tabular_q_learning.tabular_q_agent import TabularQAgent
+from gym_idsgame.agents.q_learning.dqn.dqn import DQNAgent
 from gym_idsgame.agents.train_agent import TrainAgent
 from gym_idsgame.agents.bot_agent import BotAgent
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
@@ -24,8 +25,8 @@ from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
 from gym_idsgame.agents.random_attack_bot_agent import RandomAttackBotAgent
 from gym_idsgame.agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
 from gym_idsgame.agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
-from gym_idsgame.agents.tabular_q_learning.tabular_q_attacker_bot_agent import TabularQAttackerBotAgent
-from gym_idsgame.agents.tabular_q_learning.tabular_q_defender_bot_agent import TabularQDefenderBotAgent
+from gym_idsgame.agents.q_learning.tabular_q_learning.tabular_q_attacker_bot_agent import TabularQAttackerBotAgent
+from gym_idsgame.agents.q_learning.tabular_q_learning.tabular_q_defender_bot_agent import TabularQDefenderBotAgent
 
 class Runner:
     """
@@ -71,6 +72,8 @@ class Runner:
         attacker: TrainAgent = None
         if config.attacker_type == AgentType.TABULAR_Q_AGENT.value:
             attacker = TabularQAgent(env, config.q_agent_config)
+        elif config.attacker_type == AgentType.DQN_AGENT.value:
+            attacker = DQNAgent(env, config.q_agent_config)
         else:
             raise AssertionError("Attacker train agent type not recognized: {}".format(config.attacker_type))
         attacker.train()

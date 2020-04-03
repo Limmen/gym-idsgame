@@ -91,7 +91,7 @@ class IdsGameEnv(gym.Env, ABC):
         self.state.defense_events = []
 
         if self.state.game_step > constants.GAME_CONFIG.MAX_GAME_STEPS:
-            return self.get_observation(), 0, True, info
+            return self.get_observation(), (0,0), True, info
 
         # 1. Interpret attacker action
         attacker_pos = self.state.attacker_pos
@@ -132,6 +132,8 @@ class IdsGameEnv(gym.Env, ABC):
                     self.state.done = True
                     self.state.detected = True
                     reward = self.get_detect_reward()
+        else:
+            print("illegal action: {},{}, action: {}".format(target_pos, attacker_pos, action))
         if self.state.done:
             if self.steps_beyond_done is None:
                 self.steps_beyond_done = 0

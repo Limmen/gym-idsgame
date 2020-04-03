@@ -6,6 +6,7 @@ from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.runnner import Runner
 from experiments.util import plotting_util, util
+from gym_idsgame.agents.q_learning.dqn.dqn_config import DQNConfig
 
 
 def default_output_dir() -> str:
@@ -28,19 +29,20 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    q_agent_config = QAgentConfig(gamma=0.99, alpha=0.05, epsilon=1, render=False, eval_sleep=0.9,
+    dqn_config = DQNConfig(input_dim = 33, output_dim=30, hidden_dim=64, replay_memory_size=1000,
+                           replay_start_size=100, batch_size=32, target_network_update_freq=40000)
+    q_agent_config = QAgentConfig(gamma=0.9, alpha=0.0001, epsilon=1, render=False, eval_sleep=0.9,
                                   min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
-                                  epsilon_decay=0.9999, video=True, eval_log_frequency=1,
-                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=40000,
+                                  epsilon_decay=0.99, video=True, eval_log_frequency=1,
+                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=50000,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                                  eval_frequency=5000, attacker=True, defender=False,
-                                  video_frequency=101,
-                                  save_dir=default_output_dir() + "/data")
-    env_name = "idsgame-random_defense-v4"
-    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.TABULAR_Q_AGENT.value,
+                                  eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
+                                  save_dir=default_output_dir() + "/data", dqn_config=dqn_config)
+    env_name = "idsgame-random_defense-v0"
+    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.DQN_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
                                  q_agent_config=q_agent_config, output_dir=default_output_dir(),
-                                 title="TrainingQAgent vs RandomDefender")
+                                 title="TrainingDQNAgent vs RandomDefender")
     return client_config
 
 
@@ -82,7 +84,7 @@ if __name__ == '__main__':
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir)
-    logger = util.setup_logger("tabular_q_learning_vs_random_defense-v4", config.output_dir + "/logs/",
+    logger = util.setup_logger("tabular_q_learning_vs_random_defense-v0", config.output_dir + "/logs/",
                                time_str=time_str)
     config.logger = logger
     config.q_agent_config.logger = logger

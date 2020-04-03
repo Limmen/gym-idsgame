@@ -3,8 +3,8 @@ from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.dao.render_config import RenderConfig
-from gym_idsgame.agents.tabular_q_learning.tabular_q_agent import TabularQAgent
-from gym_idsgame.agents.tabular_q_learning.q_agent_config import QAgentConfig
+from gym_idsgame.agents.q_learning.tabular_q_learning.tabular_q_agent import TabularQAgent
+from gym_idsgame.agents.q_learning.tabular_q_learning.q_agent_config import QAgentConfig
 
 # Program entrypoint
 if __name__ == '__main__':

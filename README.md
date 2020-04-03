@@ -61,7 +61,7 @@ The environment ships with an implementation of the tabular Q(0) algorithm, see 
 
 ```python
 import gym
-from gym_idsgame.agents.tabular_q_learning.tabular_q_agent import TabularQAgent
+from gym_idsgame.agents.q_learning.tabular_q_learning.tabular_q_agent import TabularQAgent
 TODO
 ```
 

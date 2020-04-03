@@ -2,6 +2,7 @@
 Configuratin for QAgent
 """
 import csv
+from gym_idsgame.agents.q_learning.dqn.dqn_config import DQNConfig
 
 class QAgentConfig:
     """
@@ -16,7 +17,7 @@ class QAgentConfig:
                  num_episodes :int = 5000,
                  eval_render :bool = False, gifs :bool = False, gif_dir: str = None, eval_frequency :int =1000,
                  video_frequency :int = 1, attacker :bool = True, defender :bool = False,
-                 save_dir :str = None, load_path :str = None):
+                 save_dir :str = None, load_path :str = None, dqn_config: DQNConfig = None):
         """
         Initialize environment and hyperparameters
 
@@ -43,6 +44,7 @@ class QAgentConfig:
         :param attacker: True if the QAgent is a defender
         :param save_dir: dir to save Q-table
         :param load_path: path to load a saved Q-table
+        :param dqn_config: configuration for DQN
         """
         self.gamma = gamma
         self.alpha = alpha
@@ -68,6 +70,7 @@ class QAgentConfig:
         self.defender = defender
         self.save_dir = save_dir
         self.load_path = load_path
+        self.dqn_config = dqn_config
 
     def to_str(self) -> str:
         """
