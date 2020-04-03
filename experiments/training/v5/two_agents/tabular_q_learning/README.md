@@ -44,18 +44,18 @@ Example configuration in `config.json`:
 ```json
 {
     "attacker_type": 0,
-    "defender_type": 1,
-    "env_name": "idsgame-random_defense-v5",
+    "defender_type": 0,
+    "env_name": "idsgame-v5",
     "idsgame_config": null,
     "initial_state_path": null,
     "logger": null,
-    "mode": 0,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v5/random_defense/tabular_q_learning",
+    "mode": 5,
+    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v5/two_agents/tabular_q_learning",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
         "alpha": 0.05,
         "attacker": true,
-        "defender": false,
+        "defender": true,
         "epsilon": 1,
         "epsilon_decay": 0.9999,
         "eval_episodes": 100,
@@ -64,23 +64,23 @@ Example configuration in `config.json`:
         "eval_render": false,
         "eval_sleep": 0.9,
         "gamma": 0.99,
-        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v5/random_defense/tabular_q_learning/gifs",
+        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v5/two_agents/tabular_q_learning/gifs",
         "gifs": true,
         "load_path": null,
         "logger": null,
         "min_epsilon": 0.01,
-        "num_episodes": 40000,
+        "num_episodes": 40001,
         "py/object": "gym_idsgame.agents.tabular_q_learning.q_agent_config.QAgentConfig",
         "render": false,
-        "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v5/random_defense/tabular_q_learning/data",
+        "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v5/two_agents/tabular_q_learning/data",
         "train_log_frequency": 1,
         "video": true,
-        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v5/random_defense/tabular_q_learning/videos",
+        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v5/two_agents/tabular_q_learning/videos",
         "video_fps": 5,
         "video_frequency": 101
     },
     "simulation_config": null,
-    "title": "TrainingQAgent vs RandomDefender"
+    "title": "TrainingQAgent vs TrainingQAgent"
 }
 ```
 
@@ -88,18 +88,19 @@ Example configuration in `run.py`:
 
 ```python
 q_agent_config = QAgentConfig(gamma=0.99, alpha=0.05, epsilon=1, render=False, eval_sleep=0.9,
-                                  min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
-                                  epsilon_decay=0.9999, video=True, eval_log_frequency=1,
-                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=40000,
-                                  eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                                  eval_frequency=5000, attacker=True, defender=False,
-                                  video_frequency=101,
-                                  save_dir=default_output_dir() + "/data")
-env_name = "idsgame-random_defense-v5"
+                              min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
+                              epsilon_decay=0.9999, video=True, eval_log_frequency=1,
+                              video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=40001,
+                              eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
+                              eval_frequency=5000, attacker=True, defender=True,
+                              video_frequency=101,
+                              save_dir=default_output_dir() + "/data")
+env_name = "idsgame-v5"
 client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.TABULAR_Q_AGENT.value,
-                             mode=RunnerMode.TRAIN_ATTACKER.value,
+                             defender_type=AgentType.TABULAR_Q_AGENT.value,
+                             mode=RunnerMode.TRAIN_DEFENDER_AND_ATTACKER.value,
                              q_agent_config=q_agent_config, output_dir=default_output_dir(),
-                             title="TrainingQAgent vs RandomDefender")
+                             title="TrainingQAgent vs TrainingQAgent")
 ```
 
 After the experiment has finished, the results are written to the following sub-directories:
