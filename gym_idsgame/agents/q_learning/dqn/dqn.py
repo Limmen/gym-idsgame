@@ -5,7 +5,6 @@ from typing import Union
 import numpy as np
 import time
 import tqdm
-import logging
 import torch
 from torch.utils.tensorboard import SummaryWriter
 from gym_idsgame.envs.rendering.video.idsgame_monitor import IdsGameMonitor

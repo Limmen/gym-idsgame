@@ -1,9 +1,24 @@
+"""
+A FNN model defined in PyTorch
+"""
 import torch
 
-
 class SixLayerFNN(torch.nn.Module):
+    """
+    Implements a six-layer FNN with ReLu activations.
+
+    Sub-classing the torch.nn.Module to be able to use high-level API for creating the custom network
+    """
     def __init__(self, input_dim : int, output_dim : int, hidden_dim : int):
+        """
+        Bulilds the model
+
+        :param input_dim: the input dimension
+        :param output_dim: the output dimension
+        :param hidden_dim: the hidden dimension
+        """
         super(SixLayerFNN, self).__init__()
+
         self.input_dim = input_dim
         self.output_dim = output_dim
         self.num_layers = 6
@@ -24,6 +39,12 @@ class SixLayerFNN(torch.nn.Module):
 
 
     def forward(self, x):
+        """
+        Forward propagation
+
+        :param x: input tensor
+        :return: Output prediction
+        """
         input = self.input_relu(self.input_layer(x))
         hidden_1 = self.hidden_1_relu(self.hidden_1(input))
         hidden_2 = self.hidden_2_relu(self.hidden_2(hidden_1))
@@ -33,7 +54,12 @@ class SixLayerFNN(torch.nn.Module):
         return y_hat
 
 
-def test():
+def test() -> None:
+    """
+    A basic test-case to verify that the model can fit some randomly generated data
+
+    :return: None
+    """
     # Constants
     input_dim = 44
     output_dim = 44

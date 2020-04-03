@@ -245,3 +245,9 @@ make clean
 ```
 tensorboard --logdir=tensorboard
 ```
+
+or: 
+
+```
+make tensorboard
+```
