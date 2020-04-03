@@ -27,6 +27,8 @@ def create_artefact_dirs(output_dir: str) -> None:
         os.makedirs(output_dir + "/hyperparameters/")
     if not os.path.exists(output_dir + "/gifs/"):
         os.makedirs(output_dir + "/gifs/")
+    if not os.path.exists(output_dir + "/tensorboard/"):
+        os.makedirs(output_dir + "/tensorboard/")
 
 def setup_logger(name: str, logdir: str, time_str = None):
     """

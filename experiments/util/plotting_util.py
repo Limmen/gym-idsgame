@@ -62,25 +62,35 @@ def read_and_plot_results(train_csv_path : str, eval_csv_path: str, train_log_fr
                  eval_frequency : int, eval_log_frequency : int, eval_episodes: int, output_dir: str, sim=False):
     eval_df = read_data(eval_csv_path)
     train_df = read_data(train_csv_path)
+    avg_episode_loss_attacker = None
+    avg_episode_loss_defender = None
+    if "avg_episode_loss_attacker" in train_df:
+        avg_episode_loss_attacker = train_df["avg_episode_loss_attacker"]
+    if "avg_episode_loss_defender" in train_df:
+        avg_episode_loss_defender = train_df["avg_episode_loss_defender"]
     plot_results(train_df["avg_attacker_episode_rewards"].values,
                  train_df["avg_defender_episode_rewards"].values,
                  train_df["avg_episode_steps"].values,
                  train_df["epsilon_values"], train_df["hack_probability"],
                  train_df["attacker_cumulative_reward"], train_df["defender_cumulative_reward"],
+                 avg_episode_loss_attacker, avg_episode_loss_defender,
                  train_log_frequency, eval_frequency, eval_log_frequency, eval_episodes,
                  output_dir, eval=False, sim=sim)
     plot_results(eval_df["avg_attacker_episode_rewards"].values,
                  eval_df["avg_defender_episode_rewards"].values,
                  eval_df["avg_episode_steps"].values,
                  eval_df["epsilon_values"], eval_df["hack_probability"],
-                 eval_df["attacker_cumulative_reward"], eval_df["defender_cumulative_reward"],train_log_frequency,
+                 eval_df["attacker_cumulative_reward"], eval_df["defender_cumulative_reward"], None, None,
+                 train_log_frequency,
                  eval_frequency, eval_log_frequency, eval_episodes, output_dir, eval=True, sim=sim)
 
 def plot_results(avg_attacker_episode_rewards: np.ndarray = None, avg_defender_episode_rewards: np.ndarray = None,
                  avg_episode_steps: np.ndarray = None,
                  epsilon_values: np.ndarray = None,
                  hack_probability: np.ndarray = None, attacker_cumulative_reward: np.ndarray = None,
-                 defender_cumulative_reward: np.ndarray = None, log_frequency: int = None,
+                 defender_cumulative_reward: np.ndarray = None, avg_episode_loss_attacker: np.ndarray = None,
+                 avg_episode_loss_defender: np.ndarray = None,
+                 log_frequency: int = None,
                  eval_frequency: int = None, eval_log_frequency: int = None, eval_episodes: int = None,
                  output_dir: str = None,
                  eval: bool = False, sim:bool = False) -> None:
@@ -94,6 +104,8 @@ def plot_results(avg_attacker_episode_rewards: np.ndarray = None, avg_defender_e
     :param hack_probability: list of hack probabilities recorded every <log_frequency>
     :param attacker_cumulative_reward: list of attacker cumulative rewards recorded every <log_frequency>
     :param defender_cumulative_reward: list of defender cumulative rewards recorded every <log_frequency>
+    :param avg_episode_loss_attacker: avg episode loss for attacker
+    :param avg_episode_loss_defender: avg episode loss for defender
     :param log_frequency: frequency that the metrics were recorded
     :param eval_frequency: frequency of evaluation
     :param eval_frequency: number of evaluation episodes
@@ -145,4 +157,16 @@ def plot_results(avg_attacker_episode_rewards: np.ndarray = None, avg_defender_e
                          title="Defender Cumulative Reward",
                          xlabel="Episode", ylabel="Cumulative Reward",
                          file_name=output_dir + "/plots/defender_cumulative_reward_" + suffix)
+    if avg_episode_loss_attacker is not None and len(avg_episode_loss_attacker) > 0:
+        simple_line_plot(np.array(list(range(len(avg_episode_loss_attacker)))) * step,
+                         avg_episode_loss_attacker,
+                         title="Avg Episode Loss (Attacker)",
+                         xlabel="Episode", ylabel="Loss",
+                         file_name=output_dir + "/plots/avg_episode_loss_attacker_" + suffix)
+    if avg_episode_loss_defender is not None and len(avg_episode_loss_defender) > 0:
+        simple_line_plot(np.array(list(range(len(avg_episode_loss_defender)))) * step,
+                         avg_episode_loss_defender,
+                         title="Avg Episode Loss (Defender)",
+                         xlabel="Episode", ylabel="Loss",
+                         file_name=output_dir + "/plots/avg_episode_loss_defender_" + suffix)
 

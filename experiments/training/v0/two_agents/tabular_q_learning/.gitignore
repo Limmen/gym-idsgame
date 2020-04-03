@@ -3,6 +3,7 @@
 ./plots/*
 ./hyperparameters/*
 ./data/*
+./tensorboard/*
 videos
 plots
 hyperparameters
@@ -10,3 +11,4 @@ data
 hyperparameters
 gifs
 plots
+tensorboard

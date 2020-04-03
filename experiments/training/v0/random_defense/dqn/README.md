@@ -1,8 +1,8 @@
-# Experiment `random_defense-v0`_`neural_fitted_q_learning`
+# Experiment `random_defense-v0`_`dqn`
 
 This is an experiment in the `random_defense-v0` environment. 
 An environment where the defender is following a random defense policy. 
-This experiment trains an attacker agent using neural-fitted q-learning to act optimally in the given
+This experiment trains an attacker agent using the DQN algorithm to act optimally in the given
 environment and defeat the random defender.
 
 The network configuration of the environment is as follows:
@@ -43,19 +43,32 @@ Example configuration in `config.json`:
 
 ```json
 {
-    "attacker_type": 0,
+    "attacker_type": 6,
     "defender_type": 1,
     "env_name": "idsgame-random_defense-v0",
     "idsgame_config": null,
     "initial_state_path": null,
     "logger": null,
     "mode": 0,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_defense/tabular_q_learning",
+    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_defense/dqn",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
-        "alpha": 0.05,
+        "alpha": 0.0001,
         "attacker": true,
         "defender": false,
+        "dqn_config": {
+            "batch_size": 32,
+            "gpu": true,
+            "hidden_dim": 64,
+            "input_dim": 33,
+            "output_dim": 30,
+            "py/object": "gym_idsgame.agents.q_learning.dqn.dqn_config.DQNConfig",
+            "replay_memory_size": 1000,
+            "replay_start_size": 100,
+            "target_network_update_freq": 100,
+            "tensorboard": true,
+            "tensorboard_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_defense/dqn/tensorboard"
+        },
         "epsilon": 1,
         "epsilon_decay": 0.999,
         "eval_episodes": 100,
@@ -64,41 +77,44 @@ Example configuration in `config.json`:
         "eval_render": false,
         "eval_sleep": 0.9,
         "gamma": 0.9,
-        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_defense/tabular_q_learning/gifs",
+        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_defense/dqn/gifs",
         "gifs": true,
         "load_path": null,
         "logger": null,
         "min_epsilon": 0.01,
         "num_episodes": 5000,
-        "py/object": "gym_idsgame.agents.tabular_q_learning.q_agent_config.QAgentConfig",
+        "py/object": "gym_idsgame.agents.q_learning.tabular_q_learning.q_agent_config.QAgentConfig",
         "render": false,
-        "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_defense/tabular_q_learning/data",
+        "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_defense/dqn/data",
         "train_log_frequency": 1,
         "video": true,
-        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_defense/tabular_q_learning/videos",
+        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_defense/dqn/videos",
         "video_fps": 5,
         "video_frequency": 101
     },
     "simulation_config": null,
-    "title": "TrainingQAgent vs RandomDefender"
+    "title": "TrainingDQNAgent vs RandomDefender"
 }
 ```
 
 Example configuration in `run.py`:
 
 ```python
-q_agent_config = QAgentConfig(gamma=0.9, alpha=0.05, epsilon=1, render=False, eval_sleep=0.9,
+dqn_config = DQNConfig(input_dim = 33, output_dim=30, hidden_dim=64, replay_memory_size=1000,
+                       replay_start_size=100, batch_size=32, target_network_update_freq=100,
+                       gpu=True, tensorboard=True, tensorboard_dir=default_output_dir() + "/tensorboard")
+q_agent_config = QAgentConfig(gamma=0.9, alpha=0.0001, epsilon=1, render=False, eval_sleep=0.9,
                               min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
                               epsilon_decay=0.999, video=True, eval_log_frequency=1,
                               video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5000,
                               eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
                               eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
-                              save_dir=default_output_dir() + "/data")
+                              save_dir=default_output_dir() + "/data", dqn_config=dqn_config)
 env_name = "idsgame-random_defense-v0"
-client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.TABULAR_Q_AGENT.value,
+client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.DQN_AGENT.value,
                              mode=RunnerMode.TRAIN_ATTACKER.value,
                              q_agent_config=q_agent_config, output_dir=default_output_dir(),
-                             title="TrainingQAgent vs RandomDefender")
+                             title="TrainingDQNAgent vs RandomDefender")
 ```
 
 After the experiment has finished, the results are written to the following sub-directories:
@@ -156,6 +172,13 @@ After the experiment has finished, the results are written to the following sub-
 #### Defender (Train)
 <p align="center">
 <img src="docs/defender_cumulative_reward_train.png" width="800">
+</p>
+
+### Loss
+
+#### Attacker (Train)
+<p align="center">
+<img src="docs/avg_episode_loss_attacker_train.png" width="800">
 </p>
 
 ### Policy Inspection
@@ -217,3 +240,8 @@ make run_server
 make clean
 ```
 
+### Tensorboard
+
+```
+tensorboard --logdir=tensorboard
+```
