@@ -31,7 +31,8 @@ def default_config() -> ClientConfig:
     """
     dqn_config = DQNConfig(input_dim = 33, output_dim=30, hidden_dim=64, replay_memory_size=1000,
                            replay_start_size=100, batch_size=32, target_network_update_freq=100,
-                           gpu=True, tensorboard=True, tensorboard_dir=default_output_dir() + "/tensorboard")
+                           gpu=True, tensorboard=True, tensorboard_dir=default_output_dir() + "/tensorboard",
+                           loss_fn="MSE", optimizer="Adam")
     q_agent_config = QAgentConfig(gamma=0.9, alpha=0.0001, epsilon=1, render=False, eval_sleep=0.9,
                                   min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
                                   epsilon_decay=0.999, video=True, eval_log_frequency=1,

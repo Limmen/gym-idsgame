@@ -11,7 +11,8 @@ class DQNConfig:
 
     def __init__(self, input_dim: int, output_dim: int, hidden_dim: int = 64, replay_memory_size: int = 100000,
                  replay_start_size : int = 10000, batch_size: int = 64, target_network_update_freq : int = 10,
-                 gpu : bool = False, tensorboard : bool = False, tensorboard_dir: str = ""):
+                 gpu : bool = False, tensorboard : bool = False, tensorboard_dir: str = "",
+                 loss_fn : str = "MSE", optimizer : str = "Adam"):
         """
         Initializes the config
 
@@ -25,6 +26,8 @@ class DQNConfig:
         :param gpu: boolean flag whether using GPU or not
         :param tensorboard: boolean flag whether using tensorboard logging or not
         :param tensorboard_dir: tensorboard logdir
+        :param loss_fn: loss function
+        :param optimizer: optimizer
         """
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
@@ -36,6 +39,8 @@ class DQNConfig:
         self.gpu = gpu
         self.tensorboard = tensorboard
         self.tensorboard_dir = tensorboard_dir
+        self.loss_fn = loss_fn
+        self.optimizer = optimizer
 
     def to_str(self) -> str:
         """
@@ -44,10 +49,11 @@ class DQNConfig:
         return "DQN Hyperparameters: input_dim:{0},output_dim:{1},hidden_dim:{2},replay_memory_size:{3}," \
                "replay_start_size:{4}," \
                "batch_size:{5},target_network_update_freq:{6},gpu:{7},tensorboard:{8}," \
-               "tensorboard_dir:{9}".format(self.input_dim, self.output_dim, self.hidden_dim, self.replay_memory_size,
-                                            self.replay_start_size, self.batch_size, self.target_network_update_freq,
-                                            self.batch_size, self.target_network_update_freq, self.gpu,
-                                            self.tensorboard, self.tensorboard_dir)
+               "tensorboard_dir:{9},loss_fn:{10},optimizer:{11}".format(
+            self.input_dim, self.output_dim, self.hidden_dim, self.replay_memory_size,
+            self.replay_start_size, self.batch_size, self.target_network_update_freq,
+            self.batch_size, self.target_network_update_freq, self.gpu, self.tensorboard, self.tensorboard_dir,
+            self.loss_fn, self.optimizer)
 
     def to_csv(self, file_path: str) -> None:
         """
@@ -69,3 +75,5 @@ class DQNConfig:
             writer.writerow(["gpu", str(self.gpu)])
             writer.writerow(["tensorboard", str(self.tensorboard)])
             writer.writerow(["tensorboard_dir", str(self.tensorboard_dir)])
+            writer.writerow(["loss_fn", str(self.loss_fn)])
+            writer.writerow(["optimizer", str(self.optimizer)])

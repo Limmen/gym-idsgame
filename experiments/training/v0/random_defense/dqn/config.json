@@ -17,6 +17,8 @@
             "gpu": true,
             "hidden_dim": 64,
             "input_dim": 33,
+            "loss_fn": "MSE",
+            "optimizer": "Adam",
             "output_dim": 30,
             "py/object": "gym_idsgame.agents.q_learning.dqn.dqn_config.DQNConfig",
             "replay_memory_size": 1000,

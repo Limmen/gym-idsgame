@@ -130,9 +130,21 @@ class DQNAgent(QAgent):
 
         # Construct our loss function and an Optimizer. The call to model.parameters()
         # in the optimizer constructor will contain the learnable parameters of the layers in the model
-        self.loss_fn = torch.nn.MSELoss(reduction='sum')
-        self.attacker_optimizer = torch.optim.Adam(self.attacker_q_network.parameters(), lr=self.config.alpha)
-        self.defender_optimizer = torch.optim.Adam(self.defender_q_network.parameters(), lr=self.config.alpha)
+        if self.config.dqn_config.loss_fn == "MSE":
+            self.loss_fn = torch.nn.MSELoss(reduction='sum')
+        elif self.config.dqn_config.loss_fn == "Huber":
+            self.loss_fn = torch.nn.functional.smooth_l1_loss()
+        else:
+            raise ValueError("Loss function not recognized")
+
+        if self.config.dqn_config.optimizer == "Adam":
+            self.attacker_optimizer = torch.optim.Adam(self.attacker_q_network.parameters(), lr=self.config.alpha)
+            self.defender_optimizer = torch.optim.Adam(self.defender_q_network.parameters(), lr=self.config.alpha)
+        elif self.config.dqn_config.optimizer == "SGD":
+            self.attacker_optimizer = torch.optim.SGD(self.attacker_q_network.parameters(), lr=self.config.alpha)
+            self.defender_optimizer = torch.optim.SGD(self.defender_q_network.parameters(), lr=self.config.alpha)
+        else:
+            raise ValueError("Optimizer not recognized")
 
     def training_step(self, mini_batch: Union[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray,
                                               np.ndarray, np.ndarray, np.ndarray]) -> torch.Tensor:
