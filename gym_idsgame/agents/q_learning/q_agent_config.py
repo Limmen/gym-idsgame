@@ -128,3 +128,8 @@ class QAgentConfig:
                 writer.writerow(["gpu", str(self.dqn_config.gpu)])
                 writer.writerow(["tensorboard", str(self.dqn_config.tensorboard)])
                 writer.writerow(["tensorboard_dir", str(self.dqn_config.tensorboard_dir)])
+                writer.writerow(["loss_fn", str(self.dqn_config.loss_fn)])
+                writer.writerow(["optimizer", str(self.dqn_config.optimizer)])
+                writer.writerow(["num_hidden_layers", str(self.dqn_config.num_hidden_layers)])
+                writer.writerow(["lr_exp_decay", str(self.dqn_config.lr_exp_decay)])
+                writer.writerow(["lr_decay_rate", str(self.dqn_config.lr_decay_rate)])

@@ -12,7 +12,7 @@ from gym_idsgame.agents.q_learning.q_agent_config import QAgentConfig
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
 from gym_idsgame.envs.constants import constants
-from gym_idsgame.agents.q_learning.dqn.model import SixLayerFNN
+from gym_idsgame.agents.q_learning.dqn.model import FeedForwardNN
 from gym_idsgame.agents.q_learning.experience_replay.replay_buffer import ReplayBuffer
 from gym_idsgame.agents.q_learning.q_agent import QAgent
 
@@ -37,6 +37,8 @@ class DQNAgent(QAgent):
         self.loss_fn = None
         self.attacker_optimizer = None
         self.defender_optimizer = None
+        self.attacker_lr_decay = None
+        self.defender_lr_decay = None
         self.initialize_models()
         self.buffer = ReplayBuffer(config.dqn_config.replay_memory_size)
         self.tensorboard_writer = SummaryWriter(self.config.dqn_config.tensorboard_dir)
@@ -97,14 +99,18 @@ class DQNAgent(QAgent):
         """
 
         # Initialize models
-        self.attacker_q_network = SixLayerFNN(self.config.dqn_config.input_dim, self.config.dqn_config.output_dim,
-                                              self.config.dqn_config.hidden_dim)
-        self.attacker_target_network = SixLayerFNN(self.config.dqn_config.input_dim, self.config.dqn_config.output_dim,
-                                                   self.config.dqn_config.hidden_dim)
-        self.defender_q_network = SixLayerFNN(self.config.dqn_config.input_dim, self.config.dqn_config.output_dim,
-                                              self.config.dqn_config.hidden_dim)
-        self.defender_target_network = SixLayerFNN(self.config.dqn_config.input_dim, self.config.dqn_config.output_dim,
-                                                   self.config.dqn_config.hidden_dim)
+        self.attacker_q_network = FeedForwardNN(self.config.dqn_config.input_dim, self.config.dqn_config.output_dim,
+                                                self.config.dqn_config.hidden_dim,
+                                                num_hidden_layers=self.config.dqn_config.num_hidden_layers)
+        self.attacker_target_network = FeedForwardNN(self.config.dqn_config.input_dim, self.config.dqn_config.output_dim,
+                                                     self.config.dqn_config.hidden_dim,
+                                                     num_hidden_layers=self.config.dqn_config.num_hidden_layers)
+        self.defender_q_network = FeedForwardNN(self.config.dqn_config.input_dim, self.config.dqn_config.output_dim,
+                                                self.config.dqn_config.hidden_dim,
+                                                num_hidden_layers=self.config.dqn_config.num_hidden_layers)
+        self.defender_target_network = FeedForwardNN(self.config.dqn_config.input_dim, self.config.dqn_config.output_dim,
+                                                     self.config.dqn_config.hidden_dim,
+                                                     num_hidden_layers=self.config.dqn_config.num_hidden_layers)
 
 
         # Specify device
@@ -130,9 +136,9 @@ class DQNAgent(QAgent):
 
         # Construct loss function
         if self.config.dqn_config.loss_fn == "MSE":
-            self.loss_fn = torch.nn.MSELoss(reduction='sum')
+            self.loss_fn = torch.nn.MSELoss()
         elif self.config.dqn_config.loss_fn == "Huber":
-            self.loss_fn = torch.nn.functional.smooth_l1_loss()
+            self.loss_fn = torch.nn.SmoothL1Loss()
         else:
             raise ValueError("Loss function not recognized")
 
@@ -146,6 +152,14 @@ class DQNAgent(QAgent):
             self.defender_optimizer = torch.optim.SGD(self.defender_q_network.parameters(), lr=self.config.alpha)
         else:
             raise ValueError("Optimizer not recognized")
+
+        # LR decay
+        if self.config.dqn_config.lr_exp_decay:
+            self.attacker_lr_decay = torch.optim.lr_scheduler.ExponentialLR(optimizer=self.attacker_optimizer,
+                                                                       gamma=self.config.dqn_config.lr_decay_rate)
+            self.defender_lr_decay = torch.optim.lr_scheduler.ExponentialLR(optimizer=self.attacker_optimizer,
+                                                                            gamma=self.config.dqn_config.lr_decay_rate)
+
 
     def training_step(self, mini_batch: Union[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray,
                                               np.ndarray, np.ndarray, np.ndarray]) -> torch.Tensor:
@@ -313,6 +327,13 @@ class DQNAgent(QAgent):
                 attacker_obs = obs_prime_attacker
                 defender_obs = obs_prime_defender
 
+
+            # Decay LR
+            lr = self.config.alpha
+            if self.config.dqn_config.lr_exp_decay:
+                self.attacker_lr_decay.step()
+                lr = self.attacker_lr_decay.get_lr()[0]
+
             # Record episode metrics
             episode_attacker_rewards.append(episode_attacker_reward)
             episode_defender_rewards.append(episode_defender_reward)
@@ -325,7 +346,7 @@ class DQNAgent(QAgent):
             # Log average metrics every <self.config.train_log_frequency> episodes
             if episode % self.config.train_log_frequency == 0:
                 self.log_metrics(episode, self.train_result, episode_attacker_rewards, episode_defender_rewards, episode_steps,
-                                 episode_avg_loss)
+                                 episode_avg_loss, lr=lr)
                 episode_attacker_rewards = []
                 episode_defender_rewards = []
                 episode_steps = []
@@ -336,7 +357,7 @@ class DQNAgent(QAgent):
 
             # Run evaluation every <self.config.eval_frequency> episodes
             if episode % self.config.eval_frequency == 0:
-                self.eval()
+                self.eval(episode)
 
             # Reset environment for the next episode and update game stats
             done = False
@@ -349,7 +370,7 @@ class DQNAgent(QAgent):
         self.config.logger.info("Training Complete")
 
         # Final evaluation (for saving Gifs etc)
-        self.eval(log=False)
+        self.eval(self.config.num_episodes-1, log=False)
 
         # Save Q-networks
         self.save_model()
@@ -367,10 +388,11 @@ class DQNAgent(QAgent):
         self.attacker_target_network.load_state_dict(self.attacker_q_network.state_dict())
         self.attacker_target_network.eval()
 
-    def eval(self, log=True) -> ExperimentResult:
+    def eval(self, train_episode, log=True) -> ExperimentResult:
         """
         Performs evaluation with the greedy policy with respect to the learned Q-values
 
+        :param train_episode: the train episode to keep track of logging
         :param log: whether to log the result
         :return: None
         """
@@ -466,13 +488,13 @@ class DQNAgent(QAgent):
                 if self.num_eval_hacks > 0:
                     self.eval_hack_probability = float(self.num_eval_hacks) / float(self.num_eval_games)
                 self.log_metrics(episode, self.eval_result, episode_attacker_rewards, episode_defender_rewards, episode_steps,
-                                 eval = True)
-                episode_attacker_rewards = []
-                episode_steps = []
+                                 eval = True, update_stats=False)
+                # episode_attacker_rewards = []
+                # episode_steps = []
 
             # Save gifs
             if self.config.gifs and self.config.video:
-                self.env.generate_gif(self.config.gif_dir + "/episode_" + str(episode) + "_"
+                self.env.generate_gif(self.config.gif_dir + "/episode_" + str(train_episode) + "_"
                                       + time_str + ".gif", self.config.video_fps)
 
             # Reset for new eval episode
@@ -480,6 +502,11 @@ class DQNAgent(QAgent):
             attacker_obs, defender_obs = self.env.reset(update_stats=False)
             self.outer_eval.update(1)
 
+        # Log average eval statistics
+        if self.num_eval_hacks > 0:
+            self.eval_hack_probability = float(self.num_eval_hacks) / float(self.num_eval_games)
+        self.log_metrics(train_episode, self.eval_result, episode_attacker_rewards, episode_defender_rewards,
+                         episode_steps, eval=True, update_stats=True)
         self.env.close()
         self.config.logger.info("Evaluation Complete")
         return self.eval_result

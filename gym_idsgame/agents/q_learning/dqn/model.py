@@ -3,40 +3,45 @@ A FNN model defined in PyTorch
 """
 import torch
 
-class SixLayerFNN(torch.nn.Module):
+class FeedForwardNN(torch.nn.Module):
     """
-    Implements a six-layer FNN with ReLu activations.
+    Implements a FNN with ReLu activations.
 
     Sub-classing the torch.nn.Module to be able to use high-level API for creating the custom network
     """
-    def __init__(self, input_dim : int, output_dim : int, hidden_dim : int):
+    def __init__(self, input_dim : int, output_dim : int, hidden_dim : int, num_hidden_layers :int = 2):
         """
         Bulilds the model
 
         :param input_dim: the input dimension
         :param output_dim: the output dimension
         :param hidden_dim: the hidden dimension
+        :param num_hidden_layers: the number of hidden layers
         """
-        super(SixLayerFNN, self).__init__()
+        super(FeedForwardNN, self).__init__()
 
         self.input_dim = input_dim
         self.output_dim = output_dim
-        self.num_layers = 6
+        self.hidden_dim = hidden_dim
+        self.num_hidden_layers = num_hidden_layers
+        self.num_layers = num_hidden_layers + 2
+
 
         # Define layers of FNN
-        self.hidden_dim = hidden_dim
-        self.input_layer = torch.nn.Linear(input_dim, hidden_dim)
-        self.input_relu = torch.nn.ReLU()
-        self.hidden_1 = torch.nn.Linear(hidden_dim, hidden_dim)
-        self.hidden_1_relu = torch.nn.ReLU()
-        self.hidden_2 = torch.nn.Linear(hidden_dim, hidden_dim)
-        self.hidden_2_relu = torch.nn.ReLU()
-        self.hidden_3 = torch.nn.Linear(hidden_dim, hidden_dim)
-        self.hidden_3_relu = torch.nn.ReLU()
-        self.hidden_4 = torch.nn.Linear(hidden_dim, hidden_dim)
-        self.hidden_4_relu = torch.nn.ReLU()
-        self.output_layer = torch.nn.Linear(hidden_dim, self.output_dim)
 
+        self.layers = torch.nn.ModuleList()
+
+        # Input layer
+        self.layers.append(torch.nn.Linear(input_dim, hidden_dim))
+        self.layers.append(torch.nn.ReLU())
+
+        # Hidden Layers
+        for i in range(self.num_hidden_layers):
+            self.layers.append(torch.nn.Linear(hidden_dim, hidden_dim))
+            self.layers.append(torch.nn.ReLU())
+
+        # Output layer
+        self.layers.append(torch.nn.Linear(hidden_dim, self.output_dim))
 
     def forward(self, x):
         """
@@ -45,13 +50,10 @@ class SixLayerFNN(torch.nn.Module):
         :param x: input tensor
         :return: Output prediction
         """
-        input = self.input_relu(self.input_layer(x))
-        hidden_1 = self.hidden_1_relu(self.hidden_1(input))
-        hidden_2 = self.hidden_2_relu(self.hidden_2(hidden_1))
-        hidden_3 = self.hidden_3_relu(self.hidden_3(hidden_2))
-        hidden_4 = self.hidden_4_relu(self.hidden_4(hidden_3))
-        y_hat = self.output_layer(hidden_4)
-        return y_hat
+        y = x
+        for i in range(len(self.layers)):
+            y = self.layers[i](y)
+        return y
 
 
 def test() -> None:
@@ -67,7 +69,7 @@ def test() -> None:
     batch_size = 64
 
     # Create model
-    model = SixLayerFNN(input_dim, output_dim, hidden_dim)
+    model = FeedForwardNN(input_dim, output_dim, hidden_dim, num_hidden_layers=2)
 
     # Create random Tensors to hold inputs and outputs
     x = torch.randn(batch_size, input_dim)
