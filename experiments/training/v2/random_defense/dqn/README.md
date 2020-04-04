@@ -55,15 +55,20 @@ Example configuration in `config.json`:
     "q_agent_config": {
         "alpha": 0.0001,
         "attacker": true,
+        "checkpoint_freq": 1000,
         "defender": false,
         "dqn_config": {
             "batch_size": 32,
             "gpu": true,
+            "hidden_activation": "ReLU",
             "hidden_dim": 64,
             "input_dim": 44,
-            "loss_fn": "MSE",
+            "loss_fn": "Huber",
+            "lr_decay_rate": 0.999,
+            "lr_exp_decay": true,
+            "num_hidden_layers": 1,
             "optimizer": "Adam",
-            "output_dim": 30,
+            "output_dim": 40,
             "py/object": "gym_idsgame.agents.q_learning.dqn.dqn_config.DQNConfig",
             "replay_memory_size": 1000,
             "replay_start_size": 100,
@@ -102,17 +107,19 @@ Example configuration in `config.json`:
 Example configuration in `run.py`:
 
 ```python
-dqn_config = DQNConfig(input_dim = 44, output_dim=30, hidden_dim=64, replay_memory_size=1000,
+dqn_config = DQNConfig(input_dim=44, output_dim=40, hidden_dim=64, replay_memory_size=1000,
+                       num_hidden_layers=1,
                        replay_start_size=100, batch_size=32, target_network_update_freq=100,
                        gpu=True, tensorboard=True, tensorboard_dir=default_output_dir() + "/tensorboard",
-                       loss_fn="MSE", optimizer="Adam")
+                       loss_fn="Huber", optimizer="Adam", lr_exp_decay=True, lr_decay_rate=0.999)
 q_agent_config = QAgentConfig(gamma=0.9, alpha=0.0001, epsilon=1, render=False, eval_sleep=0.9,
                               min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
                               epsilon_decay=0.999, video=True, eval_log_frequency=1,
                               video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5000,
                               eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
                               eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
-                              save_dir=default_output_dir() + "/data", dqn_config=dqn_config)
+                              save_dir=default_output_dir() + "/data", dqn_config=dqn_config,
+                              checkpoint_freq=1000)
 env_name = "idsgame-random_defense-v2"
 client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.DQN_AGENT.value,
                              mode=RunnerMode.TRAIN_ATTACKER.value,
@@ -182,6 +189,13 @@ After the experiment has finished, the results are written to the following sub-
 #### Attacker (Train)
 <p align="center">
 <img src="docs/avg_episode_loss_attacker_train.png" width="800">
+</p>
+
+### Learning Rate Decay
+
+#### Attacker (Train)
+<p align="center">
+<img src="docs/lr_train.png" width="800">
 </p>
 
 ### Policy Inspection

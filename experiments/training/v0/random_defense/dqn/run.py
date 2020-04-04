@@ -40,7 +40,8 @@ def default_config() -> ClientConfig:
                                   video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5000,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
                                   eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
-                                  save_dir=default_output_dir() + "/data", dqn_config=dqn_config)
+                                  save_dir=default_output_dir() + "/data", dqn_config=dqn_config,
+                                  checkpoint_freq=1000)
     env_name = "idsgame-random_defense-v0"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.DQN_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,

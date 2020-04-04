@@ -95,17 +95,20 @@ class DQNAgent(QAgent):
             self.config.dqn_config.replay_start_size, self.buffer.size()))
         self.env.close()
 
-        # Add network graph to tensorboard with a sample batch as input
-        mini_batch = self.buffer.sample(self.config.dqn_config.batch_size)
-        s_attacker_batch, s_defender_batch, a_attacker_batch, a_defender_batch, r_attacker_batch, r_defender_batch, \
-        d_batch, s2_attacker_batch, s2_defender_batch = mini_batch
-        s_1 = torch.tensor(s_attacker_batch).float()
+        try:
+            # Add network graph to tensorboard with a sample batch as input
+            mini_batch = self.buffer.sample(self.config.dqn_config.batch_size)
+            s_attacker_batch, s_defender_batch, a_attacker_batch, a_defender_batch, r_attacker_batch, r_defender_batch, \
+            d_batch, s2_attacker_batch, s2_defender_batch = mini_batch
+            s_1 = torch.tensor(s_attacker_batch).float()
 
-        # Move to GPU if using GPU
-        if torch.cuda.is_available() and self.config.dqn_config.gpu:
-            device = torch.device("cuda:0")
-            s_1 = s_1.to(device)
-        self.tensorboard_writer.add_graph(self.attacker_q_network, s_1)
+            # Move to GPU if using GPU
+            if torch.cuda.is_available() and self.config.dqn_config.gpu:
+                device = torch.device("cuda:0")
+                s_1 = s_1.to(device)
+            self.tensorboard_writer.add_graph(self.attacker_q_network, s_1)
+        except:
+            self.config.logger.warning("Error when trying to add network grpah to tensorboard")
 
     def initialize_models(self) -> None:
         """
