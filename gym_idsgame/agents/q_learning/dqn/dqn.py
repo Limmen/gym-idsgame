@@ -43,6 +43,9 @@ class DQNAgent(QAgent):
         self.buffer = ReplayBuffer(config.dqn_config.replay_memory_size)
         self.initialize_models()
 
+        for i in range(5):
+            self.tensorboard_writer.add_hparams(self.config.hparams_dict(), {})
+
     def warmup(self) -> None:
         """
         A warmup without any learning just to populate the replay buffer following a random strategy
@@ -521,17 +524,11 @@ class DQNAgent(QAgent):
                 self.env.generate_gif(self.config.gif_dir + "/episode_" + str(train_episode) + "_"
                                       + time_str + ".gif", self.config.video_fps)
 
-                # info = {'images': self.env.episode_frames}
-                #          # Save final image to tensorboard
-                # for tag, images in info.items():
-                #     self.tensorboard_writer.image_summary(tag, images, train_episode)
+                # Add frames to tensorboard
                 for idx, frame in enumerate(self.env.episode_frames):
-                    print("frame shape: {}".format(frame.shape))
                     self.tensorboard_writer.add_image(str(train_episode) + "_eval_frames/" + str(idx),
                                                        frame, global_step=train_episode,
                                                       dataformats = "HWC")
-                    # self.tensorboard_writer.add_image()
-                    # self.tensorboard_writer.add_image(da)
 
 
             # Reset for new eval episode

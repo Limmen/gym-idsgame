@@ -139,3 +139,35 @@ class QAgentConfig:
                 writer.writerow(["lr_exp_decay", str(self.dqn_config.lr_exp_decay)])
                 writer.writerow(["lr_decay_rate", str(self.dqn_config.lr_decay_rate)])
                 writer.writerow(["hidden_activation", str(self.dqn_config.hidden_activation)])
+
+    def hparams_dict(self):
+        hparams = {}
+        hparams["gamma"] = self.gamma
+        hparams["alpha"] = self.alpha
+        hparams["epsilon"] = self.epsilon
+        hparams["epsilon_decay"] = self.epsilon_decay
+        hparams["min_epsilon"] = self.min_epsilon
+        hparams["eval_episodes"] = self.eval_episodes
+        hparams["train_log_frequency"] = self.train_log_frequency
+        hparams["eval_log_frequency"] = self.eval_log_frequency
+        hparams["num_episodes"] = self.num_episodes
+        hparams["eval_frequency"] = self.eval_frequency
+        hparams["attacker"] = self.attacker
+        hparams["defender"] = self.defender
+        hparams["checkpoint_freq"] = self.checkpoint_freq
+        if self.dqn_config is not None:
+            hparams["input_dim"] = self.dqn_config.input_dim
+            hparams["output_dim"] = self.dqn_config.output_dim
+            hparams["hidden_dim"] = self.dqn_config.hidden_dim
+            hparams["replay_memory_size"] = self.dqn_config.replay_memory_size
+            hparams["replay_start_size"] = self.dqn_config.replay_start_size
+            hparams["batch_size"] = self.dqn_config.batch_size
+            hparams["num_hidden_layers"] = self.dqn_config.num_hidden_layers
+            hparams["target_network_update_freq"] = self.dqn_config.target_network_update_freq
+            hparams["gpu"] = self.dqn_config.gpu
+            hparams["loss_fn"] = self.dqn_config.loss_fn
+            hparams["optimizer"] = self.dqn_config.optimizer
+            hparams["lr_exp_decay"] = self.dqn_config.lr_exp_decay
+            hparams["lr_decay_rate"] = self.dqn_config.lr_decay_rate
+            hparams["hidden_activation"] = self.dqn_config.hidden_activation
+        return hparams
