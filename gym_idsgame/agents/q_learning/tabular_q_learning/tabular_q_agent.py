@@ -25,7 +25,7 @@ class TabularQAgent(QAgent):
         """
         super(TabularQAgent, self).__init__(env, config)
         self.Q_attacker = np.random.rand(self.env.num_states, self.env.num_attack_actions)
-        self.Q_defender = np.random.rand(1, self.env.num_attack_actions + 1)
+        self.Q_defender = np.random.rand(1, self.env.num_defense_actions)
 
     def get_action(self, s, eval=False, attacker=True) -> int:
         """
@@ -167,14 +167,17 @@ class TabularQAgent(QAgent):
         obs_prime, reward, done, info = self.env.step(action)
         attacker_reward, defender_reward = reward
         attacker_obs_prime, defender_obs_prime = obs_prime
+        attacker_action, defender_action = action
 
         if self.config.attacker:
             state_prime_node_id = self.env.get_attacker_node_from_observation(attacker_obs_prime)
-            self.q_learning_update(attacker_state_node_id, action, attacker_reward, state_prime_node_id, attacker=True)
+            self.q_learning_update(attacker_state_node_id, attacker_action, attacker_reward, state_prime_node_id,
+                                   attacker=True)
 
         if self.config.defender:
             state_prime_node_id = 0
-            self.q_learning_update(defender_state_node_id, action, defender_reward, state_prime_node_id, attacker=False)
+            self.q_learning_update(defender_state_node_id, defender_action, defender_reward, state_prime_node_id,
+                                   attacker=False)
 
         return reward, obs_prime, done
 
@@ -190,8 +193,8 @@ class TabularQAgent(QAgent):
         :return: None
         """
         if attacker:
-            self.Q_attacker[s, a] = self.Q_attacker[s, a] + self.config.alpha * (r + self.config.gamma * np.max(self.Q_attacker[s_prime])
-                                                                                 - self.Q_attacker[s, a])
+            self.Q_attacker[s, a] = self.Q_attacker[s, a] + self.config.alpha * (
+                    r + self.config.gamma * np.max(self.Q_attacker[s_prime]) - self.Q_attacker[s, a])
         else:
             self.Q_defender[s, a] = self.Q_defender[s, a] + self.config.alpha * (
                         r + self.config.gamma * np.max(self.Q_defender[s_prime])

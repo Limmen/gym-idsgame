@@ -102,14 +102,25 @@ def test_train_tabular_q_learning_tabular_q_learning(version) -> ClientConfig:
 if __name__ == '__main__':
     versions = list(range(6))
     for version in versions:
+        print("Test Version: {}".format(version))
+
+        print("test_sim_attack_maximal_vs_defend_minimal, version:{}".format(version))
         test_sim_attack_maximal_vs_defend_minimal(version)
+        print("test_sim_attack_maximal_vs_random, version:{}".format(version))
         test_sim_attack_maximal_vs_random(version)
+        print("test_sim_random_vs_defend_minimal, version:{}".format(version))
         test_sim_random_vs_defend_minimal(version)
+        print("test_sim_random_vs_random, version:{}".format(version))
         test_sim_random_vs_random(version)
+        print("test_train_maximal_attack_tabular_q_learning, version:{}".format(version))
         test_train_maximal_attack_tabular_q_learning(version)
+        print("test_train_minimal_defense_tabular_q_learning, version:{}".format(version))
         test_train_minimal_defense_tabular_q_learning(version)
+        print("test_train_random_attack_tabular_q_learning, version:{}".format(version))
         test_train_random_attack_tabular_q_learning(version)
+        print("test_train_random_defense_tabular_q_learning, version:{}".format(version))
         test_train_random_defense_tabular_q_learning(version)
+        print("test_train_tabular_q_learning_tabular_q_learning, version:{}".format(version))
         test_train_tabular_q_learning_tabular_q_learning(version)
 
 
