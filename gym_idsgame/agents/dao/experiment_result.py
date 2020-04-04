@@ -82,7 +82,7 @@ class ExperimentResult:
         metrics = [self.avg_attacker_episode_rewards, self.avg_defender_episode_rewards,
                    self.avg_episode_steps, self.epsilon_values, self.hack_probability,
                    self.attacker_cumulative_reward, self.defender_cumulative_reward, self.attacker_wins,
-                   self.defender_wins, self.avg_episode_loss_attacker, self.lr_list]
+                   self.defender_wins, self.avg_episode_loss_attacker, self.avg_episode_loss_defender, self.lr_list]
         metric_labels = ["avg_attacker_episode_rewards", "avg_defender_episode_rewards", "avg_episode_steps",
                          "epsilon_values", "hack_probability", "attacker_cumulative_reward",
                          "defender_cumulative_reward","attacker_wins", "defender_wins", "avg_episode_loss_attacker",

@@ -17,7 +17,8 @@ class QAgentConfig:
                  num_episodes :int = 5000,
                  eval_render :bool = False, gifs :bool = False, gif_dir: str = None, eval_frequency :int =1000,
                  video_frequency :int = 1, attacker :bool = True, defender :bool = False,
-                 save_dir :str = None, load_path :str = None, dqn_config: DQNConfig = None):
+                 save_dir :str = None, load_path : str = None, dqn_config: DQNConfig = None,
+                 checkpoint_freq : int = 100000):
         """
         Initialize environment and hyperparameters
 
@@ -45,6 +46,7 @@ class QAgentConfig:
         :param save_dir: dir to save Q-table
         :param load_path: path to load a saved Q-table
         :param dqn_config: configuration for DQN
+        :param checkpoint_freq: frequency of checkpointing the model (episodes)
         """
         self.gamma = gamma
         self.alpha = alpha
@@ -71,6 +73,7 @@ class QAgentConfig:
         self.save_dir = save_dir
         self.load_path = load_path
         self.dqn_config = dqn_config
+        self.checkpoint_freq = checkpoint_freq
 
     def to_str(self) -> str:
         """
@@ -80,11 +83,12 @@ class QAgentConfig:
                "epsilon_decay:{5},min_epsilon:{6},eval_episodes:{7},train_log_frequency:{8}," \
                "eval_log_frequency:{9},video:{10},video_fps:{11}," \
                "video_dir:{12},num_episodes:{13},eval_render:{14},gifs:{15}," \
-               "gifdir:{16},eval_frequency:{17},video_frequency:{18},attacker{19},defender:{20}".format(
+               "gifdir:{16},eval_frequency:{17},video_frequency:{18},attacker{19},defender:{20}," \
+               "checkpoint_freq:{21}".format(
             self.gamma, self.alpha, self.epsilon, self.render, self.eval_sleep, self.epsilon_decay,
             self.min_epsilon, self.eval_episodes, self.train_log_frequency, self.eval_log_frequency, self.video,
             self.video_fps, self.video_dir, self.num_episodes, self.eval_render, self.gifs, self.gif_dir,
-            self.eval_frequency, self.video_frequency, self.attacker, self.defender)
+            self.eval_frequency, self.video_frequency, self.attacker, self.defender, self.checkpoint_freq)
 
     def to_csv(self, file_path: str) -> None:
         """
@@ -117,6 +121,7 @@ class QAgentConfig:
             writer.writerow(["video_frequency", str(self.video_frequency)])
             writer.writerow(["attacker", str(self.attacker)])
             writer.writerow(["defender", str(self.defender)])
+            writer.writerow(["checkpoint_freq", str(self.checkpoint_freq)])
             if self.dqn_config is not None:
                 writer.writerow(["input_dim", str(self.dqn_config.input_dim)])
                 writer.writerow(["output_dim", str(self.dqn_config.output_dim)])
@@ -133,3 +138,4 @@ class QAgentConfig:
                 writer.writerow(["num_hidden_layers", str(self.dqn_config.num_hidden_layers)])
                 writer.writerow(["lr_exp_decay", str(self.dqn_config.lr_exp_decay)])
                 writer.writerow(["lr_decay_rate", str(self.dqn_config.lr_decay_rate)])
+                writer.writerow(["hidden_activation", str(self.dqn_config.hidden_activation)])

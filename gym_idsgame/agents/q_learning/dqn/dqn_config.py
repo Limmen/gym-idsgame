@@ -14,7 +14,7 @@ class DQNConfig:
                  target_network_update_freq : int = 10,
                  gpu : bool = False, tensorboard : bool = False, tensorboard_dir: str = "",
                  loss_fn : str = "MSE", optimizer : str = "Adam", lr_exp_decay : bool = False,
-                 lr_decay_rate : float = 0.96):
+                 lr_decay_rate : float = 0.96, hidden_activation : str = "ReLU"):
         """
         Initializes the config
 
@@ -33,6 +33,7 @@ class DQNConfig:
         :param optimizer: optimizer
         :param lr_exp_decay: whether to use exponential decay of learning rate or not
         :param lr_decay_rate: decay rate of lr
+        :param hidden_activation: the activation function for hidden units
         """
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
@@ -49,6 +50,7 @@ class DQNConfig:
         self.num_hidden_layers = num_hidden_layers
         self.lr_exp_decay = lr_exp_decay
         self.lr_decay_rate = lr_decay_rate
+        self.hidden_activation = hidden_activation
 
     def to_str(self) -> str:
         """
@@ -58,11 +60,12 @@ class DQNConfig:
                "replay_start_size:{4}," \
                "batch_size:{5},target_network_update_freq:{6},gpu:{7},tensorboard:{8}," \
                "tensorboard_dir:{9},loss_fn:{10},optimizer:{11},num_hidden_layers:{12}," \
-               "lr_exp_decay:{13},lr_decay_rate:{14}".format(
+               "lr_exp_decay:{13},lr_decay_rate:{14},hidden_activation:{15}".format(
             self.input_dim, self.output_dim, self.hidden_dim, self.replay_memory_size,
             self.replay_start_size, self.batch_size, self.target_network_update_freq,
             self.batch_size, self.target_network_update_freq, self.gpu, self.tensorboard, self.tensorboard_dir,
-            self.loss_fn, self.optimizer, self.num_hidden_layers, self.lr_exp_decay, self.lr_decay_rate)
+            self.loss_fn, self.optimizer, self.num_hidden_layers, self.lr_exp_decay, self.lr_decay_rate,
+            self.hidden_activation)
 
     def to_csv(self, file_path: str) -> None:
         """
@@ -89,3 +92,4 @@ class DQNConfig:
             writer.writerow(["num_hidden_layers", str(self.num_hidden_layers)])
             writer.writerow(["lr_exp_decay", str(self.lr_exp_decay)])
             writer.writerow(["lr_decay_rate", str(self.lr_decay_rate)])
+            writer.writerow(["hidden_activation", str(self.hidden_activation)])

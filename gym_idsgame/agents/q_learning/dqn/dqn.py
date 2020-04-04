@@ -39,9 +39,9 @@ class DQNAgent(QAgent):
         self.defender_optimizer = None
         self.attacker_lr_decay = None
         self.defender_lr_decay = None
-        self.initialize_models()
-        self.buffer = ReplayBuffer(config.dqn_config.replay_memory_size)
         self.tensorboard_writer = SummaryWriter(self.config.dqn_config.tensorboard_dir)
+        self.buffer = ReplayBuffer(config.dqn_config.replay_memory_size)
+        self.initialize_models()
 
     def warmup(self) -> None:
         """
@@ -92,6 +92,18 @@ class DQNAgent(QAgent):
             self.config.dqn_config.replay_start_size, self.buffer.size()))
         self.env.close()
 
+        # Add network graph to tensorboard with a sample batch as input
+        mini_batch = self.buffer.sample(self.config.dqn_config.batch_size)
+        s_attacker_batch, s_defender_batch, a_attacker_batch, a_defender_batch, r_attacker_batch, r_defender_batch, \
+        d_batch, s2_attacker_batch, s2_defender_batch = mini_batch
+        s_1 = torch.tensor(s_attacker_batch).float()
+
+        # Move to GPU if using GPU
+        if torch.cuda.is_available() and self.config.dqn_config.gpu:
+            device = torch.device("cuda:0")
+            s_1 = s_1.to(device)
+        self.tensorboard_writer.add_graph(self.attacker_q_network, s_1)
+
     def initialize_models(self) -> None:
         """
         Initialize models
@@ -101,17 +113,20 @@ class DQNAgent(QAgent):
         # Initialize models
         self.attacker_q_network = FeedForwardNN(self.config.dqn_config.input_dim, self.config.dqn_config.output_dim,
                                                 self.config.dqn_config.hidden_dim,
-                                                num_hidden_layers=self.config.dqn_config.num_hidden_layers)
+                                                num_hidden_layers=self.config.dqn_config.num_hidden_layers,
+                                                hidden_activation=self.config.dqn_config.hidden_activation)
         self.attacker_target_network = FeedForwardNN(self.config.dqn_config.input_dim, self.config.dqn_config.output_dim,
                                                      self.config.dqn_config.hidden_dim,
-                                                     num_hidden_layers=self.config.dqn_config.num_hidden_layers)
+                                                     num_hidden_layers=self.config.dqn_config.num_hidden_layers,
+                                                     hidden_activation=self.config.dqn_config.hidden_activation)
         self.defender_q_network = FeedForwardNN(self.config.dqn_config.input_dim, self.config.dqn_config.output_dim,
                                                 self.config.dqn_config.hidden_dim,
-                                                num_hidden_layers=self.config.dqn_config.num_hidden_layers)
+                                                num_hidden_layers=self.config.dqn_config.num_hidden_layers,
+                                                hidden_activation=self.config.dqn_config.hidden_activation)
         self.defender_target_network = FeedForwardNN(self.config.dqn_config.input_dim, self.config.dqn_config.output_dim,
                                                      self.config.dqn_config.hidden_dim,
-                                                     num_hidden_layers=self.config.dqn_config.num_hidden_layers)
-
+                                                     num_hidden_layers=self.config.dqn_config.num_hidden_layers,
+                                                     hidden_activation=self.config.dqn_config.hidden_activation)
 
         # Specify device
         if torch.cuda.is_available() and self.config.dqn_config.gpu:
@@ -328,7 +343,7 @@ class DQNAgent(QAgent):
                 defender_obs = obs_prime_defender
 
 
-            # Decay LR
+            # Decay LR after every episode
             lr = self.config.alpha
             if self.config.dqn_config.lr_exp_decay:
                 self.attacker_lr_decay.step()
@@ -347,6 +362,13 @@ class DQNAgent(QAgent):
             if episode % self.config.train_log_frequency == 0:
                 self.log_metrics(episode, self.train_result, episode_attacker_rewards, episode_defender_rewards, episode_steps,
                                  episode_avg_loss, lr=lr)
+
+                # Log values and gradients of the parameters (histogram summary) to tensorboard
+                for tag, value in self.attacker_q_network.named_parameters():
+                    tag = tag.replace('.', '/')
+                    self.tensorboard_writer.add_histogram(tag, value.data.cpu().numpy(), episode)
+                    self.tensorboard_writer.add_histogram(tag + '/grad', value.grad.data.cpu().numpy(), episode)
+
                 episode_attacker_rewards = []
                 episode_defender_rewards = []
                 episode_steps = []
@@ -358,6 +380,10 @@ class DQNAgent(QAgent):
             # Run evaluation every <self.config.eval_frequency> episodes
             if episode % self.config.eval_frequency == 0:
                 self.eval(episode)
+
+            # Save models every <self.config.checkpoint_frequency> episodes
+            if episode % self.config.checkpoint_freq == 0:
+                self.save_model()
 
             # Reset environment for the next episode and update game stats
             done = False
@@ -517,12 +543,15 @@ class DQNAgent(QAgent):
 
         :return: None
         """
+        time_str = str(time.time())
         if self.config.save_dir is not None:
             if self.config.attacker:
-                self.config.logger.info("Saving Q-network to: {}".format(self.config.save_dir + "/attacker_q_network.pt"))
-                torch.save(self.attacker_q_network.state_dict(), self.config.save_dir + "/attacker_q_network.pt")
+                path = self.config.save_dir + "/" + time_str + "_attacker_q_network.pt"
+                self.config.logger.info("Saving Q-network to: {}".format(path))
+                torch.save(self.attacker_q_network.state_dict(), path)
             if self.config.defender:
-                self.config.logger.info("Saving Q-network to: {}".format(self.config.save_dir + "/defender_q_network.pt"))
-                torch.save(self.attacker_q_network.state_dict(), self.config.save_dir + "/defender_q_network.pt")
+                path = self.config.save_dir + "/" + time_str + "_defender_q_network.pt"
+                self.config.logger.info("Saving Q-network to: {}".format(path))
+                torch.save(self.attacker_q_network.state_dict(), path)
         else:
             self.config.logger.warning("Save path not defined, not saving Q-networks to disk")

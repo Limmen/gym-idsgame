@@ -5,11 +5,12 @@ import torch
 
 class FeedForwardNN(torch.nn.Module):
     """
-    Implements a FNN with ReLu activations.
+    Implements a FNN with parameterizable number of layers, dimensions, and hidden activations.
 
     Sub-classing the torch.nn.Module to be able to use high-level API for creating the custom network
     """
-    def __init__(self, input_dim : int, output_dim : int, hidden_dim : int, num_hidden_layers :int = 2):
+    def __init__(self, input_dim : int, output_dim : int, hidden_dim : int, num_hidden_layers :int = 2,
+                 hidden_activation : str = "ReLU"):
         """
         Bulilds the model
 
@@ -17,6 +18,7 @@ class FeedForwardNN(torch.nn.Module):
         :param output_dim: the output dimension
         :param hidden_dim: the hidden dimension
         :param num_hidden_layers: the number of hidden layers
+        :param hidden_activation: hidden activation type
         """
         super(FeedForwardNN, self).__init__()
 
@@ -25,23 +27,46 @@ class FeedForwardNN(torch.nn.Module):
         self.hidden_dim = hidden_dim
         self.num_hidden_layers = num_hidden_layers
         self.num_layers = num_hidden_layers + 2
+        self.hidden_activation = hidden_activation
 
 
         # Define layers of FNN
-
         self.layers = torch.nn.ModuleList()
 
         # Input layer
         self.layers.append(torch.nn.Linear(input_dim, hidden_dim))
-        self.layers.append(torch.nn.ReLU())
+        self.layers.append(self.get_hidden_activation())
 
         # Hidden Layers
         for i in range(self.num_hidden_layers):
             self.layers.append(torch.nn.Linear(hidden_dim, hidden_dim))
-            self.layers.append(torch.nn.ReLU())
+            self.layers.append(self.get_hidden_activation())
 
         # Output layer
         self.layers.append(torch.nn.Linear(hidden_dim, self.output_dim))
+
+    def get_hidden_activation(self):
+        """
+        Interprets the hidden activation
+
+        :return: the hidden activation function
+        """
+        if self.hidden_activation == "ReLU":
+            return torch.nn.ReLU()
+        elif self.hidden_activation == "LeakyReLU":
+            return torch.nn.LeakyReLU()
+        elif self.hidden_activation == "LogSigmoid":
+            return torch.nn.LogSigmoid()
+        elif self.hidden_activation == "PReLU":
+            return torch.nn.PReLU()
+        elif self.hidden_activation == "Sigmoid":
+            return torch.nn.Sigmoid()
+        elif self.hidden_activation == "Softplus":
+            return torch.nn.Softplus()
+        elif self.hidden_activation == "Tanh":
+            return torch.nn.Tanh()
+        else:
+            raise ValueError("Activation type: {} not recognized".format(self.hidden_activation))
 
     def forward(self, x):
         """
@@ -92,7 +117,6 @@ def test() -> None:
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-
 
 
 if __name__ == '__main__':

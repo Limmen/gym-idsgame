@@ -11,10 +11,12 @@
     "q_agent_config": {
         "alpha": 1e-05,
         "attacker": true,
+        "checkpoint_freq": 1000,
         "defender": false,
         "dqn_config": {
             "batch_size": 32,
             "gpu": true,
+            "hidden_activation": "ReLU",
             "hidden_dim": 64,
             "input_dim": 88,
             "loss_fn": "Huber",
