@@ -15,7 +15,8 @@ class ExperimentResult:
                  epsilon_values: List[float] = None, hack_probability: List[float] = None,
                  attacker_cumulative_reward: List[int] = None, defender_cumulative_reward: List[int] = None,
                  attacker_wins: List[int] = None, defender_wins: List[int] = None,
-                 avg_episode_loss_attacker: List[float] = None, avg_episode_loss_defender: List[float] = None
+                 avg_episode_loss_attacker: List[float] = None, avg_episode_loss_defender: List[float] = None,
+                 lr_list : List[float] = None
                  ):
         """
         Constructor, initializes the DTO
@@ -31,6 +32,7 @@ class ExperimentResult:
         :param defender_wins: num episodes won by the defender
         :param avg_episode_loss_attacker: average loss for attacker
         :param avg_episode_loss_defender: average loss for defender
+        :param lr_list: learning rates
         """
         self.avg_attacker_episode_rewards = avg_attacker_episode_rewards
         self.avg_defender_episode_rewards = avg_defender_episode_rewards
@@ -43,6 +45,7 @@ class ExperimentResult:
         self.defender_wins = defender_wins
         self.avg_episode_loss_attacker = avg_episode_loss_attacker
         self.avg_episode_loss_defender = avg_episode_loss_defender
+        self.lr_list = lr_list
         if avg_episode_steps is None:
             self.avg_episode_steps = []
         if avg_attacker_episode_rewards is None:
@@ -65,6 +68,8 @@ class ExperimentResult:
             self.avg_episode_loss_attacker = []
         if avg_episode_loss_defender is None:
             self.avg_episode_loss_defender = []
+        if lr_list is None:
+            self.lr_list = []
 
 
     def to_csv(self, file_path : str) -> None:
@@ -77,11 +82,11 @@ class ExperimentResult:
         metrics = [self.avg_attacker_episode_rewards, self.avg_defender_episode_rewards,
                    self.avg_episode_steps, self.epsilon_values, self.hack_probability,
                    self.attacker_cumulative_reward, self.defender_cumulative_reward, self.attacker_wins,
-                   self.defender_wins, self.avg_episode_loss_attacker]
+                   self.defender_wins, self.avg_episode_loss_attacker, self.lr_list]
         metric_labels = ["avg_attacker_episode_rewards", "avg_defender_episode_rewards", "avg_episode_steps",
                          "epsilon_values", "hack_probability", "attacker_cumulative_reward",
                          "defender_cumulative_reward","attacker_wins", "defender_wins", "avg_episode_loss_attacker",
-                         "avg_episode_loss_defender"]
+                         "avg_episode_loss_defender", "lr_list"]
         filtered_metric_labels = []
         filtered_metrics = []
         for i in range(len(metrics)):

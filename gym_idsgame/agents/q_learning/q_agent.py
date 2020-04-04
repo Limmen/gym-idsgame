@@ -96,7 +96,7 @@ class QAgent(TrainAgent, ABC):
         if update_stats and self.config.dqn_config is not None and self.config.dqn_config.tensorboard:
             self.log_tensorboard(episode, avg_attacker_episode_rewards, avg_defender_episode_rewards, avg_episode_steps,
                                  avg_episode_loss, hack_probability, attacker_cumulative_reward,
-                                 defender_cumulative_reward, eval=eval)
+                                 defender_cumulative_reward, self.config.epsilon, lr, eval=eval)
         if update_stats:
             result.avg_episode_steps.append(avg_episode_steps)
             result.avg_attacker_episode_rewards.append(avg_attacker_episode_rewards)
@@ -106,10 +106,13 @@ class QAgent(TrainAgent, ABC):
             result.attacker_cumulative_reward.append(attacker_cumulative_reward)
             result.defender_cumulative_reward.append(defender_cumulative_reward)
             result.avg_episode_loss_attacker.append(avg_episode_loss)
+            result.lr_list.append(lr)
 
     def log_tensorboard(self, episode: int, avg_attacker_episode_rewards: float, avg_defender_episode_rewards: float,
                         avg_episode_steps: float, episode_avg_loss: float, hack_probability: float,
-                        attacker_cumulative_reward: int, defender_cumulative_reward: int, eval=False) -> None:
+                        attacker_cumulative_reward: int, defender_cumulative_reward: int, epsilon: float,
+                        lr: float,
+                        eval=False) -> None:
         """
         Log metrics to tensorboard
 
@@ -121,8 +124,10 @@ class QAgent(TrainAgent, ABC):
         :param hack_probability: the hack probability
         :param attacker_cumulative_reward: the cumulative attacker reward
         :param defender_cumulative_reward: the cumulative defender reward
+        :param epsilon: the exploration rate
+        :param lr: the learning rate
         :param eval: boolean flag whether eval or not
-        :return: Nont
+        :return: None
         """
         train_or_eval = "eval" if eval else "train"
         self.tensorboard_writer.add_scalar('avg_episode_rewards/' + train_or_eval + "/attacker",
@@ -136,6 +141,9 @@ class QAgent(TrainAgent, ABC):
                                            attacker_cumulative_reward, episode)
         self.tensorboard_writer.add_scalar('cumulative_reward/defender/' + train_or_eval,
                                            defender_cumulative_reward, episode)
+        self.tensorboard_writer.add_scalar('epsilon', epsilon, episode)
+        if not eval:
+            self.tensorboard_writer.add_scalar('lr', lr, episode)
 
     def anneal_epsilon(self) -> None:
         """
