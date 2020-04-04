@@ -59,7 +59,7 @@ class QAgent(TrainAgent, ABC):
             avg_episode_loss = np.mean(episode_avg_loss)
         else:
             avg_episode_loss = 0.0
-        if self.buffer is not None:
+        if hasattr(self, "buffer") and self.buffer is not None:
             replay_memory_size = self.buffer.size()
         else:
             replay_memory_size = -1

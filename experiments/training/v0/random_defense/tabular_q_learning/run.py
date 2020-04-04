@@ -87,6 +87,9 @@ if __name__ == '__main__':
     config.q_agent_config.logger = logger
     config.q_agent_config.to_csv(config.output_dir + "/hyperparameters/" + time_str + ".csv")
     train_result, eval_result = Runner.run(config)
+    print("plot?")
+    print("train_result: {}".format(len(train_result.avg_episode_steps)))
+    print("eval_result: {}".format(len(eval_result.avg_episode_steps)))
     if len(train_result.avg_episode_steps) > 0 and len(eval_result.avg_episode_steps) > 0:
         train_csv_path = config.output_dir + "/data/" + time_str + "_train" + ".csv"
         train_result.to_csv(train_csv_path)

@@ -220,7 +220,7 @@
    * This is an experiment in the `random_defense-v2` environment. 
    An environment where the defender is following a random defense policy. 
    This experiment trains an attacker agent using DQN to act optimally in the given
-   environment and defeat the random defender.    
+   environment and defeat the random defender.
    
 ### Simulation Experiments
    
@@ -297,6 +297,12 @@
    it is intended for 2-agent simulations or RL training.
    This experiment trains both an attacker and a defender agent simultaneously against each other 
    using tabular q-learning. 
+   
+- [dqn_vs_random_defense-v3](training/v3/random_defense/dqn/)
+   * This is an experiment in the `random_defense-v3` environment. 
+   An environment where the defender is following a random defense policy. 
+   This experiment trains an attacker agent using DQN to act optimally in the given
+   environment and defeat the random defender.   
    
 ### Simulation Experiments
    

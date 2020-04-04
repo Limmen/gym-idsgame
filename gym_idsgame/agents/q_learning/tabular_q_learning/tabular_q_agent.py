@@ -129,7 +129,7 @@ class TabularQAgent(QAgent):
             # Log average metrics every <self.config.train_log_frequency> episodes
             if episode % self.config.train_log_frequency == 0:
                 self.log_metrics(episode, self.train_result, episode_attacker_rewards, episode_defender_rewards,
-                                 episode_steps)
+                                 episode_steps, None, lr=self.config.alpha)
                 episode_attacker_rewards = []
                 episode_defender_rewards = []
                 episode_steps = []
@@ -310,10 +310,12 @@ class TabularQAgent(QAgent):
             attacker_obs, defender_obs = self.env.reset(update_stats=False)
             self.outer_eval.update(1)
 
-        if self.num_eval_hacks > 0:
-            self.eval_hack_probability = float(self.num_eval_hacks) / float(self.num_eval_games)
-        self.log_metrics(train_episode, self.eval_result, episode_attacker_rewards, episode_defender_rewards,
-                         episode_steps, update_stats=False, eval=True)
+        # Log average eval statistics
+        if log:
+            if self.num_eval_hacks > 0:
+                self.eval_hack_probability = float(self.num_eval_hacks) / float(self.num_eval_games)
+            self.log_metrics(train_episode, self.eval_result, episode_attacker_rewards, episode_defender_rewards,
+                             episode_steps, update_stats=True, eval=True)
 
         self.env.close()
         self.config.logger.info("Evaluation Complete")

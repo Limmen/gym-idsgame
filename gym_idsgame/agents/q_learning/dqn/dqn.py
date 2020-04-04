@@ -537,10 +537,12 @@ class DQNAgent(QAgent):
             self.outer_eval.update(1)
 
         # Log average eval statistics
-        if self.num_eval_hacks > 0:
-            self.eval_hack_probability = float(self.num_eval_hacks) / float(self.num_eval_games)
-        self.log_metrics(train_episode, self.eval_result, episode_attacker_rewards, episode_defender_rewards,
-                         episode_steps, eval=True, update_stats=True)
+        if log:
+            if self.num_eval_hacks > 0:
+                self.eval_hack_probability = float(self.num_eval_hacks) / float(self.num_eval_games)
+
+            self.log_metrics(train_episode, self.eval_result, episode_attacker_rewards, episode_defender_rewards,
+                             episode_steps, eval=True, update_stats=True)
 
         self.env.close()
         self.config.logger.info("Evaluation Complete")
