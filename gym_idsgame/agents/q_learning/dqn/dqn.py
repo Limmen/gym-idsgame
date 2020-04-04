@@ -365,6 +365,7 @@ class DQNAgent(QAgent):
         """
         self.config.logger.info("Updating target network")
         self.attacker_target_network.load_state_dict(self.attacker_q_network.state_dict())
+        self.attacker_target_network.eval()
 
     def eval(self, log=True) -> ExperimentResult:
         """

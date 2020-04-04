@@ -29,18 +29,18 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    dqn_config = DQNConfig(input_dim = 44, output_dim=40, hidden_dim=64, replay_memory_size=1000,
-                           replay_start_size=100, batch_size=32, target_network_update_freq=100,
+    dqn_config = DQNConfig(input_dim=88, output_dim=80, hidden_dim=64, replay_memory_size=10000,
+                           replay_start_size=1000, batch_size=32, target_network_update_freq=1000,
                            gpu=True, tensorboard=True, tensorboard_dir=default_output_dir() + "/tensorboard",
                            loss_fn="MSE", optimizer="Adam")
-    q_agent_config = QAgentConfig(gamma=0.9, alpha=0.0001, epsilon=1, render=False, eval_sleep=0.9,
-                                  min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
-                                  epsilon_decay=0.999, video=True, eval_log_frequency=1,
-                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5000,
+    q_agent_config = QAgentConfig(gamma=0.99, alpha=0.0000001, epsilon=1, render=False, eval_sleep=0.9,
+                                  min_epsilon=0.05, eval_episodes=100, train_log_frequency=100,
+                                  epsilon_decay=0.99999, video=True, eval_log_frequency=1,
+                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=200000,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                                  eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
+                                  eval_frequency=10000, attacker=True, defender=False, video_frequency=101,
                                   save_dir=default_output_dir() + "/data", dqn_config=dqn_config)
-    env_name = "idsgame-random_defense-v2"
+    env_name = "idsgame-random_defense-v3"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.DQN_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
                                  q_agent_config=q_agent_config, output_dir=default_output_dir(),
@@ -86,7 +86,7 @@ if __name__ == '__main__':
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir)
-    logger = util.setup_logger("tabular_q_learning_vs_random_defense-v0", config.output_dir + "/logs/",
+    logger = util.setup_logger("tabular_q_learning_vs_random_defense-v3", config.output_dir + "/logs/",
                                time_str=time_str)
     config.logger = logger
     config.q_agent_config.logger = logger
