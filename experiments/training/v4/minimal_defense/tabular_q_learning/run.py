@@ -1,7 +1,7 @@
 import os
 import time
 from gym_idsgame.config.runner_mode import RunnerMode
-from gym_idsgame.agents.q_learning.tabular_q_learning.q_agent_config import QAgentConfig
+from gym_idsgame.agents.q_learning.q_agent_config import QAgentConfig
 from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.runnner import Runner

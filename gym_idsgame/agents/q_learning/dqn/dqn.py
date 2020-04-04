@@ -8,7 +8,7 @@ import tqdm
 import torch
 from torch.utils.tensorboard import SummaryWriter
 from gym_idsgame.envs.rendering.video.idsgame_monitor import IdsGameMonitor
-from gym_idsgame.agents.q_learning.tabular_q_learning.q_agent_config import QAgentConfig
+from gym_idsgame.agents.q_learning.q_agent_config import QAgentConfig
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
 from gym_idsgame.envs.constants import constants
@@ -128,8 +128,7 @@ class DQNAgent(QAgent):
         self.attacker_target_network.eval()
         self.defender_target_network.eval()
 
-        # Construct our loss function and an Optimizer. The call to model.parameters()
-        # in the optimizer constructor will contain the learnable parameters of the layers in the model
+        # Construct loss function
         if self.config.dqn_config.loss_fn == "MSE":
             self.loss_fn = torch.nn.MSELoss(reduction='sum')
         elif self.config.dqn_config.loss_fn == "Huber":
@@ -137,6 +136,8 @@ class DQNAgent(QAgent):
         else:
             raise ValueError("Loss function not recognized")
 
+        # Define Optimizer. The call to model.parameters() in the optimizer constructor will contain the learnable
+        # parameters of the layers in the model
         if self.config.dqn_config.optimizer == "Adam":
             self.attacker_optimizer = torch.optim.Adam(self.attacker_q_network.parameters(), lr=self.config.alpha)
             self.defender_optimizer = torch.optim.Adam(self.defender_q_network.parameters(), lr=self.config.alpha)

@@ -1,7 +1,7 @@
 """
 Client configuration for running experiments (parsed from JSON)
 """
-from gym_idsgame.agents.q_learning.tabular_q_learning.q_agent_config import QAgentConfig
+from gym_idsgame.agents.q_learning.q_agent_config import QAgentConfig
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.simulation.dao.simulation_config import SimulationConfig
 

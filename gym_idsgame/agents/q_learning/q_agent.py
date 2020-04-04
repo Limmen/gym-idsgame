@@ -5,7 +5,7 @@ import numpy as np
 import tqdm
 import logging
 from abc import ABC, abstractmethod
-from gym_idsgame.agents.q_learning.tabular_q_learning.q_agent_config import QAgentConfig
+from gym_idsgame.agents.q_learning.q_agent_config import QAgentConfig
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
 from gym_idsgame.agents.train_agent import TrainAgent

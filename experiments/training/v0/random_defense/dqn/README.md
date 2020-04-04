@@ -31,7 +31,7 @@ The starting state for each node in the environment is initialized as follows (w
 
 ## Algorithm
 
-- Tabular Q-learning with linear exploration annealing 
+- DQN with linear exploration annealing 
  
 ## Instructions 
 
@@ -61,6 +61,8 @@ Example configuration in `config.json`:
             "gpu": true,
             "hidden_dim": 64,
             "input_dim": 33,
+            "loss_fn": "MSE",
+            "optimizer": "Adam",
             "output_dim": 30,
             "py/object": "gym_idsgame.agents.q_learning.dqn.dqn_config.DQNConfig",
             "replay_memory_size": 1000,
@@ -83,7 +85,7 @@ Example configuration in `config.json`:
         "logger": null,
         "min_epsilon": 0.01,
         "num_episodes": 5000,
-        "py/object": "gym_idsgame.agents.q_learning.tabular_q_learning.q_agent_config.QAgentConfig",
+        "py/object": "gym_idsgame.agents.q_learning.q_agent_config.QAgentConfig",
         "render": false,
         "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_defense/dqn/data",
         "train_log_frequency": 1,
