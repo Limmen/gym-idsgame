@@ -136,7 +136,11 @@ class TabularQAgent(QAgent):
 
             # Run evaluation every <self.config.eval_frequency> episodes
             if episode % self.config.eval_frequency == 0:
-                self.eval()
+                self.eval(episode)
+
+            # Save Q table every <self.config.checkpoint_frequency> episodes
+            if episode % self.config.checkpoint_freq == 0:
+                self.save_q_table()
 
             # Reset environment for the next episode and update game stats
             done = False
@@ -149,7 +153,7 @@ class TabularQAgent(QAgent):
         self.config.logger.info("Training Complete")
 
         # Final evaluation (for saving Gifs etc)
-        self.eval(log=False)
+        self.eval(self.config.num_episodes, log=False)
 
         # Log and return
         self.log_state_values()
@@ -193,11 +197,12 @@ class TabularQAgent(QAgent):
                         r + self.config.gamma * np.max(self.Q_defender[s_prime])
                         - self.Q_defender[s, a])
 
-    def eval(self, log=True) -> ExperimentResult:
+    def eval(self, train_episode, log=True) -> ExperimentResult:
         """
         Performs evaluation with the greedy policy with respect to the learned Q-values
 
         :param log: whether to log the result
+        :param train_episode: train episode to keep track of logs and plots
         :return: None
         """
         self.config.logger.info("Starting Evaluation")
@@ -293,19 +298,22 @@ class TabularQAgent(QAgent):
                 if self.num_eval_hacks > 0:
                     self.eval_hack_probability = float(self.num_eval_hacks) / float(self.num_eval_games)
                 self.log_metrics(episode, self.eval_result, episode_attacker_rewards, episode_defender_rewards,
-                                 episode_steps, eval = True)
-                episode_attacker_rewards = []
-                episode_steps = []
+                                 episode_steps, update_stats=False, eval = True)
 
             # Save gifs
             if self.config.gifs and self.config.video:
-                self.env.generate_gif(self.config.gif_dir + "/episode_" + str(episode) + "_"
+                self.env.generate_gif(self.config.gif_dir + "/episode_" + str(train_episode) + "_"
                                       + time_str + ".gif", self.config.video_fps)
 
             # Reset for new eval episode
             done = False
             attacker_obs, defender_obs = self.env.reset(update_stats=False)
             self.outer_eval.update(1)
+
+        if self.num_eval_hacks > 0:
+            self.eval_hack_probability = float(self.num_eval_hacks) / float(self.num_eval_games)
+        self.log_metrics(train_episode, self.eval_result, episode_attacker_rewards, episode_defender_rewards,
+                         episode_steps, update_stats=False, eval=True)
 
         self.env.close()
         self.config.logger.info("Evaluation Complete")
@@ -338,12 +346,15 @@ class TabularQAgent(QAgent):
 
         :return: None
         """
+        time_str = str(time.time())
         if self.config.save_dir is not None:
             if self.config.attacker:
-                self.config.logger.info("Saving Q-table to: {}".format(self.config.save_dir + "/attacker_q_table.npy"))
-                np.save(self.config.save_dir + "/attacker_q_table.npy", self.Q_attacker)
+                path = self.config.save_dir + "/" + time_str + "_attacker_q_table.npy"
+                self.config.logger.info("Saving Q-table to: {}".format(path))
+                np.save(path, self.Q_attacker)
             if self.config.defender:
-                self.config.logger.info("Saving Q-table to: {}".format(self.config.save_dir + "/defender_q_table.npy"))
-                np.save(self.config.save_dir + "/defender_q_table.npy", self.Q_defender)
+                path = self.config.save_dir + "/" + time_str + "_defender_q_table.npy"
+                self.config.logger.info("Saving Q-table to: {}".format(path))
+                np.save(path, self.Q_defender)
         else:
             self.config.logger.warning("Save path not defined, not saving Q table to disk")

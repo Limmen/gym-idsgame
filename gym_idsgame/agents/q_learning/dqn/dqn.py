@@ -515,13 +515,24 @@ class DQNAgent(QAgent):
                     self.eval_hack_probability = float(self.num_eval_hacks) / float(self.num_eval_games)
                 self.log_metrics(episode, self.eval_result, episode_attacker_rewards, episode_defender_rewards, episode_steps,
                                  eval = True, update_stats=False)
-                # episode_attacker_rewards = []
-                # episode_steps = []
 
             # Save gifs
             if self.config.gifs and self.config.video:
                 self.env.generate_gif(self.config.gif_dir + "/episode_" + str(train_episode) + "_"
                                       + time_str + ".gif", self.config.video_fps)
+
+                # info = {'images': self.env.episode_frames}
+                #          # Save final image to tensorboard
+                # for tag, images in info.items():
+                #     self.tensorboard_writer.image_summary(tag, images, train_episode)
+                for idx, frame in enumerate(self.env.episode_frames):
+                    print("frame shape: {}".format(frame.shape))
+                    self.tensorboard_writer.add_image(str(train_episode) + "_eval_frames/" + str(idx),
+                                                       frame, global_step=train_episode,
+                                                      dataformats = "HWC")
+                    # self.tensorboard_writer.add_image()
+                    # self.tensorboard_writer.add_image(da)
+
 
             # Reset for new eval episode
             done = False
@@ -533,6 +544,7 @@ class DQNAgent(QAgent):
             self.eval_hack_probability = float(self.num_eval_hacks) / float(self.num_eval_games)
         self.log_metrics(train_episode, self.eval_result, episode_attacker_rewards, episode_defender_rewards,
                          episode_steps, eval=True, update_stats=True)
+
         self.env.close()
         self.config.logger.info("Evaluation Complete")
         return self.eval_result
