@@ -379,7 +379,13 @@
    An environment where neither the attacker nor defender is part of the environment, i.e.
    it is intended for 2-agent simulations or RL training.
    This experiment trains both an attacker and a defender agent simultaneously against each other 
-   using tabular q-learning.       
+   using tabular q-learning.    
+   
+- [dqn_vs_random_defense-v4](training/v4/random_defense/dqn/)
+   * This is an experiment in the `random_defense-v4` environment. 
+   An environment where the defender is following a random defense policy. 
+   This experiment trains an attacker agent using DQN to act optimally in the given
+   environment and defeat the random defender.         
    
 ### Simulation Experiments
    
@@ -466,6 +472,13 @@
    This experiment trains both an attacker and a defender agent simultaneously against each other 
    using tabular q-learning.    
    
+- [dqn_vs_random_defense-v5](training/v5/random_defense/dqn/)
+   * This is an experiment in the `random_defense-v5` environment. 
+   An environment where the defender is following a random defense policy. 
+   This experiment trains an attacker agent using DQN to act optimally in the given
+   environment and defeat the random defender.
+   
+      
 ### Simulation Experiments
    
 - [random_vs_random-v5](simulations/v5/random_vs_random/)

@@ -1,6 +1,6 @@
-# Experiment `random_defense-v4`_`dqn`
+# Experiment `random_defense-v5`_`dqn`
 
-This is an experiment in the `random_defense-v4` environment.
+This is an experiment in the `random_defense-v5` environment.
 An environment where the defender is following a random defense policy. 
 This experiment trains an attacker agent using the DQN algorithm to act optimally in the given
 environment and defeat the random defender.
@@ -11,6 +11,7 @@ The network configuration of the environment is as follows:
 - `num_servers_per_layer=5`
 - `num_attack_types=10`
 - `max_value=9`  
+- `connected_layers = True`
 
 <p align="center">
 <img src="docs/env.png" width="700">
@@ -22,12 +23,12 @@ The starting state for each node in the environment is initialized as follows (w
 - `attack_val=0`
 - `num_vulnerabilities_per_node=1` (which type of defense at the node that is vulnerable is selected randomly when the environment is initialized)
 - `det_val=2`
-- `vulnerability_val=0` 
-- `num_vulnerabilities_per_layer=5`
+- `vulnerability_val=0`
+- `num_vulnerabilities_per_layer=2` 
 
 ## Environment 
 
-- Env: `random_defense-v4`
+- Env: `random_defense-v5`
 
 ## Algorithm
 
