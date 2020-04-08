@@ -341,11 +341,10 @@
    the maximum value out of all of its neighbors. The defender is implemented with a
    random defense policy. 
    
-- [tabular_q_agent_vs_defend_minimal-v3](simulations/v3/tabular_q_agent_vs_tabular_q_agent/)
+- [tabular_q_agent_vs_tabular_q_agent-v3](simulations/v3/tabular_q_agent_vs_tabular_q_agent/)
    * This is an experiment in the `idsgame-v3` environment. 
    An environment where neither the attacker nor defender is part of the environment, i.e.
-   it is intended for 2-agent simulations or RL training.
-   
+   it is intended for 2-agent simulations or RL training. 
    In this experiment, both the attacker and defender are implemented with a greedy policy 
    based on saved Q-table from previous Q-training. 
    
