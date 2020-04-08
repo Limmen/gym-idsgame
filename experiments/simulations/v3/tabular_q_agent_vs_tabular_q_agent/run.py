@@ -8,6 +8,7 @@ from gym_idsgame.runnner import Runner
 from gym_idsgame.agents.q_learning.q_agent_config import QAgentConfig
 from experiments.util import plotting_util, util
 
+
 def default_output_dir() -> str:
     """
     :return: the default output dir
@@ -28,15 +29,17 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    simulation_config = SimulationConfig(render=False, sleep=0.8, video=True, log_frequency=1,
+    simulation_config = SimulationConfig(render=True, sleep=0.8, video=True, log_frequency=1,
                                          video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=1000,
                                          gifs=True, gif_dir=default_output_dir() + "/gifs", video_frequency = 1)
-    q_agent_config = QAgentConfig(attacker_load_path=default_output_dir() + "/q_table/q_table.npy")
-    env_name = "idsgame-v0"
-    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.RANDOM.value,
+    q_agent_config = QAgentConfig(attacker_load_path=default_output_dir() + "/q_table/attacker_q_table.npy",
+                                  defender_load_path=default_output_dir() + "/q_table/defender_q_table.npy"
+                                  )
+    env_name = "idsgame-v3"
+    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.TABULAR_Q_AGENT.value,
                                  defender_type=AgentType.TABULAR_Q_AGENT.value, mode=RunnerMode.SIMULATE.value,
                                  simulation_config=simulation_config, output_dir=default_output_dir(),
-                                 title="RandomAttacker vs TabularQAgentDefender",
+                                 title="TabularQAgentAttacker vs TabularQAgentDefender",
                                  q_agent_config=q_agent_config,
                                  initial_state_path = default_output_dir() + "/initial_state/initial_state.pkl")
     return client_config
@@ -83,7 +86,7 @@ if __name__ == '__main__':
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir)
-    logger = util.setup_logger("idsgame-v0-random_vs_tabular_q_agent", config.output_dir + "/logs/",
+    logger = util.setup_logger("idsgame-v3-tabular_q_agent_vs_tabular_q_agent", config.output_dir + "/logs/",
                                time_str=time_str)
     config.logger = logger
     config.simulation_config.logger = logger

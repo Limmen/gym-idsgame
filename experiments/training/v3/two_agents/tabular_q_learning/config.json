@@ -11,7 +11,9 @@
     "q_agent_config": {
         "alpha": 0.05,
         "attacker": true,
+        "checkpoint_freq": 100000,
         "defender": true,
+        "dqn_config": null,
         "epsilon": 1,
         "epsilon_decay": 0.9999,
         "eval_episodes": 100,
@@ -26,7 +28,7 @@
         "logger": null,
         "min_epsilon": 0.01,
         "num_episodes": 40001,
-        "py/object": "gym_idsgame.agents.tabular_q_learning.q_agent_config.QAgentConfig",
+        "py/object": "gym_idsgame.agents.q_learning.q_agent_config.QAgentConfig",
         "render": false,
         "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v3/two_agents/tabular_q_learning/data",
         "train_log_frequency": 100,

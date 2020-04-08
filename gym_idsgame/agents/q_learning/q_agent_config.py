@@ -17,7 +17,8 @@ class QAgentConfig:
                  num_episodes :int = 5000,
                  eval_render :bool = False, gifs :bool = False, gif_dir: str = None, eval_frequency :int =1000,
                  video_frequency :int = 1, attacker :bool = True, defender :bool = False,
-                 save_dir :str = None, load_path : str = None, dqn_config: DQNConfig = None,
+                 save_dir :str = None, attacker_load_path : str = None, defender_load_path : str = None,
+                 dqn_config: DQNConfig = None,
                  checkpoint_freq : int = 100000):
         """
         Initialize environment and hyperparameters
@@ -44,7 +45,8 @@ class QAgentConfig:
         :param attacker: True if the QAgent is an attacker
         :param attacker: True if the QAgent is a defender
         :param save_dir: dir to save Q-table
-        :param load_path: path to load a saved Q-table
+        :param attacker_load_path: path to load a saved Q-table of the attacker
+        :param defender_load_path: path to load a saved Q-table of the defender
         :param dqn_config: configuration for DQN
         :param checkpoint_freq: frequency of checkpointing the model (episodes)
         """
@@ -71,7 +73,8 @@ class QAgentConfig:
         self.attacker = attacker
         self.defender = defender
         self.save_dir = save_dir
-        self.load_path = load_path
+        self.attacker_load_path = attacker_load_path
+        self.defender_load_path = defender_load_path
         self.dqn_config = dqn_config
         self.checkpoint_freq = checkpoint_freq
 

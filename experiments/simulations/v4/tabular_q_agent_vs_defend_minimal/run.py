@@ -32,7 +32,7 @@ def default_config() -> ClientConfig:
     simulation_config = SimulationConfig(render=True, sleep=0.8, video=True, log_frequency=1,
                                          video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=1000,
                                          gifs=True, gif_dir=default_output_dir() + "/gifs", video_frequency = 1)
-    q_agent_config = QAgentConfig(load_path=default_output_dir() + "/q_table/q_table.npy")
+    q_agent_config = QAgentConfig(attacker_load_path=default_output_dir() + "/q_table/q_table.npy")
     env_name = "idsgame-v4"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.TABULAR_Q_AGENT.value,
                                  defender_type=AgentType.DEFEND_MINIMAL_VALUE.value, mode=RunnerMode.SIMULATE.value,
@@ -84,7 +84,7 @@ if __name__ == '__main__':
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir)
-    logger = util.setup_logger("idsgame-v0-tabular_q_agent_vs_random_defender", config.output_dir + "/logs/",
+    logger = util.setup_logger("idsgame-v4-tabular_q_agent_vs_random_defender", config.output_dir + "/logs/",
                                time_str=time_str)
     config.logger = logger
     config.simulation_config.logger = logger

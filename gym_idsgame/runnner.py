@@ -149,19 +149,20 @@ class Runner:
         elif config.defender_type == AgentType.DEFEND_MINIMAL_VALUE.value:
             defender = DefendMinimalValueBotAgent(env.idsgame_config.game_config)
         elif config.defender_type == AgentType.TABULAR_Q_AGENT.value:
-            if config.q_agent_config is None or config.q_agent_config.load_path is None:
+            if config.q_agent_config is None or config.q_agent_config.defender_load_path is None:
                 raise ValueError("To run a simulation with a tabular Q-agent, the path to the saved "
                                  "Q-table must be specified")
-            defender = TabularQDefenderBotAgent(env.idsgame_config.game_config, config.q_agent_config.load_path)
+            defender = TabularQDefenderBotAgent(env.idsgame_config.game_config, config.q_agent_config.defender_load_path)
         else:
             raise AssertionError("Defender type not recognized: {}".format(config.defender_type))
 
         attacker: BotAgent = None
         if config.attacker_type == AgentType.TABULAR_Q_AGENT.value:
-            if config.q_agent_config is None or config.q_agent_config.load_path is None:
+            if config.q_agent_config is None or config.q_agent_config.attacker_load_path is None:
                 raise ValueError("To run a simulation with a tabular Q-agent, the path to the saved "
                                  "Q-table must be specified")
-            attacker = TabularQAttackerBotAgent(env.idsgame_config.game_config, config.q_agent_config.load_path)
+            attacker = TabularQAttackerBotAgent(env.idsgame_config.game_config,
+                                                config.q_agent_config.attacker_load_path)
         elif config.attacker_type == AgentType.RANDOM.value:
             attacker = RandomAttackBotAgent(env.idsgame_config.game_config)
         elif config.attacker_type == AgentType.ATTACK_MAXIMAL_VALUE.value:

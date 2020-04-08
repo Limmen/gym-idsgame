@@ -34,12 +34,12 @@ def default_config() -> ClientConfig:
                            gpu=True, tensorboard=True, tensorboard_dir=default_output_dir() + "/tensorboard",
                            loss_fn="Huber", optimizer="Adam", lr_exp_decay=True, lr_decay_rate=0.9999)
 
-    q_agent_config = QAgentConfig(gamma=0.99, alpha=0.000001, epsilon=1, render=False, eval_sleep=0.9,
+    q_agent_config = QAgentConfig(gamma=0.99, alpha=0.00001, epsilon=1, render=False, eval_sleep=0.9,
                                   min_epsilon=0.05, eval_episodes=100, train_log_frequency=100,
                                   epsilon_decay=0.9999, video=True, eval_log_frequency=1,
-                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=30000,
+                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=40000,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                                  eval_frequency=5000, attacker=True, defender=False, video_frequency=101,
+                                  eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
                                   save_dir=default_output_dir() + "/data", dqn_config=dqn_config,
                                   checkpoint_freq=1000)
     env_name = "idsgame-random_defense-v5"
