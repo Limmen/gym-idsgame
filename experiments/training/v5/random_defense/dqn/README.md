@@ -67,7 +67,7 @@ Example configuration in `config.json`:
             "hidden_dim": 64,
             "input_dim": 242,
             "loss_fn": "Huber",
-            "lr_decay_rate": 0.9999,
+            "lr_decay_rate": 0.99995,
             "lr_exp_decay": true,
             "num_hidden_layers": 1,
             "optimizer": "Adam",
@@ -80,7 +80,7 @@ Example configuration in `config.json`:
             "tensorboard_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v5/random_defense/dqn/tensorboard"
         },
         "epsilon": 1,
-        "epsilon_decay": 0.99995,
+        "epsilon_decay": 0.9995,
         "eval_episodes": 100,
         "eval_frequency": 5000,
         "eval_log_frequency": 1,
@@ -91,7 +91,7 @@ Example configuration in `config.json`:
         "gifs": true,
         "logger": null,
         "min_epsilon": 0.05,
-        "num_episodes": 45000,
+        "num_episodes": 50000,
         "py/object": "gym_idsgame.agents.q_learning.q_agent_config.QAgentConfig",
         "render": false,
         "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v5/random_defense/dqn/data",
@@ -110,15 +110,15 @@ Example configuration in `run.py`:
 
 ```python
 dqn_config = DQNConfig(input_dim=242, output_dim=220, hidden_dim=64, replay_memory_size=100000,
-                       num_hidden_layers=1,
-                       replay_start_size=10000, batch_size=32, target_network_update_freq=10000,
-                       gpu=True, tensorboard=True, tensorboard_dir=default_output_dir() + "/tensorboard",
-                       loss_fn="Huber", optimizer="Adam", lr_exp_decay=True, lr_decay_rate=0.9999)
+                           num_hidden_layers=1,
+                           replay_start_size=10000, batch_size=32, target_network_update_freq=10000,
+                           gpu=True, tensorboard=True, tensorboard_dir=default_output_dir() + "/tensorboard",
+                           loss_fn="Huber", optimizer="Adam", lr_exp_decay=True, lr_decay_rate=0.99995)
 
 q_agent_config = QAgentConfig(gamma=1, alpha=0.00001, epsilon=1, render=False, eval_sleep=0.9,
                               min_epsilon=0.05, eval_episodes=100, train_log_frequency=100,
-                              epsilon_decay=0.99995, video=True, eval_log_frequency=1,
-                              video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=45000,
+                              epsilon_decay=0.9995, video=True, eval_log_frequency=1,
+                              video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=50000,
                               eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
                               eval_frequency=5000, attacker=True, defender=False, video_frequency=101,
                               save_dir=default_output_dir() + "/data", dqn_config=dqn_config,
@@ -215,10 +215,10 @@ After the experiment has finished, the results are written to the following sub-
 <img src="docs/episode_5000.gif" width="700">
 </p>  
 
-#### Evaluation after 10000 Training Episodes
+#### Evaluation after 50000 Training Episodes
 
 <p align="center">
-<img src="docs/episode_10000.gif" width="700">
+<img src="docs/episode_50000.gif" width="700">
 </p>  
 
 ## Commands
