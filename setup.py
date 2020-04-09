@@ -2,10 +2,10 @@ from setuptools import setup
 
 setup(name='gym_idsgame',
       version='1.0.0',
-      install_requires=['gym', 'pyglet', 'numpy'],
+      install_requires=['gym', 'pyglet', 'numpy', 'torch'],
       author='Kim Hammar',
       author_email='hammar.kim@gmail.com',
-      description='IDS Markov Game RL Environment',
+      description='An Abstract Cyber Security Simulation and Markov Game for OpenAI Gym',
       license='MIT License',
       keywords='Cyber Security, Intrusion Detection, Markov Games, Reinforcement Learning, Q-learning',
       url='https://github.com/Limmen/gym-idsgame',
