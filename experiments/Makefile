@@ -18,6 +18,9 @@ tabular_q_learning_vs_tabular_q_learning-v0: training/v0/two_agents/tabular_q_le
 dqn_vs_tabular_random_defense-v0: training/v0/random_defense/dqn/run.py training/v0/random_defense/dqn/run.sh
 	cd training/v0/random_defense/dqn/ && $(MAKE) run
 
+dqn_vs_minimal_defense-v0: training/v0/minimal_defense/dqn/run.py training/v0/minimal_defense/dqn/run.sh
+	cd training/v0/minimal_defense/dqn/ && $(MAKE) run
+
 random_vs_random-v0: simulations/v0/random_vs_random/run.py simulations/v0/random_vs_random/run.sh
 	cd simulations/v0/random_vs_random/ && $(MAKE) run
 
@@ -40,6 +43,7 @@ v0: tabular_q_learning_vs_random_defense-v0 random_vs_random-v0 random_vs_defend
 v0: attack_maximal_vs_defend_minimal-v0 attack_maximal_vs_random-v0 random_attack_vs_tabular_q_learning-v0
 v0: maximal_attack_vs_tabular_q_learning-v0 tabular_q_agent_vs_random-v0
 v0: tabular_q_learning_vs_tabular_q_learning-v0 dqn_vs_tabular_random_defense-v0
+v0: dqn_vs_minimal_defense-v0
 
 # V1 Experiments
 
@@ -255,6 +259,7 @@ clean:
 	cd ./training/v0/random_defense/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/v0/random_defense/dqn/ && $(MAKE) clean
 	cd ./training/v0/minimal_defense/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v0/minimal_defense/dqn/ && $(MAKE) clean
 	cd ./training/v0/random_attack/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/v0/maximal_attack/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/v0/two_agents/tabular_q_learning/ && $(MAKE) clean
