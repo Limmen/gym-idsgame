@@ -1,6 +1,6 @@
-# Experiment `minimal_defense-v0`_`dqn`
+# Experiment `minimal_defense-v1`_`dqn`
 
-This is an experiment in the `minimal_defense-v0` environment. 
+This is an experiment in the `minimal_defense-v1` environment. 
 An environment where the defender is following the `defend_minimal` defense policy. 
 The `defend_minimal` policy entails that the defender will always 
 defend the attribute with the minimal value out of all of its neighbors.
@@ -21,16 +21,16 @@ The network configuration of the environment is as follows:
 
 The starting state for each node in the environment is initialized as follows (with some randomness for where the vulnerabilities are placed).
 
-- `defense_val=2`
+- `defense_val=4`
 - `attack_val=0`
-- `num_vulnerabilities_per_node=1` (which type of defense at the node that is vulnerable is selected randomly when the environment is initialized)
-- `det_val=2`
-- `vulnerability_val=0` 
+- `num_vulnerabilities_per_node=4` (which type of defenses at the node that are vulnerable is selected randomly when the environment is initialized)
+- `det_val=3`
+- `vulnerability_val=0`  
 - `num_vulnerabilities_per_layer=1`
 
 ## Environment 
 
-- Env: `minimal_defense-v0`
+- Env: `minimal_defense-v1`
 
 ## Algorithm
 
@@ -48,12 +48,12 @@ Example configuration in `config.json`:
 {
     "attacker_type": 6,
     "defender_type": 1,
-    "env_name": "idsgame-minimal_defense-v0",
+    "env_name": "idsgame-minimal_defense-v1",
     "idsgame_config": null,
     "initial_state_path": null,
     "logger": null,
     "mode": 0,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/minimal_defense/dqn",
+    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v1/minimal_defense/dqn",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
         "alpha": 0.0001,
@@ -79,7 +79,7 @@ Example configuration in `config.json`:
             "replay_start_size": 100,
             "target_network_update_freq": 100,
             "tensorboard": true,
-            "tensorboard_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/minimal_defense/dqn/tensorboard"
+            "tensorboard_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v1/minimal_defense/dqn/tensorboard"
         },
         "epsilon": 1,
         "epsilon_decay": 0.999,
@@ -89,17 +89,17 @@ Example configuration in `config.json`:
         "eval_render": false,
         "eval_sleep": 0.9,
         "gamma": 0.9,
-        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/minimal_defense/dqn/gifs",
+        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v1/minimal_defense/dqn/gifs",
         "gifs": true,
         "logger": null,
         "min_epsilon": 0.01,
         "num_episodes": 5000,
         "py/object": "gym_idsgame.agents.q_learning.q_agent_config.QAgentConfig",
         "render": false,
-        "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/minimal_defense/dqn/data",
+        "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v1/minimal_defense/dqn/data",
         "train_log_frequency": 1,
         "video": true,
-        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/minimal_defense/dqn/videos",
+        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v1/minimal_defense/dqn/videos",
         "video_fps": 5,
         "video_frequency": 101
     },
@@ -124,7 +124,7 @@ q_agent_config = QAgentConfig(gamma=0.9, alpha=0.0001, epsilon=1, render=False, 
                               eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
                               save_dir=default_output_dir() + "/data", dqn_config=dqn_config,
                               checkpoint_freq=1000)
-env_name = "idsgame-minimal_defense-v0"
+env_name = "idsgame-minimal_defense-v1"
 client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.DQN_AGENT.value,
                              mode=RunnerMode.TRAIN_ATTACKER.value,
                              q_agent_config=q_agent_config, output_dir=default_output_dir(),
@@ -201,6 +201,7 @@ After the experiment has finished, the results are written to the following sub-
 <p align="center">
 <img src="docs/lr_train.png" width="800">
 </p>
+
 
 ### Policy Inspection
 
