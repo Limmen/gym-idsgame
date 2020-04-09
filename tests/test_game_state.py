@@ -16,12 +16,15 @@ class TestGameStateSuite():
 
     def test_default_state(self):
         state = GameState()
-        num_nodes = 8
+        rows = 4
+        cols = 4
+        network_config = NetworkConfig(rows, cols)
+        num_nodes = len(network_config.node_list)
         num_attack_types = 10
-        state.default_state(list(range(num_nodes)), (3,1), num_attack_types)
-        assert state.attack_values.shape == (8, 10)
-        assert state.defense_values.shape == (8, 10)
-        assert state.defense_det.shape == (8,)
+        state.default_state(list(range(num_nodes)), (3,1), num_attack_types, network_config)
+        assert state.attack_values.shape == (num_nodes, 10)
+        assert state.defense_values.shape == (num_nodes, 10)
+        assert state.defense_det.shape == (num_nodes,)
         assert state.attacker_pos == (3,1)
         assert state.done == False
         assert state.hacked == False
@@ -31,9 +34,12 @@ class TestGameStateSuite():
 
     def test_copy(self):
         state = GameState()
-        num_nodes = 8
         num_attack_types = 10
-        state.default_state(list(range(num_nodes)), (3, 1), num_attack_types)
+        rows = 4
+        cols = 4
+        network_config = NetworkConfig(rows, cols)
+        num_nodes = len(network_config.node_list)
+        state.default_state(list(range(num_nodes)), (3, 1), num_attack_types, network_config)
         copy = state.copy()
         assert copy.num_hacks == state.num_hacks
         assert np.array_equal(copy.attack_values, state.attack_values)
@@ -41,17 +47,20 @@ class TestGameStateSuite():
         assert np.array_equal(copy.defense_values, state.defense_values)
 
     def test_new_game(self):
+        rows = 4
+        cols = 4
+        network_config = NetworkConfig(rows, cols)
         state = GameState()
-        num_nodes = 8
+        num_nodes = len(network_config.node_list)
         num_attack_types = 10
-        state.default_state(list(range(num_nodes)), (3, 1), num_attack_types)
+        state.default_state(list(range(num_nodes)), (3, 1), num_attack_types, network_config)
         init_state = state.copy()
         old_game_count = state.num_games
         state.new_game(init_state)
         assert state.num_games == old_game_count+1
         assert state.done == False
         assert state.detected == False
-        state.default_state(list(range(num_nodes)), (3, 1), num_attack_types)
+        state.default_state(list(range(num_nodes)), (3, 1), num_attack_types, network_config)
         init_state = state.copy()
         state.hacked = True
         old_hacked_count = 0
@@ -60,10 +69,12 @@ class TestGameStateSuite():
 
     def test_attack(self):
         state = GameState()
-        network_config = NetworkConfig(3,3)
-        num_nodes = 8
+        rows = 4
+        cols = 4
+        network_config = NetworkConfig(rows, cols)
+        num_nodes = len(network_config.node_list)
         num_attack_types = 10
-        state.default_state(list(range(num_nodes)), (3, 1), num_attack_types)
+        state.default_state(list(range(num_nodes)), (3, 1), num_attack_types, network_config)
         attack_node_id = 3
         attack_type =4
         max_value = 10
@@ -77,10 +88,12 @@ class TestGameStateSuite():
 
     def test_defend(self):
         state = GameState()
-        network_config = NetworkConfig(3,3)
-        num_nodes = 8
+        rows = 4
+        cols = 4
+        network_config = NetworkConfig(rows, cols)
+        num_nodes = len(network_config.node_list)
         num_attack_types = 10
-        state.default_state(list(range(num_nodes)), (3, 1), num_attack_types)
+        state.default_state(list(range(num_nodes)), (3, 1), num_attack_types, network_config)
         defend_node_id = 3
         defense_type = 4
         max_value = 10
@@ -93,11 +106,13 @@ class TestGameStateSuite():
         assert state.defense_values[defend_node_id][defense_type] == max_value
 
     def test_simulate_attack(self):
+        rows = 4
+        cols = 4
+        network_config = NetworkConfig(rows, cols)
+        num_nodes = len(network_config.node_list)
         state = GameState()
-        network_config = NetworkConfig(3, 3)
-        num_nodes = 8
         num_attack_types = 10
-        state.default_state(list(range(num_nodes)), (3, 1), num_attack_types)
+        state.default_state(list(range(num_nodes)), (3, 1), num_attack_types, network_config)
         attack_node_id = 3
         attack_type = 4
         state.defense_values[attack_node_id][attack_type] = 5
