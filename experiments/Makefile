@@ -233,8 +233,11 @@ maximal_attack_vs_tabular_q_learning-v5: training/v5/maximal_attack/tabular_q_le
 tabular_q_learning_vs_tabular_q_learning-v5: training/v5/two_agents/tabular_q_learning/run.py training/v5/two_agents/tabular_q_learning/run.sh
 	cd training/v5/two_agents/tabular_q_learning/ && $(MAKE) run
 
-dqn_vs_tabular_random_defense-v5: training/v5/random_defense/dqn/run.py training/v5/random_defense/dqn/run.sh
+dqn_vs_random_defense-v5: training/v5/random_defense/dqn/run.py training/v5/random_defense/dqn/run.sh
 	cd training/v5/random_defense/dqn/ && $(MAKE) run
+
+dqn_vs_minimal_defense-v5: training/v5/minimal_defense/dqn/run.py training/v5/minimal_defense/dqn/run.sh
+	cd training/v5/minimal_defense/dqn/ && $(MAKE) run
 
 random_vs_random-v5: simulations/v5/random_vs_random/run.py simulations/v5/random_vs_random/run.sh
 	cd simulations/v5/random_vs_random/ && $(MAKE) run
@@ -252,7 +255,7 @@ v5: tabular_q_learning_vs_random_defense-v5 tabular_q_learning_vs_minimal_defens
 v5: random_attack_vs_tabular_fq_learning-v5 maximal_attack_vs_tabular_q_learning-v5
 v5: random_vs_random-v5 random_vs_defend_minimal-v5 attack_maximal_vs_defend_minimal-v5
 v5: attack_maximal_vs_random-v5 tabular_q_learning_vs_tabular_q_learning-v5
-v5: dqn_vs_tabular_random_defense-v5
+v5: dqn_vs_random_defense-v5 dqn_vs_minimal_defense-v5
 
 # Tests
 
@@ -340,6 +343,7 @@ clean:
 	cd ./training/v5/random_defense/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/v5/random_defense/dqn/ && $(MAKE) clean
 	cd ./training/v5/minimal_defense/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v5/minimal_defense/dqn/ && $(MAKE) clean
 	cd ./training/v5/random_attack/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/v5/maximal_attack/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/v5/two_agents/tabular_q_learning/ && $(MAKE) clean
