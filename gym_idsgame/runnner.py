@@ -96,6 +96,8 @@ class Runner:
         defender: TrainAgent = None
         if config.defender_type == AgentType.TABULAR_Q_AGENT.value:
             defender = TabularQAgent(env, config.q_agent_config)
+        elif config.defender_type == AgentType.DQN_AGENT.value:
+            defender = DQNAgent(env, config.q_agent_config)
         else:
             raise AssertionError("Defender train agent type not recognized: {}".format(config.defender_type))
         defender.train()

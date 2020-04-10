@@ -42,9 +42,7 @@ class DQNAgent(QAgent):
         self.tensorboard_writer = SummaryWriter(self.config.dqn_config.tensorboard_dir)
         self.buffer = ReplayBuffer(config.dqn_config.replay_memory_size)
         self.initialize_models()
-
-        for i in range(5):
-            self.tensorboard_writer.add_hparams(self.config.hparams_dict(), {})
+        self.tensorboard_writer.add_hparams(self.config.hparams_dict(), {})
 
     def warmup(self) -> None:
         """
@@ -100,15 +98,27 @@ class DQNAgent(QAgent):
             mini_batch = self.buffer.sample(self.config.dqn_config.batch_size)
             s_attacker_batch, s_defender_batch, a_attacker_batch, a_defender_batch, r_attacker_batch, r_defender_batch, \
             d_batch, s2_attacker_batch, s2_defender_batch = mini_batch
-            s_1 = torch.tensor(s_attacker_batch).float()
 
-            # Move to GPU if using GPU
-            if torch.cuda.is_available() and self.config.dqn_config.gpu:
-                device = torch.device("cuda:0")
-                s_1 = s_1.to(device)
-            self.tensorboard_writer.add_graph(self.attacker_q_network, s_1)
+            if self.config.attacker:
+                s_1 = torch.tensor(s_attacker_batch).float()
+                # Move to GPU if using GPU
+                if torch.cuda.is_available() and self.config.dqn_config.gpu:
+                    device = torch.device("cuda:0")
+                    s_1 = s_1.to(device)
+
+                self.tensorboard_writer.add_graph(self.attacker_q_network, s_1)
+
+            if self.config.defender:
+
+                s_1 = torch.tensor(s_defender_batch).float()
+                # Move to GPU if using GPU
+                if torch.cuda.is_available() and self.config.dqn_config.gpu:
+                    device = torch.device("cuda:0")
+                    s_1 = s_1.to(device)
+
+                self.tensorboard_writer.add_graph(self.defender_q_network, s_1)
         except:
-            self.config.logger.warning("Error when trying to add network grpah to tensorboard")
+            self.config.logger.warning("Error when trying to add network graph to tensorboard")
 
     def initialize_models(self) -> None:
         """
@@ -182,12 +192,14 @@ class DQNAgent(QAgent):
                                                                             gamma=self.config.dqn_config.lr_decay_rate)
 
 
-    def training_step(self, mini_batch: Union[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray,
-                                              np.ndarray, np.ndarray, np.ndarray]) -> torch.Tensor:
+    def training_step(self,
+                      mini_batch: Union[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray,
+                                        np.ndarray, np.ndarray, np.ndarray], attacker: bool = True) -> torch.Tensor:
         """
         Performs a training step of the Deep-Q-learning algorithm (implemented in PyTorch)
 
         :param mini_batch: a minibatch to use for the training step
+        :param attacker: whether doing a training step for the attacker (otherwise defender)
         :return: loss
         """
 
@@ -196,12 +208,18 @@ class DQNAgent(QAgent):
         d_batch, s2_attacker_batch, s2_defender_batch = mini_batch
 
         # Convert batch into torch tensors and set Q-network in train mode and target network in eval mode
-        self.attacker_q_network.train()
-        self.attacker_target_network.eval()
-
-        r_1 = torch.tensor(r_attacker_batch).float()
-        s_1 = torch.tensor(s_attacker_batch).float()
-        s_2 = torch.tensor(s2_attacker_batch).float()
+        if attacker:
+            self.attacker_q_network.train()
+            self.attacker_target_network.eval()
+            r_1 = torch.tensor(r_attacker_batch).float()
+            s_1 = torch.tensor(s_attacker_batch).float()
+            s_2 = torch.tensor(s2_attacker_batch).float()
+        else:
+            self.defender_q_network.train()
+            self.defender_q_network.eval()
+            r_1 = torch.tensor(r_defender_batch).float()
+            s_1 = torch.tensor(s_defender_batch).float()
+            s_2 = torch.tensor(s2_defender_batch).float()
 
         # Move to GPU if using GPU
         if torch.cuda.is_available() and self.config.dqn_config.gpu:
@@ -213,31 +231,52 @@ class DQNAgent(QAgent):
         # Set target baseline. We only want the loss to be computed for the Q-values of the actions taken, not the entire
         # vector of all Q-values. Therefore we initialize the target to the Q-values of the Q-network for s
         # and then we only update the Q-values for the affected actions with the real targets
-        target = self.attacker_q_network(s_1)
+        if attacker:
+            target = self.attacker_q_network(s_1)
+        else:
+            target = self.defender_q_network(s_1)
 
         # Use the target network to compute the Q-values of s'
         with torch.no_grad():
-            target_next = self.attacker_target_network(s_2).detach()
+            if attacker:
+                target_next = self.attacker_target_network(s_2).detach()
+            else:
+                target_next = self.defender_target_network(s_2).detach()
 
         for i in range(self.config.dqn_config.batch_size):
             # As defined by Mnih et. al. : For terminal states the Q-target should be equal to the immediate reward
             if d_batch[i]:
-                target[i][a_attacker_batch[i]] = r_1[i]
+                if attacker:
+                    target[i][a_attacker_batch[i]] = r_1[i]
+                else:
+                    target[i][a_defender_batch[i]] = r_1[i]
 
             # For non terminal states the Q-target should be the immediate reward plus the discounted estimated future
             # reward when following Q* estimated by the target network.
             else:
                 a = torch.argmax(target_next[i]).detach()
-                target[i][a_attacker_batch[i]] = r_1[i] + self.config.gamma * (target_next[i][a])
+                if attacker:
+                    target[i][a_attacker_batch[i]] = r_1[i] + self.config.gamma * (target_next[i][a])
+                else:
+                    target[i][a_defender_batch[i]] = r_1[i] + self.config.gamma * (target_next[i][a])
 
         # Compute loss
-        prediction = self.attacker_q_network(s_1)
+        if attacker:
+            prediction = self.attacker_q_network(s_1)
+        else:
+            prediction = self.defender_q_network(s_1)
+
         loss = self.loss_fn(prediction, target)
 
         # Zero gradients, perform a backward pass, and update the weights.
-        self.attacker_optimizer.zero_grad()
-        loss.backward()
-        self.attacker_optimizer.step()
+        if attacker:
+            self.attacker_optimizer.zero_grad()
+            loss.backward()
+            self.attacker_optimizer.step()
+        else:
+            self.defender_optimizer.zero_grad()
+            loss.backward()
+            self.defender_optimizer.step()
 
         return loss
 
@@ -263,10 +302,16 @@ class DQNAgent(QAgent):
         else:
             actions = list(range(self.env.num_defense_actions))
             legal_actions = list(filter(lambda action: self.env.is_defense_legal(action), actions))
+
         if np.random.rand() < self.config.epsilon and not eval:
             return np.random.choice(legal_actions)
+
         with torch.no_grad():
-            act_values = self.attacker_q_network(state)
+            if attacker:
+                act_values = self.attacker_q_network(state)
+            else:
+                act_values = self.defender_q_network(state)
+
         return legal_actions[torch.argmax(act_values[legal_actions]).item()]
 
     def train(self) -> ExperimentResult:
@@ -289,7 +334,8 @@ class DQNAgent(QAgent):
         episode_attacker_rewards = []
         episode_defender_rewards = []
         episode_steps = []
-        episode_avg_loss = []
+        episode_avg_attacker_loss = []
+        episode_avg_defender_loss = []
 
         # Logging
         self.outer_train.set_description_str("[Train] epsilon:{:.2f},avg_a_R:{:.2f},avg_d_R:{:.2f},"
@@ -301,8 +347,8 @@ class DQNAgent(QAgent):
             episode_attacker_reward = 0
             episode_defender_reward = 0
             episode_step = 0
-            episode_loss = 0.0
-            actions = []
+            episode_attacker_loss = 0.0
+            episode_defender_loss = 0.0
             while not done:
                 if self.config.render:
                     self.env.render(mode="human")
@@ -311,16 +357,15 @@ class DQNAgent(QAgent):
                     raise AssertionError("Must specify whether training an attacker agent or defender agent")
 
                 # Default initialization
-                defender_state_node_id = 0
                 attacker_action = 0
                 defender_action = 0
 
                 # Get attacker and defender actions
                 if self.config.attacker:
                     attacker_action = self.get_action(attacker_obs, attacker=True)
-                    actions.append(attacker_action)
                 if self.config.defender:
-                    defender_action = self.get_action(defender_state_node_id, attacker=False)
+                    defender_action = self.get_action(defender_obs, attacker=False)
+
                 action = (attacker_action, defender_action)
 
                 # Take a step in the environment
@@ -333,8 +378,14 @@ class DQNAgent(QAgent):
                 minibatch = self.buffer.sample(self.config.dqn_config.batch_size)
 
                 # Perform a gradient descent step of the Q-network using targets produced by target network
-                loss = self.training_step(minibatch)
-                episode_loss += loss.item()
+                if self.config.attacker:
+                    loss = self.training_step(minibatch, attacker=True)
+                    episode_attacker_loss += loss.item()
+
+                if self.config.defender:
+                    loss = self.training_step(minibatch, attacker=False)
+                    episode_defender_loss += loss.item()
+
 
                 # Update metrics
                 attacker_reward, defender_reward = reward
@@ -359,21 +410,38 @@ class DQNAgent(QAgent):
             episode_attacker_rewards.append(episode_attacker_reward)
             episode_defender_rewards.append(episode_defender_reward)
             if episode_step > 0:
-                episode_avg_loss.append(episode_loss/episode_step)
+                if self.config.attacker:
+                    episode_avg_attacker_loss.append(episode_attacker_loss/episode_step)
+                if self.config.defender:
+                    episode_avg_defender_loss.append(episode_defender_loss / episode_step)
             else:
-                episode_avg_loss.append(episode_loss)
+                if self.config.attacker:
+                    episode_avg_attacker_loss.append(episode_attacker_loss)
+                if self.config.defender:
+                    episode_avg_defender_loss.append(episode_defender_loss)
+
             episode_steps.append(episode_step)
 
             # Log average metrics every <self.config.train_log_frequency> episodes
             if episode % self.config.train_log_frequency == 0:
                 self.log_metrics(episode, self.train_result, episode_attacker_rewards, episode_defender_rewards, episode_steps,
-                                 episode_avg_loss, lr=lr)
+                                 episode_avg_attacker_loss, episode_avg_defender_loss, lr=lr)
 
                 # Log values and gradients of the parameters (histogram summary) to tensorboard
-                for tag, value in self.attacker_q_network.named_parameters():
-                    tag = tag.replace('.', '/')
-                    self.tensorboard_writer.add_histogram(tag, value.data.cpu().numpy(), episode)
-                    self.tensorboard_writer.add_histogram(tag + '/grad', value.grad.data.cpu().numpy(), episode)
+
+                if self.config.attacker:
+                    for tag, value in self.attacker_q_network.named_parameters():
+                        tag = tag.replace('.', '/')
+                        self.tensorboard_writer.add_histogram(tag, value.data.cpu().numpy(), episode)
+                        self.tensorboard_writer.add_histogram(tag + '_attacker/grad', value.grad.data.cpu().numpy(),
+                                                              episode)
+
+                if self.config.defender:
+                    for tag, value in self.defender_q_network.named_parameters():
+                        tag = tag.replace('.', '/')
+                        self.tensorboard_writer.add_histogram(tag, value.data.cpu().numpy(), episode)
+                        self.tensorboard_writer.add_histogram(tag + '_defender/grad', value.grad.data.cpu().numpy(),
+                                                              episode)
 
                 episode_attacker_rewards = []
                 episode_defender_rewards = []
@@ -417,8 +485,14 @@ class DQNAgent(QAgent):
         :return: None
         """
         self.config.logger.info("Updating target network")
-        self.attacker_target_network.load_state_dict(self.attacker_q_network.state_dict())
-        self.attacker_target_network.eval()
+
+        if self.config.attacker:
+            self.attacker_target_network.load_state_dict(self.attacker_q_network.state_dict())
+            self.attacker_target_network.eval()
+
+        if self.config.defender:
+            self.defender_target_network.load_state_dict(self.defender_q_network.state_dict())
+            self.defender_target_network.eval()
 
     def eval(self, train_episode, log=True) -> ExperimentResult:
         """
@@ -470,8 +544,6 @@ class DQNAgent(QAgent):
                     time.sleep(self.config.eval_sleep)
 
                 # Default initialization
-                attacker_state_node_id = 0
-                defender_state_node_id = 0
                 attacker_action = 0
                 defender_action = 0
 
@@ -479,7 +551,7 @@ class DQNAgent(QAgent):
                 if self.config.attacker:
                     attacker_action = self.get_action(attacker_obs, eval=True, attacker=True)
                 if self.config.defender:
-                    defender_action = self.get_action(defender_state_node_id, eval=True, attacker=False)
+                    defender_action = self.get_action(defender_obs, eval=True, attacker=False)
                 action = (attacker_action, defender_action)
 
                 # Take a step in the environment
@@ -566,6 +638,6 @@ class DQNAgent(QAgent):
             if self.config.defender:
                 path = self.config.save_dir + "/" + time_str + "_defender_q_network.pt"
                 self.config.logger.info("Saving Q-network to: {}".format(path))
-                torch.save(self.attacker_q_network.state_dict(), path)
+                torch.save(self.defender_q_network.state_dict(), path)
         else:
             self.config.logger.warning("Save path not defined, not saving Q-networks to disk")

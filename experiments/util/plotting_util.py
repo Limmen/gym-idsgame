@@ -161,17 +161,23 @@ def plot_results(avg_attacker_episode_rewards: np.ndarray = None, avg_defender_e
                          xlabel="Episode", ylabel="Cumulative Reward",
                          file_name=output_dir + "/plots/defender_cumulative_reward_" + suffix)
     if avg_episode_loss_attacker is not None and len(avg_episode_loss_attacker) > 0:
-        simple_line_plot(np.array(list(range(len(avg_episode_loss_attacker)))) * step,
-                         avg_episode_loss_attacker,
-                         title="Avg Episode Loss (Attacker)",
-                         xlabel="Episode", ylabel="Loss",
-                         file_name=output_dir + "/plots/avg_episode_loss_attacker_" + suffix)
+        try:
+            simple_line_plot(np.array(list(range(len(avg_episode_loss_attacker)))) * step,
+                             avg_episode_loss_attacker,
+                             title="Avg Episode Loss (Attacker)",
+                             xlabel="Episode", ylabel="Loss",
+                             file_name=output_dir + "/plots/avg_episode_loss_attacker_" + suffix)
+        except:
+            pass
     if avg_episode_loss_defender is not None and len(avg_episode_loss_defender) > 0:
-        simple_line_plot(np.array(list(range(len(avg_episode_loss_defender)))) * step,
-                         avg_episode_loss_defender,
-                         title="Avg Episode Loss (Defender)",
-                         xlabel="Episode", ylabel="Loss",
-                         file_name=output_dir + "/plots/avg_episode_loss_defender_" + suffix)
+        try:
+            simple_line_plot(np.array(list(range(len(avg_episode_loss_defender)))) * step,
+                             avg_episode_loss_defender,
+                             title="Avg Episode Loss (Defender)",
+                             xlabel="Episode", ylabel="Loss",
+                             file_name=output_dir + "/plots/avg_episode_loss_defender_" + suffix)
+        except:
+            pass
     if learning_rate_values is not None:
         simple_line_plot(np.array(list(range(len(learning_rate_values)))) * step, learning_rate_values,
                          title="Learning rate (Eta)",

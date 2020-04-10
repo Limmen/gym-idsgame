@@ -35,7 +35,9 @@ class QAgent(TrainAgent, ABC):
 
     def log_metrics(self, episode: int, result: ExperimentResult, attacker_episode_rewards: list,
                     defender_episode_rewards: list,
-                    episode_steps: list, episode_avg_loss: list = None, eval: bool = False,
+                    episode_steps: list, episode_avg_attacker_loss: list = None,
+                    episode_avg_defender_loss: list = None,
+                    eval: bool = False,
                     update_stats : bool = True, lr: float = None) -> None:
         """
         Logs average metrics for the last <self.config.log_frequency> episodes
@@ -45,7 +47,8 @@ class QAgent(TrainAgent, ABC):
         :param attacker_episode_rewards: list of attacker episode rewards for the last <self.config.log_frequency> episodes
         :param defender_episode_rewards: list of defender episode rewards for the last <self.config.log_frequency> episodes
         :param episode_steps: list of episode steps for the last <self.config.log_frequency> episodes
-        :param episode_avg_loss: list of episode loss for the last <self.config.log_frequency> episodes
+        :param episode_avg_attacker_loss: list of episode attacker loss for the last <self.config.log_frequency> episodes
+        :param episode_avg_defender_loss: list of episode defedner loss for the last <self.config.log_frequency> episodes
         :param eval: boolean flag whether the metrics are logged in an evaluation context.
         :param update_stats: boolean flag whether to update stats
         :param lr: the learning rate
@@ -55,10 +58,15 @@ class QAgent(TrainAgent, ABC):
         avg_defender_episode_rewards = np.mean(defender_episode_rewards)
         if lr is None:
             lr = 0.0
-        if not eval and episode_avg_loss is not None:
-            avg_episode_loss = np.mean(episode_avg_loss)
+        if not eval and episode_avg_attacker_loss is not None:
+            avg_episode_attacker_loss = np.mean(episode_avg_attacker_loss)
         else:
-            avg_episode_loss = 0.0
+            avg_episode_attacker_loss = 0.0
+        if not eval and episode_avg_defender_loss is not None:
+            avg_episode_defender_loss = np.mean(episode_avg_defender_loss)
+        else:
+            avg_episode_defender_loss = 0.0
+
         if hasattr(self, "buffer") and self.buffer is not None:
             replay_memory_size = self.buffer.size()
         else:
@@ -82,20 +90,21 @@ class QAgent(TrainAgent, ABC):
             self.outer_eval.set_description_str(log_str)
         else:
             log_str = "[Train] epsilon:{:.2f},avg_a_R:{:.2f},avg_d_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
-                      "acc_D_R:{:.2f},loss:{:.6f},replay_s:{},lr:{:.2E}".format(self.config.epsilon, avg_attacker_episode_rewards,
+                      "acc_D_R:{:.2f},A_loss:{:.6f},D_loss:{:.6f},replay_s:{},lr:{:.2E}".format(self.config.epsilon, avg_attacker_episode_rewards,
                                                                       avg_defender_episode_rewards,
                                                                       avg_episode_steps,
                                                                       hack_probability,
                                                                       attacker_cumulative_reward,
                                                                       defender_cumulative_reward,
-                                                                      avg_episode_loss,
+                                                                      avg_episode_attacker_loss,
+                                                                      avg_episode_defender_loss,
                                                                       replay_memory_size,
                                                                       lr)
             self.outer_train.set_description_str(log_str)
         self.config.logger.info(log_str)
         if update_stats and self.config.dqn_config is not None and self.config.dqn_config.tensorboard:
             self.log_tensorboard(episode, avg_attacker_episode_rewards, avg_defender_episode_rewards, avg_episode_steps,
-                                 avg_episode_loss, hack_probability, attacker_cumulative_reward,
+                                 avg_episode_attacker_loss, hack_probability, attacker_cumulative_reward,
                                  defender_cumulative_reward, self.config.epsilon, lr, eval=eval)
         if update_stats:
             result.avg_episode_steps.append(avg_episode_steps)
@@ -105,7 +114,8 @@ class QAgent(TrainAgent, ABC):
             result.hack_probability.append(hack_probability)
             result.attacker_cumulative_reward.append(attacker_cumulative_reward)
             result.defender_cumulative_reward.append(defender_cumulative_reward)
-            result.avg_episode_loss_attacker.append(avg_episode_loss)
+            result.avg_episode_loss_attacker.append(avg_episode_attacker_loss)
+            result.avg_episode_loss_defender.append(avg_episode_defender_loss)
             result.lr_list.append(lr)
 
     def log_tensorboard(self, episode: int, avg_attacker_episode_rewards: float, avg_defender_episode_rewards: float,

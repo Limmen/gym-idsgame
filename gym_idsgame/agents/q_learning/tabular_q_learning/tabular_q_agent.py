@@ -129,7 +129,7 @@ class TabularQAgent(QAgent):
             # Log average metrics every <self.config.train_log_frequency> episodes
             if episode % self.config.train_log_frequency == 0:
                 self.log_metrics(episode, self.train_result, episode_attacker_rewards, episode_defender_rewards,
-                                 episode_steps, None, lr=self.config.alpha)
+                                 episode_steps, None, None, lr=self.config.alpha)
                 episode_attacker_rewards = []
                 episode_defender_rewards = []
                 episode_steps = []
