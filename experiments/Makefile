@@ -284,7 +284,7 @@ clean:
 	cd ./training/v0/random_attack/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/v0/random_attack/dqn/ && $(MAKE) clean
 	cd ./training/v0/maximal_attack/tabular_q_learning/ && $(MAKE) clean
-	#cd ./training/v0/maximal_attack/dqn/ && $(MAKE) clean
+	cd ./training/v0/maximal_attack/dqn/ && $(MAKE) clean
 	cd ./training/v0/two_agents/tabular_q_learning/ && $(MAKE) clean
 	cd simulations/v0/random_vs_random/ && $(MAKE) clean
 	cd simulations/v0/random_vs_defend_minimal/ && $(MAKE) clean
