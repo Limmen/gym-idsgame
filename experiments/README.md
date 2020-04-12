@@ -25,6 +25,8 @@ defense values: [2,2,0,2,2,2,2,2,2,2]
 det: 2
 ```
 
+The environment has sparse rewards (+1,-1 rewards are given at the terminal state of each episode)
+
 ### Training Experiments
 
 Experiments where one or two of the agents are using some learning algorithm to update their policy.
@@ -148,6 +150,7 @@ attack values: [0,0,0,0,0,0,0,0,0,0]
 defense values: [4,0,0,4,4,0,4,4,0,4]
 det: 3
 ```
+The environment has sparse rewards (+1,-1 rewards are given at the terminal state of each episode)
 
 ### Training Experiments
 
@@ -265,6 +268,7 @@ attack values: [0,0,0,0,0,0,0,0,0,0]
 defense values: [2,2,0,2,2,2,2,2,2,2]
 det: 2
 ```
+The environment has sparse rewards (+1,-1 rewards are given at the terminal state of each episode)
 
 ### Training Experiments
 
@@ -390,6 +394,8 @@ attack values: [0,0,0,0,0,0,0,0,0,0]
 defense values: [2,2,0,2,2,2,2,2,2,2]
 det: 2
 ```
+
+The environment has sparse rewards (+1,-1 rewards are given at the terminal state of each episode)
 
 ### Training Experiments
 
@@ -534,6 +540,8 @@ defense values: [2,2,0,2,2,2,2,2,2,2]
 det: 2
 ```
 
+The environment has sparse rewards (+1,-1 rewards are given at the terminal state of each episode)
+
 ### Training Experiments
 
 Experiments where one or two of the agents are using some learning algorithm to update their policy.
@@ -676,6 +684,8 @@ defense values: [2,2,0,2,2,2,2,2,2,2]
 det: 2
 ```
 Moreover, only two nodes per layer has a vulnerability (defense value set to 0, all other nodes in the layer have defense value initialized to 2 on all attributes)
+
+The environment has sparse rewards (+1,-1 rewards are given at the terminal state of each episode)
 
 ### Training Experiments
 

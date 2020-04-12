@@ -12,7 +12,8 @@ class GameConfig():
     """
     def __init__(self, network_config: NetworkConfig = None, manual_attacker: bool = True, num_layers: int = 1,
                  num_servers_per_layer: int = 2, num_attack_types: int = 10, max_value: int = 9,
-                 initial_state: GameState = None, manual_defender: bool = False, initial_state_path :str = None):
+                 initial_state: GameState = None, manual_defender: bool = False, initial_state_path :str = None,
+                 dense_rewards = False):
         """
         Class constructor, initializes the DTO
 
@@ -25,6 +26,7 @@ class GameConfig():
         :param max_value: max value for a defense/attack attribute
         :param initial_state: the initial state
         :param initial_state_path: path to the initial state saved on disk
+        :param dense_rewards: if true, give hacker dense rewards (reward for each intermediate server hacked)
         """
         self.manual_attacker = manual_attacker
         self.manual_defender = manual_defender
@@ -49,6 +51,7 @@ class GameConfig():
             self.initial_state = GameState()
             self.initial_state.default_state(self.network_config.node_list, self.network_config.start_pos,
                                              self.num_attack_types, network_config=self.network_config)
+        self.dense_rewards = dense_rewards
 
     def set_load_initial_state(self, initial_state_path: str) -> None:
         """

@@ -25,6 +25,8 @@ The starting state for each node in the environment is initialized as follows (w
 - `vulnerability_val=0` 
 - `num_vulnerabilities_per_layer=2`
 
+The environment has sparse rewards (+1,-1 rewards are given at the terminal state of each episode)
+
 ## Environment 
 
 - Env: `random_attack-v2`

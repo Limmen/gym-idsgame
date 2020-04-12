@@ -68,6 +68,7 @@ class IdsGameEnv(gym.Env, ABC):
         self.past_positions = []
         self.past_positions.append(self.state.attacker_pos)
         self.save_initial_state()
+        self.furthest_hack = self.idsgame_config.game_config.network_config.num_rows-1
 
     # -------- API ------------
     def step(self, action: int) -> Union[np.ndarray, int, bool, dict]:
@@ -85,7 +86,7 @@ class IdsGameEnv(gym.Env, ABC):
             info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)
         """
         # Initialization
-        reward = 0,0
+        reward = (0,0)
         info = {}
         self.state.attack_events = []
         self.state.defense_events = []
@@ -126,6 +127,8 @@ class IdsGameEnv(gym.Env, ABC):
                     self.state.done = True
                     self.state.hacked = True
                     reward = self.get_hack_reward()
+                else:
+                    reward = self.get_successful_attack_reward()
             else:
                 self.past_positions.append(self.state.attacker_pos)
                 detected = self.state.simulate_detection(target_node_id)
@@ -159,6 +162,7 @@ class IdsGameEnv(gym.Env, ABC):
         """
         self.past_moves = []
         self.past_positions = []
+        self.furthest_hack = self.idsgame_config.game_config.network_config.num_rows-1
         self.steps_beyond_done = None
         self.state.new_game(self.idsgame_config.game_config.initial_state, update_stats=update_stats)
         if self.viewer is not None:
@@ -264,6 +268,16 @@ class IdsGameEnv(gym.Env, ABC):
 
     def get_detect_reward(self) -> Union[int, int]:
         return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
+
+    def get_successful_attack_reward(self) -> Union[int, int]:
+        if not self.idsgame_config.game_config.dense_rewards:
+            return 0, 0
+        else:
+            attack_row, attack_col = self.state.attacker_pos
+            if attack_row < self.furthest_hack:
+                self.furthest_hack = attack_row
+                return constants.GAME_CONFIG.POSITIVE_REWARD, 0
+            return 0,0
 
     def get_observation(self) -> Union[np.ndarray, np.ndarray]:
         attacker_obs = self.state.get_attacker_observation(self.idsgame_config.game_config.network_config)
@@ -393,6 +407,7 @@ class IdsGameRandomDefenseV0Env(AttackerEnv):
     """
     [AttackerEnv] 1 layer, 1 server per layer, 10 attack-defense-values, random defender
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 0
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -419,6 +434,7 @@ class IdsGameMinimalDefenseV0Env(AttackerEnv):
     """
     [AttackerEnv] 1 layer, 1 server per layer, 10 attack-defense-values, defender following the "defend minimal strategy"
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 0
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -445,6 +461,7 @@ class IdsGameRandomAttackV0Env(DefenderEnv):
     """
     [DefenderEnv] 1 layer, 1 server per layer, 10 attack-defense-values, random attacker
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 0
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -471,6 +488,7 @@ class IdsGameMaximalAttackV0Env(DefenderEnv):
     """
     [DefenderEnv] 1 layer, 1 server per layer, 10 attack-defense-values, attacker following the "attack maximal strategy"
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 0
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -497,6 +515,7 @@ class IdsGameV0Env(AttackDefenseEnv):
     """
     [AttackDefenseEnv] 1 layer, 1 server per layer, 10 attack-defense-values
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 0
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -525,6 +544,7 @@ class IdsGameRandomDefenseV1Env(AttackerEnv):
     """
     [AttackerEnv] 1 layer, 1 server per layer, 10 attack-defense-values, random defender
     [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 1
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -551,6 +571,7 @@ class IdsGameMinimalDefenseV1Env(AttackerEnv):
     """
     [AttackerEnv] 1 layer, 1 server per layer, 10 attack-defense-values, defender following the "defend minimal strategy"
     [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 1
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -577,6 +598,7 @@ class IdsGameRandomAttackV1Env(DefenderEnv):
     """
     [DefenderEnv] 1 layer, 1 server per layer, 10 attack-defense-values, random attacker
     [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 1
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -603,6 +625,7 @@ class IdsGameMaximalAttackV1Env(DefenderEnv):
     """
     [DefenderEnv] 1 layer, 1 server per layer, 10 attack-defense-values, attacker following the "attack maximal strategy"
     [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 1
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -629,6 +652,7 @@ class IdsGameV1Env(AttackDefenseEnv):
     """
     [AttackDefenseEnv] 1 layer, 1 server per layer, 10 attack-defense-values
     [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 1
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -656,6 +680,7 @@ class IdsGameRandomDefenseV2Env(AttackerEnv):
     """
     [AttackerEnv] 1 layer, 2 servers per layer, 10 attack-defense-values, random defender
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 2
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -682,6 +707,7 @@ class IdsGameMinimalDefenseV2Env(AttackerEnv):
     """
     [AttackerEnv] 1 layer, 2 servers per layer, 10 attack-defense-values, defender following the "defend minimal strategy"
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 2
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -708,6 +734,7 @@ class IdsGameRandomAttackV2Env(DefenderEnv):
     """
     [DefenderEnv] 1 layer, 2 servers per layer, 10 attack-defense-values, random attacker
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 2
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -734,6 +761,7 @@ class IdsGameMaximalAttackV2Env(DefenderEnv):
     """
     [DefenderEnv] 1 layer, 2 servers per layer, 10 attack-defense-values, attacker following the "attack maximal strategy"
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 2
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -760,6 +788,7 @@ class IdsGameV2Env(AttackDefenseEnv):
     """
     [AttackDefenseEnv] 1 layer, 2 servers per layer, 10 attack-defense-values
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 2
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -787,6 +816,7 @@ class IdsGameRandomDefenseV3Env(AttackerEnv):
     """
     [AttackerEnv] 2 layers, 3 servers per layer, 10 attack-defense-values, random defender
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 3
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -813,6 +843,7 @@ class IdsGameMinimalDefenseV3Env(AttackerEnv):
     """
     [AttackerEnv] 2 layers, 3 servers per layer, 10 attack-defense-values, defender following the "defend minimal strategy"
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 3
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -839,6 +870,7 @@ class IdsGameRandomAttackV3Env(DefenderEnv):
     """
     [DefenderEnv] 2 layers, 3 servers per layer, 10 attack-defense-values, random attacker
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 3
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -865,6 +897,7 @@ class IdsGameMaximalAttackV3Env(DefenderEnv):
     """
     [DefenderEnv] 2 layers, 3 servers per layer, 10 attack-defense-values, attacker following the "attack maximal strategy"
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 3
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -891,6 +924,7 @@ class IdsGameV3Env(AttackDefenseEnv):
     """
     [AttackDefenseEnv] 2 layer, 3 servers per layer, 10 attack-defense-values
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 3
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -918,6 +952,7 @@ class IdsGameRandomDefenseV4Env(AttackerEnv):
     """
     [AttackerEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, random defender
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 4
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -944,6 +979,7 @@ class IdsGameMinimalDefenseV4Env(AttackerEnv):
     """
     [AttackerEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, defender following the "defend minimal strategy"
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 4
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -970,6 +1006,7 @@ class IdsGameRandomAttackV4Env(DefenderEnv):
     """
     [DefenderEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, random attacker
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 4
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -996,6 +1033,7 @@ class IdsGameMaximalAttackV4Env(DefenderEnv):
     """
     [DefenderEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, attacker following the "attack maximal strategy"
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 4
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -1022,6 +1060,7 @@ class IdsGameV4Env(AttackDefenseEnv):
     """
     [AttackDefenseEnv] 4 layer, 5 servers per layer, 10 attack-defense-values
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 4
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -1048,6 +1087,7 @@ class IdsGameRandomDefenseV5Env(AttackerEnv):
     """
     [AttackerEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, random defender, connected layers
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 5
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -1077,6 +1117,7 @@ class IdsGameMinimalDefenseV5Env(AttackerEnv):
     [AttackerEnv] 4 layers, 5 servers per layer, 10 attack-defense-values,
     defender following the "defend minimal strategy", connected layers
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 5
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -1105,6 +1146,7 @@ class IdsGameRandomAttackV5Env(DefenderEnv):
     """
     [DefenderEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, random attacker, connected layers
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 5
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -1134,6 +1176,7 @@ class IdsGameMaximalAttackV5Env(DefenderEnv):
     [DefenderEnv] 4 layers, 5 servers per layer, 10 attack-defense-values,
     attacker following the "attack maximal strategy", connected layers
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 5
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -1162,6 +1205,7 @@ class IdsGameV5Env(AttackDefenseEnv):
     """
     [AttackDefenseEnv] 4 layer, 5 servers per layer, 10 attack-defense-values, connected layers
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Sparse
     [Version] 5
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
@@ -1182,4 +1226,156 @@ class IdsGameV5Env(AttackDefenseEnv):
                 game_config.set_load_initial_state(initial_state_path)
             idsgame_config = IdsGameConfig(game_config=game_config)
             idsgame_config.render_config.caption = "idsgame-v5"
+        super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
+
+# -------- Version 6 ------------
+
+class IdsGameRandomDefenseV6Env(AttackerEnv):
+    """
+    [AttackerEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, random defender, connected layers
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards]: Dense
+    [Version] 6
+    """
+    def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
+        """
+        Initialization of the environment
+
+        :param save_dir: directory to save outputs of the env
+        :param initial_state_path: path to the initial state (if none, use default)
+        :param idsgame_config: configuration of the environment (if not specified a default config is used)
+        """
+        if idsgame_config is None:
+            game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
+            game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=2)
+            game_config.network_config = NetworkConfig(game_config.num_rows, game_config.num_cols,
+                                                       connected_layers=True)
+            game_config.dense_rewards = True
+            if initial_state_path is not None:
+                game_config.set_load_initial_state(initial_state_path)
+            defender_agent = RandomDefenseBotAgent(game_config)
+            idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
+            idsgame_config.render_config.caption = "idsgame-random_defense-v6"
+        super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
+
+
+class IdsGameMinimalDefenseV6Env(AttackerEnv):
+    """
+    [AttackerEnv] 4 layers, 5 servers per layer, 10 attack-defense-values,
+    defender following the "defend minimal strategy", connected layers
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards]: Dense
+    [Version] 6
+    """
+    def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
+        """
+        Initialization of the environment
+
+        :param save_dir: directory to save outputs of the env
+        :param initial_state_path: path to the initial state (if none, use default)
+        :param idsgame_config: configuration of the environment (if not specified a default config is used)
+        """
+        if idsgame_config is None:
+            game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
+            game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=2)
+            game_config.network_config = NetworkConfig(game_config.num_rows, game_config.num_cols,
+                                                       connected_layers=True)
+            game_config.dense_rewards = True
+            if initial_state_path is not None:
+                game_config.set_load_initial_state(initial_state_path)
+            defender_agent = DefendMinimalValueBotAgent(game_config)
+            idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
+            idsgame_config.render_config.caption = "idsgame-minimal_defense-v6"
+        super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
+
+
+class IdsGameRandomAttackV6Env(DefenderEnv):
+    """
+    [DefenderEnv] 4 layers, 5 servers per layer, 10 attack-defense-values, random attacker, connected layers
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards]: Dense
+    [Version] 5
+    """
+    def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
+        """
+        Initialization of the environment
+
+        :param save_dir: directory to save outputs of the env
+        :param initial_state_path: path to the initial state (if none, use default)
+        :param idsgame_config: configuration of the environment (if not specified a default config is used)
+        """
+        if idsgame_config is None:
+            game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
+            game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=2)
+            game_config.network_config = NetworkConfig(game_config.num_rows, game_config.num_cols,
+                                                       connected_layers=True)
+            game_config.dense_rewards = True
+            if initial_state_path is not None:
+                game_config.set_load_initial_state(initial_state_path)
+            attacker_agent = RandomAttackBotAgent(game_config)
+            idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
+            idsgame_config.render_config.caption = "idsgame-random_attack-v6"
+        super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
+
+
+class IdsGameMaximalAttackV6Env(DefenderEnv):
+    """
+    [DefenderEnv] 4 layers, 5 servers per layer, 10 attack-defense-values,
+    attacker following the "attack maximal strategy", connected layers
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards]: Dense
+    [Version] 6
+    """
+    def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
+        """
+        Initialization of the environment
+
+        :param save_dir: directory to save outputs of the env
+        :param initial_state_path: path to the initial state (if none, use default)
+        :param idsgame_config: configuration of the environment (if not specified a default config is used)
+        """
+        if idsgame_config is None:
+            game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
+            game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=2)
+            game_config.network_config = NetworkConfig(game_config.num_rows, game_config.num_cols,
+                                                       connected_layers=True)
+            game_config.dense_rewards = True
+            if initial_state_path is not None:
+                game_config.set_load_initial_state(initial_state_path)
+            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
+            idsgame_config.render_config.caption = "idsgame-maximal_attack-v6"
+        super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
+
+
+class IdsGameV6Env(AttackDefenseEnv):
+    """
+    [AttackDefenseEnv] 4 layer, 5 servers per layer, 10 attack-defense-values, connected layers
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+    [Rewards] Dense
+    [Version] 6
+    """
+    def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
+        """
+        Initialization of the environment
+
+        :param save_dir: directory to save outputs of the env
+        :param initial_state_path: path to the initial state (if none, use default)
+        :param idsgame_config: configuration of the environment (if not specified a default config is used)
+        """
+        if idsgame_config is None:
+            game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
+            game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=2)
+            game_config.network_config = NetworkConfig(game_config.num_rows, game_config.num_cols,
+                                                       connected_layers=True)
+            game_config.dense_rewards = True
+            if initial_state_path is not None:
+                game_config.set_load_initial_state(initial_state_path)
+            idsgame_config = IdsGameConfig(game_config=game_config)
+            idsgame_config.render_config.caption = "idsgame-v6"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)

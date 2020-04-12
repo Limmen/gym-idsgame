@@ -288,12 +288,9 @@ class TabularQAgent(QAgent):
 
             # Update eval stats
             self.num_eval_games +=1
-            if self.env.state.detected:
-                self.eval_attacker_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
-                self.eval_defender_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
+            self.eval_attacker_cumulative_reward += episode_attacker_reward
+            self.eval_defender_cumulative_reward += episode_defender_reward
             if self.env.state.hacked:
-                self.eval_attacker_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
-                self.eval_defender_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
                 self.num_eval_hacks += 1
 
             # Log average metrics every <self.config.eval_log_frequency> episodes
