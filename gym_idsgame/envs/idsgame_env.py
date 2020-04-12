@@ -69,6 +69,8 @@ class IdsGameEnv(gym.Env, ABC):
         self.past_positions.append(self.state.attacker_pos)
         self.save_initial_state()
         self.furthest_hack = self.idsgame_config.game_config.network_config.num_rows-1
+        self.a_cumulative_reward = 0
+        self.d_cumulative_reward = 0
 
     # -------- API ------------
     def step(self, action: int) -> Union[np.ndarray, int, bool, dict]:
@@ -151,6 +153,8 @@ class IdsGameEnv(gym.Env, ABC):
         observation = self.get_observation()
         if self.viewer is not None:
             self.viewer.gameframe.set_state(self.state)
+        self.a_cumulative_reward += reward[0]
+        self.d_cumulative_reward += reward[1]
         return observation, reward, self.state.done, info
 
     def reset(self, update_stats = False) -> np.ndarray:
@@ -164,7 +168,10 @@ class IdsGameEnv(gym.Env, ABC):
         self.past_positions = []
         self.furthest_hack = self.idsgame_config.game_config.network_config.num_rows-1
         self.steps_beyond_done = None
-        self.state.new_game(self.idsgame_config.game_config.initial_state, update_stats=update_stats)
+        self.state.new_game(self.idsgame_config.game_config.initial_state, self.a_cumulative_reward,
+                            self.d_cumulative_reward, update_stats=update_stats)
+        self.a_cumulative_reward = 0
+        self.d_cumulative_reward = 0
         if self.viewer is not None:
             self.viewer.gameframe.reset()
         observation = self.get_observation()

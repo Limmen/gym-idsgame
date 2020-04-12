@@ -137,7 +137,8 @@ class GameState():
         self.defense_det = det_values.astype(np.int32)
 
 
-    def new_game(self, init_state: "GameState", update_stats = True) -> None:
+    def new_game(self, init_state: "GameState", a_cumulative_reward : int = 0, d_cumulative_reward : int = 0,
+                 update_stats = True) -> None:
         """
         Updates the current state for a new game
 
@@ -146,12 +147,9 @@ class GameState():
         """
         if update_stats:
             self.num_games += 1
-            if self.detected:
-                self.attacker_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
-                self.defender_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
+            self.attacker_cumulative_reward += a_cumulative_reward
+            self.defender_cumulative_reward += d_cumulative_reward
             if self.hacked:
-                self.attacker_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
-                self.defender_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
                 self.num_hacks += 1
         self.done = False
         self.attack_defense_type = 0
