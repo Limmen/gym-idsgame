@@ -5,11 +5,11 @@ from typing import Union
 import numpy as np
 import time
 import tqdm
+import os
 from gym_idsgame.envs.rendering.video.idsgame_monitor import IdsGameMonitor
 from gym_idsgame.agents.q_learning.q_agent_config import QAgentConfig
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
-from gym_idsgame.envs.constants import constants
 from gym_idsgame.agents.q_learning.q_agent import QAgent
 
 class TabularQAgent(QAgent):
@@ -24,8 +24,8 @@ class TabularQAgent(QAgent):
         :param config: the configuration
         """
         super(TabularQAgent, self).__init__(env, config)
-        self.Q_attacker = np.random.rand(self.env.num_states, self.env.num_attack_actions)
-        self.Q_defender = np.random.rand(1, self.env.num_defense_actions)
+        self.Q_attacker = np.zeros((self.env.num_states, self.env.num_attack_actions))
+        self.Q_defender = np.zeros((1, self.env.num_defense_actions))
 
     def get_action(self, s, eval=False, attacker=True) -> int:
         """
@@ -240,10 +240,22 @@ class TabularQAgent(QAgent):
         # Eval
         attacker_obs, defender_obs = self.env.reset(update_stats=False)
 
+        # Get initial frame
+        if self.config.video or self.config.gifs:
+            initial_frame = self.env.render(mode="rgb_array")[0]
+            self.env.episode_frames.append(initial_frame)
+
         for episode in range(self.config.eval_episodes):
             episode_attacker_reward = 0
             episode_defender_reward = 0
             episode_step = 0
+            attacker_state_values = []
+            attacker_states = []
+            attacker_frames = []
+            defender_state_values = []
+            defender_states = []
+            defender_frames = []
+
             while not done:
                 if self.config.eval_render:
                     self.env.render()
@@ -275,6 +287,28 @@ class TabularQAgent(QAgent):
                 attacker_obs = obs_prime_attacker
                 defender_obs = obs_prime_defender
 
+                # Save state values for analysis later
+                if self.config.video and len(self.env.episode_frames) > 0:
+                    if self.config.attacker:
+                        if episode_step == 1:
+                            attacker_frames.append(initial_frame)
+                            attacker_state_values.append(sum(self.Q_attacker[attacker_state_node_id]))
+                            attacker_states.append(attacker_state_node_id)
+                        attacker_state_node_id = self.env.get_attacker_node_from_observation(attacker_obs)
+                        attacker_state_values.append(sum(self.Q_attacker[attacker_state_node_id]))
+                        attacker_states.append(attacker_state_node_id)
+                        attacker_frames.append(self.env.episode_frames[-1])
+
+                    if self.config.defender:
+                        if episode_step == 1:
+                            defender_frames.append(initial_frame)
+                            defender_state_values.append(sum(self.Q_defender[defender_state_node_id]))
+                            defender_states.append(defender_state_node_id)
+                        defender_state_node_id = 0
+                        defender_state_values.append(sum(self.Q_defender[defender_state_node_id]))
+                        defender_states.append(defender_state_node_id)
+                        defender_frames.append(self.env.episode_frames[-1])
+
             # Render final frame when game completed
             if self.config.eval_render:
                 self.env.render()
@@ -305,9 +339,32 @@ class TabularQAgent(QAgent):
                 self.env.generate_gif(self.config.gif_dir + "/episode_" + str(train_episode) + "_"
                                       + time_str + ".gif", self.config.video_fps)
 
+            if len(attacker_frames) > 0:
+                # Save state values analysis for final state
+                base_path = self.config.save_dir + "/state_values/" + str(train_episode) + "/"
+                if not os.path.exists(base_path):
+                    os.makedirs(base_path)
+                np.save(base_path + "attacker_states.npy", attacker_states)
+                np.save(base_path + "attacker_state_values.npy", attacker_state_values)
+                np.save(base_path + "attacker_frames.npy", attacker_frames)
+
+
+            if len(defender_frames) > 0:
+                # Save state values analysis for final state
+                base_path = self.config.save_dir + "/state_values/" + str(train_episode) + "/"
+                if not os.path.exists(base_path):
+                    os.makedirs(base_path)
+                np.save(base_path + "defender_states.npy", np.array(defender_states))
+                np.save(base_path + "defender_state_values.npy", np.array(defender_state_values))
+                np.save(base_path + "defender_frames.npy", np.array(defender_frames))
+
             # Reset for new eval episode
             done = False
             attacker_obs, defender_obs = self.env.reset(update_stats=False)
+            # Get initial frame
+            if self.config.video or self.config.gifs:
+                initial_frame = self.env.render(mode="rgb_array")[0]
+                self.env.episode_frames.append(initial_frame)
             self.outer_eval.update(1)
 
         # Log average eval statistics
@@ -320,6 +377,15 @@ class TabularQAgent(QAgent):
         self.env.close()
         self.config.logger.info("Evaluation Complete")
         return self.eval_result
+
+    def save_state_values(self):
+        self.config.logger.info("--- Attacker State Values ---")
+        for i in range(len(self.Q_attacker)):
+            state_value = sum(self.Q_attacker[i])
+            node_id = i
+
+            #self.config.logger.info("s:{},V(s):{}".format(node_id, state_value))
+        self.config.logger.info("--------------------")
 
     def log_state_values(self) -> None:
         """
