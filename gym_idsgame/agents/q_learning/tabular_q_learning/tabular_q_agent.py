@@ -256,6 +256,16 @@ class TabularQAgent(QAgent):
             defender_states = []
             defender_frames = []
 
+            if self.config.video or self.config.gifs:
+                attacker_state_node_id = self.env.get_attacker_node_from_observation(attacker_obs)
+                attacker_state_values.append(sum(self.Q_attacker[attacker_state_node_id]))
+                attacker_states.append(attacker_state_node_id)
+                attacker_frames.append(initial_frame)
+                defender_state_node_id = 0
+                defender_state_values.append(sum(self.Q_defender[defender_state_node_id]))
+                defender_states.append(defender_state_node_id)
+                defender_frames.append(initial_frame)
+
             while not done:
                 if self.config.eval_render:
                     self.env.render()
@@ -288,22 +298,14 @@ class TabularQAgent(QAgent):
                 defender_obs = obs_prime_defender
 
                 # Save state values for analysis later
-                if self.config.video and len(self.env.episode_frames) > 0:
+                if self.config.video and len(self.env.episode_frames) > 1:
                     if self.config.attacker:
-                        if episode_step == 1:
-                            attacker_frames.append(initial_frame)
-                            attacker_state_values.append(sum(self.Q_attacker[attacker_state_node_id]))
-                            attacker_states.append(attacker_state_node_id)
                         attacker_state_node_id = self.env.get_attacker_node_from_observation(attacker_obs)
                         attacker_state_values.append(sum(self.Q_attacker[attacker_state_node_id]))
                         attacker_states.append(attacker_state_node_id)
                         attacker_frames.append(self.env.episode_frames[-1])
 
                     if self.config.defender:
-                        if episode_step == 1:
-                            defender_frames.append(initial_frame)
-                            defender_state_values.append(sum(self.Q_defender[defender_state_node_id]))
-                            defender_states.append(defender_state_node_id)
                         defender_state_node_id = 0
                         defender_state_values.append(sum(self.Q_defender[defender_state_node_id]))
                         defender_states.append(defender_state_node_id)
@@ -339,7 +341,7 @@ class TabularQAgent(QAgent):
                 self.env.generate_gif(self.config.gif_dir + "/episode_" + str(train_episode) + "_"
                                       + time_str + ".gif", self.config.video_fps)
 
-            if len(attacker_frames) > 0:
+            if len(attacker_frames) > 1:
                 # Save state values analysis for final state
                 base_path = self.config.save_dir + "/state_values/" + str(train_episode) + "/"
                 if not os.path.exists(base_path):
@@ -349,7 +351,7 @@ class TabularQAgent(QAgent):
                 np.save(base_path + "attacker_frames.npy", attacker_frames)
 
 
-            if len(defender_frames) > 0:
+            if len(defender_frames) > 1:
                 # Save state values analysis for final state
                 base_path = self.config.save_dir + "/state_values/" + str(train_episode) + "/"
                 if not os.path.exists(base_path):
@@ -365,6 +367,7 @@ class TabularQAgent(QAgent):
             if self.config.video or self.config.gifs:
                 initial_frame = self.env.render(mode="rgb_array")[0]
                 self.env.episode_frames.append(initial_frame)
+
             self.outer_eval.update(1)
 
         # Log average eval statistics
@@ -377,15 +380,6 @@ class TabularQAgent(QAgent):
         self.env.close()
         self.config.logger.info("Evaluation Complete")
         return self.eval_result
-
-    def save_state_values(self):
-        self.config.logger.info("--- Attacker State Values ---")
-        for i in range(len(self.Q_attacker)):
-            state_value = sum(self.Q_attacker[i])
-            node_id = i
-
-            #self.config.logger.info("s:{},V(s):{}".format(node_id, state_value))
-        self.config.logger.info("--------------------")
 
     def log_state_values(self) -> None:
         """

@@ -160,23 +160,26 @@ def read_and_plot_results(train_csv_path : str, eval_csv_path: str, train_log_fr
         avg_episode_loss_attacker = train_df["avg_episode_loss_attacker"]
     if "avg_episode_loss_defender" in train_df:
         avg_episode_loss_defender = train_df["avg_episode_loss_defender"]
-    plot_results(train_df["avg_attacker_episode_rewards"].values,
-                 train_df["avg_defender_episode_rewards"].values,
-                 train_df["avg_episode_steps"].values,
-                 train_df["epsilon_values"], train_df["hack_probability"],
-                 train_df["attacker_cumulative_reward"], train_df["defender_cumulative_reward"],
-                 avg_episode_loss_attacker, avg_episode_loss_defender,
-                 train_df["lr_list"],
-                 train_log_frequency, eval_frequency, eval_log_frequency, eval_episodes,
-                 output_dir, eval=False, sim=sim)
-    plot_results(eval_df["avg_attacker_episode_rewards"].values,
-                 eval_df["avg_defender_episode_rewards"].values,
-                 eval_df["avg_episode_steps"].values,
-                 eval_df["epsilon_values"], eval_df["hack_probability"],
-                 eval_df["attacker_cumulative_reward"], eval_df["defender_cumulative_reward"], None, None,
-                 eval_df["lr_list"],
-                 train_log_frequency,
-                 eval_frequency, eval_log_frequency, eval_episodes, output_dir, eval=True, sim=sim)
+    try:
+        plot_results(train_df["avg_attacker_episode_rewards"].values,
+                     train_df["avg_defender_episode_rewards"].values,
+                     train_df["avg_episode_steps"].values,
+                     train_df["epsilon_values"], train_df["hack_probability"],
+                     train_df["attacker_cumulative_reward"], train_df["defender_cumulative_reward"],
+                     avg_episode_loss_attacker, avg_episode_loss_defender,
+                     train_df["lr_list"],
+                     train_log_frequency, eval_frequency, eval_log_frequency, eval_episodes,
+                     output_dir, eval=False, sim=sim)
+        plot_results(eval_df["avg_attacker_episode_rewards"].values,
+                     eval_df["avg_defender_episode_rewards"].values,
+                     eval_df["avg_episode_steps"].values,
+                     eval_df["epsilon_values"], eval_df["hack_probability"],
+                     eval_df["attacker_cumulative_reward"], eval_df["defender_cumulative_reward"], None, None,
+                     eval_df["lr_list"],
+                     train_log_frequency,
+                     eval_frequency, eval_log_frequency, eval_episodes, output_dir, eval=True, sim=sim)
+    except:
+        pass
 
     dirs = [x[0].replace("./data/state_values/", "") for x in os.walk("./data/state_values")]
     f_dirs = list(filter(lambda x: x.isnumeric(), dirs))
