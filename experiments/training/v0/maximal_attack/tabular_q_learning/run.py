@@ -6,7 +6,7 @@ from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.runnner import Runner
 from experiments.util import plotting_util, util
-
+import glob
 
 def default_output_dir() -> str:
     """
@@ -79,20 +79,26 @@ if __name__ == '__main__':
         config = util.read_config(args.configpath)
     else:
         config = default_config()
-    time_str = str(time.time())
-    util.create_artefact_dirs(config.output_dir)
-    logger = util.setup_logger("maximal_attack_vs_tabular_q_learning-v0", config.output_dir + "/logs/",
-                               time_str=time_str)
-    config.logger = logger
-    config.q_agent_config.logger = logger
-    config.q_agent_config.to_csv(config.output_dir + "/hyperparameters/" + time_str + ".csv")
-    train_result, eval_result = Runner.run(config)
-    if len(train_result.avg_episode_steps) > 0 and len(eval_result.avg_episode_steps) > 0:
-        train_csv_path = config.output_dir + "/data/" + time_str + "_train" + ".csv"
-        train_result.to_csv(train_csv_path)
-        eval_csv_path = config.output_dir + "/data/" + time_str + "_eval" + ".csv"
-        eval_result.to_csv(eval_csv_path)
-        plot_csv(config, eval_csv_path, train_csv_path)
+    if args.plotonly:
+        base_dir = config.output_dir + "/data/"
+        train_csv_path = base_dir + "*_train.csv"
+        eval_csv_path = base_dir + "*_eval.csv"
+        plot_csv(config, glob.glob(eval_csv_path)[0], glob.glob(train_csv_path)[0])
+    else:
+        time_str = str(time.time())
+        util.create_artefact_dirs(config.output_dir)
+        logger = util.setup_logger("maximal_attack_vs_tabular_q_learning-v0", config.output_dir + "/logs/",
+                                   time_str=time_str)
+        config.logger = logger
+        config.q_agent_config.logger = logger
+        config.q_agent_config.to_csv(config.output_dir + "/hyperparameters/" + time_str + ".csv")
+        train_result, eval_result = Runner.run(config)
+        if len(train_result.avg_episode_steps) > 0 and len(eval_result.avg_episode_steps) > 0:
+            train_csv_path = config.output_dir + "/data/" + time_str + "_train" + ".csv"
+            train_result.to_csv(train_csv_path)
+            eval_csv_path = config.output_dir + "/data/" + time_str + "_eval" + ".csv"
+            eval_result.to_csv(eval_csv_path)
+            plot_csv(config, eval_csv_path, train_csv_path)
 
 
 

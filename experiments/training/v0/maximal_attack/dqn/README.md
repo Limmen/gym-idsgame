@@ -263,3 +263,14 @@ make run_server
 make clean
 ```
 
+### Tensorboard
+
+```
+tensorboard --logdir=tensorboard
+```
+
+or: 
+
+```
+make tensorboard
+```

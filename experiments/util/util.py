@@ -95,5 +95,7 @@ def parse_args(default_config_path):
     parser = argparse.ArgumentParser(description='Parse flags to configure the json parsing')
     parser.add_argument("-cp", "--configpath", help="Path to configuration file",
                         default=default_config_path, type=str)
+    parser.add_argument("-po", "--plotonly", help="Boolean parameter, if true, only plot",
+                        action="store_true")
     args = parser.parse_args()
     return args

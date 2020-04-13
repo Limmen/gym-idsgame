@@ -222,3 +222,14 @@ make run_server
 make clean
 ```
 
+### Plots only
+
+```
+./make_plots.sh
+```
+
+or: 
+
+```
+make plots
+```
