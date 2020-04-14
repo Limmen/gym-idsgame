@@ -218,13 +218,13 @@ After the experiment has finished, the results are written to the following sub-
 #### Evaluation after 5000 Training Episodes
 
 <p align="center">
-<img src="docs/episode_5000.gif" width="700">
+<img src="docs/episode_45000.gif" width="700">
 </p>  
 
 #### Evaluation after 50000 Training Episodes
 
 <p align="center">
-<img src="docs/episode_50000.gif" width="700">
+<img src="docs/episode_85000.gif" width="700">
 </p>  
 
 ## Commands

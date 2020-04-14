@@ -706,12 +706,16 @@ An environment where the defender is following a random defense policy.
 #### Minimal Defense
 Experiments in the `minimal_defense-v5` environment.  
 An environment where the defender is following the `defend_minimal` defense policy.
+The `defend_minimal` policy entails that the defender will always 
+defend the attribute with the minimal value out of all of its neighbors.
       
 - [tabular_q_learning_vs_minimal_defense-v5](training/v5/minimal_defense/tabular_q_learning/)
-   * The `defend_minimal` policy entails that the defender will always 
-   defend the attribute with the minimal value out of all of its neighbors.
-   This experiment trains an attacker agent using tabular q-learning to act optimally in the given 
-   environment and defeat the defender.   
+   * This experiment trains an attacker agent using tabular q-learning to act optimally in the given 
+   environment and defeat the defender.
+   
+- [dqn_vs_minimal_defense-v5](training/v5/minimal_defense/dqn/)
+   * This experiment trains an attacker agent using dqn to act optimally in the given 
+   environment and defeat the defender.         
 
 #### Random Attack
 Experiments in the `random_attack-v5` environment.  
