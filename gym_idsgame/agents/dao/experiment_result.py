@@ -16,8 +16,7 @@ class ExperimentResult:
                  attacker_cumulative_reward: List[int] = None, defender_cumulative_reward: List[int] = None,
                  attacker_wins: List[int] = None, defender_wins: List[int] = None,
                  avg_episode_loss_attacker: List[float] = None, avg_episode_loss_defender: List[float] = None,
-                 lr_list : List[float] = None
-                 ):
+                 lr_list : List[float] = None):
         """
         Constructor, initializes the DTO
 
@@ -33,6 +32,7 @@ class ExperimentResult:
         :param avg_episode_loss_attacker: average loss for attacker
         :param avg_episode_loss_defender: average loss for defender
         :param lr_list: learning rates
+        :param random_seed: the random seed for reproducibility
         """
         self.avg_attacker_episode_rewards = avg_attacker_episode_rewards
         self.avg_defender_episode_rewards = avg_defender_episode_rewards

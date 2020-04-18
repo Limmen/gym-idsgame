@@ -1,5 +1,6 @@
 import os
 import time
+import sys
 from gym_idsgame.config.runner_mode import RunnerMode
 from gym_idsgame.agents.q_learning.q_agent_config import QAgentConfig
 from gym_idsgame.agents.dao.agent_type import AgentType
@@ -9,11 +10,18 @@ from experiments.util import plotting_util, util
 from gym_idsgame.agents.q_learning.dqn.dqn_config import DQNConfig
 
 
+def get_script_path():
+    """
+    :return: the script path
+    """
+    return os.path.dirname(os.path.realpath(sys.argv[0]))
+
+
 def default_output_dir() -> str:
     """
     :return: the default output dir
     """
-    script_dir = os.path.dirname(__file__)
+    script_dir = get_script_path()
     return script_dir
 
 

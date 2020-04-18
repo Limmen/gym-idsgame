@@ -12,4 +12,4 @@ plots:
 all: run
 
 clean:
-	rm -rf data logs plots hyperparameters gifs videos tensorboard nohup.out
+	rm -rf results data logs plots hyperparameters gifs videos tensorboard nohup.out

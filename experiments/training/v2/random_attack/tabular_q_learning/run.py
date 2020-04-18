@@ -8,11 +8,18 @@ from gym_idsgame.runnner import Runner
 from experiments.util import plotting_util, util
 
 
+def get_script_path():
+    """
+    :return: the script path
+    """
+    return os.path.dirname(os.path.realpath(sys.argv[0]))
+
+
 def default_output_dir() -> str:
     """
     :return: the default output dir
     """
-    script_dir = os.path.dirname(__file__)
+    script_dir = get_script_path()
     return script_dir
 
 

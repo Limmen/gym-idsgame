@@ -9,7 +9,10 @@ run_server: run.py run_server.sh
 tensorboard:
 	tensorboard --logdir=./tensorboard
 
+plots:
+	./make_plots.sh
+
 all: run
 
 clean:
-	rm -rf data logs plots hyperparameters gifs videos tensorboard nohup.out
+	rm -rf results data logs plots hyperparameters gifs videos tensorboard nohup.out

@@ -4,6 +4,8 @@ Abstract Q Agent
 import numpy as np
 import tqdm
 import logging
+import random
+import torch
 from abc import ABC, abstractmethod
 from gym_idsgame.agents.q_learning.q_agent_config import QAgentConfig
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
@@ -32,6 +34,9 @@ class QAgent(TrainAgent, ABC):
         self.outer_train = tqdm.tqdm(total=self.config.num_episodes, desc='Train Episode', position=0)
         if self.config.logger is None:
             self.config.logger = logging.getLogger('QAgent')
+        random.seed(self.config.random_seed)
+        np.random.seed(self.config.random_seed)
+        torch.manual_seed(self.config.random_seed)
 
     def log_metrics(self, episode: int, result: ExperimentResult, attacker_episode_rewards: list,
                     defender_episode_rewards: list,

@@ -10,25 +10,27 @@ import argparse
 import os
 from gym_idsgame.config.client_config import ClientConfig
 
-def create_artefact_dirs(output_dir: str) -> None:
+def create_artefact_dirs(output_dir: str, random_seed : int) -> None:
     """
     Creates artefact directories if they do not already exist
 
     :param output_dir: the base directory
+    :param random_seed: the random seed of the experiment
     :return: None
     """
-    if not os.path.exists(output_dir + "/logs/"):
-        os.makedirs(output_dir + "/logs/")
-    if not os.path.exists(output_dir + "/plots/"):
-        os.makedirs(output_dir + "/plots/")
-    if not os.path.exists(output_dir + "/data/"):
-        os.makedirs(output_dir + "/data/")
-    if not os.path.exists(output_dir + "/hyperparameters/"):
-        os.makedirs(output_dir + "/hyperparameters/")
-    if not os.path.exists(output_dir + "/gifs/"):
-        os.makedirs(output_dir + "/gifs/")
-    if not os.path.exists(output_dir + "/tensorboard/"):
-        os.makedirs(output_dir + "/tensorboard/")
+    if not os.path.exists(output_dir + "/results/logs/" + str(random_seed) + "/"):
+        os.makedirs(output_dir + "/results/logs/" + str(random_seed) + "/")
+    if not os.path.exists(output_dir + "/results/plots/" + str(random_seed) + "/"):
+        os.makedirs(output_dir + "/results/plots/" + str(random_seed) + "/")
+    if not os.path.exists(output_dir + "/results/data/" + str(random_seed) + "/"):
+        os.makedirs(output_dir + "/results/data/" + str(random_seed) + "/")
+    if not os.path.exists(output_dir + "/results/hyperparameters/" + str(random_seed) + "/"):
+        os.makedirs(output_dir + "/results/hyperparameters/" + str(random_seed) + "/")
+    if not os.path.exists(output_dir + "/results/gifs/" + str(random_seed) + "/"):
+        os.makedirs(output_dir + "/results/gifs/" + str(random_seed) + "/")
+    if not os.path.exists(output_dir + "/results/tensorboard/" + str(random_seed) + "/"):
+        os.makedirs(output_dir + "/results/tensorboard/" + str(random_seed) + "/")
+
 
 def setup_logger(name: str, logdir: str, time_str = None):
     """
