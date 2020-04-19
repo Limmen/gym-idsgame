@@ -2,6 +2,7 @@
 Basic plotting functions
 """
 
+import csv
 from typing import Union
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
@@ -955,6 +956,1333 @@ def plot_all_avg_summary_1(x_1_1, y_1_1, x_1_2, y_1_2, x_1_3, y_1_3, x_1_4, y_1_
     fig.savefig(file_name + ".png", format="png")
     fig.savefig(file_name + ".pdf", format='pdf', dpi=500, bbox_inches='tight', transparent=True)
 
+
+
+def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1_3_v0, x_1_4_v0, y_1_4_v0,
+                           x_1_5_v0, y_1_5_v0,
+                           std_1_1_v0, std_1_2_v0, std_1_3_v0, std_1_4_v0, std_1_5_v0,
+                           line_1_1_label_v0, line_1_2_label_v0, line_1_3_label_v0, line_1_4_label_v0,
+                           line_1_5_label_v0, title_1_v0, xlabel_1_v0, ylabel_1_v0,
+                           markevery_1_1_v0, markevery_1_2_v0, markevery_1_3_v0, markevery_1_4_v0, markevery_1_5_v0,
+                           x_2_1_v0, y_2_1_v0, x_2_2_v0, y_2_2_v0, x_2_3_v0, y_2_3_v0, x_2_4_v0, y_2_4_v0, x_2_5_v0,
+                           y_2_5_v0, std_2_1_v0, std_2_2_v0, std_2_3_v0, std_2_4_v0, std_2_5_v0,
+                           line_2_1_label_v0, line_2_2_label_v0, line_2_3_label_v0, line_2_4_label_v0,
+                           line_2_5_label_v0, title_2_v0, xlabel_2_v0, ylabel_2_v0,
+                           markevery_2_1_v0, markevery_2_2_v0, markevery_2_3_v0, markevery_2_4_v0, markevery_2_5_v0,
+                           x_3_1_v0, y_3_1_v0, x_3_2_v0, y_3_2_v0, x_3_3_v0, y_3_3_v0, x_3_4_v0, y_3_4_v0, x_3_5_v0,
+                           y_3_5_v0,
+                           std_3_1_v0, std_3_2_v0, std_3_3_v0, std_3_4_v0, std_3_5_v0,
+                           line_3_1_label_v0, line_3_2_label_v0, line_3_3_label_v0, line_3_4_label_v0,
+                           line_3_5_label_v0, title_3_v0, xlabel_3_v0, ylabel_3_v0,
+                           markevery_3_1_v0, markevery_3_2_v0, markevery_3_3_v0, markevery_3_4_v0, markevery_3_5_v0,
+
+                           x_1_1_v2, y_1_1_v2, x_1_2_v2, y_1_2_v2, x_1_3_v2, y_1_3_v2, x_1_4_v2, y_1_4_v2,
+                           x_1_5_v2, y_1_5_v2,
+                           std_1_1_v2, std_1_2_v2, std_1_3_v2, std_1_4_v2, std_1_5_v2,
+                           line_1_1_label_v2, line_1_2_label_v2, line_1_3_label_v2, line_1_4_label_v2,
+                           line_1_5_label_v2, title_1_v2, xlabel_1_v2, ylabel_1_v2,
+                           markevery_1_1_v2, markevery_1_2_v2, markevery_1_3_v2, markevery_1_4_v2, markevery_1_5_v2,
+                           x_2_1_v2, y_2_1_v2, x_2_2_v2, y_2_2_v2, x_2_3_v2, y_2_3_v2, x_2_4_v2, y_2_4_v2, x_2_5_v2,
+                           y_2_5_v2, std_2_1_v2, std_2_2_v2, std_2_3_v2, std_2_4_v2, std_2_5_v2,
+                           line_2_1_label_v2, line_2_2_label_v2, line_2_3_label_v2, line_2_4_label_v2,
+                           line_2_5_label_v2, title_2_v2, xlabel_2_v2, ylabel_2_v2,
+                           markevery_2_1_v2, markevery_2_2_v2, markevery_2_3_v2, markevery_2_4_v2, markevery_2_5_v2,
+                           x_3_1_v2, y_3_1_v2, x_3_2_v2, y_3_2_v2, x_3_3_v2, y_3_3_v2, x_3_4_v2, y_3_4_v2, x_3_5_v2,
+                           y_3_5_v2,
+                           std_3_1_v2, std_3_2_v2, std_3_3_v2, std_3_4_v2, std_3_5_v2,
+                           line_3_1_label_v2, line_3_2_label_v2, line_3_3_label_v2, line_3_4_label_v2,
+                           line_3_5_label_v2, title_3_v2, xlabel_3_v2, ylabel_3_v2,
+                           markevery_3_1_v2, markevery_3_2_v2, markevery_3_3_v2, markevery_3_4_v2, markevery_3_5_v2,
+
+                           x_1_1_v3, y_1_1_v3, x_1_2_v3, y_1_2_v3, x_1_3_v3, y_1_3_v3, x_1_4_v3, y_1_4_v3,
+                           x_1_5_v3, y_1_5_v3,
+                           std_1_1_v3, std_1_2_v3, std_1_3_v3, std_1_4_v3, std_1_5_v3,
+                           line_1_1_label_v3, line_1_2_label_v3, line_1_3_label_v3, line_1_4_label_v3,
+                           line_1_5_label_v3, title_1_v3, xlabel_1_v3, ylabel_1_v3,
+                           markevery_1_1_v3, markevery_1_2_v3, markevery_1_3_v3, markevery_1_4_v3, markevery_1_5_v3,
+                           x_2_1_v3, y_2_1_v3, x_2_2_v3, y_2_2_v3, x_2_3_v3, y_2_3_v3, x_2_4_v3, y_2_4_v3, x_2_5_v3,
+                           y_2_5_v3, std_2_1_v3, std_2_2_v3, std_2_3_v3, std_2_4_v3, std_2_5_v3,
+                           line_2_1_label_v3, line_2_2_label_v3, line_2_3_label_v3, line_2_4_label_v3,
+                           line_2_5_label_v3, title_2_v3, xlabel_2_v3, ylabel_2_v3,
+                           markevery_2_1_v3, markevery_2_2_v3, markevery_2_3_v3, markevery_2_4_v3, markevery_2_5_v3,
+                           x_3_1_v3, y_3_1_v3, x_3_2_v3, y_3_2_v3, x_3_3_v3, y_3_3_v3, x_3_4_v3, y_3_4_v3, x_3_5_v3,
+                           y_3_5_v3,
+                           std_3_1_v3, std_3_2_v3, std_3_3_v3, std_3_4_v3, std_3_5_v3,
+                           line_3_1_label_v3, line_3_2_label_v3, line_3_3_label_v3, line_3_4_label_v3,
+                           line_3_5_label_v3, title_3_v3, xlabel_3_v3, ylabel_3_v3,
+                           markevery_3_1_v3, markevery_3_2_v3, markevery_3_3_v3, markevery_3_4_v3, markevery_3_5_v3,
+
+                           file_name
+                           ):
+    plt.rc('text', usetex=True)
+    plt.rc('text.latex', preamble=r'\usepackage{amsfonts}')
+    fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(9, 6.5))
+    #gs1 = gridspec.GridSpec(1, 4)
+    #gs1.update(wspace=0.005, hspace=0.05)
+
+    # Plot avg hack_probability train
+    xlims = (min(min(x_1_1_v0), min(x_1_2_v0), min(x_1_3_v0), min(x_1_4_v0), min(x_1_5_v0)),
+             max(max(x_1_1_v0), max(x_1_2_v0), max(x_1_3_v0), max(x_1_4_v0), max(x_1_5_v0)))
+    ylims = (0, 1)
+
+    ax[0][0].plot(x_1_1_v0, y_1_1_v0, label=line_1_1_label_v0, marker="s", ls='-', color="#599ad3", markevery=markevery_1_1_v0)
+    ax[0][0].fill_between(x_1_1_v0, y_1_1_v0 - std_1_1_v0, y_1_1_v0 + std_1_1_v0, alpha=0.35, color="#599ad3")
+
+    ax[0][0].plot(x_1_2_v0, y_1_2_v0, label=line_1_2_label_v0, marker="o", ls='-', color='#f9a65a', markevery=markevery_1_2_v0)
+    ax[0][0].fill_between(x_1_2_v0, y_1_2_v0 - std_1_2_v0, y_1_2_v0 + std_1_2_v0, alpha=0.35, color='#f9a65a')
+
+    ax[0][0].plot(x_1_3_v0, y_1_3_v0, label=line_1_3_label_v0, marker="p", ls='-', color="#9e66ab", markevery=markevery_1_3_v0)
+    ax[0][0].fill_between(x_1_3_v0, y_1_3_v0 - std_1_3_v0, y_1_3_v0 + std_1_3_v0, alpha=0.35, color="#9e66ab")
+
+    ax[0][0].plot(x_1_4_v0, y_1_4_v0, label=line_1_4_label_v0, marker="d", ls='-', color='g', markevery=markevery_1_4_v0)
+    ax[0][0].fill_between(x_1_4_v0, y_1_4_v0 - std_1_4_v0, y_1_4_v0 + std_1_4_v0, alpha=0.35, color='g')
+
+    ax[0][0].plot(x_1_5_v0, y_1_5_v0, label=line_1_5_label_v0, marker="^", ls='-', color='r', markevery=markevery_1_5_v0)
+    ax[0][0].fill_between(x_1_5_v0, y_1_5_v0 - std_1_5_v0, y_1_5_v0 + std_1_5_v0, alpha=0.35, color='r')
+
+    ax[0][0].set_xlim(xlims)
+    ax[0][0].set_ylim(ylims)
+
+    ax[0][0].set_title(title_1_v0)
+    ax[0][0].set_xlabel(xlabel_1_v0)
+    ax[0][0].set_ylabel(ylabel_1_v0)
+    # set the grid on
+    ax[0][0].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[0][0].xaxis.get_label()
+    ylab = ax[0][0].yaxis.get_label()
+
+    # xlab.set_style('italic')
+    #xlab.set_size(8)
+    # ylab.set_style('italic')
+    #ylab.set_size(8)
+
+    # change the color of the top and right spines to opaque gray
+    ax[0][0].spines['right'].set_color((.8, .8, .8))
+    ax[0][0].spines['top'].set_color((.8, .8, .8))
+
+    # plt.legend(loc=legend_loc)
+
+    # Shrink current axis's height by 10% on the bottom
+    # box = ax[0].get_position()
+    # ax[0].set_position([box.x0, 0.8*box.y0,
+    #                     box.width, box.height * 0.99])
+    fig.subplots_adjust(bottom=0.4)
+
+    # Put a legend below current axis
+    # ax[0].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
+    #              fancybox=True, shadow=True, ncol=2)
+
+    # Plot avg hack_probability eval
+    xlims = (min(min(x_2_1_v0), min(x_2_2_v0), min(x_2_3_v0), min(x_2_4_v0), min(x_2_5_v0)),
+             max(max(x_2_1_v0), max(x_2_2_v0), max(x_2_3_v0), max(x_2_4_v0), max(x_2_5_v0)))
+    ylims = (0, 1)
+
+    ax[0][1].plot(x_2_1_v0, y_2_1_v0, label=line_2_1_label_v0, marker="s", ls='-', color="#599ad3", markevery=markevery_2_1_v0)
+    ax[0][1].fill_between(x_2_1_v0, y_2_1_v0 - std_2_1_v0, y_2_1_v0 + std_2_1_v0, alpha=0.35, color="#599ad3")
+
+    ax[0][1].plot(x_2_2_v0, y_2_2_v0, label=line_2_2_label_v0, marker="o", ls='-', color='#f9a65a', markevery=markevery_2_2_v0)
+    ax[0][1].fill_between(x_2_2_v0, y_2_2_v0 - std_2_2_v0, y_2_2_v0 + std_2_2_v0, alpha=0.35, color='#f9a65a')
+
+    ax[0][1].plot(x_2_3_v0, y_2_3_v0, label=line_2_3_label_v0, marker="p", ls='-', color="#9e66ab", markevery=markevery_2_3_v0)
+    ax[0][1].fill_between(x_2_3_v0, y_2_3_v0 - std_2_3_v0, y_2_3_v0 + std_2_3_v0, alpha=0.35, color="#9e66ab")
+
+    ax[0][1].plot(x_2_4_v0, y_2_4_v0, label=line_2_4_label_v0, marker="d", ls='-', color='g', markevery=markevery_2_4_v0)
+    ax[0][1].fill_between(x_2_4_v0, y_2_4_v0 - std_2_4_v0, y_2_4_v0 + std_2_4_v0, alpha=0.35, color='g')
+
+    ax[0][1].plot(x_2_5_v0, y_2_5_v0, label=line_2_5_label_v0, marker="^", ls='-', color='r', markevery=markevery_2_5_v0)
+    ax[0][1].fill_between(x_2_5_v0, y_2_5_v0 - std_2_5_v0, y_2_5_v0 + std_2_5_v0, alpha=0.35, color='r')
+
+    ax[0][1].set_xlim(xlims)
+    ax[0][1].set_ylim(ylims)
+
+    ax[0][1].set_title(title_2_v0)
+    ax[0][1].set_xlabel(xlabel_2_v0)
+    ax[0][1].set_ylabel(ylabel_2_v0)
+    # set the grid on
+    ax[0][1].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[0][1].xaxis.get_label()
+    ylab = ax[0][1].yaxis.get_label()
+
+    # xlab.set_style('italic')
+    #xlab.set_size(10)
+    # ylab.set_style('italic')
+    #ylab.set_size(10)
+
+    # change the color of the top and right spines to opaque gray
+    ax[0][1].spines['right'].set_color((.8, .8, .8))
+    ax[0][1].spines['top'].set_color((.8, .8, .8))
+
+    # plt.legend(loc=legend_loc)
+
+    # Shrink current axis's height by 10% on the bottom
+    box = ax[0][1].get_position()
+    ax[0][1].set_position([box.x0, box.y0 + box.height * 0.03,
+                        box.width, box.height * 0.9])
+
+    # Put a legend below current axis
+    # ax[1].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
+    #              fancybox=True, shadow=True, ncol=2)
+
+    # Plot attacker cumulative reward
+    xlims = (min(min(x_3_1_v0), min(x_3_2_v0), min(x_3_3_v0), min(x_3_4_v0), min(x_3_5_v0)),
+             max(max(x_3_1_v0), max(x_3_2_v0), max(x_3_3_v0), max(x_3_4_v0), max(x_3_5_v0)))
+    ylims = (min(min(y_3_1_v0), min(y_3_2_v0), min(y_3_3_v0), min(y_3_4_v0), min(y_3_5_v0)),
+             max(max(y_3_1_v0), max(y_3_2_v0), max(y_3_3_v0), max(y_3_4_v0), max(y_3_5_v0)))
+
+    ax[0][2].plot(x_3_1_v0, y_3_1_v0, label=line_3_1_label_v0, marker="s", ls='-', color="#599ad3", markevery=markevery_3_1_v0)
+    ax[0][2].fill_between(x_3_1_v0, y_3_1_v0 - std_3_1_v0, y_3_1_v0 + std_3_1_v0, alpha=0.35, color="#599ad3")
+
+    ax[0][2].plot(x_3_2_v0, y_3_2_v0, label=line_3_2_label_v0, marker="o", ls='-', color='#f9a65a', markevery=markevery_3_2_v0)
+    ax[0][2].fill_between(x_3_2_v0, y_3_2_v0 - std_3_2_v0, y_3_2_v0 + std_3_2_v0, alpha=0.35, color='#f9a65a')
+
+    ax[0][2].plot(x_3_3_v0, y_3_3_v0, label=line_3_3_label_v0, marker="p", ls='-', color="#9e66ab", markevery=markevery_3_3_v0)
+    ax[0][2].fill_between(x_3_3_v0, y_3_3_v0 - std_3_3_v0, y_3_3_v0 + std_3_3_v0, alpha=0.35, color="#9e66ab")
+
+    ax[0][2].plot(x_3_4_v0, y_3_4_v0, label=line_3_4_label_v0, marker="d", ls='-', color='g', markevery=markevery_3_4_v0)
+    ax[0][2].fill_between(x_3_4_v0, y_3_4_v0 - std_3_4_v0, y_3_4_v0 + std_3_4_v0, alpha=0.35, color='g')
+
+    ax[0][2].plot(x_3_5_v0, y_3_5_v0, label=line_3_5_label_v0, marker="^", ls='-', color='r', markevery=markevery_3_5_v0)
+    ax[0][2].fill_between(x_3_5_v0, y_3_5_v0 - std_3_5_v0, y_3_5_v0 + std_3_5_v0, alpha=0.35, color='r')
+
+    ax[0][2].set_xlim(xlims)
+    ax[0][2].set_ylim(ylims)
+
+    ax[0][2].set_title(title_3_v0)
+    ax[0][2].set_xlabel(xlabel_3_v0)
+    ax[0][2].set_ylabel(ylabel_3_v0)
+    # set the grid on
+    ax[0][2].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[0][2].xaxis.get_label()
+    ylab = ax[0][2].yaxis.get_label()
+
+    ax[0][2].yaxis.labelpad = -5
+
+    # xlab.set_style('italic')
+    #xlab.set_size(10)
+    # ylab.set_style('italic')
+    #ylab.set_size(10)
+
+    # change the color of the top and right spines to opaque gray
+    ax[0][2].spines['right'].set_color((.8, .8, .8))
+    ax[0][2].spines['top'].set_color((.8, .8, .8))
+
+    # plt.legend(loc=legend_loc)
+
+    # Shrink current axis's height by 10% on the bottom
+    box = ax[0][2].get_position()
+    ax[0][2].set_position([box.x0, box.y0 + box.height * 0.03,
+                        box.width, box.height * 0.9])
+
+    ax[0][2].get_yaxis().set_major_formatter(tkr.FuncFormatter(lambda x, p: "${:1.0f}K$".format(x * 1e-3)))
+
+    # Put a legend below current axis
+    # ax[2].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
+    #              fancybox=True, shadow=True, ncol=2)
+
+    #handles, labels = ax.get_legend_handles_labels()
+    #lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
+    #lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
+    #fig.legend(handles, labels, loc='upper center')
+    #ax[2].legend(loc='upper center', bbox_to_anchor=(-0.5, -0.35), fancybox=True, shadow=True, ncol=3)
+
+
+    # V2
+
+    # Plot avg hack_probability train
+    xlims = (min(min(x_1_1_v2), min(x_1_2_v2), min(x_1_3_v2), min(x_1_4_v2), min(x_1_5_v2)),
+             max(max(x_1_1_v2), max(x_1_2_v2), max(x_1_3_v2), max(x_1_4_v2), max(x_1_5_v2)))
+    ylims = (0, 1)
+
+    ax[1][0].plot(x_1_1_v2, y_1_1_v2, label=line_1_1_label_v2, marker="s", ls='-', color="#599ad3",
+                  markevery=markevery_1_1_v2)
+    ax[1][0].fill_between(x_1_1_v2, y_1_1_v2 - std_1_1_v2, y_1_1_v2 + std_1_1_v2, alpha=0.35, color="#599ad3")
+
+    ax[1][0].plot(x_1_2_v2, y_1_2_v2, label=line_1_2_label_v2, marker="o", ls='-', color='#f9a65a',
+                  markevery=markevery_1_2_v2)
+    ax[1][0].fill_between(x_1_2_v2, y_1_2_v2 - std_1_2_v2, y_1_2_v2 + std_1_2_v2, alpha=0.35, color='#f9a65a')
+
+    ax[1][0].plot(x_1_3_v2, y_1_3_v2, label=line_1_3_label_v2, marker="p", ls='-', color="#9e66ab",
+                  markevery=markevery_1_3_v2)
+    ax[1][0].fill_between(x_1_3_v2, y_1_3_v2 - std_1_3_v2, y_1_3_v2 + std_1_3_v2, alpha=0.35, color="#9e66ab")
+
+    ax[1][0].plot(x_1_4_v2, y_1_4_v2, label=line_1_4_label_v2, marker="d", ls='-', color='g',
+                  markevery=markevery_1_4_v2)
+    ax[1][0].fill_between(x_1_4_v2, y_1_4_v2 - std_1_4_v2, y_1_4_v2 + std_1_4_v2, alpha=0.35, color='g')
+
+    ax[1][0].plot(x_1_5_v2, y_1_5_v2, label=line_1_5_label_v2, marker="^", ls='-', color='r',
+                  markevery=markevery_1_5_v2)
+    ax[1][0].fill_between(x_1_5_v2, y_1_5_v2 - std_1_5_v2, y_1_5_v2 + std_1_5_v2, alpha=0.35, color='r')
+
+    ax[1][0].set_xlim(xlims)
+    ax[1][0].set_ylim(ylims)
+
+    ax[1][0].set_title(title_1_v2)
+    ax[1][0].set_xlabel(xlabel_1_v2)
+    ax[1][0].set_ylabel(ylabel_1_v2)
+    # set the grid on
+    ax[1][0].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[1][0].xaxis.get_label()
+    ylab = ax[1][0].yaxis.get_label()
+
+    # xlab.set_style('italic')
+    # xlab.set_size(8)
+    # ylab.set_style('italic')
+    # ylab.set_size(8)
+
+    # change the color of the top and right spines to opaque gray
+    ax[1][0].spines['right'].set_color((.8, .8, .8))
+    ax[1][0].spines['top'].set_color((.8, .8, .8))
+
+    # plt.legend(loc=legend_loc)
+
+    # Shrink current axis's height by 10% on the bottom
+    # box = ax[0].get_position()
+    # ax[0].set_position([box.x0, 0.8*box.y0,
+    #                     box.width, box.height * 0.99])
+    fig.subplots_adjust(bottom=0.4)
+
+    # Put a legend below current axis
+    # ax[0].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
+    #              fancybox=True, shadow=True, ncol=2)
+
+    # Plot avg hack_probability eval
+    xlims = (min(min(x_2_1_v2), min(x_2_2_v2), min(x_2_3_v2), min(x_2_4_v2), min(x_2_5_v2)),
+             max(max(x_2_1_v2), max(x_2_2_v2), max(x_2_3_v2), max(x_2_4_v2), max(x_2_5_v2)))
+    ylims = (0, 1)
+
+    ax[1][1].plot(x_2_1_v2, y_2_1_v2, label=line_2_1_label_v2, marker="s", ls='-', color="#599ad3",
+                  markevery=markevery_2_1_v2)
+    ax[1][1].fill_between(x_2_1_v2, y_2_1_v2 - std_2_1_v2, y_2_1_v2 + std_2_1_v2, alpha=0.35, color="#599ad3")
+
+    ax[1][1].plot(x_2_2_v2, y_2_2_v2, label=line_2_2_label_v2, marker="o", ls='-', color='#f9a65a',
+                  markevery=markevery_2_2_v2)
+    ax[1][1].fill_between(x_2_2_v2, y_2_2_v2 - std_2_2_v2, y_2_2_v2 + std_2_2_v2, alpha=0.35, color='#f9a65a')
+
+    ax[1][1].plot(x_2_3_v2, y_2_3_v2, label=line_2_3_label_v2, marker="p", ls='-', color="#9e66ab",
+                  markevery=markevery_2_3_v2)
+    ax[1][1].fill_between(x_2_3_v2, y_2_3_v2 - std_2_3_v2, y_2_3_v2 + std_2_3_v2, alpha=0.35, color="#9e66ab")
+
+    ax[1][1].plot(x_2_4_v2, y_2_4_v2, label=line_2_4_label_v2, marker="d", ls='-', color='g',
+                  markevery=markevery_2_4_v2)
+    ax[1][1].fill_between(x_2_4_v2, y_2_4_v2 - std_2_4_v2, y_2_4_v2 + std_2_4_v2, alpha=0.35, color='g')
+
+    ax[1][1].plot(x_2_5_v2, y_2_5_v2, label=line_2_5_label_v2, marker="^", ls='-', color='r',
+                  markevery=markevery_2_5_v2)
+    ax[1][1].fill_between(x_2_5_v2, y_2_5_v2 - std_2_5_v2, y_2_5_v2 + std_2_5_v2, alpha=0.35, color='r')
+
+    ax[1][1].set_xlim(xlims)
+    ax[1][1].set_ylim(ylims)
+
+    ax[1][1].set_title(title_2_v2)
+    ax[1][1].set_xlabel(xlabel_2_v2)
+    ax[1][1].set_ylabel(ylabel_2_v2)
+    # set the grid on
+    ax[1][1].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[1][1].xaxis.get_label()
+    ylab = ax[1][1].yaxis.get_label()
+
+    # xlab.set_style('italic')
+    # xlab.set_size(10)
+    # ylab.set_style('italic')
+    # ylab.set_size(10)
+
+    # change the color of the top and right spines to opaque gray
+    ax[1][1].spines['right'].set_color((.8, .8, .8))
+    ax[1][1].spines['top'].set_color((.8, .8, .8))
+
+    # plt.legend(loc=legend_loc)
+
+    # Shrink current axis's height by 10% on the bottom
+    box = ax[1][1].get_position()
+    ax[1][1].set_position([box.x0, box.y0 + box.height * 0.03,
+                           box.width, box.height * 0.9])
+
+    # Put a legend below current axis
+    # ax[1].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
+    #              fancybox=True, shadow=True, ncol=2)
+
+    # Plot attacker cumulative reward
+    xlims = (min(min(x_3_1_v2), min(x_3_2_v2), min(x_3_3_v2), min(x_3_4_v2), min(x_3_5_v2)),
+             max(max(x_3_1_v2), max(x_3_2_v2), max(x_3_3_v2), max(x_3_4_v2), max(x_3_5_v2)))
+    ylims = (min(min(y_3_1_v2), min(y_3_2_v2), min(y_3_3_v2), min(y_3_4_v2), min(y_3_5_v2)),
+             max(max(y_3_1_v2), max(y_3_2_v2), max(y_3_3_v2), max(y_3_4_v2), max(y_3_5_v2)))
+
+    ax[1][2].plot(x_3_1_v2, y_3_1_v2, label=line_3_1_label_v2, marker="s", ls='-', color="#599ad3",
+                  markevery=markevery_3_1_v2)
+    ax[1][2].fill_between(x_3_1_v2, y_3_1_v2 - std_3_1_v2, y_3_1_v2 + std_3_1_v2, alpha=0.35, color="#599ad3")
+
+    ax[1][2].plot(x_3_2_v2, y_3_2_v2, label=line_3_2_label_v2, marker="o", ls='-', color='#f9a65a',
+                  markevery=markevery_3_2_v2)
+    ax[1][2].fill_between(x_3_2_v2, y_3_2_v2 - std_3_2_v2, y_3_2_v2 + std_3_2_v2, alpha=0.35, color='#f9a65a')
+
+    ax[1][2].plot(x_3_3_v2, y_3_3_v2, label=line_3_3_label_v2, marker="p", ls='-', color="#9e66ab",
+                  markevery=markevery_3_3_v2)
+    ax[1][2].fill_between(x_3_3_v2, y_3_3_v2 - std_3_3_v2, y_3_3_v2 + std_3_3_v2, alpha=0.35, color="#9e66ab")
+
+    ax[1][2].plot(x_3_4_v2, y_3_4_v2, label=line_3_4_label_v2, marker="d", ls='-', color='g',
+                  markevery=markevery_3_4_v2)
+    ax[1][2].fill_between(x_3_4_v2, y_3_4_v2 - std_3_4_v2, y_3_4_v2 + std_3_4_v2, alpha=0.35, color='g')
+
+    ax[1][2].plot(x_3_5_v2, y_3_5_v2, label=line_3_5_label_v2, marker="^", ls='-', color='r',
+                  markevery=markevery_3_5_v2)
+    ax[1][2].fill_between(x_3_5_v2, y_3_5_v2 - std_3_5_v2, y_3_5_v2 + std_3_5_v2, alpha=0.35, color='r')
+
+    ax[1][2].set_xlim(xlims)
+    ax[1][2].set_ylim(ylims)
+
+    ax[1][2].set_title(title_3_v2)
+    ax[1][2].set_xlabel(xlabel_3_v2)
+    ax[1][2].set_ylabel(ylabel_3_v2)
+    # set the grid on
+    ax[1][2].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[1][2].xaxis.get_label()
+    ylab = ax[1][2].yaxis.get_label()
+
+    ax[1][2].yaxis.labelpad = -5
+
+    # xlab.set_style('italic')
+    # xlab.set_size(10)
+    # ylab.set_style('italic')
+    # ylab.set_size(10)
+
+    # change the color of the top and right spines to opaque gray
+    ax[1][2].spines['right'].set_color((.8, .8, .8))
+    ax[1][2].spines['top'].set_color((.8, .8, .8))
+
+    # plt.legend(loc=legend_loc)
+
+    # Shrink current axis's height by 10% on the bottom
+    box = ax[1][2].get_position()
+    ax[1][2].set_position([box.x0, box.y0 + box.height * 0.03,
+                           box.width, box.height * 0.9])
+
+    ax[1][2].get_yaxis().set_major_formatter(tkr.FuncFormatter(lambda x, p: "${:1.0f}K$".format(x * 1e-3)))
+
+
+    # V3
+
+    # Plot avg hack_probability train
+    xlims = (min(min(x_1_1_v3), min(x_1_2_v3), min(x_1_3_v3), min(x_1_4_v3), min(x_1_5_v3)),
+             max(max(x_1_1_v3), max(x_1_2_v3), max(x_1_3_v3), max(x_1_4_v3), max(x_1_5_v3)))
+    ylims = (0, 1)
+
+    ax[2][0].plot(x_1_1_v3, y_1_1_v3, label=line_1_1_label_v3, marker="s", ls='-', color="#599ad3",
+                  markevery=markevery_1_1_v3)
+    ax[2][0].fill_between(x_1_1_v3, y_1_1_v3 - std_1_1_v3, y_1_1_v3 + std_1_1_v3, alpha=0.35, color="#599ad3")
+
+    ax[2][0].plot(x_1_2_v3, y_1_2_v3, label=line_1_2_label_v3, marker="o", ls='-', color='#f9a65a',
+                  markevery=markevery_1_2_v3)
+    ax[2][0].fill_between(x_1_2_v3, y_1_2_v3 - std_1_2_v3, y_1_2_v3 + std_1_2_v3, alpha=0.35, color='#f9a65a')
+
+    ax[2][0].plot(x_1_3_v3, y_1_3_v3, label=line_1_3_label_v3, marker="p", ls='-', color="#9e66ab",
+                  markevery=markevery_1_3_v3)
+    ax[2][0].fill_between(x_1_3_v3, y_1_3_v3 - std_1_3_v3, y_1_3_v3 + std_1_3_v3, alpha=0.35, color="#9e66ab")
+
+    ax[2][0].plot(x_1_4_v3, y_1_4_v3, label=line_1_4_label_v3, marker="d", ls='-', color='g',
+                  markevery=markevery_1_4_v3)
+    ax[2][0].fill_between(x_1_4_v3, y_1_4_v3 - std_1_4_v3, y_1_4_v3 + std_1_4_v3, alpha=0.35, color='g')
+
+    ax[2][0].plot(x_1_5_v3, y_1_5_v3, label=line_1_5_label_v3, marker="^", ls='-', color='r',
+                  markevery=markevery_1_5_v3)
+    ax[2][0].fill_between(x_1_5_v3, y_1_5_v3 - std_1_5_v3, y_1_5_v3 + std_1_5_v3, alpha=0.35, color='r')
+
+    ax[2][0].set_xlim(xlims)
+    ax[2][0].set_ylim(ylims)
+
+    ax[2][0].set_title(title_1_v3)
+    ax[2][0].set_xlabel(xlabel_1_v3)
+    ax[2][0].set_ylabel(ylabel_1_v3)
+    # set the grid on
+    ax[2][0].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[2][0].xaxis.get_label()
+    ylab = ax[2][0].yaxis.get_label()
+
+    # xlab.set_style('italic')
+    # xlab.set_size(8)
+    # ylab.set_style('italic')
+    # ylab.set_size(8)
+
+    # change the color of the top and right spines to opaque gray
+    ax[2][0].spines['right'].set_color((.8, .8, .8))
+    ax[2][0].spines['top'].set_color((.8, .8, .8))
+
+    # plt.legend(loc=legend_loc)
+
+    # Shrink current axis's height by 10% on the bottom
+    # box = ax[0].get_position()
+    # ax[0].set_position([box.x0, 0.8*box.y0,
+    #                     box.width, box.height * 0.99])
+    fig.subplots_adjust(bottom=0.4)
+
+    # Put a legend below current axis
+    # ax[0].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
+    #              fancybox=True, shadow=True, ncol=2)
+
+    # Plot avg hack_probability eval
+    xlims = (min(min(x_2_1_v3), min(x_2_2_v3), min(x_2_3_v3), min(x_2_4_v3), min(x_2_5_v3)),
+             max(max(x_2_1_v3), max(x_2_2_v3), max(x_2_3_v3), max(x_2_4_v3), max(x_2_5_v3)))
+    ylims = (0, 1)
+
+    ax[2][1].plot(x_2_1_v3, y_2_1_v3, label=line_2_1_label_v3, marker="s", ls='-', color="#599ad3",
+                  markevery=markevery_2_1_v3)
+    ax[2][1].fill_between(x_2_1_v3, y_2_1_v3 - std_2_1_v3, y_2_1_v3 + std_2_1_v3, alpha=0.35, color="#599ad3")
+
+    ax[2][1].plot(x_2_2_v3, y_2_2_v3, label=line_2_2_label_v3, marker="o", ls='-', color='#f9a65a',
+                  markevery=markevery_2_2_v3)
+    ax[2][1].fill_between(x_2_2_v3, y_2_2_v3 - std_2_2_v3, y_2_2_v3 + std_2_2_v3, alpha=0.35, color='#f9a65a')
+
+    ax[2][1].plot(x_2_3_v3, y_2_3_v3, label=line_2_3_label_v3, marker="p", ls='-', color="#9e66ab",
+                  markevery=markevery_2_3_v3)
+    ax[2][1].fill_between(x_2_3_v3, y_2_3_v3 - std_2_3_v3, y_2_3_v3 + std_2_3_v3, alpha=0.35, color="#9e66ab")
+
+    ax[2][1].plot(x_2_4_v3, y_2_4_v3, label=line_2_4_label_v3, marker="d", ls='-', color='g',
+                  markevery=markevery_2_4_v3)
+    ax[2][1].fill_between(x_2_4_v3, y_2_4_v3 - std_2_4_v3, y_2_4_v3 + std_2_4_v3, alpha=0.35, color='g')
+
+    ax[2][1].plot(x_2_5_v3, y_2_5_v3, label=line_2_5_label_v3, marker="^", ls='-', color='r',
+                  markevery=markevery_2_5_v3)
+    ax[2][1].fill_between(x_2_5_v3, y_2_5_v3 - std_2_5_v3, y_2_5_v3 + std_2_5_v3, alpha=0.35, color='r')
+
+    ax[2][1].set_xlim(xlims)
+    ax[2][1].set_ylim(ylims)
+
+    ax[2][1].set_title(title_2_v3)
+    ax[2][1].set_xlabel(xlabel_2_v3)
+    ax[2][1].set_ylabel(ylabel_2_v3)
+    # set the grid on
+    ax[2][1].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[2][1].xaxis.get_label()
+    ylab = ax[2][1].yaxis.get_label()
+
+    # xlab.set_style('italic')
+    # xlab.set_size(10)
+    # ylab.set_style('italic')
+    # ylab.set_size(10)
+
+    # change the color of the top and right spines to opaque gray
+    ax[2][1].spines['right'].set_color((.8, .8, .8))
+    ax[2][1].spines['top'].set_color((.8, .8, .8))
+
+    # plt.legend(loc=legend_loc)
+
+    # Shrink current axis's height by 10% on the bottom
+    box = ax[2][1].get_position()
+    ax[2][1].set_position([box.x0, box.y0 + box.height * 0.03,
+                           box.width, box.height * 0.9])
+
+    # Put a legend below current axis
+    # ax[2].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
+    #              fancybox=True, shadow=True, ncol=2)
+
+    # Plot attacker cumulative reward
+    xlims = (min(min(x_3_1_v3), min(x_3_2_v3), min(x_3_3_v3), min(x_3_4_v3), min(x_3_5_v3)),
+             max(max(x_3_1_v3), max(x_3_2_v3), max(x_3_3_v3), max(x_3_4_v3), max(x_3_5_v3)))
+    ylims = (min(min(y_3_1_v3), min(y_3_2_v3), min(y_3_3_v3), min(y_3_4_v3), min(y_3_5_v3)),
+             max(max(y_3_1_v3), max(y_3_2_v3), max(y_3_3_v3), max(y_3_4_v3), max(y_3_5_v3)))
+
+    ax[2][2].plot(x_3_1_v3, y_3_1_v3, label=line_3_1_label_v3, marker="s", ls='-', color="#599ad3",
+                  markevery=markevery_3_1_v3)
+    ax[2][2].fill_between(x_3_1_v3, y_3_1_v3 - std_3_1_v3, y_3_1_v3 + std_3_1_v3, alpha=0.35, color="#599ad3")
+
+    ax[2][2].plot(x_3_2_v3, y_3_2_v3, label=line_3_2_label_v3, marker="o", ls='-', color='#f9a65a',
+                  markevery=markevery_3_2_v3)
+    ax[2][2].fill_between(x_3_2_v3, y_3_2_v3 - std_3_2_v3, y_3_2_v3 + std_3_2_v3, alpha=0.35, color='#f9a65a')
+
+    ax[2][2].plot(x_3_3_v3, y_3_3_v3, label=line_3_3_label_v3, marker="p", ls='-', color="#9e66ab",
+                  markevery=markevery_3_3_v3)
+    ax[2][2].fill_between(x_3_3_v3, y_3_3_v3 - std_3_3_v3, y_3_3_v3 + std_3_3_v3, alpha=0.35, color="#9e66ab")
+
+    ax[2][2].plot(x_3_4_v3, y_3_4_v3, label=line_3_4_label_v3, marker="d", ls='-', color='g',
+                  markevery=markevery_3_4_v3)
+    ax[2][2].fill_between(x_3_4_v3, y_3_4_v3 - std_3_4_v3, y_3_4_v3 + std_3_4_v3, alpha=0.35, color='g')
+
+    ax[2][2].plot(x_3_5_v3, y_3_5_v3, label=line_3_5_label_v3, marker="^", ls='-', color='r',
+                  markevery=markevery_3_5_v3)
+    ax[2][2].fill_between(x_3_5_v3, y_3_5_v3 - std_3_5_v3, y_3_5_v3 + std_3_5_v3, alpha=0.35, color='r')
+
+    ax[2][2].set_xlim(xlims)
+    ax[2][2].set_ylim(ylims)
+
+    ax[2][2].set_title(title_3_v3)
+    ax[2][2].set_xlabel(xlabel_3_v3)
+    ax[2][2].set_ylabel(ylabel_3_v3)
+    # set the grid on
+    ax[2][2].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[2][2].xaxis.get_label()
+    ylab = ax[2][2].yaxis.get_label()
+
+    ax[2][2].yaxis.labelpad = -5
+
+    # xlab.set_style('italic')
+    # xlab.set_size(10)
+    # ylab.set_style('italic')
+    # ylab.set_size(10)
+
+    # change the color of the top and right spines to opaque gray
+    ax[2][2].spines['right'].set_color((.8, .8, .8))
+    ax[2][2].spines['top'].set_color((.8, .8, .8))
+
+    # plt.legend(loc=legend_loc)
+
+    # Shrink current axis's height by 10% on the bottom
+    box = ax[2][2].get_position()
+    ax[2][2].set_position([box.x0, box.y0 + box.height * 0.03,
+                           box.width, box.height * 0.9])
+
+    ax[2][2].get_yaxis().set_major_formatter(tkr.FuncFormatter(lambda x, p: "${:1.0f}K$".format(x * 1e-3)))
+
+    #handles, labels = ax.get_legend_handles_labels()
+    lines_labels = [ax[2][2].get_legend_handles_labels()]
+    lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
+    #ax = fig.add_axes([0.1, 0.1, 0.6, 0.75])
+    fig.legend(lines, labels, loc=(0.16, 0.002), ncol=3, borderaxespad=0.)
+
+    #ax[2][2].legend(loc='lower center', bbox_to_anchor=(5, -1), fancybox=True, shadow=True, ncol=3)
+    #fig.legend(loc='upper center', bbox_to_anchor=(-0.7, -1), fancybox=True, shadow=True, ncol=3)
+    fig.tight_layout()
+    plt.subplots_adjust(wspace=0.28, hspace=0.47)
+    fig.subplots_adjust(bottom=0.13)
+    fig.savefig(file_name + ".png", format="png", bbox_inches='tight')
+    fig.savefig(file_name + ".pdf", format='pdf', dpi=500, bbox_inches='tight', transparent=True)
+
+
+
+def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maximal_attack_eval_csv_paths_v0,
+                                        minimal_defense_train_csv_paths_v0, minimal_defense_eval_csv_paths_v0,
+                                        random_attack_train_csv_paths_v0, random_attack_eval_csv_paths_v0,
+                                        random_defense_train_csv_paths_v0, random_defense_eval_csv_paths_v0,
+                                        two_agents_train_csv_paths_v0, two_agents_eval_csv_paths_v0,
+
+                                        maximal_attack_train_csv_paths_v2, maximal_attack_eval_csv_paths_v2,
+                                        minimal_defense_train_csv_paths_v2, minimal_defense_eval_csv_paths_v2,
+                                        random_attack_train_csv_paths_v2, random_attack_eval_csv_paths_v2,
+                                        random_defense_train_csv_paths_v2, random_defense_eval_csv_paths_v2,
+                                        two_agents_train_csv_paths_v2, two_agents_eval_csv_paths_v2,
+
+                                        maximal_attack_train_csv_paths_v3, maximal_attack_eval_csv_paths_v3,
+                                        minimal_defense_train_csv_paths_v3, minimal_defense_eval_csv_paths_v3,
+                                        random_attack_train_csv_paths_v3, random_attack_eval_csv_paths_v3,
+                                        random_defense_train_csv_paths_v3, random_defense_eval_csv_paths_v3,
+                                        two_agents_train_csv_paths_v3, two_agents_eval_csv_paths_v3,
+
+                                        algorithm, output_dir, eval_freq : int, train_log_freq : int):
+
+    # V0
+    train_max_attack_dfs_v0 = []
+    eval_max_attack_dfs_v0 = []
+    for csv_path in maximal_attack_train_csv_paths_v0:
+        df = read_data(csv_path)
+        train_max_attack_dfs_v0.append(df)
+
+    for csv_path in maximal_attack_eval_csv_paths_v0:
+        df = read_data(csv_path)
+        eval_max_attack_dfs_v0.append(df)
+
+    hack_prob_train_max_attack_data_v0 = list(map(lambda df: df["hack_probability"].values, train_max_attack_dfs_v0))
+    hack_prob_train_max_attack_means_v0 = np.mean(tuple(hack_prob_train_max_attack_data_v0), axis=0)
+    hack_prob_train_max_attack_stds_v0 = np.std(tuple(hack_prob_train_max_attack_data_v0), axis=0, ddof=1)
+    hack_prob_eval_max_attack_data_v0 = list(map(lambda df: df["hack_probability"].values, eval_max_attack_dfs_v0))
+    hack_prob_eval_max_attack_means_v0 = np.mean(tuple(hack_prob_eval_max_attack_data_v0), axis=0)
+    hack_prob_eval_max_attack_stds_v0 = np.std(tuple(hack_prob_eval_max_attack_data_v0), axis=0, ddof=1)
+
+    a_cum_reward_train_max_attack_data_v0 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, train_max_attack_dfs_v0))
+    a_cum_reward_train_max_attack_means_v0 = np.mean(tuple(a_cum_reward_train_max_attack_data_v0), axis=0)
+    a_cum_reward_train_max_attack_stds_v0 = np.std(tuple(a_cum_reward_train_max_attack_data_v0), axis=0, ddof=1)
+    a_cum_reward_eval_max_attack_data_v0 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, eval_max_attack_dfs_v0))
+    a_cum_reward_eval_max_attack_means_v0 = np.mean(tuple(a_cum_reward_eval_max_attack_data_v0), axis=0)
+    a_cum_reward_eval_max_attack_stds_v0 = np.std(tuple(a_cum_reward_eval_max_attack_data_v0), axis=0, ddof=1)
+
+    d_cum_reward_train_max_attack_data_v0 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, train_max_attack_dfs_v0))
+    d_cum_reward_train_max_attack_means_v0 = np.mean(tuple(d_cum_reward_train_max_attack_data_v0), axis=0)
+    d_cum_reward_train_max_attack_stds_v0 = np.std(tuple(d_cum_reward_train_max_attack_data_v0), axis=0, ddof=1)
+    d_cum_reward_eval_max_attack_data_v0 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, eval_max_attack_dfs_v0))
+    d_cum_reward_eval_max_attack_means_v0 = np.mean(tuple(d_cum_reward_eval_max_attack_data_v0), axis=0)
+    d_cum_reward_eval_max_attack_stds_v0 = np.std(tuple(d_cum_reward_eval_max_attack_data_v0), axis=0, ddof=1)
+
+    train_min_defense_dfs_v0 = []
+    eval_min_defense_dfs_v0 = []
+    for csv_path in minimal_defense_train_csv_paths_v0:
+        df = read_data(csv_path)
+        train_min_defense_dfs_v0.append(df)
+
+    for csv_path in minimal_defense_eval_csv_paths_v0:
+        df = read_data(csv_path)
+        eval_min_defense_dfs_v0.append(df)
+
+    hack_prob_train_min_defense_data_v0 = list(map(lambda df: df["hack_probability"].values, train_min_defense_dfs_v0))
+    hack_prob_train_min_defense_means_v0 = np.mean(tuple(hack_prob_train_min_defense_data_v0), axis=0)
+    hack_prob_train_min_defense_stds_v0 = np.std(tuple(hack_prob_train_min_defense_data_v0), axis=0, ddof=1)
+    hack_prob_eval_min_defense_data_v0 = list(map(lambda df: df["hack_probability"].values, eval_min_defense_dfs_v0))
+    hack_prob_eval_min_defense_means_v0 = np.mean(tuple(hack_prob_eval_min_defense_data_v0), axis=0)
+    hack_prob_eval_min_defense_stds_v0 = np.std(tuple(hack_prob_eval_min_defense_data_v0), axis=0, ddof=1)
+
+    a_cum_reward_train_min_defense_data_v0 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, train_min_defense_dfs_v0))
+    a_cum_reward_train_min_defense_means_v0 = np.mean(tuple(a_cum_reward_train_min_defense_data_v0), axis=0)
+    a_cum_reward_train_min_defense_stds_v0 = np.std(tuple(a_cum_reward_train_min_defense_data_v0), axis=0, ddof=1)
+    a_cum_reward_eval_min_defense_data_v0 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, eval_min_defense_dfs_v0))
+    a_cum_reward_eval_min_defense_means_v0 = np.mean(tuple(a_cum_reward_eval_min_defense_data_v0), axis=0)
+    a_cum_reward_eval_min_defense_stds_v0 = np.std(tuple(a_cum_reward_eval_min_defense_data_v0), axis=0, ddof=1)
+
+    d_cum_reward_train_min_defense_data_v0 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, train_min_defense_dfs_v0))
+    d_cum_reward_train_min_defense_means_v0 = np.mean(tuple(d_cum_reward_train_min_defense_data_v0), axis=0)
+    d_cum_reward_train_min_defense_stds_v0 = np.std(tuple(d_cum_reward_train_min_defense_data_v0), axis=0, ddof=1)
+    d_cum_reward_eval_min_defense_data_v0 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, eval_min_defense_dfs_v0))
+    d_cum_reward_eval_min_defense_means_v0 = np.mean(tuple(d_cum_reward_eval_min_defense_data_v0), axis=0)
+    d_cum_reward_eval_min_defense_stds_v0 = np.std(tuple(d_cum_reward_eval_min_defense_data_v0), axis=0, ddof=1)
+
+    train_random_attack_dfs_v0 = []
+    eval_random_attack_dfs_v0 = []
+    for csv_path in random_attack_train_csv_paths_v0:
+        df = read_data(csv_path)
+        train_random_attack_dfs_v0.append(df)
+
+    for csv_path in random_attack_eval_csv_paths_v0:
+        df = read_data(csv_path)
+        eval_random_attack_dfs_v0.append(df)
+
+    hack_prob_train_random_attack_data_v0 = list(map(lambda df: df["hack_probability"].values, train_random_attack_dfs_v0))
+    hack_prob_train_random_attack_means_v0 = np.mean(tuple(hack_prob_train_random_attack_data_v0), axis=0)
+    hack_prob_train_random_attack_stds_v0 = np.std(tuple(hack_prob_train_random_attack_data_v0), axis=0, ddof=1)
+    hack_prob_eval_random_attack_data_v0 = list(map(lambda df: df["hack_probability"].values, eval_random_attack_dfs_v0))
+    hack_prob_eval_random_attack_means_v0 = np.mean(tuple(hack_prob_eval_random_attack_data_v0), axis=0)
+    hack_prob_eval_random_attack_stds_v0 = np.std(tuple(hack_prob_eval_random_attack_data_v0), axis=0, ddof=1)
+
+    a_cum_reward_train_random_attack_data_v0 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, train_random_attack_dfs_v0))
+    a_cum_reward_train_random_attack_means_v0 = np.mean(tuple(a_cum_reward_train_random_attack_data_v0), axis=0)
+    a_cum_reward_train_random_attack_stds_v0 = np.std(tuple(a_cum_reward_train_random_attack_data_v0), axis=0, ddof=1)
+    a_cum_reward_eval_random_attack_data_v0 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, eval_random_attack_dfs_v0))
+    a_cum_reward_eval_random_attack_means_v0 = np.mean(tuple(a_cum_reward_eval_random_attack_data_v0), axis=0)
+    a_cum_reward_eval_random_attack_stds_v0 = np.std(tuple(a_cum_reward_eval_random_attack_data_v0), axis=0, ddof=1)
+
+    d_cum_reward_train_random_attack_data_v0 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, train_random_attack_dfs_v0))
+    d_cum_reward_train_random_attack_means_v0 = np.mean(tuple(d_cum_reward_train_random_attack_data_v0), axis=0)
+    d_cum_reward_train_random_attack_stds_v0 = np.std(tuple(d_cum_reward_train_random_attack_data_v0), axis=0, ddof=1)
+    d_cum_reward_eval_random_attack_data_v0 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, eval_random_attack_dfs_v0))
+    d_cum_reward_eval_random_attack_means_v0 = np.mean(tuple(d_cum_reward_eval_random_attack_data_v0), axis=0)
+    d_cum_reward_eval_random_attack_stds_v0 = np.std(tuple(d_cum_reward_eval_random_attack_data_v0), axis=0, ddof=1)
+
+    train_random_defense_dfs_v0 = []
+    eval_random_defense_dfs_v0 = []
+    for csv_path in random_defense_train_csv_paths_v0:
+        df = read_data(csv_path)
+        train_random_defense_dfs_v0.append(df)
+
+    for csv_path in random_defense_eval_csv_paths_v0:
+        df = read_data(csv_path)
+        eval_random_defense_dfs_v0.append(df)
+
+    hack_prob_train_random_defense_data_v0 = list(map(lambda df: df["hack_probability"].values, train_random_defense_dfs_v0))
+    hack_prob_train_random_defense_means_v0 = np.mean(tuple(hack_prob_train_random_defense_data_v0), axis=0)
+    hack_prob_train_random_defense_stds_v0 = np.std(tuple(hack_prob_train_random_defense_data_v0), axis=0, ddof=1)
+    hack_prob_eval_random_defense_data_v0 = list(map(lambda df: df["hack_probability"].values, eval_random_defense_dfs_v0))
+    hack_prob_eval_random_defense_means_v0 = np.mean(tuple(hack_prob_eval_random_defense_data_v0), axis=0)
+    hack_prob_eval_random_defense_stds_v0 = np.std(tuple(hack_prob_eval_random_defense_data_v0), axis=0, ddof=1)
+
+    a_cum_reward_train_random_defense_data_v0 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, train_random_defense_dfs_v0))
+    a_cum_reward_train_random_defense_means_v0 = np.mean(tuple(a_cum_reward_train_random_defense_data_v0), axis=0)
+    a_cum_reward_train_random_defense_stds_v0 = np.std(tuple(a_cum_reward_train_random_defense_data_v0), axis=0, ddof=1)
+    a_cum_reward_eval_random_defense_data_v0 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, eval_random_defense_dfs_v0))
+    a_cum_reward_eval_random_defense_means_v0 = np.mean(tuple(a_cum_reward_eval_random_defense_data_v0), axis=0)
+    a_cum_reward_eval_random_defense_stds_v0 = np.std(tuple(a_cum_reward_eval_random_defense_data_v0), axis=0, ddof=1)
+
+    d_cum_reward_train_random_defense_data_v0 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, train_random_defense_dfs_v0))
+    d_cum_reward_train_random_defense_means_v0 = np.mean(tuple(d_cum_reward_train_random_defense_data_v0), axis=0)
+    d_cum_reward_train_random_defense_stds_v0 = np.std(tuple(d_cum_reward_train_random_defense_data_v0), axis=0, ddof=1)
+    d_cum_reward_eval_random_defense_data_v0 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, eval_random_defense_dfs_v0))
+    d_cum_reward_eval_random_defense_means_v0 = np.mean(tuple(d_cum_reward_eval_random_defense_data_v0), axis=0)
+    d_cum_reward_eval_random_defense_stds_v0 = np.std(tuple(d_cum_reward_eval_random_defense_data_v0), axis=0, ddof=1)
+
+    train_two_agents_dfs_v0 = []
+    eval_two_agents_dfs_v0 = []
+    for csv_path in two_agents_train_csv_paths_v0:
+        df = read_data(csv_path)
+        train_two_agents_dfs_v0.append(df)
+
+    for csv_path in two_agents_eval_csv_paths_v0:
+        df = read_data(csv_path)
+        eval_two_agents_dfs_v0.append(df)
+
+    hack_prob_train_two_agents_data_v0 = list(map(lambda df: df["hack_probability"].values, train_two_agents_dfs_v0))
+    hack_prob_train_two_agents_means_v0 = np.mean(tuple(hack_prob_train_two_agents_data_v0), axis=0)
+    hack_prob_train_two_agents_stds_v0 = np.std(tuple(hack_prob_train_two_agents_data_v0), axis=0, ddof=1)
+    hack_prob_eval_two_agents_data_v0 = list(map(lambda df: df["hack_probability"].values, eval_two_agents_dfs_v0))
+    hack_prob_eval_two_agents_means_v0 = np.mean(tuple(hack_prob_eval_two_agents_data_v0), axis=0)
+    hack_prob_eval_two_agents_stds_v0 = np.std(tuple(hack_prob_eval_two_agents_data_v0), axis=0, ddof=1)
+
+    a_cum_reward_train_two_agents_data_v0 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, train_two_agents_dfs_v0))
+    a_cum_reward_train_two_agents_means_v0 = np.mean(tuple(a_cum_reward_train_two_agents_data_v0), axis=0)
+    a_cum_reward_train_two_agents_stds_v0 = np.std(tuple(a_cum_reward_train_two_agents_data_v0), axis=0, ddof=1)
+    a_cum_reward_eval_two_agents_data = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, eval_two_agents_dfs_v0))
+    a_cum_reward_eval_two_agents_means_v0 = np.mean(tuple(a_cum_reward_eval_two_agents_data), axis=0)
+    a_cum_reward_eval_two_agents_stds_v0 = np.std(tuple(a_cum_reward_eval_two_agents_data), axis=0, ddof=1)
+
+    d_cum_reward_train_two_agents_data_v0 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, train_two_agents_dfs_v0))
+    d_cum_reward_train_two_agents_means_v0 = np.mean(tuple(d_cum_reward_train_two_agents_data_v0), axis=0)
+    d_cum_reward_train_two_agents_stds_v0 = np.std(tuple(d_cum_reward_train_two_agents_data_v0), axis=0, ddof=1)
+    d_cum_reward_eval_two_agents_data_v0 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, eval_two_agents_dfs_v0))
+    d_cum_reward_eval_two_agents_means_v0 = np.mean(tuple(d_cum_reward_eval_two_agents_data_v0), axis=0)
+    d_cum_reward_eval_two_agents_stds_v0 = np.std(tuple(d_cum_reward_eval_two_agents_data_v0), axis=0, ddof=1)
+
+
+
+    # V2
+    train_max_attack_dfs_v2 = []
+    eval_max_attack_dfs_v2 = []
+    for csv_path in maximal_attack_train_csv_paths_v2:
+        df = read_data(csv_path)
+        train_max_attack_dfs_v2.append(df)
+
+    for csv_path in maximal_attack_eval_csv_paths_v2:
+        df = read_data(csv_path)
+        eval_max_attack_dfs_v2.append(df)
+
+    hack_prob_train_max_attack_data_v2 = list(map(lambda df: df["hack_probability"].values, train_max_attack_dfs_v2))
+    hack_prob_train_max_attack_means_v2 = np.mean(tuple(hack_prob_train_max_attack_data_v2), axis=0)
+    hack_prob_train_max_attack_stds_v2 = np.std(tuple(hack_prob_train_max_attack_data_v2), axis=0, ddof=1)
+    hack_prob_eval_max_attack_data_v2 = list(map(lambda df: df["hack_probability"].values, eval_max_attack_dfs_v2))
+    hack_prob_eval_max_attack_means_v2 = np.mean(tuple(hack_prob_eval_max_attack_data_v2), axis=0)
+    hack_prob_eval_max_attack_stds_v2 = np.std(tuple(hack_prob_eval_max_attack_data_v2), axis=0, ddof=1)
+
+    a_cum_reward_train_max_attack_data_v2 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, train_max_attack_dfs_v2))
+    a_cum_reward_train_max_attack_means_v2 = np.mean(tuple(a_cum_reward_train_max_attack_data_v2), axis=0)
+    a_cum_reward_train_max_attack_stds_v2 = np.std(tuple(a_cum_reward_train_max_attack_data_v2), axis=0, ddof=1)
+    a_cum_reward_eval_max_attack_data_v2 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, eval_max_attack_dfs_v2))
+    a_cum_reward_eval_max_attack_means_v2 = np.mean(tuple(a_cum_reward_eval_max_attack_data_v2), axis=0)
+    a_cum_reward_eval_max_attack_stds_v2 = np.std(tuple(a_cum_reward_eval_max_attack_data_v2), axis=0, ddof=1)
+
+    d_cum_reward_train_max_attack_data_v2 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, train_max_attack_dfs_v2))
+    d_cum_reward_train_max_attack_means_v2 = np.mean(tuple(d_cum_reward_train_max_attack_data_v2), axis=0)
+    d_cum_reward_train_max_attack_stds_v2 = np.std(tuple(d_cum_reward_train_max_attack_data_v2), axis=0, ddof=1)
+    d_cum_reward_eval_max_attack_data_v2 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, eval_max_attack_dfs_v2))
+    d_cum_reward_eval_max_attack_means_v2 = np.mean(tuple(d_cum_reward_eval_max_attack_data_v2), axis=0)
+    d_cum_reward_eval_max_attack_stds_v2 = np.std(tuple(d_cum_reward_eval_max_attack_data_v2), axis=0, ddof=1)
+
+    train_min_defense_dfs_v2 = []
+    eval_min_defense_dfs_v2 = []
+    for csv_path in minimal_defense_train_csv_paths_v2:
+        df = read_data(csv_path)
+        train_min_defense_dfs_v2.append(df)
+
+    for csv_path in minimal_defense_eval_csv_paths_v2:
+        df = read_data(csv_path)
+        eval_min_defense_dfs_v2.append(df)
+
+    hack_prob_train_min_defense_data_v2 = list(map(lambda df: df["hack_probability"].values, train_min_defense_dfs_v2))
+    hack_prob_train_min_defense_means_v2 = np.mean(tuple(hack_prob_train_min_defense_data_v2), axis=0)
+    hack_prob_train_min_defense_stds_v2 = np.std(tuple(hack_prob_train_min_defense_data_v2), axis=0, ddof=1)
+    hack_prob_eval_min_defense_data_v2 = list(map(lambda df: df["hack_probability"].values, eval_min_defense_dfs_v2))
+    hack_prob_eval_min_defense_means_v2 = np.mean(tuple(hack_prob_eval_min_defense_data_v2), axis=0)
+    hack_prob_eval_min_defense_stds_v2 = np.std(tuple(hack_prob_eval_min_defense_data_v2), axis=0, ddof=1)
+
+    a_cum_reward_train_min_defense_data_v2 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, train_min_defense_dfs_v2))
+    a_cum_reward_train_min_defense_means_v2 = np.mean(tuple(a_cum_reward_train_min_defense_data_v2), axis=0)
+    a_cum_reward_train_min_defense_stds_v2 = np.std(tuple(a_cum_reward_train_min_defense_data_v2), axis=0, ddof=1)
+    a_cum_reward_eval_min_defense_data_v2 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, eval_min_defense_dfs_v2))
+    a_cum_reward_eval_min_defense_means_v2 = np.mean(tuple(a_cum_reward_eval_min_defense_data_v2), axis=0)
+    a_cum_reward_eval_min_defense_stds_v2 = np.std(tuple(a_cum_reward_eval_min_defense_data_v2), axis=0, ddof=1)
+
+    d_cum_reward_train_min_defense_data_v2 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, train_min_defense_dfs_v2))
+    d_cum_reward_train_min_defense_means_v2 = np.mean(tuple(d_cum_reward_train_min_defense_data_v2), axis=0)
+    d_cum_reward_train_min_defense_stds_v2 = np.std(tuple(d_cum_reward_train_min_defense_data_v2), axis=0, ddof=1)
+    d_cum_reward_eval_min_defense_data_v2 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, eval_min_defense_dfs_v2))
+    d_cum_reward_eval_min_defense_means_v2 = np.mean(tuple(d_cum_reward_eval_min_defense_data_v2), axis=0)
+    d_cum_reward_eval_min_defense_stds_v2 = np.std(tuple(d_cum_reward_eval_min_defense_data_v2), axis=0, ddof=1)
+
+    train_random_attack_dfs_v2 = []
+    eval_random_attack_dfs_v2 = []
+    for csv_path in random_attack_train_csv_paths_v2:
+        df = read_data(csv_path)
+        train_random_attack_dfs_v2.append(df)
+
+    for csv_path in random_attack_eval_csv_paths_v2:
+        df = read_data(csv_path)
+        eval_random_attack_dfs_v2.append(df)
+
+    hack_prob_train_random_attack_data_v2 = list(
+        map(lambda df: df["hack_probability"].values, train_random_attack_dfs_v2))
+    hack_prob_train_random_attack_means_v2 = np.mean(tuple(hack_prob_train_random_attack_data_v2), axis=0)
+    hack_prob_train_random_attack_stds_v2 = np.std(tuple(hack_prob_train_random_attack_data_v2), axis=0, ddof=1)
+    hack_prob_eval_random_attack_data_v2 = list(
+        map(lambda df: df["hack_probability"].values, eval_random_attack_dfs_v2))
+    hack_prob_eval_random_attack_means_v2 = np.mean(tuple(hack_prob_eval_random_attack_data_v2), axis=0)
+    hack_prob_eval_random_attack_stds_v2 = np.std(tuple(hack_prob_eval_random_attack_data_v2), axis=0, ddof=1)
+
+    a_cum_reward_train_random_attack_data_v2 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, train_random_attack_dfs_v2))
+    a_cum_reward_train_random_attack_means_v2 = np.mean(tuple(a_cum_reward_train_random_attack_data_v2), axis=0)
+    a_cum_reward_train_random_attack_stds_v2 = np.std(tuple(a_cum_reward_train_random_attack_data_v2), axis=0, ddof=1)
+    a_cum_reward_eval_random_attack_data_v2 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, eval_random_attack_dfs_v2))
+    a_cum_reward_eval_random_attack_means_v2 = np.mean(tuple(a_cum_reward_eval_random_attack_data_v2), axis=0)
+    a_cum_reward_eval_random_attack_stds_v2 = np.std(tuple(a_cum_reward_eval_random_attack_data_v2), axis=0, ddof=1)
+
+    d_cum_reward_train_random_attack_data_v2 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, train_random_attack_dfs_v2))
+    d_cum_reward_train_random_attack_means_v2 = np.mean(tuple(d_cum_reward_train_random_attack_data_v2), axis=0)
+    d_cum_reward_train_random_attack_stds_v2 = np.std(tuple(d_cum_reward_train_random_attack_data_v2), axis=0, ddof=1)
+    d_cum_reward_eval_random_attack_data_v2 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, eval_random_attack_dfs_v2))
+    d_cum_reward_eval_random_attack_means_v2 = np.mean(tuple(d_cum_reward_eval_random_attack_data_v2), axis=0)
+    d_cum_reward_eval_random_attack_stds_v2 = np.std(tuple(d_cum_reward_eval_random_attack_data_v2), axis=0, ddof=1)
+
+    train_random_defense_dfs_v2 = []
+    eval_random_defense_dfs_v2 = []
+    for csv_path in random_defense_train_csv_paths_v2:
+        df = read_data(csv_path)
+        train_random_defense_dfs_v2.append(df)
+
+    for csv_path in random_defense_eval_csv_paths_v2:
+        df = read_data(csv_path)
+        eval_random_defense_dfs_v2.append(df)
+
+    hack_prob_train_random_defense_data_v2 = list(
+        map(lambda df: df["hack_probability"].values, train_random_defense_dfs_v2))
+    hack_prob_train_random_defense_means_v2 = np.mean(tuple(hack_prob_train_random_defense_data_v2), axis=0)
+    hack_prob_train_random_defense_stds_v2 = np.std(tuple(hack_prob_train_random_defense_data_v2), axis=0, ddof=1)
+    hack_prob_eval_random_defense_data_v2 = list(
+        map(lambda df: df["hack_probability"].values, eval_random_defense_dfs_v2))
+    hack_prob_eval_random_defense_means_v2 = np.mean(tuple(hack_prob_eval_random_defense_data_v2), axis=0)
+    hack_prob_eval_random_defense_stds_v2 = np.std(tuple(hack_prob_eval_random_defense_data_v2), axis=0, ddof=1)
+
+    a_cum_reward_train_random_defense_data_v2 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, train_random_defense_dfs_v2))
+    a_cum_reward_train_random_defense_means_v2 = np.mean(tuple(a_cum_reward_train_random_defense_data_v2), axis=0)
+    a_cum_reward_train_random_defense_stds_v2 = np.std(tuple(a_cum_reward_train_random_defense_data_v2), axis=0, ddof=1)
+    a_cum_reward_eval_random_defense_data_v2 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, eval_random_defense_dfs_v2))
+    a_cum_reward_eval_random_defense_means_v2 = np.mean(tuple(a_cum_reward_eval_random_defense_data_v2), axis=0)
+    a_cum_reward_eval_random_defense_stds_v2 = np.std(tuple(a_cum_reward_eval_random_defense_data_v2), axis=0, ddof=1)
+
+    d_cum_reward_train_random_defense_data_v2 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, train_random_defense_dfs_v2))
+    d_cum_reward_train_random_defense_means_v2 = np.mean(tuple(d_cum_reward_train_random_defense_data_v2), axis=0)
+    d_cum_reward_train_random_defense_stds_v2 = np.std(tuple(d_cum_reward_train_random_defense_data_v2), axis=0, ddof=1)
+    d_cum_reward_eval_random_defense_data_v2 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, eval_random_defense_dfs_v2))
+    d_cum_reward_eval_random_defense_means_v2 = np.mean(tuple(d_cum_reward_eval_random_defense_data_v2), axis=0)
+    d_cum_reward_eval_random_defense_stds_v2 = np.std(tuple(d_cum_reward_eval_random_defense_data_v2), axis=0, ddof=1)
+
+    train_two_agents_dfs_v2 = []
+    eval_two_agents_dfs_v2 = []
+    for csv_path in two_agents_train_csv_paths_v2:
+        df = read_data(csv_path)
+        train_two_agents_dfs_v2.append(df)
+
+    for csv_path in two_agents_eval_csv_paths_v2:
+        df = read_data(csv_path)
+        eval_two_agents_dfs_v2.append(df)
+
+    hack_prob_train_two_agents_data_v2 = list(map(lambda df: df["hack_probability"].values, train_two_agents_dfs_v2))
+    hack_prob_train_two_agents_means_v2 = np.mean(tuple(hack_prob_train_two_agents_data_v2), axis=0)
+    hack_prob_train_two_agents_stds_v2 = np.std(tuple(hack_prob_train_two_agents_data_v2), axis=0, ddof=1)
+    hack_prob_eval_two_agents_data_v2 = list(map(lambda df: df["hack_probability"].values, eval_two_agents_dfs_v2))
+    hack_prob_eval_two_agents_means_v2 = np.mean(tuple(hack_prob_eval_two_agents_data_v2), axis=0)
+    hack_prob_eval_two_agents_stds_v2 = np.std(tuple(hack_prob_eval_two_agents_data_v2), axis=0, ddof=1)
+
+    a_cum_reward_train_two_agents_data_v2 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, train_two_agents_dfs_v2))
+    a_cum_reward_train_two_agents_means_v2 = np.mean(tuple(a_cum_reward_train_two_agents_data_v2), axis=0)
+    a_cum_reward_train_two_agents_stds_v2 = np.std(tuple(a_cum_reward_train_two_agents_data_v2), axis=0, ddof=1)
+    a_cum_reward_eval_two_agents_data = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, eval_two_agents_dfs_v2))
+    a_cum_reward_eval_two_agents_means_v2 = np.mean(tuple(a_cum_reward_eval_two_agents_data), axis=0)
+    a_cum_reward_eval_two_agents_stds_v2 = np.std(tuple(a_cum_reward_eval_two_agents_data), axis=0, ddof=1)
+
+    d_cum_reward_train_two_agents_data_v2 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, train_two_agents_dfs_v2))
+    d_cum_reward_train_two_agents_means_v2 = np.mean(tuple(d_cum_reward_train_two_agents_data_v2), axis=0)
+    d_cum_reward_train_two_agents_stds_v2 = np.std(tuple(d_cum_reward_train_two_agents_data_v2), axis=0, ddof=1)
+    d_cum_reward_eval_two_agents_data_v2 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, eval_two_agents_dfs_v2))
+    d_cum_reward_eval_two_agents_means_v2 = np.mean(tuple(d_cum_reward_eval_two_agents_data_v2), axis=0)
+    d_cum_reward_eval_two_agents_stds_v2 = np.std(tuple(d_cum_reward_eval_two_agents_data_v2), axis=0, ddof=1)
+
+    # V3
+    train_max_attack_dfs_v3 = []
+    eval_max_attack_dfs_v3 = []
+    for csv_path in maximal_attack_train_csv_paths_v3:
+        df = read_data(csv_path)
+        train_max_attack_dfs_v3.append(df)
+
+    for csv_path in maximal_attack_eval_csv_paths_v3:
+        df = read_data(csv_path)
+        eval_max_attack_dfs_v3.append(df)
+
+    hack_prob_train_max_attack_data_v3 = list(map(lambda df: df["hack_probability"].values, train_max_attack_dfs_v3))
+    hack_prob_train_max_attack_means_v3 = np.mean(tuple(hack_prob_train_max_attack_data_v3), axis=0)
+    hack_prob_train_max_attack_stds_v3 = np.std(tuple(hack_prob_train_max_attack_data_v3), axis=0, ddof=1)
+    hack_prob_eval_max_attack_data_v3 = list(map(lambda df: df["hack_probability"].values, eval_max_attack_dfs_v3))
+    hack_prob_eval_max_attack_means_v3 = np.mean(tuple(hack_prob_eval_max_attack_data_v3), axis=0)
+    hack_prob_eval_max_attack_stds_v3 = np.std(tuple(hack_prob_eval_max_attack_data_v3), axis=0, ddof=1)
+
+    a_cum_reward_train_max_attack_data_v3 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, train_max_attack_dfs_v3))
+    a_cum_reward_train_max_attack_means_v3 = np.mean(tuple(a_cum_reward_train_max_attack_data_v3), axis=0)
+    a_cum_reward_train_max_attack_stds_v3 = np.std(tuple(a_cum_reward_train_max_attack_data_v3), axis=0, ddof=1)
+    a_cum_reward_eval_max_attack_data_v3 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, eval_max_attack_dfs_v3))
+    a_cum_reward_eval_max_attack_means_v3 = np.mean(tuple(a_cum_reward_eval_max_attack_data_v3), axis=0)
+    a_cum_reward_eval_max_attack_stds_v3 = np.std(tuple(a_cum_reward_eval_max_attack_data_v3), axis=0, ddof=1)
+
+    d_cum_reward_train_max_attack_data_v3 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, train_max_attack_dfs_v3))
+    d_cum_reward_train_max_attack_means_v3 = np.mean(tuple(d_cum_reward_train_max_attack_data_v3), axis=0)
+    d_cum_reward_train_max_attack_stds_v3 = np.std(tuple(d_cum_reward_train_max_attack_data_v3), axis=0, ddof=1)
+    d_cum_reward_eval_max_attack_data_v3 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, eval_max_attack_dfs_v3))
+    d_cum_reward_eval_max_attack_means_v3 = np.mean(tuple(d_cum_reward_eval_max_attack_data_v3), axis=0)
+    d_cum_reward_eval_max_attack_stds_v3 = np.std(tuple(d_cum_reward_eval_max_attack_data_v3), axis=0, ddof=1)
+
+    train_min_defense_dfs_v3 = []
+    eval_min_defense_dfs_v3 = []
+    for csv_path in minimal_defense_train_csv_paths_v3:
+        df = read_data(csv_path)
+        train_min_defense_dfs_v3.append(df)
+
+    for csv_path in minimal_defense_eval_csv_paths_v3:
+        df = read_data(csv_path)
+        eval_min_defense_dfs_v3.append(df)
+
+    hack_prob_train_min_defense_data_v3 = list(map(lambda df: df["hack_probability"].values, train_min_defense_dfs_v3))
+    hack_prob_train_min_defense_means_v3 = np.mean(tuple(hack_prob_train_min_defense_data_v3), axis=0)
+    hack_prob_train_min_defense_stds_v3 = np.std(tuple(hack_prob_train_min_defense_data_v3), axis=0, ddof=1)
+    hack_prob_eval_min_defense_data_v3 = list(map(lambda df: df["hack_probability"].values, eval_min_defense_dfs_v3))
+    hack_prob_eval_min_defense_means_v3 = np.mean(tuple(hack_prob_eval_min_defense_data_v3), axis=0)
+    hack_prob_eval_min_defense_stds_v3 = np.std(tuple(hack_prob_eval_min_defense_data_v3), axis=0, ddof=1)
+
+    a_cum_reward_train_min_defense_data_v3 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, train_min_defense_dfs_v3))
+    a_cum_reward_train_min_defense_means_v3 = np.mean(tuple(a_cum_reward_train_min_defense_data_v3), axis=0)
+    a_cum_reward_train_min_defense_stds_v3 = np.std(tuple(a_cum_reward_train_min_defense_data_v3), axis=0, ddof=1)
+    a_cum_reward_eval_min_defense_data_v3 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, eval_min_defense_dfs_v3))
+    a_cum_reward_eval_min_defense_means_v3 = np.mean(tuple(a_cum_reward_eval_min_defense_data_v3), axis=0)
+    a_cum_reward_eval_min_defense_stds_v3 = np.std(tuple(a_cum_reward_eval_min_defense_data_v3), axis=0, ddof=1)
+
+    d_cum_reward_train_min_defense_data_v3 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, train_min_defense_dfs_v3))
+    d_cum_reward_train_min_defense_means_v3 = np.mean(tuple(d_cum_reward_train_min_defense_data_v3), axis=0)
+    d_cum_reward_train_min_defense_stds_v3 = np.std(tuple(d_cum_reward_train_min_defense_data_v3), axis=0, ddof=1)
+    d_cum_reward_eval_min_defense_data_v3 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, eval_min_defense_dfs_v3))
+    d_cum_reward_eval_min_defense_means_v3 = np.mean(tuple(d_cum_reward_eval_min_defense_data_v3), axis=0)
+    d_cum_reward_eval_min_defense_stds_v3 = np.std(tuple(d_cum_reward_eval_min_defense_data_v3), axis=0, ddof=1)
+
+    train_random_attack_dfs_v3 = []
+    eval_random_attack_dfs_v3 = []
+    for csv_path in random_attack_train_csv_paths_v3:
+        df = read_data(csv_path)
+        train_random_attack_dfs_v3.append(df)
+
+    for csv_path in random_attack_eval_csv_paths_v3:
+        df = read_data(csv_path)
+        eval_random_attack_dfs_v3.append(df)
+
+    hack_prob_train_random_attack_data_v3 = list(
+        map(lambda df: df["hack_probability"].values, train_random_attack_dfs_v3))
+    hack_prob_train_random_attack_means_v3 = np.mean(tuple(hack_prob_train_random_attack_data_v3), axis=0)
+    hack_prob_train_random_attack_stds_v3 = np.std(tuple(hack_prob_train_random_attack_data_v3), axis=0, ddof=1)
+    hack_prob_eval_random_attack_data_v3 = list(
+        map(lambda df: df["hack_probability"].values, eval_random_attack_dfs_v3))
+    hack_prob_eval_random_attack_means_v3 = np.mean(tuple(hack_prob_eval_random_attack_data_v3), axis=0)
+    hack_prob_eval_random_attack_stds_v3 = np.std(tuple(hack_prob_eval_random_attack_data_v3), axis=0, ddof=1)
+
+    a_cum_reward_train_random_attack_data_v3 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, train_random_attack_dfs_v3))
+    a_cum_reward_train_random_attack_means_v3 = np.mean(tuple(a_cum_reward_train_random_attack_data_v3), axis=0)
+    a_cum_reward_train_random_attack_stds_v3 = np.std(tuple(a_cum_reward_train_random_attack_data_v3), axis=0, ddof=1)
+    a_cum_reward_eval_random_attack_data_v3 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, eval_random_attack_dfs_v3))
+    a_cum_reward_eval_random_attack_means_v3 = np.mean(tuple(a_cum_reward_eval_random_attack_data_v3), axis=0)
+    a_cum_reward_eval_random_attack_stds_v3 = np.std(tuple(a_cum_reward_eval_random_attack_data_v3), axis=0, ddof=1)
+
+    d_cum_reward_train_random_attack_data_v3 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, train_random_attack_dfs_v3))
+    d_cum_reward_train_random_attack_means_v3 = np.mean(tuple(d_cum_reward_train_random_attack_data_v3), axis=0)
+    d_cum_reward_train_random_attack_stds_v3 = np.std(tuple(d_cum_reward_train_random_attack_data_v3), axis=0, ddof=1)
+    d_cum_reward_eval_random_attack_data_v3 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, eval_random_attack_dfs_v3))
+    d_cum_reward_eval_random_attack_means_v3 = np.mean(tuple(d_cum_reward_eval_random_attack_data_v3), axis=0)
+    d_cum_reward_eval_random_attack_stds_v3 = np.std(tuple(d_cum_reward_eval_random_attack_data_v3), axis=0, ddof=1)
+
+    train_random_defense_dfs_v3 = []
+    eval_random_defense_dfs_v3 = []
+    for csv_path in random_defense_train_csv_paths_v3:
+        df = read_data(csv_path)
+        train_random_defense_dfs_v3.append(df)
+
+    for csv_path in random_defense_eval_csv_paths_v3:
+        df = read_data(csv_path)
+        eval_random_defense_dfs_v3.append(df)
+
+    hack_prob_train_random_defense_data_v3 = list(
+        map(lambda df: df["hack_probability"].values, train_random_defense_dfs_v3))
+    hack_prob_train_random_defense_means_v3 = np.mean(tuple(hack_prob_train_random_defense_data_v3), axis=0)
+    hack_prob_train_random_defense_stds_v3 = np.std(tuple(hack_prob_train_random_defense_data_v3), axis=0, ddof=1)
+    hack_prob_eval_random_defense_data_v3 = list(
+        map(lambda df: df["hack_probability"].values, eval_random_defense_dfs_v3))
+    hack_prob_eval_random_defense_means_v3 = np.mean(tuple(hack_prob_eval_random_defense_data_v3), axis=0)
+    hack_prob_eval_random_defense_stds_v3 = np.std(tuple(hack_prob_eval_random_defense_data_v3), axis=0, ddof=1)
+
+    a_cum_reward_train_random_defense_data_v3 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, train_random_defense_dfs_v3))
+    a_cum_reward_train_random_defense_means_v3 = np.mean(tuple(a_cum_reward_train_random_defense_data_v3), axis=0)
+    a_cum_reward_train_random_defense_stds_v3 = np.std(tuple(a_cum_reward_train_random_defense_data_v3), axis=0, ddof=1)
+    a_cum_reward_eval_random_defense_data_v3 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, eval_random_defense_dfs_v3))
+    a_cum_reward_eval_random_defense_means_v3 = np.mean(tuple(a_cum_reward_eval_random_defense_data_v3), axis=0)
+    a_cum_reward_eval_random_defense_stds_v3 = np.std(tuple(a_cum_reward_eval_random_defense_data_v3), axis=0, ddof=1)
+
+    d_cum_reward_train_random_defense_data_v3 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, train_random_defense_dfs_v3))
+    d_cum_reward_train_random_defense_means_v3 = np.mean(tuple(d_cum_reward_train_random_defense_data_v3), axis=0)
+    d_cum_reward_train_random_defense_stds_v3 = np.std(tuple(d_cum_reward_train_random_defense_data_v3), axis=0, ddof=1)
+    d_cum_reward_eval_random_defense_data_v3 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, eval_random_defense_dfs_v3))
+    d_cum_reward_eval_random_defense_means_v3 = np.mean(tuple(d_cum_reward_eval_random_defense_data_v3), axis=0)
+    d_cum_reward_eval_random_defense_stds_v3 = np.std(tuple(d_cum_reward_eval_random_defense_data_v3), axis=0, ddof=1)
+
+    train_two_agents_dfs_v3 = []
+    eval_two_agents_dfs_v3 = []
+    for csv_path in two_agents_train_csv_paths_v3:
+        df = read_data(csv_path)
+        train_two_agents_dfs_v3.append(df)
+
+    for csv_path in two_agents_eval_csv_paths_v3:
+        df = read_data(csv_path)
+        eval_two_agents_dfs_v3.append(df)
+
+    hack_prob_train_two_agents_data_v3 = list(map(lambda df: df["hack_probability"].values, train_two_agents_dfs_v3))
+    hack_prob_train_two_agents_means_v3 = np.mean(tuple(hack_prob_train_two_agents_data_v3), axis=0)
+    hack_prob_train_two_agents_stds_v3 = np.std(tuple(hack_prob_train_two_agents_data_v3), axis=0, ddof=1)
+    hack_prob_eval_two_agents_data_v3 = list(map(lambda df: df["hack_probability"].values, eval_two_agents_dfs_v3))
+    hack_prob_eval_two_agents_means_v3 = np.mean(tuple(hack_prob_eval_two_agents_data_v3), axis=0)
+    hack_prob_eval_two_agents_stds_v3 = np.std(tuple(hack_prob_eval_two_agents_data_v3), axis=0, ddof=1)
+
+    a_cum_reward_train_two_agents_data_v3 = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, train_two_agents_dfs_v3))
+    a_cum_reward_train_two_agents_means_v3 = np.mean(tuple(a_cum_reward_train_two_agents_data_v3), axis=0)
+    a_cum_reward_train_two_agents_stds_v3 = np.std(tuple(a_cum_reward_train_two_agents_data_v3), axis=0, ddof=1)
+    a_cum_reward_eval_two_agents_data = list(
+        map(lambda df: df["attacker_cumulative_reward"].values, eval_two_agents_dfs_v3))
+    a_cum_reward_eval_two_agents_means_v3 = np.mean(tuple(a_cum_reward_eval_two_agents_data), axis=0)
+    a_cum_reward_eval_two_agents_stds_v3 = np.std(tuple(a_cum_reward_eval_two_agents_data), axis=0, ddof=1)
+
+    d_cum_reward_train_two_agents_data_v3 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, train_two_agents_dfs_v3))
+    d_cum_reward_train_two_agents_means_v3 = np.mean(tuple(d_cum_reward_train_two_agents_data_v3), axis=0)
+    d_cum_reward_train_two_agents_stds_v3 = np.std(tuple(d_cum_reward_train_two_agents_data_v3), axis=0, ddof=1)
+    d_cum_reward_eval_two_agents_data_v3 = list(
+        map(lambda df: df["defender_cumulative_reward"].values, eval_two_agents_dfs_v3))
+    d_cum_reward_eval_two_agents_means_v3 = np.mean(tuple(d_cum_reward_eval_two_agents_data_v3), axis=0)
+    d_cum_reward_eval_two_agents_stds_v3 = np.std(tuple(d_cum_reward_eval_two_agents_data_v3), axis=0, ddof=1)
+
+    plot_all_avg_summary_3(np.array(list(range(len(hack_prob_train_min_defense_data_v0[0])))) * train_log_freq,
+                           hack_prob_train_min_defense_means_v0,
+                           np.array(list(range(len(hack_prob_train_random_defense_data_v0[0])))) * train_log_freq,
+                           hack_prob_train_random_defense_means_v0,
+                           np.array(list(range(len(hack_prob_train_max_attack_data_v0[0])))) * train_log_freq,
+                           hack_prob_train_max_attack_means_v0,
+                           np.array(list(range(len(hack_prob_train_random_attack_data_v0[0])))) * train_log_freq,
+                           hack_prob_train_random_attack_means_v0,
+                           np.array(list(range(len(hack_prob_train_two_agents_data_v0[0])))) * train_log_freq,
+                           hack_prob_train_two_agents_means_v0, hack_prob_train_min_defense_stds_v0,
+                           hack_prob_train_random_defense_stds_v0, hack_prob_train_max_attack_stds_v0,
+                           hack_prob_train_random_attack_stds_v0, hack_prob_train_two_agents_stds_v0,
+                           "Q-learning vs minimal defense", "Q-learning vs random defense",
+                           "maximal attack vs Q-learning", "random attack vs Q-learning",
+                           "Q-learning vs Q-learning", "Hack probability (train, v" + str(0) + ")",
+                           "Episode \#", "$\mathbb{P}[Hacked]$", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+
+                           np.array(list(range(len(hack_prob_eval_min_defense_data_v0[0])))) * eval_freq,
+                           hack_prob_eval_min_defense_means_v0,
+                           np.array(list(range(len(hack_prob_eval_random_defense_data_v0[0])))) * eval_freq,
+                           hack_prob_eval_random_defense_means_v0,
+                           np.array(list(range(len(hack_prob_eval_max_attack_data_v0[0])))) * eval_freq,
+                           hack_prob_eval_max_attack_means_v0,
+                           np.array(list(range(len(hack_prob_eval_random_attack_data_v0[0])))) * eval_freq,
+                           hack_prob_eval_random_attack_means_v0,
+                           np.array(list(range(len(hack_prob_eval_two_agents_data_v0[0])))) * eval_freq,
+                           hack_prob_eval_two_agents_means_v0, hack_prob_eval_min_defense_stds_v0,
+                           hack_prob_eval_random_defense_stds_v0, hack_prob_eval_max_attack_stds_v0,
+                           hack_prob_eval_random_attack_stds_v0, hack_prob_eval_two_agents_stds_v0,
+                           "Q-learning vs minimal defense", "Q-learning vs random defense",
+                           "maximal attack vs Q-learning", "random attack vs Q-learning",
+                           "Q-learning vs Q-learning", "Hack probability (eval v" + str(0) + ")",
+                           "Episode \#", "$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1,
+
+                           np.array(list(range(len(a_cum_reward_train_min_defense_data_v0[0])))) * train_log_freq,
+                           a_cum_reward_train_min_defense_means_v0,
+                           np.array(list(range(len(a_cum_reward_train_random_defense_data_v0[0])))) * train_log_freq,
+                           a_cum_reward_train_random_defense_means_v0,
+                           np.array(list(range(len(a_cum_reward_train_max_attack_data_v0[0])))) * train_log_freq,
+                           a_cum_reward_train_max_attack_means_v0,
+                           np.array(list(range(len(a_cum_reward_train_random_attack_data_v0[0])))) * train_log_freq,
+                           a_cum_reward_train_random_attack_means_v0,
+                           np.array(list(range(len(a_cum_reward_train_two_agents_data_v0[0])))) * train_log_freq,
+                           a_cum_reward_train_two_agents_means_v0, a_cum_reward_train_min_defense_stds_v0,
+                           a_cum_reward_train_random_defense_stds_v0, a_cum_reward_train_max_attack_stds_v0,
+                           a_cum_reward_train_random_attack_stds_v0, a_cum_reward_train_two_agents_stds_v0,
+                           "Q-learning vs minimal defense", "Q-learning vs random defense",
+                           "maximal attack vs Q-learning", "random attack vs Q-learning",
+                           "Q-learning vs Q-learning", "Attacker reward (train v" + str(0) + ")",
+                           "Episode \#", "Cumulative Reward", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+
+
+                           np.array(list(range(len(hack_prob_train_min_defense_data_v2[0])))) * train_log_freq,
+                           hack_prob_train_min_defense_means_v2,
+                           np.array(list(range(len(hack_prob_train_random_defense_data_v2[0])))) * train_log_freq,
+                           hack_prob_train_random_defense_means_v2,
+                           np.array(list(range(len(hack_prob_train_max_attack_data_v2[0])))) * train_log_freq,
+                           hack_prob_train_max_attack_means_v2,
+                           np.array(list(range(len(hack_prob_train_random_attack_data_v2[0])))) * train_log_freq,
+                           hack_prob_train_random_attack_means_v2,
+                           np.array(list(range(len(hack_prob_train_two_agents_data_v2[0])))) * train_log_freq,
+                           hack_prob_train_two_agents_means_v2, hack_prob_train_min_defense_stds_v2,
+                           hack_prob_train_random_defense_stds_v2, hack_prob_train_max_attack_stds_v2,
+                           hack_prob_train_random_attack_stds_v2, hack_prob_train_two_agents_stds_v2,
+                           "Q-learning vs minimal defense", "Q-learning vs random defense",
+                           "maximal attack vs Q-learning", "random attack vs Q-learning",
+                           "Q-learning vs Q-learning", "Hack probability (train, v" + str(1) + ")",
+                           "Episode \#", "$\mathbb{P}[Hacked]$", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+
+                           np.array(list(range(len(hack_prob_eval_min_defense_data_v2[0])))) * eval_freq,
+                           hack_prob_eval_min_defense_means_v2,
+                           np.array(list(range(len(hack_prob_eval_random_defense_data_v2[0])))) * eval_freq,
+                           hack_prob_eval_random_defense_means_v2,
+                           np.array(list(range(len(hack_prob_eval_max_attack_data_v2[0])))) * eval_freq,
+                           hack_prob_eval_max_attack_means_v2,
+                           np.array(list(range(len(hack_prob_eval_random_attack_data_v2[0])))) * eval_freq,
+                           hack_prob_eval_random_attack_means_v2,
+                           np.array(list(range(len(hack_prob_eval_two_agents_data_v2[0])))) * eval_freq,
+                           hack_prob_eval_two_agents_means_v2, hack_prob_eval_min_defense_stds_v2,
+                           hack_prob_eval_random_defense_stds_v2, hack_prob_eval_max_attack_stds_v2,
+                           hack_prob_eval_random_attack_stds_v2, hack_prob_eval_two_agents_stds_v2,
+                           "Q-learning vs minimal defense", "Q-learning vs random defense",
+                           "maximal attack vs Q-learning", "random attack vs Q-learning",
+                           "Q-learning vs Q-learning", "Hack probability (eval v" + str(1) + ")",
+                           "Episode \#", "$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1,
+
+                           np.array(list(range(len(a_cum_reward_train_min_defense_data_v2[0])))) * train_log_freq,
+                           a_cum_reward_train_min_defense_means_v2,
+                           np.array(list(range(len(a_cum_reward_train_random_defense_data_v2[0])))) * train_log_freq,
+                           a_cum_reward_train_random_defense_means_v2,
+                           np.array(list(range(len(a_cum_reward_train_max_attack_data_v2[0])))) * train_log_freq,
+                           a_cum_reward_train_max_attack_means_v2,
+                           np.array(list(range(len(a_cum_reward_train_random_attack_data_v2[0])))) * train_log_freq,
+                           a_cum_reward_train_random_attack_means_v2,
+                           np.array(list(range(len(a_cum_reward_train_two_agents_data_v2[0])))) * train_log_freq,
+                           a_cum_reward_train_two_agents_means_v2, a_cum_reward_train_min_defense_stds_v2,
+                           a_cum_reward_train_random_defense_stds_v2, a_cum_reward_train_max_attack_stds_v2,
+                           a_cum_reward_train_random_attack_stds_v2, a_cum_reward_train_two_agents_stds_v2,
+                           "Q-learning vs minimal defense", "Q-learning vs random defense",
+                           "maximal attack vs Q-learning", "random attack vs Q-learning",
+                           "Q-learning vs Q-learning", "Attacker reward (train v" + str(1) + ")",
+                           "Episode \#", "Cumulative Reward", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+
+                           np.array(list(range(len(hack_prob_train_min_defense_data_v3[0])))) * train_log_freq,
+                           hack_prob_train_min_defense_means_v3,
+                           np.array(list(range(len(hack_prob_train_random_defense_data_v3[0])))) * train_log_freq,
+                           hack_prob_train_random_defense_means_v3,
+                           np.array(list(range(len(hack_prob_train_max_attack_data_v3[0])))) * train_log_freq,
+                           hack_prob_train_max_attack_means_v3,
+                           np.array(list(range(len(hack_prob_train_random_attack_data_v3[0])))) * train_log_freq,
+                           hack_prob_train_random_attack_means_v3,
+                           np.array(list(range(len(hack_prob_train_two_agents_data_v3[0])))) * train_log_freq,
+                           hack_prob_train_two_agents_means_v3, hack_prob_train_min_defense_stds_v3,
+                           hack_prob_train_random_defense_stds_v3, hack_prob_train_max_attack_stds_v3,
+                           hack_prob_train_random_attack_stds_v3, hack_prob_train_two_agents_stds_v3,
+                           "Q-learning vs minimal defense", "Q-learning vs random defense",
+                           "maximal attack vs Q-learning", "random attack vs Q-learning",
+                           "Q-learning vs Q-learning", "Hack probability (train, v" + str(2) + ")",
+                           "Episode \#", "$\mathbb{P}[Hacked]$", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+
+                           np.array(list(range(len(hack_prob_eval_min_defense_data_v3[0])))) * eval_freq,
+                           hack_prob_eval_min_defense_means_v3,
+                           np.array(list(range(len(hack_prob_eval_random_defense_data_v3[0])))) * eval_freq,
+                           hack_prob_eval_random_defense_means_v3,
+                           np.array(list(range(len(hack_prob_eval_max_attack_data_v3[0])))) * eval_freq,
+                           hack_prob_eval_max_attack_means_v3,
+                           np.array(list(range(len(hack_prob_eval_random_attack_data_v3[0])))) * eval_freq,
+                           hack_prob_eval_random_attack_means_v3,
+                           np.array(list(range(len(hack_prob_eval_two_agents_data_v3[0])))) * eval_freq,
+                           hack_prob_eval_two_agents_means_v3, hack_prob_eval_min_defense_stds_v3,
+                           hack_prob_eval_random_defense_stds_v3, hack_prob_eval_max_attack_stds_v3,
+                           hack_prob_eval_random_attack_stds_v3, hack_prob_eval_two_agents_stds_v3,
+                           "Q-learning vs minimal defense", "Q-learning vs random defense",
+                           "maximal attack vs Q-learning", "random attack vs Q-learning",
+                           "Q-learning vs Q-learning", "Hack probability (eval v" + str(2) + ")",
+                           "Episode \#", "$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1,
+
+                           np.array(list(range(len(a_cum_reward_train_min_defense_data_v3[0])))) * train_log_freq,
+                           a_cum_reward_train_min_defense_means_v3,
+                           np.array(list(range(len(a_cum_reward_train_random_defense_data_v3[0])))) * train_log_freq,
+                           a_cum_reward_train_random_defense_means_v3,
+                           np.array(list(range(len(a_cum_reward_train_max_attack_data_v3[0])))) * train_log_freq,
+                           a_cum_reward_train_max_attack_means_v3,
+                           np.array(list(range(len(a_cum_reward_train_random_attack_data_v3[0])))) * train_log_freq,
+                           a_cum_reward_train_random_attack_means_v3,
+                           np.array(list(range(len(a_cum_reward_train_two_agents_data_v3[0])))) * train_log_freq,
+                           a_cum_reward_train_two_agents_means_v3, a_cum_reward_train_min_defense_stds_v3,
+                           a_cum_reward_train_random_defense_stds_v3, a_cum_reward_train_max_attack_stds_v3,
+                           a_cum_reward_train_random_attack_stds_v3, a_cum_reward_train_two_agents_stds_v3,
+                           "Q-learning vs minimal defense", "Q-learning vs random defense",
+                           "maximal attack vs Q-learning", "random attack vs Q-learning",
+                           "Q-learning vs Q-learning", "Attacker reward (train v" + str(2) + ")",
+                           "Episode \#", "Cumulative Reward", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+
+
+                           output_dir + "/combined_plot_mult_versions_" + algorithm + "_" + str(0)
+                           )
+
+
+
 def plot_all_averages(maximal_attack_train_csv_paths, maximal_attack_eval_csv_paths,
                       minimal_defense_train_csv_paths, minimal_defense_eval_csv_paths,
                       random_attack_train_csv_paths, random_attack_eval_csv_paths,
@@ -1287,6 +2615,127 @@ def plot_all_averages(maximal_attack_train_csv_paths, maximal_attack_eval_csv_pa
                            "Cumulative Reward", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
                            output_dir + "/combined_plot_" + algorithm + "_" + str(version)
                            )
+
+    # Save mean and std data
+    with open(output_dir + "/data/hack_prob_train_min_defense_means.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_train_min_defense_means"])
+        for row in hack_prob_train_min_defense_means.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_train_min_defense_stds.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_train_min_defense_stds"])
+        for row in hack_prob_train_min_defense_stds.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_train_random_defense_means.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_train_random_defense_means"])
+        for row in hack_prob_train_random_defense_means.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_train_random_defense_stds.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_train_random_defense_stds"])
+        for row in hack_prob_train_random_defense_stds.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_train_max_attack_means.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_train_max_attack_means"])
+        for row in hack_prob_train_max_attack_means.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_train_max_attack_stds.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_train_max_attack_stds"])
+        for row in hack_prob_train_max_attack_stds.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_train_random_attack_means.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_train_random_attack_means"])
+        for row in hack_prob_train_random_attack_means.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_train_random_attack_stds.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_train_random_attack_stds"])
+        for row in hack_prob_train_random_attack_stds.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_train_two_agents_means.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_train_two_agents_means"])
+        for row in hack_prob_train_two_agents_means.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_train_two_agents_stds.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_train_two_agents_stds"])
+        for row in hack_prob_train_two_agents_stds.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_eval_min_defense_means.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_eval_min_defense_means"])
+        for row in hack_prob_eval_min_defense_means.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_eval_min_defense_stds.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_eval_min_defense_stds"])
+        for row in hack_prob_eval_min_defense_stds.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_eval_random_defense_means.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_eval_random_defense_means"])
+        for row in hack_prob_eval_random_defense_means.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_eval_random_defense_stds.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_eval_random_defense_stds"])
+        for row in hack_prob_eval_random_defense_stds.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_eval_max_attack_means.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_eval_max_attack_means"])
+        for row in hack_prob_eval_max_attack_means.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_eval_max_attack_stds.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_eval_max_attack_stds"])
+        for row in hack_prob_eval_max_attack_stds.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_eval_random_attack_means.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_eval_random_attack_means"])
+        for row in hack_prob_eval_random_attack_means.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_eval_random_attack_stds.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_eval_random_attack_stds"])
+        for row in hack_prob_eval_random_attack_stds.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_eval_two_agents_means.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_eval_two_agents_means"])
+        for row in hack_prob_eval_two_agents_means.tolist():
+            writer.writerow([row])
+
+    with open(output_dir + "/data/hack_prob_eval_two_agents_stds.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["hack_prob_eval_two_agents_stds"])
+        for row in hack_prob_eval_two_agents_stds.tolist():
+            writer.writerow([row])
 
 
 def plot_average_results(train_dfs, eval_dfs, train_log_frequency, eval_frequency, experiment_title, output_dir):

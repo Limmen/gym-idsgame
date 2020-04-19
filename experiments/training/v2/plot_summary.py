@@ -91,7 +91,7 @@ def plot_summary(algorithm : str, eval_freq : int, train_log_freq : int):
                                     random_attack_train_csv_paths, random_attack_eval_csv_paths,
                                     random_defense_train_csv_paths, random_defense_eval_csv_paths,
                                     two_agents_train_csv_paths, two_agents_eval_csv_paths,
-                                    0, algorithm, default_output_dir() + "/plots", eval_freq, train_log_freq)
+                                    2, algorithm, default_output_dir() + "/plots", eval_freq, train_log_freq)
 
 
 def plot():
