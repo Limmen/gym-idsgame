@@ -220,6 +220,8 @@ def plot_summary(algorithm : str, eval_freq : int, train_log_freq : int):
         algorithm, default_output_dir() + "/plots", eval_freq, train_log_freq)
 
 
+
+
 def plot():
     if not os.path.exists(default_output_dir() + "/plots"):
         os.makedirs(default_output_dir() + "/plots")
