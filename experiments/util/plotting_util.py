@@ -1279,7 +1279,7 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
                            ):
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts}')
-    fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(9, 6.5))
+    fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(9, 6.8))
     #gs1 = gridspec.GridSpec(1, 4)
     #gs1.update(wspace=0.005, hspace=0.05)
 
@@ -1816,13 +1816,13 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     lines_labels = [ax[2][2].get_legend_handles_labels()]
     lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
     #ax = fig.add_axes([0.1, 0.1, 0.6, 0.75])
-    fig.legend(lines, labels, loc=(0.16, 0.002), ncol=3, borderaxespad=0.)
+    fig.legend(lines, labels, loc=(0.16, 0.01), ncol=2, borderaxespad=0.)
 
     #ax[2][2].legend(loc='lower center', bbox_to_anchor=(5, -1), fancybox=True, shadow=True, ncol=3)
     #fig.legend(loc='upper center', bbox_to_anchor=(-0.7, -1), fancybox=True, shadow=True, ncol=3)
     fig.tight_layout()
     plt.subplots_adjust(wspace=0.28, hspace=0.47)
-    fig.subplots_adjust(bottom=0.13)
+    fig.subplots_adjust(bottom=0.17)
     fig.savefig(file_name + ".png", format="png", bbox_inches='tight')
     fig.savefig(file_name + ".pdf", format='pdf', dpi=500, bbox_inches='tight', transparent=True)
 
@@ -2515,10 +2515,10 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            hack_prob_train_two_agents_means_v0, hack_prob_train_min_defense_stds_v0,
                            hack_prob_train_random_defense_stds_v0, hack_prob_train_max_attack_stds_v0,
                            hack_prob_train_random_attack_stds_v0, hack_prob_train_two_agents_stds_v0,
-                           "Q-learning vs minimal defense", "Q-learning vs random defense",
-                           "maximal attack vs Q-learning", "random attack vs Q-learning",
-                           "Q-learning vs Q-learning", "Hack probability (train, v" + str(0) + ")",
-                           "Episode \#", "$\mathbb{P}[Hacked]$", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+                           r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
+                           r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
+                           r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Hack probability (train, v" + str(0) + ")",
+                           r"Episode \#", r"$\mathbb{P}[Hacked]$", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
 
                            np.array(list(range(len(hack_prob_eval_min_defense_data_v0[0])))) * eval_freq,
                            hack_prob_eval_min_defense_means_v0,
@@ -2532,10 +2532,10 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            hack_prob_eval_two_agents_means_v0, hack_prob_eval_min_defense_stds_v0,
                            hack_prob_eval_random_defense_stds_v0, hack_prob_eval_max_attack_stds_v0,
                            hack_prob_eval_random_attack_stds_v0, hack_prob_eval_two_agents_stds_v0,
-                           "Q-learning vs minimal defense", "Q-learning vs random defense",
-                           "maximal attack vs Q-learning", "random attack vs Q-learning",
-                           "Q-learning vs Q-learning", "Hack probability (eval v" + str(0) + ")",
-                           "Episode \#", "$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1,
+                           r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
+                           r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
+                           r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Hack probability (eval v" + str(0) + ")",
+                           r"Episode \#", r"$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1,
 
                            np.array(list(range(len(a_cum_reward_train_min_defense_data_v0[0])))) * train_log_freq,
                            a_cum_reward_train_min_defense_means_v0,
@@ -2549,10 +2549,10 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            a_cum_reward_train_two_agents_means_v0, a_cum_reward_train_min_defense_stds_v0,
                            a_cum_reward_train_random_defense_stds_v0, a_cum_reward_train_max_attack_stds_v0,
                            a_cum_reward_train_random_attack_stds_v0, a_cum_reward_train_two_agents_stds_v0,
-                           "Q-learning vs minimal defense", "Q-learning vs random defense",
-                           "maximal attack vs Q-learning", "random attack vs Q-learning",
-                           "Q-learning vs Q-learning", "Attacker reward (train v" + str(0) + ")",
-                           "Episode \#", "Cumulative Reward", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+                           r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
+                           r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
+                           r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Attacker reward (train v" + str(0) + ")",
+                           r"Episode \#", r"Cumulative Reward", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
 
 
                            np.array(list(range(len(hack_prob_train_min_defense_data_v2[0])))) * train_log_freq,
@@ -2567,10 +2567,10 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            hack_prob_train_two_agents_means_v2, hack_prob_train_min_defense_stds_v2,
                            hack_prob_train_random_defense_stds_v2, hack_prob_train_max_attack_stds_v2,
                            hack_prob_train_random_attack_stds_v2, hack_prob_train_two_agents_stds_v2,
-                           "Q-learning vs minimal defense", "Q-learning vs random defense",
-                           "maximal attack vs Q-learning", "random attack vs Q-learning",
-                           "Q-learning vs Q-learning", "Hack probability (train, v" + str(1) + ")",
-                           "Episode \#", "$\mathbb{P}[Hacked]$", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+                           r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
+                           r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
+                           r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Hack probability (train, v" + str(1) + ")",
+                           r"Episode \#", r"$\mathbb{P}[Hacked]$", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
 
                            np.array(list(range(len(hack_prob_eval_min_defense_data_v2[0])))) * eval_freq,
                            hack_prob_eval_min_defense_means_v2,
@@ -2584,10 +2584,10 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            hack_prob_eval_two_agents_means_v2, hack_prob_eval_min_defense_stds_v2,
                            hack_prob_eval_random_defense_stds_v2, hack_prob_eval_max_attack_stds_v2,
                            hack_prob_eval_random_attack_stds_v2, hack_prob_eval_two_agents_stds_v2,
-                           "Q-learning vs minimal defense", "Q-learning vs random defense",
-                           "maximal attack vs Q-learning", "random attack vs Q-learning",
-                           "Q-learning vs Q-learning", "Hack probability (eval v" + str(1) + ")",
-                           "Episode \#", "$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1,
+                           r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
+                           r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
+                           r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Hack probability (eval v" + str(1) + ")",
+                           r"Episode \#", r"$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1,
 
                            np.array(list(range(len(a_cum_reward_train_min_defense_data_v2[0])))) * train_log_freq,
                            a_cum_reward_train_min_defense_means_v2,
@@ -2601,10 +2601,10 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            a_cum_reward_train_two_agents_means_v2, a_cum_reward_train_min_defense_stds_v2,
                            a_cum_reward_train_random_defense_stds_v2, a_cum_reward_train_max_attack_stds_v2,
                            a_cum_reward_train_random_attack_stds_v2, a_cum_reward_train_two_agents_stds_v2,
-                           "Q-learning vs minimal defense", "Q-learning vs random defense",
-                           "maximal attack vs Q-learning", "random attack vs Q-learning",
-                           "Q-learning vs Q-learning", "Attacker reward (train v" + str(1) + ")",
-                           "Episode \#", "Cumulative Reward", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+                           r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
+                           r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
+                           r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Attacker reward (train v" + str(1) + ")",
+                           r"Episode \#", r"Cumulative Reward", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
 
                            np.array(list(range(len(hack_prob_train_min_defense_data_v3[0])))) * train_log_freq,
                            hack_prob_train_min_defense_means_v3,
@@ -2618,10 +2618,10 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            hack_prob_train_two_agents_means_v3, hack_prob_train_min_defense_stds_v3,
                            hack_prob_train_random_defense_stds_v3, hack_prob_train_max_attack_stds_v3,
                            hack_prob_train_random_attack_stds_v3, hack_prob_train_two_agents_stds_v3,
-                           "Q-learning vs minimal defense", "Q-learning vs random defense",
-                           "maximal attack vs Q-learning", "random attack vs Q-learning",
-                           "Q-learning vs Q-learning", "Hack probability (train, v" + str(2) + ")",
-                           "Episode \#", "$\mathbb{P}[Hacked]$", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+                           r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
+                           r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
+                           r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Hack probability (train, v" + str(2) + ")",
+                           r"Episode \#", r"$\mathbb{P}[Hacked]$", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
 
                            np.array(list(range(len(hack_prob_eval_min_defense_data_v3[0])))) * eval_freq,
                            hack_prob_eval_min_defense_means_v3,
@@ -2635,10 +2635,10 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            hack_prob_eval_two_agents_means_v3, hack_prob_eval_min_defense_stds_v3,
                            hack_prob_eval_random_defense_stds_v3, hack_prob_eval_max_attack_stds_v3,
                            hack_prob_eval_random_attack_stds_v3, hack_prob_eval_two_agents_stds_v3,
-                           "Q-learning vs minimal defense", "Q-learning vs random defense",
-                           "maximal attack vs Q-learning", "random attack vs Q-learning",
-                           "Q-learning vs Q-learning", "Hack probability (eval v" + str(2) + ")",
-                           "Episode \#", "$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1,
+                           r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
+                           r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
+                           r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Hack probability (eval v" + str(2) + ")",
+                           r"Episode \#", r"$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1,
 
                            np.array(list(range(len(a_cum_reward_train_min_defense_data_v3[0])))) * train_log_freq,
                            a_cum_reward_train_min_defense_means_v3,
@@ -2652,10 +2652,10 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            a_cum_reward_train_two_agents_means_v3, a_cum_reward_train_min_defense_stds_v3,
                            a_cum_reward_train_random_defense_stds_v3, a_cum_reward_train_max_attack_stds_v3,
                            a_cum_reward_train_random_attack_stds_v3, a_cum_reward_train_two_agents_stds_v3,
-                           "Q-learning vs minimal defense", "Q-learning vs random defense",
-                           "maximal attack vs Q-learning", "random attack vs Q-learning",
-                           "Q-learning vs Q-learning", "Attacker reward (train v" + str(2) + ")",
-                           "Episode \#", "Cumulative Reward", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+                           r'\textsc{TabularQLearning} vs \textsc{MinDefense}', r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
+                           r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
+                           r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Attacker reward (train v" + str(2) + ")",
+                           r"Episode \#", r"Cumulative Reward", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
 
 
                            output_dir + "/combined_plot_mult_versions_" + algorithm + "_" + str(0)
@@ -2672,12 +2672,14 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                             episode_len_eval_two_agents_means_v0, stds_1=episode_len_eval_max_attack_stds_v0,
                             stds_2=episode_len_eval_min_defense_stds_v0, stds_3=episode_len_eval_random_attack_stds_v0,
                             stds_4=episode_len_eval_random_defense_stds_v0, stds_5=episode_len_eval_two_agents_stds_v0,
-                            title="Avg Episode Lengths [Eval] (v" + str(0) + ")",
-                            xlabel="Episode \#", ylabel="Avg Length (num steps)",
+                            title=r"Avg Episode Lengths [Eval] (v" + str(0) + ")",
+                            xlabel=r"Episode \#", ylabel=r"Avg Length (num steps)",
                             file_name=output_dir + "/avg_episode_length_eval_" + algorithm + "_" + str(0),
-                            line1_label="maximal attack vs Q-learning", line2_label="Q-learning vs minimal defense",
-                            line3_label="random attack vs Q-learning", line4_label="Q-learning vs random defense",
-                            line5_label="Q-learning vs Q-learning", legend_loc="lower right",
+                            line1_label=r"\textsc{MaxAttack} vs \textsc{TabularQLearning}",
+                            line2_label=r"\textsc{TabularQLearning} vs \textsc{MinDefense}",
+                            line3_label=r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
+                            line4_label=r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
+                            line5_label=r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", legend_loc="lower right",
                             markevery_1=1, markevery_2=1, markevery_3=1,
                             markevery_4=1, markevery_5=1)
 
@@ -2693,12 +2695,14 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                             episode_len_eval_two_agents_means_v2, stds_1=episode_len_eval_max_attack_stds_v2,
                             stds_2=episode_len_eval_min_defense_stds_v2, stds_3=episode_len_eval_random_attack_stds_v2,
                             stds_4=episode_len_eval_random_defense_stds_v2, stds_5=episode_len_eval_two_agents_stds_v2,
-                            title="Avg Episode Lengths [Eval] (v" + str(1) + ")",
-                            xlabel="Episode \#", ylabel="Avg Length (num steps)",
+                            title=r"Avg Episode Lengths [Eval] (v" + str(1) + ")",
+                            xlabel=r"Episode \#", ylabel=r"Avg Length (num steps)",
                             file_name=output_dir + "/avg_episode_length_eval_" + algorithm + "_" + str(1),
-                            line1_label="maximal attack vs Q-learning", line2_label="Q-learning vs minimal defense",
-                            line3_label="random attack vs Q-learning", line4_label="Q-learning vs random defense",
-                            line5_label="Q-learning vs Q-learning", legend_loc="lower right",
+                            line1_label=r"\textsc{MaxAttack} vs \textsc{TabularQLearning}",
+                            line2_label=r"\textsc{TabularQLearning} vs \textsc{MinDefense}",
+                            line3_label=r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
+                            line4_label=r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
+                            line5_label=r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", legend_loc="lower right",
                             markevery_1=1, markevery_2=1, markevery_3=1,
                             markevery_4=1, markevery_5=1)
 
@@ -2714,12 +2718,15 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                             episode_len_eval_two_agents_means_v3, stds_1=episode_len_eval_max_attack_stds_v3,
                             stds_2=episode_len_eval_min_defense_stds_v3, stds_3=episode_len_eval_random_attack_stds_v3,
                             stds_4=episode_len_eval_random_defense_stds_v3, stds_5=episode_len_eval_two_agents_stds_v3,
-                            title="Avg Episode Lengths [Eval] (v" + str(2) + ")",
-                            xlabel="Episode \#", ylabel="Avg Length (num steps)",
+                            title=r"Avg Episode Lengths [Eval] (v" + str(2) + ")",
+                            xlabel=r"Episode \#", ylabel=r"Avg Length (num steps)",
                             file_name=output_dir + "/avg_episode_length_eval_" + algorithm + "_" + str(2),
-                            line1_label="maximal attack vs Q-learning", line2_label="Q-learning vs minimal defense",
-                            line3_label="random attack vs Q-learning", line4_label="Q-learning vs random defense",
-                            line5_label="Q-learning vs Q-learning", legend_loc="lower right",
+                            line1_label=r"\textsc{MaxAttack} vs \textsc{TabularQLearning}",
+                            line2_label=r"\textsc{TabularQLearning} vs \textsc{MinDefense}",
+                            line3_label=r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
+                            line4_label=r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
+                            line5_label=r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}",
+                            legend_loc="lower right",
                             markevery_1=1, markevery_2=1, markevery_3=1,
                             markevery_4=1, markevery_5=1)
 
@@ -2735,10 +2742,10 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            episode_len_eval_two_agents_means_v0, episode_len_eval_min_defense_stds_v0,
                            episode_len_eval_random_defense_stds_v0, episode_len_eval_max_attack_stds_v0,
                            episode_len_eval_random_attack_stds_v0, episode_len_eval_two_agents_stds_v0,
-                           "Q-learning vs minimal defense", "Q-learning vs random defense",
-                           "maximal attack vs Q-learning", "random attack vs Q-learning",
-                           "Q-learning vs Q-learning", "Avg Episode Lengths [Eval] (v" + str(0) + ")",
-                           "Episode \#", "Avg Length (num steps)", 1, 1, 1, 1, 1,
+                           r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
+                           r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
+                           r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Avg Episode Lengths [Eval] (v" + str(0) + ")",
+                           r"Episode \#", r"Avg Length (num steps)", 1, 1, 1, 1, 1,
 
                            np.array(list(range(len(episode_len_eval_min_defense_data_v2[0])))) * eval_freq,
                            episode_len_eval_min_defense_means_v2,
@@ -2752,10 +2759,10 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            episode_len_eval_two_agents_means_v2, episode_len_eval_min_defense_stds_v2,
                            episode_len_eval_random_defense_stds_v2, episode_len_eval_max_attack_stds_v2,
                            episode_len_eval_random_attack_stds_v2, episode_len_eval_two_agents_stds_v2,
-                           "Q-learning vs minimal defense", "Q-learning vs random defense",
-                           "maximal attack vs Q-learning", "random attack vs Q-learning",
-                           "Q-learning vs Q-learning", "Avg Episode Lengths [Eval] (v" + str(1) + ")",
-                           "Episode \#", "Avg Length (num steps)", 1, 1, 1, 1, 1,
+                           r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
+                           r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
+                           r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Avg Episode Lengths [Eval] (v" + str(1) + ")",
+                           r"Episode \#", r"Avg Length (num steps)", 1, 1, 1, 1, 1,
 
                            np.array(list(range(len(episode_len_eval_min_defense_data_v3[0])))) * eval_freq,
                            episode_len_eval_min_defense_means_v3,
@@ -2769,10 +2776,10 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            episode_len_eval_two_agents_means_v3, episode_len_eval_min_defense_stds_v3,
                            episode_len_eval_random_defense_stds_v3, episode_len_eval_max_attack_stds_v3,
                            episode_len_eval_random_attack_stds_v3, episode_len_eval_two_agents_stds_v3,
-                           "Q-learning vs minimal defense", "Q-learning vs random defense",
-                           "maximal attack vs Q-learning", "random attack vs Q-learning",
-                           "Q-learning vs Q-learning", "Avg Episode Lengths [Eval] (v" + str(2) + ")",
-                           "Episode \#", "Avg Length (num steps)", 1, 1, 1, 1, 1,
+                           r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
+                           r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
+                           r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Avg Episode Lengths [Eval] (v" + str(2) + ")",
+                           r"Episode \#", r"Avg Length (num steps)", 1, 1, 1, 1, 1,
 
                            np.array(list(range(len(episode_len_eval_min_defense_data_v3[0])))) * eval_freq,
                            episode_len_eval_min_defense_means_v3,
@@ -2786,10 +2793,10 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            episode_len_eval_two_agents_means_v3, episode_len_eval_min_defense_stds_v3,
                            episode_len_eval_random_defense_stds_v3, episode_len_eval_max_attack_stds_v3,
                            episode_len_eval_random_attack_stds_v3, episode_len_eval_two_agents_stds_v3,
-                           "Q-learning vs minimal defense", "Q-learning vs random defense",
-                           "maximal attack vs Q-learning", "random attack vs Q-learning",
-                           "Q-learning vs Q-learning", "Avg Episode Lengths [Eval] (v" + str(2) + ")",
-                           "Episode \#", "Avg Length (num steps)", 1, 1, 1, 1, 1,
+                           r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
+                           r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
+                           r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Avg Episode Lengths [Eval] (v" + str(2) + ")",
+                           r"Episode \#", r"Avg Length (num steps)", 1, 1, 1, 1, 1,
 
                            output_dir + "/combined_plot_mult_versions_avg_length_" + algorithm
                            )
@@ -2810,7 +2817,7 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
     #                         xlabel="Episode \#", ylabel="Avg Length (num steps)",
     #                         file_name=output_dir + "/avg_episode_length_train_" + algorithm + "_" + str(0),
     #                         line1_label="maximal attack vs Q-learning", line2_label="Q-learning vs minimal defense",
-    #                         line3_label="random attack vs Q-learning", line4_label="Q-learning vs random defense",
+    #                         line3_label="\textsc{RandomAttack} vs Q-learning", line4_label="Q-learning vs random defense",
     #                         line5_label="Q-learning vs Q-learning", legend_loc="lower right",
     #                         markevery_1=eval_freq, markevery_2=eval_freq, markevery_3=eval_freq,
     #                         markevery_4=eval_freq, markevery_5=eval_freq)
