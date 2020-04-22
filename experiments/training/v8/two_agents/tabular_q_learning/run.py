@@ -169,7 +169,7 @@ if __name__ == '__main__':
             train_csv_paths = []
             eval_csv_paths = []
             for seed in config.random_seeds:
-                train_csv_path, eval_csv_path = run_experiment(args.configpath, seed)
+                train_csv_path, eval_csv_path = run_experiment(args.configpath, seed, args.noconfig)
                 train_csv_paths.append(train_csv_path)
                 eval_csv_paths.append(eval_csv_path)
             try:

@@ -163,7 +163,7 @@ if __name__ == '__main__':
             print("Error when trying to plot summary: " + str(e))
     else:
         if not config.run_many:
-            run_experiment(args.configpath, 0)
+            run_experiment(args.configpath, 0, args.noconfig)
         else:
             train_csv_paths = []
             eval_csv_paths = []
