@@ -140,7 +140,7 @@ def run_experiment(configpath: str, random_seed: int):
 if __name__ == '__main__':
     args = util.parse_args(default_config_path())
     experiment_title = "Q-learning vs Q-learning"
-    if args.configpath is not None:
+    if args.configpath is not None and not args.noconfig:
         if not os.path.exists(args.configpath):
             write_default_config()
         config = util.read_config(args.configpath)
