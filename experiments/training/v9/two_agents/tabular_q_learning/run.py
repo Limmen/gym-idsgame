@@ -106,7 +106,7 @@ def run_experiment(configpath: str, random_seed: int):
     :param config: experiment configuration
     :return: (train_csv_path, eval_csv_path)
     """
-    if configpath is not None:
+    if configpath is not None and not args.noconfig:
         if not os.path.exists(args.configpath):
             write_default_config()
         config = util.read_config(args.configpath)
