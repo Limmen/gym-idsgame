@@ -1,6 +1,6 @@
-# Experiment `minimal_defense-v5`_`tabular_q_learning`
+# Experiment `minimal_defense-v6`_`tabular_q_learning`
 
-This is an experiment in the `minimal_defense-v5` environment. 
+This is an experiment in the `minimal_defense-v6` environment. 
 An environment where the defender is following the `defend_minimal` defense policy. 
 The `defend_minimal` policy entails that the defender will always 
 defend the attribute with the minimal value out of all of its neighbors.
@@ -29,9 +29,11 @@ The starting state for each node in the environment is initialized as follows (w
 - `vulnerability_val=0` 
 - `num_vulnerabilities_per_layer=2`
 
+The environment has dense rewards (+1,-1 given whenever the attacker reaches a new level in the network)
+
 ## Environment 
 
-- Env: `minimal_defense-v5`
+- Env: `minimal_defense-v6`
 
 ## Algorithm
 
@@ -49,18 +51,22 @@ Example configuration in `config.json`:
 {
     "attacker_type": 0,
     "defender_type": 1,
-    "env_name": "idsgame-minimal_defense-v5",
+    "env_name": "idsgame-minimal_defense-v6",
     "idsgame_config": null,
     "initial_state_path": null,
     "logger": null,
     "mode": 0,
-    "output_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v5/minimal_defense/tabular_q_learning",
+    "output_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v6/minimal_defense/tabular_q_learning",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
         "alpha": 0.05,
         "attacker": true,
+        "attacker_load_path": null,
+        "checkpoint_freq": 100000,
         "defender": false,
-        "epsilon": 1,
+        "defender_load_path": null,
+        "dqn_config": null,
+        "epsilon": 0.4,
         "epsilon_decay": 0.9999,
         "eval_episodes": 100,
         "eval_frequency": 5000,
@@ -68,18 +74,17 @@ Example configuration in `config.json`:
         "eval_render": false,
         "eval_sleep": 0.9,
         "gamma": 0.99,
-        "gif_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v5/minimal_defense/tabular_q_learning/gifs",
+        "gif_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v6/minimal_defense/tabular_q_learning/gifs",
         "gifs": true,
-        "load_path": null,
         "logger": null,
         "min_epsilon": 0.01,
         "num_episodes": 40000,
-        "py/object": "gym_idsgame.agents.tabular_q_learning.q_agent_config.QAgentConfig",
+        "py/object": "gym_idsgame.agents.q_learning.q_agent_config.QAgentConfig",
         "render": false,
-        "save_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v5/minimal_defense/tabular_q_learning/data",
+        "save_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v6/minimal_defense/tabular_q_learning/data",
         "train_log_frequency": 1,
         "video": true,
-        "video_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v5/minimal_defense/tabular_q_learning/videos",
+        "video_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v6/minimal_defense/tabular_q_learning/videos",
         "video_fps": 5,
         "video_frequency": 101
     },
@@ -91,14 +96,14 @@ Example configuration in `config.json`:
 Example configuration in `run.py`:
 
 ```python
-q_agent_config = QAgentConfig(gamma=0.99, alpha=0.05, epsilon=1, render=False, eval_sleep=0.9,
-                              min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
-                              epsilon_decay=0.9999, video=True, eval_log_frequency=1,
-                              video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=40000,
-                              eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                              eval_frequency=5000, attacker=True, defender=False, video_frequency=101,
-                              save_dir=default_output_dir() + "/data")
-env_name = "idsgame-minimal_defense-v4"
+q_agent_config = QAgentConfig(gamma=0.99, alpha=0.05, epsilon=0.4, render=False, eval_sleep=0.9,
+                                  min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
+                                  epsilon_decay=0.9999, video=True, eval_log_frequency=1,
+                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=40000,
+                                  eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
+                                  eval_frequency=5000, attacker=True, defender=False, video_frequency=101,
+                                  save_dir=default_output_dir() + "/data")
+env_name = "idsgame-minimal_defense-v6"
 client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.TABULAR_Q_AGENT.value,
                              mode=RunnerMode.TRAIN_ATTACKER.value,
                              q_agent_config=q_agent_config, output_dir=default_output_dir(),

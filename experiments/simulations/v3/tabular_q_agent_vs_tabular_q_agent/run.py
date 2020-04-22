@@ -85,7 +85,7 @@ if __name__ == '__main__':
     else:
         config = default_config()
     time_str = str(time.time())
-    util.create_artefact_dirs(config.output_dir)
+    util.create_artefact_dirs(config.output_dir, 0)
     logger = util.setup_logger("idsgame-v3-tabular_q_agent_vs_tabular_q_agent", config.output_dir + "/logs/",
                                time_str=time_str)
     config.logger = logger

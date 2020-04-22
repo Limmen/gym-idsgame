@@ -263,6 +263,23 @@ v5: random_vs_random-v5 random_vs_defend_minimal-v5 attack_maximal_vs_defend_min
 v5: attack_maximal_vs_random-v5 tabular_q_learning_vs_tabular_q_learning-v5
 v5: dqn_vs_random_defense-v5 dqn_vs_minimal_defense-v5
 
+# V6 Experiments
+
+tabular_q_learning_vs_minimal_defense-v6: training/v6/minimal_defense/tabular_q_learning/run.py training/v6/minimal_defense/tabular_q_learning/run.sh
+	cd training/v6/minimal_defense/tabular_q_learning/ && $(MAKE) run
+
+dqn_vs_minimal_defense-v6: training/v6/minimal_defense/dqn/run.py training/v6/minimal_defense/dqn/run.sh
+	cd training/v6/minimal_defense/dqn/ && $(MAKE) run
+
+v6: tabular_q_learning_vs_minimal_defense-v6 dqn_vs_minimal_defense-v6
+
+# V7 Experiments
+
+maximal_attack_vs_tabular_q_learning-v7: training/v7/maximal_attack/tabular_q_learning/run.py training/v7/maximal_attack/tabular_q_learning/run.sh
+	cd training/v7/maximal_attack/tabular_q_learning/ && $(MAKE) run
+
+v7: maximal_attack_vs_tabular_q_learning-v7
+
 # Tests
 
 tests: it_tests/run.py it_tests/run.sh
@@ -270,7 +287,7 @@ tests: it_tests/run.py it_tests/run.sh
 
 # All
 
-all: v0 v1 v2 v3 v4 v5 tests
+all: v0 v1 v2 v3 v4 v5 v6 v7 tests
 
 # Clean
 
@@ -359,6 +376,13 @@ clean:
 	cd simulations/v5/random_vs_defend_minimal/ && $(MAKE) clean
 	cd simulations/v5/attack_maximal_vs_defend_minimal/ && $(MAKE) clean
 	cd simulations/v5/attack_maximal_vs_random/ && $(MAKE) clean
+
+	# V6
+	cd ./training/v6/minimal_defense/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v6/minimal_defense/dqn/ && $(MAKE) clean
+
+	# V7
+	cd ./training/v7/maximal_attack/tabular_q_learning/ && $(MAKE) clean
 
 	# Tests
 	cd ./it_tests/ && $(MAKE) clean

@@ -370,3 +370,159 @@ register(
     entry_point='gym_idsgame.envs:IdsGameV6Env',
     kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
 )
+
+# -------- Version 7 ------------
+
+# [AttackerEnv] 2 layers, 3 servers per layer, 10 attack-defense-values, random defender
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 7
+register(
+    id='idsgame-random_defense-v7',
+    entry_point='gym_idsgame.envs:IdsGameRandomDefenseV7Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [AttackerEnv] 2 layer, 3 servers per layer, 10 attack-defense-values, defender following the "defend minimal strategy"
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 7
+register(
+    id='idsgame-minimal_defense-v7',
+    entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV7Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [DefenseEnv] 2 layers, 3 servers per layer, 10 attack-defense-values, random attacker
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 7
+register(
+    id='idsgame-random_attack-v7',
+    entry_point='gym_idsgame.envs:IdsGameRandomAttackV7Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [DefenseEnv] 2 layers, 3 servers per layer, 10 attack-defense-values, attacker following the "attack maximal strategy"
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 7
+register(
+    id='idsgame-maximal_attack-v7',
+    entry_point='gym_idsgame.envs:IdsGameMaximalAttackV7Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [AttackDefenseEnv] 2 layers, 3 servers per layer, 10 attack-defense-values
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 7
+register(
+    id='idsgame-v7',
+    entry_point='gym_idsgame.envs:IdsGameV7Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# -------- Version 8 ------------
+
+# [AttackerEnv] 1 layer, 1 server per layer, 10 attack-defense-values, random defender
+# [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 8
+register(
+    id='idsgame-random_defense-v8',
+    entry_point='gym_idsgame.envs:IdsGameRandomDefenseV8Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [AttackerEnv] 1 layer, 1 server per layer, 10 attack-defense-values, defender following the "defend minimal strategy"
+# [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 8
+register(
+    id='idsgame-minimal_defense-v8',
+    entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV8Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [DefenseEnv] 1 layer, 1 server per layer, 10 attack-defense-values, random attacker
+# [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 8
+register(
+    id='idsgame-random_attack-v8',
+    entry_point='gym_idsgame.envs:IdsGameRandomAttackV8Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [DefenseEnv] 1 layer, 1 server per layer, 10 attack-defense-values, attacker following the "attack maximal strategy"
+# [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 8
+register(
+    id='idsgame-maximal_attack-v8',
+    entry_point='gym_idsgame.envs:IdsGameMaximalAttackV8Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [AttackDefenseEnv] 1 layer, 1 server per layer, 10 attack-defense-values
+# [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 2, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 8
+register(
+    id='idsgame-v8',
+    entry_point='gym_idsgame.envs:IdsGameV8Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# -------- Version 9 ------------
+
+# [AttackerEnv] 1 layer, 2 servers per layer, 10 attack-defense-values, random defender
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 9
+register(
+    id='idsgame-random_defense-v9',
+    entry_point='gym_idsgame.envs:IdsGameRandomDefenseV9Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [AttackerEnv] 1 layer, 2 servers per layer, 10 attack-defense-values, defender following the "defend minimal strategy"
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 9
+register(
+    id='idsgame-minimal_defense-v9',
+    entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV9Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [DefenseEnv] 1 layer, 2 servers per layer, 10 attack-defense-values, random attacker
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 9
+register(
+    id='idsgame-random_attack-v9',
+    entry_point='gym_idsgame.envs:IdsGameRandomAttackV9Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [DefenseEnv] 1 layer, 2 servers per layer, 10 attack-defense-values, attacker following the "attack maximal strategy"
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 9
+register(
+    id='idsgame-maximal_attack-v9',
+    entry_point='gym_idsgame.envs:IdsGameMaximalAttackV9Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [AttackDefenseEnv] 1 layer, 2 servers per layer, 10 attack-defense-values
+# [Initial State] Defense: 4, Attack:0, Num vulnerabilities: 4, Det: 3, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 9
+register(
+    id='idsgame-v9',
+    entry_point='gym_idsgame.envs:IdsGameV9Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
