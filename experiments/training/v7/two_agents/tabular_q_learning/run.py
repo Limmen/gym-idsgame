@@ -99,14 +99,15 @@ def plot_average_results(experiment_title :str, config: ClientConfig, eval_csv_p
                                                 config.output_dir)
 
 
-def run_experiment(configpath: str, random_seed: int):
+def run_experiment(configpath: str, random_seed: int, noconfig: bool):
     """
     Runs one experiment and saves results and plots
 
     :param config: experiment configuration
+    :param noconfig: whether to override config
     :return: (train_csv_path, eval_csv_path)
     """
-    if configpath is not None:
+    if configpath is not None and not noconfig:
         if not os.path.exists(args.configpath):
             write_default_config()
         config = util.read_config(args.configpath)
@@ -140,7 +141,7 @@ def run_experiment(configpath: str, random_seed: int):
 if __name__ == '__main__':
     args = util.parse_args(default_config_path())
     experiment_title = "Q-learning vs Q-learning"
-    if args.configpath is not None:
+    if args.configpath is not None and not args.noconfig:
         if not os.path.exists(args.configpath):
             write_default_config()
         config = util.read_config(args.configpath)
@@ -163,7 +164,7 @@ if __name__ == '__main__':
             print("Error when trying to plot summary: " + str(e))
     else:
         if not config.run_many:
-            run_experiment(args.configpath, 0)
+            run_experiment(args.configpath, 0, args.noconfig)
         else:
             train_csv_paths = []
             eval_csv_paths = []

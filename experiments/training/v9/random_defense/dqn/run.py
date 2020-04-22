@@ -88,7 +88,7 @@ def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str) -> No
 # Program entrypoint
 if __name__ == '__main__':
     args = util.parse_args(default_config_path())
-    if args.configpath is not None:
+    if args.configpath is not None and not args.noconfig:
         if not os.path.exists(args.configpath):
             write_default_config()
         config = util.read_config(args.configpath)
