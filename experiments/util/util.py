@@ -99,5 +99,7 @@ def parse_args(default_config_path):
                         default=default_config_path, type=str)
     parser.add_argument("-po", "--plotonly", help="Boolean parameter, if true, only plot",
                         action="store_true")
+    parser.add_argument("-nc", "--noconfig", help="Boolean parameter, if true always override config",
+                        action="store_true")
     args = parser.parse_args()
     return args
