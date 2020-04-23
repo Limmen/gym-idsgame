@@ -86,63 +86,8 @@ After the experiment has finished, the results are written to the following sub-
 
 ## Example Results
 
-### Hack probability
-
-#### Train
-
 <p align="center">
-<img src="docs/hack_probability_train.png" width="800">
-</p>
-
-#### Eval
-
-<p align="center">
-<img src="docs/hack_probability_eval.png" width="800">
-</p>
-
-### Episode lengths
-
-#### Train
-<p align="center">
-<img src="docs/avg_episode_lengths_train.png" width="800">
-</p>
-
-#### Eval
-
-<p align="center">
-<img src="docs/avg_episode_lengths_eval.png" width="800">
-</p>
-
-### Exploration Rate
-
-<p align="center">
-<img src="docs/epsilon_train.png" width="800">
-</p>
-
-### Cumulative Rewards
-
-#### Attacker (Train)
-<p align="center">
-<img src="docs/attacker_cumulative_reward_train.png" width="800">
-</p>
-
-#### Defender (Train)
-<p align="center">
-<img src="docs/defender_cumulative_reward_train.png" width="800">
-</p>
-
-### Loss
-
-#### Attacker (Train)
-<p align="center">
-<img src="docs/avg_episode_loss_defender_train.png" width="800">
-</p>
-
-### Learning Rate Decay
-
-#### Attacker (Train)
-<p align="center">
-<img src="docs/lr_train.png" width="800">
+<img src="docs/avg_summary.png" width="800">
 </p>
 
 ### Policy Inspection
@@ -153,17 +98,12 @@ After the experiment has finished, the results are written to the following sub-
 <img src="docs/episode_0.gif" width="600">
 </p> 
 
-#### Evaluation after 1000 Training Episodes
+#### Evaluation after 15000 Training Episodes
 
 <p align="center">
-<img src="docs/episode_1000.gif" width="600">
-</p>
-
-#### Evaluation after 5000 Training Episodes
-
-<p align="center">
-<img src="docs/episode_5000.gif" width="600">
+<img src="docs/episode_15000.gif" width="600">
 </p>  
+  
 
 ## Commands
 

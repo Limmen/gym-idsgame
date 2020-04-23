@@ -275,10 +275,105 @@ v6: tabular_q_learning_vs_minimal_defense-v6 dqn_vs_minimal_defense-v6
 
 # V7 Experiments
 
+tabular_q_learning_vs_random_defense-v7: training/v7/random_defense/tabular_q_learning/run.py training/v7/random_defense/tabular_q_learning/run.sh
+	cd training/random_defense/tabular_q_learning/ && $(MAKE) run
+
+tabular_q_learning_vs_minimal_defense-v7: training/v7/minimal_defense/tabular_q_learning/run.py training/v7/minimal_defense/tabular_q_learning/run.sh
+	cd training/v7/minimal_defense/tabular_q_learning/ && $(MAKE) run
+
+random_attack_vs_tabular_q_learning-v7: training/v7/random_attack/tabular_q_learning/run.py training/v7/random_attack/tabular_q_learning/run.sh
+	cd training/v7/random_attack/tabular_q_learning/ && $(MAKE) run
+
 maximal_attack_vs_tabular_q_learning-v7: training/v7/maximal_attack/tabular_q_learning/run.py training/v7/maximal_attack/tabular_q_learning/run.sh
 	cd training/v7/maximal_attack/tabular_q_learning/ && $(MAKE) run
 
-v7: maximal_attack_vs_tabular_q_learning-v7
+tabular_q_learning_vs_tabular_q_learning-v7: training/v7/two_agents/tabular_q_learning/run.py training/v7/two_agents/tabular_q_learning/run.sh
+	cd training/v7/two_agents/tabular_q_learning/ && $(MAKE) run
+
+dqn_vs_tabular_random_defense-v7: training/v7/random_defense/dqn/run.py training/v7/random_defense/dqn/run.sh
+	cd training/v7/random_defense/dqn/ && $(MAKE) run
+
+dqn_vs_minimal_defense-v7: training/v7/minimal_defense/dqn/run.py training/v7/minimal_defense/dqn/run.sh
+	cd training/v7/minimal_defense/dqn/ && $(MAKE) run
+
+maximal_attack_vs_dqn-v7: training/v7/maximal_attack/dqn/run.py training/v7/maximal_attack/dqn/run.sh
+	cd training/v7/maximal_attack/dqn/ && $(MAKE) run
+
+random_attack_vs_dqn-v7: training/v7/random_attack/dqn/run.py training/v7/random_attack/dqn/run.sh
+	cd training/v7/random_attack/dqn/ && $(MAKE) run
+
+
+v7: tabular_q_learning_vs_random_defense-v7 tabular_q_learning_vs_minimal_defense-v7 random_attack_vs_tabular_q_learning-v7
+v7: maximal_attack_vs_tabular_q_learning-v7 tabular_q_learning_vs_tabular_q_learning-v7 dqn_vs_tabular_random_defense-v7
+v7: dqn_vs_minimal_defense-v7 maximal_attack_vs_dqn-v7 random_attack_vs_dqn-v7
+
+# v8 Experiments
+
+tabular_q_learning_vs_random_defense-v8: training/v8/random_defense/tabular_q_learning/run.py training/v8/random_defense/tabular_q_learning/run.sh
+	cd training/random_defense/tabular_q_learning/ && $(MAKE) run
+
+tabular_q_learning_vs_minimal_defense-v8: training/v8/minimal_defense/tabular_q_learning/run.py training/v8/minimal_defense/tabular_q_learning/run.sh
+	cd training/v8/minimal_defense/tabular_q_learning/ && $(MAKE) run
+
+random_attack_vs_tabular_q_learning-v8: training/v8/random_attack/tabular_q_learning/run.py training/v8/random_attack/tabular_q_learning/run.sh
+	cd training/v8/random_attack/tabular_q_learning/ && $(MAKE) run
+
+maximal_attack_vs_tabular_q_learning-v8: training/v8/maximal_attack/tabular_q_learning/run.py training/v8/maximal_attack/tabular_q_learning/run.sh
+	cd training/v8/maximal_attack/tabular_q_learning/ && $(MAKE) run
+
+tabular_q_learning_vs_tabular_q_learning-v8: training/v8/two_agents/tabular_q_learning/run.py training/v8/two_agents/tabular_q_learning/run.sh
+	cd training/v8/two_agents/tabular_q_learning/ && $(MAKE) run
+
+dqn_vs_tabular_random_defense-v8: training/v8/random_defense/dqn/run.py training/v8/random_defense/dqn/run.sh
+	cd training/v8/random_defense/dqn/ && $(MAKE) run
+
+dqn_vs_minimal_defense-v8: training/v8/minimal_defense/dqn/run.py training/v8/minimal_defense/dqn/run.sh
+	cd training/v8/minimal_defense/dqn/ && $(MAKE) run
+
+maximal_attack_vs_dqn-v8: training/v8/maximal_attack/dqn/run.py training/v8/maximal_attack/dqn/run.sh
+	cd training/v8/maximal_attack/dqn/ && $(MAKE) run
+
+random_attack_vs_dqn-v8: training/v8/random_attack/dqn/run.py training/v8/random_attack/dqn/run.sh
+	cd training/v8/random_attack/dqn/ && $(MAKE) run
+
+
+v8: tabular_q_learning_vs_random_defense-v8 tabular_q_learning_vs_minimal_defense-v8 random_attack_vs_tabular_q_learning-v8
+v8: maximal_attack_vs_tabular_q_learning-v8 tabular_q_learning_vs_tabular_q_learning-v8 dqn_vs_tabular_random_defense-v8
+v8: dqn_vs_minimal_defense-v8 maximal_attack_vs_dqn-v8 random_attack_vs_dqn-v8
+
+# v9 Experiments
+
+tabular_q_learning_vs_random_defense-v9: training/v9/random_defense/tabular_q_learning/run.py training/v9/random_defense/tabular_q_learning/run.sh
+	cd training/random_defense/tabular_q_learning/ && $(MAKE) run
+
+tabular_q_learning_vs_minimal_defense-v9: training/v9/minimal_defense/tabular_q_learning/run.py training/v9/minimal_defense/tabular_q_learning/run.sh
+	cd training/v9/minimal_defense/tabular_q_learning/ && $(MAKE) run
+
+random_attack_vs_tabular_q_learning-v9: training/v9/random_attack/tabular_q_learning/run.py training/v9/random_attack/tabular_q_learning/run.sh
+	cd training/v9/random_attack/tabular_q_learning/ && $(MAKE) run
+
+maximal_attack_vs_tabular_q_learning-v9: training/v9/maximal_attack/tabular_q_learning/run.py training/v9/maximal_attack/tabular_q_learning/run.sh
+	cd training/v9/maximal_attack/tabular_q_learning/ && $(MAKE) run
+
+tabular_q_learning_vs_tabular_q_learning-v9: training/v9/two_agents/tabular_q_learning/run.py training/v9/two_agents/tabular_q_learning/run.sh
+	cd training/v9/two_agents/tabular_q_learning/ && $(MAKE) run
+
+dqn_vs_tabular_random_defense-v9: training/v9/random_defense/dqn/run.py training/v9/random_defense/dqn/run.sh
+	cd training/v9/random_defense/dqn/ && $(MAKE) run
+
+dqn_vs_minimal_defense-v9: training/v9/minimal_defense/dqn/run.py training/v9/minimal_defense/dqn/run.sh
+	cd training/v9/minimal_defense/dqn/ && $(MAKE) run
+
+maximal_attack_vs_dqn-v9: training/v9/maximal_attack/dqn/run.py training/v9/maximal_attack/dqn/run.sh
+	cd training/v9/maximal_attack/dqn/ && $(MAKE) run
+
+random_attack_vs_dqn-v9: training/v9/random_attack/dqn/run.py training/v9/random_attack/dqn/run.sh
+	cd training/v9/random_attack/dqn/ && $(MAKE) run
+
+
+v9: tabular_q_learning_vs_random_defense-v9 tabular_q_learning_vs_minimal_defense-v9 random_attack_vs_tabular_q_learning-v9
+v9: maximal_attack_vs_tabular_q_learning-v9 tabular_q_learning_vs_tabular_q_learning-v9 dqn_vs_tabular_random_defense-v9
+v9: dqn_vs_minimal_defense-v9 maximal_attack_vs_dqn-v9 random_attack_vs_dqn-v9
 
 # Tests
 
@@ -287,7 +382,7 @@ tests: it_tests/run.py it_tests/run.sh
 
 # All
 
-all: v0 v1 v2 v3 v4 v5 v6 v7 tests
+all: v0 v1 v2 v3 v4 v5 v6 v7 v8 v9 tests
 
 # Clean
 
@@ -382,7 +477,37 @@ clean:
 	cd ./training/v6/minimal_defense/dqn/ && $(MAKE) clean
 
 	# V7
+	cd ./training/v7/random_defense/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v7/random_defense/dqn/ && $(MAKE) clean
+	cd ./training/v7/minimal_defense/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v7/minimal_defense/dqn/ && $(MAKE) clean
+	cd ./training/v7/random_attack/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v7/random_attack/dqn/ && $(MAKE) clean
 	cd ./training/v7/maximal_attack/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v7/maximal_attack/dqn/ && $(MAKE) clean
+	cd ./training/v7/two_agents/tabular_q_learning/ && $(MAKE) clean
+
+	# V8
+	cd ./training/v8/random_defense/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v8/random_defense/dqn/ && $(MAKE) clean
+	cd ./training/v8/minimal_defense/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v8/minimal_defense/dqn/ && $(MAKE) clean
+	cd ./training/v8/random_attack/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v8/random_attack/dqn/ && $(MAKE) clean
+	cd ./training/v8/maximal_attack/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v8/maximal_attack/dqn/ && $(MAKE) clean
+	cd ./training/v8/two_agents/tabular_q_learning/ && $(MAKE) clean
+
+	# V9
+	cd ./training/v9/random_defense/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v9/random_defense/dqn/ && $(MAKE) clean
+	cd ./training/v9/minimal_defense/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v9/minimal_defense/dqn/ && $(MAKE) clean
+	cd ./training/v9/random_attack/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v9/random_attack/dqn/ && $(MAKE) clean
+	cd ./training/v9/maximal_attack/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v9/maximal_attack/dqn/ && $(MAKE) clean
+	cd ./training/v9/two_agents/tabular_q_learning/ && $(MAKE) clean
 
 	# Tests
 	cd ./it_tests/ && $(MAKE) clean
