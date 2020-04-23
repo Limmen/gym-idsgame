@@ -217,8 +217,9 @@ def plot_summary(algorithm : str, eval_freq : int, train_log_freq : int):
             random_defense_train_csv_paths_v3, random_defense_eval_csv_paths_v3,
             two_agents_train_csv_paths_v3, two_agents_eval_csv_paths_v3,
             algorithm, default_output_dir() + "/plots", eval_freq, train_log_freq, [0,1,2],
-            wspace=0.28)
-    except:
+            wspace=0.28, file_name="combined_plot_mult_versions_" + "_".join(["0","2","3"]))
+    except Exception as e:
+        print(str(e))
         print("Could not plot v0,v2,v3")
 
     try:
@@ -406,9 +407,47 @@ def plot_summary(algorithm : str, eval_freq : int, train_log_freq : int):
             random_defense_train_csv_paths_v7, random_defense_eval_csv_paths_v7,
             two_agents_train_csv_paths_v7, two_agents_eval_csv_paths_v7,
             algorithm, default_output_dir() + "/plots", eval_freq, train_log_freq, [0,1,2],
-            wspace=0.35)
+            wspace=0.35, file_name = "combined_plot_mult_versions_" + "_".join(["7","8","9"]))
     except:
         print("could not plot v7,v8,v9")
+
+    try:
+        plotting_util.plot_sparse_dense_difference(
+            maximal_attack_train_csv_paths_v0, maximal_attack_eval_csv_paths_v0, minimal_defense_train_csv_paths_v0,
+            minimal_defense_eval_csv_paths_v0, random_attack_train_csv_paths_v0, random_attack_eval_csv_paths_v0,
+            random_defense_train_csv_paths_v0, random_defense_eval_csv_paths_v0,
+            two_agents_train_csv_paths_v0, two_agents_eval_csv_paths_v0,
+            maximal_attack_train_csv_paths_v2, maximal_attack_eval_csv_paths_v2,
+            minimal_defense_train_csv_paths_v2, minimal_defense_eval_csv_paths_v2,
+            random_attack_train_csv_paths_v2, random_attack_eval_csv_paths_v2,
+            random_defense_train_csv_paths_v2, random_defense_eval_csv_paths_v2,
+            two_agents_train_csv_paths_v2, two_agents_eval_csv_paths_v2,
+            maximal_attack_train_csv_paths_v3, maximal_attack_eval_csv_paths_v3,
+            minimal_defense_train_csv_paths_v3, minimal_defense_eval_csv_paths_v3,
+            random_attack_train_csv_paths_v3, random_attack_eval_csv_paths_v3,
+            random_defense_train_csv_paths_v3, random_defense_eval_csv_paths_v3,
+            two_agents_train_csv_paths_v3, two_agents_eval_csv_paths_v3,
+
+            maximal_attack_train_csv_paths_v8, maximal_attack_eval_csv_paths_v8, minimal_defense_train_csv_paths_v8,
+            minimal_defense_eval_csv_paths_v8, random_attack_train_csv_paths_v8, random_attack_eval_csv_paths_v8,
+            random_defense_train_csv_paths_v8, random_defense_eval_csv_paths_v8,
+            two_agents_train_csv_paths_v8, two_agents_eval_csv_paths_v8,
+            maximal_attack_train_csv_paths_v9, maximal_attack_eval_csv_paths_v9,
+            minimal_defense_train_csv_paths_v9, minimal_defense_eval_csv_paths_v9,
+            random_attack_train_csv_paths_v9, random_attack_eval_csv_paths_v9,
+            random_defense_train_csv_paths_v9, random_defense_eval_csv_paths_v9,
+            two_agents_train_csv_paths_v9, two_agents_eval_csv_paths_v9,
+            maximal_attack_train_csv_paths_v7, maximal_attack_eval_csv_paths_v7,
+            minimal_defense_train_csv_paths_v7, minimal_defense_eval_csv_paths_v7,
+            random_attack_train_csv_paths_v7, random_attack_eval_csv_paths_v7,
+            random_defense_train_csv_paths_v7, random_defense_eval_csv_paths_v7,
+            two_agents_train_csv_paths_v7, two_agents_eval_csv_paths_v7,
+
+            algorithm, default_output_dir() + "/plots", eval_freq, train_log_freq, [0, 1, 2],
+            wspace=0.20, file_name="comparison_dense_sparse_rewards_mult_versions" + "_".join(["0", "2", "3", "7", "8", "9"]))
+    except Exception as e:
+        print(str(e))
+        print("Could not plot dense and sparse reward comparison")
 
 
 
@@ -423,7 +462,6 @@ def plot():
         hyperparam_csv_path = glob.glob(default_output_dir() +
                                         "/v8/random_defense/tabular_q_learning/results/hyperparameters/0/*.csv")[0]
         hyperparameters = pd.read_csv(hyperparam_csv_path)
-    print(hyperparameters.head())
     eval_freq = hyperparameters.loc[hyperparameters['parameter'] == "eval_frequency"]["value"].values[0]
     train_log_freq = hyperparameters.loc[hyperparameters['parameter'] == "train_log_frequency"]["value"].values[0]
     plot_summary("tabular_q_learning", int(eval_freq), int(train_log_freq))
