@@ -292,8 +292,8 @@ def plot_all(train_df, eval_df, eval_step, a_state_values, file_name):
 
     fig.tight_layout()
     #plt.subplots_adjust(wspace=0, hspace=0)
-    fig.savefig(file_name + ".png", format="png")
-    fig.savefig(file_name + ".pdf", format='pdf', dpi=500, bbox_inches='tight', transparent=True)
+    fig.savefig(file_name + ".png", format="png", dpi=600)
+    fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     plt.close(fig)
 
 
@@ -353,8 +353,8 @@ def plot_two_histograms(d_1: np.ndarray, d_2: np.ndarray, title: str = "Test", x
     ylab.set_size(10)
 
     fig.tight_layout()
-    fig.savefig(file_name + ".png", format="png")
-    fig.savefig(file_name + ".pdf", format='pdf', dpi=500, bbox_inches='tight', transparent=True)
+    fig.savefig(file_name + ".png", format="png", dpi=600)
+    fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     plt.close(fig)
 
 def two_line_plot(x_1: np.ndarray, y_1: np.ndarray, x_2: np.ndarray, y_2: np.ndarray,
@@ -413,8 +413,8 @@ def two_line_plot(x_1: np.ndarray, y_1: np.ndarray, x_2: np.ndarray, y_2: np.nda
     plt.legend(loc=legend_loc)
 
     fig.tight_layout()
-    fig.savefig(file_name + ".png", format="png")
-    fig.savefig(file_name + ".pdf", format='pdf', dpi=500, bbox_inches='tight', transparent=True)
+    fig.savefig(file_name + ".png", format="png", dpi=600)
+    fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     plt.close(fig)
 
 
@@ -472,8 +472,8 @@ def simple_line_plot(x: np.ndarray, y: np.ndarray, title: str = "Test", xlabel: 
     if log:
         ax.set_yscale("log")
     fig.tight_layout()
-    fig.savefig(file_name + ".png", format="png")
-    fig.savefig(file_name + ".pdf", format='pdf', dpi=500, bbox_inches='tight', transparent=True)
+    fig.savefig(file_name + ".png", format="png", dpi=600)
+    fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     plt.close(fig)
 
 
@@ -538,8 +538,8 @@ def probability_plot(x: np.ndarray, y: np.ndarray, title: str = "Test", xlabel: 
     ylab.set_size(10)
 
     fig.tight_layout()
-    fig.savefig(file_name + ".png", format="png")
-    fig.savefig(file_name + ".pdf", format='pdf', dpi=500, bbox_inches='tight', transparent=True)
+    fig.savefig(file_name + ".png", format="png", dpi=600)
+    fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     plt.close(fig)
 
 
@@ -614,8 +614,8 @@ def two_line_plot_w_shades(x_1: np.ndarray, y_1: np.ndarray,
     plt.legend(loc=legend_loc)
 
     fig.tight_layout()
-    fig.savefig(file_name + ".png", format="png")
-    fig.savefig(file_name + ".pdf", format='pdf', dpi=500, bbox_inches='tight', transparent=True)
+    fig.savefig(file_name + ".png", format="png", dpi=600)
+    fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     plt.close(fig)
 
 
@@ -692,8 +692,8 @@ def five_line_plot_w_shades(x_1: np.ndarray, y_1: np.ndarray,
               fancybox=True, shadow=True, ncol=2)
 
     fig.tight_layout()
-    fig.savefig(file_name + ".png", format="png")
-    fig.savefig(file_name + ".pdf", format='pdf', dpi=500, bbox_inches='tight', transparent=True)
+    fig.savefig(file_name + ".png", format="png", dpi=600)
+    fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     plt.close(fig)
 
 
@@ -953,8 +953,8 @@ def plot_all_avg_summary_1(x_1_1, y_1_1, x_1_2, y_1_2, x_1_3, y_1_3, x_1_4, y_1_
 
     fig.tight_layout()
     plt.subplots_adjust(wspace=0.2, hspace=0)
-    fig.savefig(file_name + ".png", format="png")
-    fig.savefig(file_name + ".pdf", format='pdf', dpi=500, bbox_inches='tight', transparent=True)
+    fig.savefig(file_name + ".png", format="png", dpi=600)
+    fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
 
 
 
@@ -1216,8 +1216,8 @@ def plot_all_avg_summary_2(x_1_1, y_1_1, x_1_2, y_1_2, x_1_3, y_1_3, x_1_4, y_1_
 
     fig.tight_layout()
     plt.subplots_adjust(wspace=0.2, hspace=0)
-    fig.savefig(file_name + ".png", format="png")
-    fig.savefig(file_name + ".pdf", format='pdf', dpi=500, bbox_inches='tight', transparent=True)
+    fig.savefig(file_name + ".png", format="png", dpi=600)
+    fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
 
 
 
@@ -1280,6 +1280,7 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
                            ):
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts}')
+    #plt.rcParams.update({'font.size': 6})
     fig, ax = plt.subplots(nrows=3, ncols=3, figsize=(9, 6.8))
     #gs1 = gridspec.GridSpec(1, 4)
     #gs1.update(wspace=0.005, hspace=0.05)
@@ -1332,7 +1333,7 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     # box = ax[0].get_position()
     # ax[0].set_position([box.x0, 0.8*box.y0,
     #                     box.width, box.height * 0.99])
-    fig.subplots_adjust(bottom=0.4)
+    #fig.subplots_adjust(bottom=0.4)
 
     # Put a legend below current axis
     # ax[0].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
@@ -1388,8 +1389,6 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
                         box.width, box.height * 0.9])
 
     # Put a legend below current axis
-    # ax[1].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
-    #              fancybox=True, shadow=True, ncol=2)
 
     # Plot attacker cumulative reward
     xlims = (min(min(x_3_1_v0), min(x_3_2_v0), min(x_3_3_v0), min(x_3_4_v0), min(x_3_5_v0)),
@@ -1436,7 +1435,6 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     ax[0][2].spines['right'].set_color((.8, .8, .8))
     ax[0][2].spines['top'].set_color((.8, .8, .8))
 
-    # plt.legend(loc=legend_loc)
 
     # Shrink current axis's height by 10% on the bottom
     box = ax[0][2].get_position()
@@ -1444,16 +1442,6 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
                         box.width, box.height * 0.9])
 
     ax[0][2].get_yaxis().set_major_formatter(tkr.FuncFormatter(lambda x, p: "${:1.0f}K$".format(x * 1e-3)))
-
-    # Put a legend below current axis
-    # ax[2].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
-    #              fancybox=True, shadow=True, ncol=2)
-
-    #handles, labels = ax.get_legend_handles_labels()
-    #lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
-    #lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
-    #fig.legend(handles, labels, loc='upper center')
-    #ax[2].legend(loc='upper center', bbox_to_anchor=(-0.5, -0.35), fancybox=True, shadow=True, ncol=3)
 
 
     # V2
@@ -1496,26 +1484,10 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     xlab = ax[1][0].xaxis.get_label()
     ylab = ax[1][0].yaxis.get_label()
 
-    # xlab.set_style('italic')
-    # xlab.set_size(8)
-    # ylab.set_style('italic')
-    # ylab.set_size(8)
-
     # change the color of the top and right spines to opaque gray
     ax[1][0].spines['right'].set_color((.8, .8, .8))
     ax[1][0].spines['top'].set_color((.8, .8, .8))
 
-    # plt.legend(loc=legend_loc)
-
-    # Shrink current axis's height by 10% on the bottom
-    # box = ax[0].get_position()
-    # ax[0].set_position([box.x0, 0.8*box.y0,
-    #                     box.width, box.height * 0.99])
-    fig.subplots_adjust(bottom=0.4)
-
-    # Put a legend below current axis
-    # ax[0].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
-    #              fancybox=True, shadow=True, ncol=2)
 
     # Plot avg hack_probability eval
     xlims = (min(min(x_2_1_v2), min(x_2_2_v2), min(x_2_3_v2), min(x_2_4_v2), min(x_2_5_v2)),
@@ -1564,16 +1536,10 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     ax[1][1].spines['right'].set_color((.8, .8, .8))
     ax[1][1].spines['top'].set_color((.8, .8, .8))
 
-    # plt.legend(loc=legend_loc)
-
     # Shrink current axis's height by 10% on the bottom
     box = ax[1][1].get_position()
     ax[1][1].set_position([box.x0, box.y0 + box.height * 0.03,
                            box.width, box.height * 0.9])
-
-    # Put a legend below current axis
-    # ax[1].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
-    #              fancybox=True, shadow=True, ncol=2)
 
     # Plot attacker cumulative reward
     xlims = (min(min(x_3_1_v2), min(x_3_2_v2), min(x_3_3_v2), min(x_3_4_v2), min(x_3_5_v2)),
@@ -1624,8 +1590,6 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     # change the color of the top and right spines to opaque gray
     ax[1][2].spines['right'].set_color((.8, .8, .8))
     ax[1][2].spines['top'].set_color((.8, .8, .8))
-
-    # plt.legend(loc=legend_loc)
 
     # Shrink current axis's height by 10% on the bottom
     box = ax[1][2].get_position()
@@ -1684,18 +1648,6 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     ax[2][0].spines['right'].set_color((.8, .8, .8))
     ax[2][0].spines['top'].set_color((.8, .8, .8))
 
-    # plt.legend(loc=legend_loc)
-
-    # Shrink current axis's height by 10% on the bottom
-    # box = ax[0].get_position()
-    # ax[0].set_position([box.x0, 0.8*box.y0,
-    #                     box.width, box.height * 0.99])
-    fig.subplots_adjust(bottom=0.4)
-
-    # Put a legend below current axis
-    # ax[0].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
-    #              fancybox=True, shadow=True, ncol=2)
-
     # Plot avg hack_probability eval
     xlims = (min(min(x_2_1_v3), min(x_2_2_v3), min(x_2_3_v3), min(x_2_4_v3), min(x_2_5_v3)),
              max(max(x_2_1_v3), max(x_2_2_v3), max(x_2_3_v3), max(x_2_4_v3), max(x_2_5_v3)))
@@ -1734,25 +1686,17 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     xlab = ax[2][1].xaxis.get_label()
     ylab = ax[2][1].yaxis.get_label()
 
-    # xlab.set_style('italic')
-    # xlab.set_size(10)
-    # ylab.set_style('italic')
-    # ylab.set_size(10)
 
     # change the color of the top and right spines to opaque gray
     ax[2][1].spines['right'].set_color((.8, .8, .8))
     ax[2][1].spines['top'].set_color((.8, .8, .8))
 
-    # plt.legend(loc=legend_loc)
 
     # Shrink current axis's height by 10% on the bottom
     box = ax[2][1].get_position()
     ax[2][1].set_position([box.x0, box.y0 + box.height * 0.03,
                            box.width, box.height * 0.9])
 
-    # Put a legend below current axis
-    # ax[2].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
-    #              fancybox=True, shadow=True, ncol=2)
 
     # Plot attacker cumulative reward
     xlims = (min(min(x_3_1_v3), min(x_3_2_v3), min(x_3_3_v3), min(x_3_4_v3), min(x_3_5_v3)),
@@ -1804,7 +1748,6 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     ax[2][2].spines['right'].set_color((.8, .8, .8))
     ax[2][2].spines['top'].set_color((.8, .8, .8))
 
-    # plt.legend(loc=legend_loc)
 
     # Shrink current axis's height by 10% on the bottom
     box = ax[2][2].get_position()
@@ -1819,13 +1762,11 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     #ax = fig.add_axes([0.1, 0.1, 0.6, 0.75])
     fig.legend(lines, labels, loc=(0.16, 0.01), ncol=2, borderaxespad=0.)
 
-    #ax[2][2].legend(loc='lower center', bbox_to_anchor=(5, -1), fancybox=True, shadow=True, ncol=3)
-    #fig.legend(loc='upper center', bbox_to_anchor=(-0.7, -1), fancybox=True, shadow=True, ncol=3)
     fig.tight_layout()
     plt.subplots_adjust(wspace=wspace, hspace=0.47)
     fig.subplots_adjust(bottom=0.17)
-    fig.savefig(file_name + ".png", format="png", bbox_inches='tight')
-    fig.savefig(file_name + ".pdf", format='pdf', dpi=500, bbox_inches='tight', transparent=True)
+    fig.savefig(file_name + ".png", format="png", dpi=600, bbox_inches='tight')
+    fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight')
 
 
 def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1_3_v0, x_1_4_v0, y_1_4_v0,
@@ -2235,7 +2176,7 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     ax[3][2].set_xlim(xlims)
     ax[3][2].set_ylim(ylims)
 
-    ax[3][2].set_title(title_1_v3 + " v3")
+    ax[3][2].set_title(title_1_v3 + " v2")
     ax[3][2].set_xlabel(xlabel_1_v3)
     ax[3][2].set_ylabel(ylabel_1_v3)
     # set the grid on
@@ -2331,7 +2272,7 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     ax[4][2].set_xlim(xlims)
     ax[4][2].set_ylim(ylims)
 
-    ax[4][2].set_title(title_1_v4 + " v3")
+    ax[4][2].set_title(title_1_v4 + " v2")
     ax[4][2].set_xlabel(xlabel_1_v4)
     ax[4][2].set_ylabel(ylabel_1_v4)
     # set the grid on
@@ -2354,8 +2295,8 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     fig.tight_layout()
     plt.subplots_adjust(wspace=wspace, hspace=0.7)
     fig.subplots_adjust(bottom=0.08)
-    fig.savefig(file_name + ".png", format="png", bbox_inches='tight')
-    fig.savefig(file_name + ".pdf", format='pdf', dpi=500, bbox_inches='tight', transparent=True)
+    fig.savefig(file_name + ".png", format="png", dpi=600, bbox_inches='tight')
+    fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
 
 
 def plot_sparse_dense_difference(maximal_attack_train_csv_paths_v0, maximal_attack_eval_csv_paths_v0,
@@ -3619,22 +3560,22 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
     episode_len_eval_two_agents_means_v3 = np.mean(tuple(episode_len_eval_two_agents_data_v3), axis=0)
     episode_len_eval_two_agents_stds_v3 = np.std(tuple(episode_len_eval_two_agents_data_v3), axis=0, ddof=1)
 
-    plot_all_avg_summary_3(np.array(list(range(len(hack_prob_train_min_defense_data_v0[0])))) * train_log_freq,
-                           hack_prob_train_min_defense_means_v0,
-                           np.array(list(range(len(hack_prob_train_random_defense_data_v0[0])))) * train_log_freq,
-                           hack_prob_train_random_defense_means_v0,
-                           np.array(list(range(len(hack_prob_train_max_attack_data_v0[0])))) * train_log_freq,
-                           hack_prob_train_max_attack_means_v0,
-                           np.array(list(range(len(hack_prob_train_random_attack_data_v0[0])))) * train_log_freq,
-                           hack_prob_train_random_attack_means_v0,
-                           np.array(list(range(len(hack_prob_train_two_agents_data_v0[0])))) * train_log_freq,
-                           hack_prob_train_two_agents_means_v0, hack_prob_train_min_defense_stds_v0,
-                           hack_prob_train_random_defense_stds_v0, hack_prob_train_max_attack_stds_v0,
-                           hack_prob_train_random_attack_stds_v0, hack_prob_train_two_agents_stds_v0,
+    plot_all_avg_summary_3((np.array(list(range(len(hack_prob_train_min_defense_data_v0[0])))) * train_log_freq)[::eval_freq],
+                           hack_prob_train_min_defense_means_v0[::eval_freq],
+                           (np.array(list(range(len(hack_prob_train_random_defense_data_v0[0])))) * train_log_freq)[::eval_freq],
+                           hack_prob_train_random_defense_means_v0[::eval_freq],
+                           (np.array(list(range(len(hack_prob_train_max_attack_data_v0[0])))) * train_log_freq)[::eval_freq],
+                           hack_prob_train_max_attack_means_v0[::eval_freq],
+                           (np.array(list(range(len(hack_prob_train_random_attack_data_v0[0])))) * train_log_freq)[::eval_freq],
+                           hack_prob_train_random_attack_means_v0[::eval_freq],
+                           (np.array(list(range(len(hack_prob_train_two_agents_data_v0[0])))) * train_log_freq)[::eval_freq],
+                           hack_prob_train_two_agents_means_v0[::eval_freq], hack_prob_train_min_defense_stds_v0[::eval_freq],
+                           hack_prob_train_random_defense_stds_v0[::eval_freq], hack_prob_train_max_attack_stds_v0[::eval_freq],
+                           hack_prob_train_random_attack_stds_v0[::eval_freq], hack_prob_train_two_agents_stds_v0[::eval_freq],
                            r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
                            r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
                            r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Hack probability (train, v" + str(versions[0]) + ")",
-                           r"Episode \#", r"$\mathbb{P}[Hacked]$", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+                           r"Episode \#", r"$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1,
 
                            np.array(list(range(len(hack_prob_eval_min_defense_data_v0[0])))) * eval_freq,
                            hack_prob_eval_min_defense_means_v0,
@@ -3653,40 +3594,40 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Hack probability (eval v" + str(versions[0]) + ")",
                            r"Episode \#", r"$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1,
 
-                           np.array(list(range(len(a_cum_reward_train_min_defense_data_v0[0])))) * train_log_freq,
-                           a_cum_reward_train_min_defense_means_v0,
-                           np.array(list(range(len(a_cum_reward_train_random_defense_data_v0[0])))) * train_log_freq,
-                           a_cum_reward_train_random_defense_means_v0,
-                           np.array(list(range(len(a_cum_reward_train_max_attack_data_v0[0])))) * train_log_freq,
-                           a_cum_reward_train_max_attack_means_v0,
-                           np.array(list(range(len(a_cum_reward_train_random_attack_data_v0[0])))) * train_log_freq,
-                           a_cum_reward_train_random_attack_means_v0,
-                           np.array(list(range(len(a_cum_reward_train_two_agents_data_v0[0])))) * train_log_freq,
-                           a_cum_reward_train_two_agents_means_v0, a_cum_reward_train_min_defense_stds_v0,
-                           a_cum_reward_train_random_defense_stds_v0, a_cum_reward_train_max_attack_stds_v0,
-                           a_cum_reward_train_random_attack_stds_v0, a_cum_reward_train_two_agents_stds_v0,
+                           (np.array(list(range(len(a_cum_reward_train_min_defense_data_v0[0])))) * train_log_freq)[::eval_freq],
+                           a_cum_reward_train_min_defense_means_v0[::eval_freq],
+                           (np.array(list(range(len(a_cum_reward_train_random_defense_data_v0[0])))) * train_log_freq)[::eval_freq],
+                           a_cum_reward_train_random_defense_means_v0[::eval_freq],
+                           (np.array(list(range(len(a_cum_reward_train_max_attack_data_v0[0])))) * train_log_freq)[::eval_freq],
+                           a_cum_reward_train_max_attack_means_v0[::eval_freq],
+                           (np.array(list(range(len(a_cum_reward_train_random_attack_data_v0[0])))) * train_log_freq)[::eval_freq],
+                           a_cum_reward_train_random_attack_means_v0[::eval_freq],
+                           (np.array(list(range(len(a_cum_reward_train_two_agents_data_v0[0])))) * train_log_freq)[::eval_freq],
+                           a_cum_reward_train_two_agents_means_v0[::eval_freq], a_cum_reward_train_min_defense_stds_v0[::eval_freq],
+                           a_cum_reward_train_random_defense_stds_v0[::eval_freq], a_cum_reward_train_max_attack_stds_v0[::eval_freq],
+                           a_cum_reward_train_random_attack_stds_v0[::eval_freq], a_cum_reward_train_two_agents_stds_v0[::eval_freq],
                            r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
                            r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
                            r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Attacker reward (train v" + str(versions[0]) + ")",
-                           r"Episode \#", r"Cumulative Reward", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+                           r"Episode \#", r"Cumulative Reward", 1, 1, 1, 1, 1,
 
 
-                           np.array(list(range(len(hack_prob_train_min_defense_data_v2[0])))) * train_log_freq,
-                           hack_prob_train_min_defense_means_v2,
-                           np.array(list(range(len(hack_prob_train_random_defense_data_v2[0])))) * train_log_freq,
-                           hack_prob_train_random_defense_means_v2,
-                           np.array(list(range(len(hack_prob_train_max_attack_data_v2[0])))) * train_log_freq,
-                           hack_prob_train_max_attack_means_v2,
-                           np.array(list(range(len(hack_prob_train_random_attack_data_v2[0])))) * train_log_freq,
-                           hack_prob_train_random_attack_means_v2,
-                           np.array(list(range(len(hack_prob_train_two_agents_data_v2[0])))) * train_log_freq,
-                           hack_prob_train_two_agents_means_v2, hack_prob_train_min_defense_stds_v2,
-                           hack_prob_train_random_defense_stds_v2, hack_prob_train_max_attack_stds_v2,
-                           hack_prob_train_random_attack_stds_v2, hack_prob_train_two_agents_stds_v2,
+                           (np.array(list(range(len(hack_prob_train_min_defense_data_v2[0])))) * train_log_freq)[::eval_freq],
+                           hack_prob_train_min_defense_means_v2[::eval_freq],
+                           (np.array(list(range(len(hack_prob_train_random_defense_data_v2[0])))) * train_log_freq)[::eval_freq],
+                           hack_prob_train_random_defense_means_v2[::eval_freq],
+                           (np.array(list(range(len(hack_prob_train_max_attack_data_v2[0])))) * train_log_freq)[::eval_freq],
+                           hack_prob_train_max_attack_means_v2[::eval_freq],
+                           (np.array(list(range(len(hack_prob_train_random_attack_data_v2[0])))) * train_log_freq)[::eval_freq],
+                           hack_prob_train_random_attack_means_v2[::eval_freq],
+                           (np.array(list(range(len(hack_prob_train_two_agents_data_v2[0])))) * train_log_freq)[::eval_freq],
+                           hack_prob_train_two_agents_means_v2[::eval_freq], hack_prob_train_min_defense_stds_v2[::eval_freq],
+                           hack_prob_train_random_defense_stds_v2[::eval_freq], hack_prob_train_max_attack_stds_v2[::eval_freq],
+                           hack_prob_train_random_attack_stds_v2[::eval_freq], hack_prob_train_two_agents_stds_v2[::eval_freq],
                            r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
                            r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
                            r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Hack probability (train, v" + str(versions[1]) + ")",
-                           r"Episode \#", r"$\mathbb{P}[Hacked]$", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+                           r"Episode \#", r"$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1,
 
                            np.array(list(range(len(hack_prob_eval_min_defense_data_v2[0])))) * eval_freq,
                            hack_prob_eval_min_defense_means_v2,
@@ -3705,39 +3646,39 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Hack probability (eval v" + str(versions[1]) + ")",
                            r"Episode \#", r"$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1,
 
-                           np.array(list(range(len(a_cum_reward_train_min_defense_data_v2[0])))) * train_log_freq,
-                           a_cum_reward_train_min_defense_means_v2,
-                           np.array(list(range(len(a_cum_reward_train_random_defense_data_v2[0])))) * train_log_freq,
-                           a_cum_reward_train_random_defense_means_v2,
-                           np.array(list(range(len(a_cum_reward_train_max_attack_data_v2[0])))) * train_log_freq,
-                           a_cum_reward_train_max_attack_means_v2,
-                           np.array(list(range(len(a_cum_reward_train_random_attack_data_v2[0])))) * train_log_freq,
-                           a_cum_reward_train_random_attack_means_v2,
-                           np.array(list(range(len(a_cum_reward_train_two_agents_data_v2[0])))) * train_log_freq,
-                           a_cum_reward_train_two_agents_means_v2, a_cum_reward_train_min_defense_stds_v2,
-                           a_cum_reward_train_random_defense_stds_v2, a_cum_reward_train_max_attack_stds_v2,
-                           a_cum_reward_train_random_attack_stds_v2, a_cum_reward_train_two_agents_stds_v2,
+                           (np.array(list(range(len(a_cum_reward_train_min_defense_data_v2[0])))) * train_log_freq)[::eval_freq],
+                           a_cum_reward_train_min_defense_means_v2[::eval_freq],
+                           (np.array(list(range(len(a_cum_reward_train_random_defense_data_v2[0])))) * train_log_freq)[::eval_freq],
+                           a_cum_reward_train_random_defense_means_v2[::eval_freq],
+                           (np.array(list(range(len(a_cum_reward_train_max_attack_data_v2[0])))) * train_log_freq)[::eval_freq],
+                           a_cum_reward_train_max_attack_means_v2[::eval_freq],
+                           (np.array(list(range(len(a_cum_reward_train_random_attack_data_v2[0])))) * train_log_freq)[::eval_freq],
+                           a_cum_reward_train_random_attack_means_v2[::eval_freq],
+                           (np.array(list(range(len(a_cum_reward_train_two_agents_data_v2[0])))) * train_log_freq)[::eval_freq],
+                           a_cum_reward_train_two_agents_means_v2[::eval_freq], a_cum_reward_train_min_defense_stds_v2[::eval_freq],
+                           a_cum_reward_train_random_defense_stds_v2[::eval_freq], a_cum_reward_train_max_attack_stds_v2[::eval_freq],
+                           a_cum_reward_train_random_attack_stds_v2[::eval_freq], a_cum_reward_train_two_agents_stds_v2[::eval_freq],
                            r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
                            r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
                            r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Attacker reward (train v" + str(versions[1]) + ")",
-                           r"Episode \#", r"Cumulative Reward", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+                           r"Episode \#", r"Cumulative Reward", 1, 1, 1, 1, 1,
 
-                           np.array(list(range(len(hack_prob_train_min_defense_data_v3[0])))) * train_log_freq,
-                           hack_prob_train_min_defense_means_v3,
-                           np.array(list(range(len(hack_prob_train_random_defense_data_v3[0])))) * train_log_freq,
-                           hack_prob_train_random_defense_means_v3,
-                           np.array(list(range(len(hack_prob_train_max_attack_data_v3[0])))) * train_log_freq,
-                           hack_prob_train_max_attack_means_v3,
-                           np.array(list(range(len(hack_prob_train_random_attack_data_v3[0])))) * train_log_freq,
-                           hack_prob_train_random_attack_means_v3,
-                           np.array(list(range(len(hack_prob_train_two_agents_data_v3[0])))) * train_log_freq,
-                           hack_prob_train_two_agents_means_v3, hack_prob_train_min_defense_stds_v3,
-                           hack_prob_train_random_defense_stds_v3, hack_prob_train_max_attack_stds_v3,
-                           hack_prob_train_random_attack_stds_v3, hack_prob_train_two_agents_stds_v3,
+                           (np.array(list(range(len(hack_prob_train_min_defense_data_v3[0])))) * train_log_freq)[::eval_freq],
+                           hack_prob_train_min_defense_means_v3[::eval_freq],
+                           (np.array(list(range(len(hack_prob_train_random_defense_data_v3[0])))) * train_log_freq)[::eval_freq],
+                           hack_prob_train_random_defense_means_v3[::eval_freq],
+                           (np.array(list(range(len(hack_prob_train_max_attack_data_v3[0])))) * train_log_freq)[::eval_freq],
+                           hack_prob_train_max_attack_means_v3[::eval_freq],
+                           (np.array(list(range(len(hack_prob_train_random_attack_data_v3[0])))) * train_log_freq)[::eval_freq],
+                           hack_prob_train_random_attack_means_v3[::eval_freq],
+                           (np.array(list(range(len(hack_prob_train_two_agents_data_v3[0])))) * train_log_freq)[::eval_freq],
+                           hack_prob_train_two_agents_means_v3[::eval_freq], hack_prob_train_min_defense_stds_v3[::eval_freq],
+                           hack_prob_train_random_defense_stds_v3[::eval_freq], hack_prob_train_max_attack_stds_v3[::eval_freq],
+                           hack_prob_train_random_attack_stds_v3[::eval_freq], hack_prob_train_two_agents_stds_v3[::eval_freq],
                            r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
                            r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
                            r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Hack probability (train, v" + str(versions[2]) + ")",
-                           r"Episode \#", r"$\mathbb{P}[Hacked]$", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+                           r"Episode \#", r"$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1,
 
                            np.array(list(range(len(hack_prob_eval_min_defense_data_v3[0])))) * eval_freq,
                            hack_prob_eval_min_defense_means_v3,
@@ -3756,22 +3697,22 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Hack probability (eval v" + str(versions[2]) + ")",
                            r"Episode \#", r"$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1,
 
-                           np.array(list(range(len(a_cum_reward_train_min_defense_data_v3[0])))) * train_log_freq,
-                           a_cum_reward_train_min_defense_means_v3,
-                           np.array(list(range(len(a_cum_reward_train_random_defense_data_v3[0])))) * train_log_freq,
-                           a_cum_reward_train_random_defense_means_v3,
-                           np.array(list(range(len(a_cum_reward_train_max_attack_data_v3[0])))) * train_log_freq,
-                           a_cum_reward_train_max_attack_means_v3,
-                           np.array(list(range(len(a_cum_reward_train_random_attack_data_v3[0])))) * train_log_freq,
-                           a_cum_reward_train_random_attack_means_v3,
-                           np.array(list(range(len(a_cum_reward_train_two_agents_data_v3[0])))) * train_log_freq,
-                           a_cum_reward_train_two_agents_means_v3, a_cum_reward_train_min_defense_stds_v3,
-                           a_cum_reward_train_random_defense_stds_v3, a_cum_reward_train_max_attack_stds_v3,
-                           a_cum_reward_train_random_attack_stds_v3, a_cum_reward_train_two_agents_stds_v3,
+                           (np.array(list(range(len(a_cum_reward_train_min_defense_data_v3[0])))) * train_log_freq)[::eval_freq],
+                           a_cum_reward_train_min_defense_means_v3[::eval_freq],
+                           (np.array(list(range(len(a_cum_reward_train_random_defense_data_v3[0])))) * train_log_freq)[::eval_freq],
+                           a_cum_reward_train_random_defense_means_v3[::eval_freq],
+                           (np.array(list(range(len(a_cum_reward_train_max_attack_data_v3[0])))) * train_log_freq)[::eval_freq],
+                           a_cum_reward_train_max_attack_means_v3[::eval_freq],
+                           (np.array(list(range(len(a_cum_reward_train_random_attack_data_v3[0])))) * train_log_freq)[::eval_freq],
+                           a_cum_reward_train_random_attack_means_v3[::eval_freq],
+                           (np.array(list(range(len(a_cum_reward_train_two_agents_data_v3[0])))) * train_log_freq)[::eval_freq],
+                           a_cum_reward_train_two_agents_means_v3[::eval_freq], a_cum_reward_train_min_defense_stds_v3[::eval_freq],
+                           a_cum_reward_train_random_defense_stds_v3[::eval_freq], a_cum_reward_train_max_attack_stds_v3[::eval_freq],
+                           a_cum_reward_train_random_attack_stds_v3[::eval_freq], a_cum_reward_train_two_agents_stds_v3[::eval_freq],
                            r'\textsc{TabularQLearning} vs \textsc{MinDefense}', r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
                            r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
                            r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Attacker reward (train v" + str(versions[2]) + ")",
-                           r"Episode \#", r"Cumulative Reward", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+                           r"Episode \#", r"Cumulative Reward", 1, 1, 1, 1, 1,
 
 
                            output_dir + "/" + file_name + algorithm + "_" + str(0),
@@ -4627,8 +4568,8 @@ def plot_avg_summary(train_dfs, eval_dfs, train_log_frequency, eval_frequency, e
     ax[2].legend(loc="upper right")
 
     fig.tight_layout()
-    fig.savefig(file_name + ".png", format="png")
-    fig.savefig(file_name + ".pdf", format='pdf', dpi=500, bbox_inches='tight', transparent=True)
+    fig.savefig(file_name + ".png", format="png", dpi=600)
+    fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     plt.close(fig)
 
 def read_and_plot_average_results(experiment_title: str, train_csv_paths : list, eval_csv_paths: list,
