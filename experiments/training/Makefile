@@ -20,6 +20,26 @@ tabular_q_v0_v2_v3_server_no_config:
 	cd v2/ && $(MAKE) tabular_q_server_no_config
 	cd v3/ && $(MAKE) tabular_q_server_no_config
 
+dqn_v7_v8_v9_server:
+	cd v7/ && $(MAKE) dqn_server
+	cd v8/ && $(MAKE) dqn_server
+	cd v9/ && $(MAKE) dqn_server
+
+dqn_v7_v8_v9_server_no_config:
+	cd v7/ && $(MAKE) dqn_server_no_config
+	cd v8/ && $(MAKE) dqn_server_no_config
+	cd v9/ && $(MAKE) dqn_server_no_config
+
+dqn_v0_v2_v3_server:
+	cd v0/ && $(MAKE) dqn_server
+	cd v2/ && $(MAKE) dqn_server
+	cd v3/ && $(MAKE) dqn_server
+
+dqn_v0_v2_v3_server_no_config:
+	cd v0/ && $(MAKE) dqn_server_no_config
+	cd v2/ && $(MAKE) dqn_server_no_config
+	cd v3/ && $(MAKE) dqn_server_no_config
+
 plots:
 	./make_plots.sh
 

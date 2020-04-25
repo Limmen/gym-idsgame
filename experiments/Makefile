@@ -521,8 +521,5 @@ clean:
 	cd ./training/v9/two_agents/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/v9/two_agents/dqn/ && $(MAKE) clean
 
-	# Summaries
-	cd ./training/v0/ && $(MAKE) clean
-
 	# Tests
 	cd ./it_tests/ && $(MAKE) clean
