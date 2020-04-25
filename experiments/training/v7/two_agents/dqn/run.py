@@ -44,13 +44,13 @@ def default_config() -> ClientConfig:
                            gpu=True, tensorboard=True, tensorboard_dir=default_output_dir() + "/results/tensorboard",
                            loss_fn="Huber", optimizer="Adam", lr_exp_decay=True, lr_decay_rate=0.9999)
     q_agent_config = QAgentConfig(gamma=0.99, alpha=0.00001, epsilon=1, render=False, eval_sleep=0.9,
-                                  min_epsilon=0.05, eval_episodes=100, train_log_frequency=100,
-                                  epsilon_decay=0.999, video=True, eval_log_frequency=1,
-                                  video_fps=5, video_dir=default_output_dir() + "/results/videos", num_episodes=10000,
+                                  min_epsilon=0.01, eval_episodes=100, train_log_frequency=100,
+                                  epsilon_decay=0.9999, video=True, eval_log_frequency=1,
+                                  video_fps=5, video_dir=default_output_dir() + "/results/videos", num_episodes=15001,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/results/gifs",
                                   eval_frequency=1000, attacker=True, defender=True, video_frequency=101,
                                   save_dir=default_output_dir() + "/results/data", dqn_config=dqn_config,
-                                  checkpoint_freq=1000)
+                                  checkpoint_freq=5000)
     env_name = "idsgame-v7"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.DQN_AGENT.value,
                                  defender_type=AgentType.DQN_AGENT.value,

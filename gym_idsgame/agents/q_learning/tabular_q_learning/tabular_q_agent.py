@@ -122,17 +122,26 @@ class TabularQAgent(QAgent):
                 defender_obs = obs_prime_defender
 
             # Record episode metrics
+            self.num_train_games += 1
+            if self.env.state.hacked:
+                self.num_train_hacks += 1
             episode_attacker_rewards.append(episode_attacker_reward)
             episode_defender_rewards.append(episode_defender_reward)
             episode_steps.append(episode_step)
 
             # Log average metrics every <self.config.train_log_frequency> episodes
             if episode % self.config.train_log_frequency == 0:
+                if self.num_train_games > 0:
+                    self.train_hack_probability = self.num_train_hacks / self.num_train_games
+                else:
+                    self.train_hack_probability = 0.0
                 self.log_metrics(episode, self.train_result, episode_attacker_rewards, episode_defender_rewards,
                                  episode_steps, None, None, lr=self.config.alpha)
                 episode_attacker_rewards = []
                 episode_defender_rewards = []
                 episode_steps = []
+                self.num_train_games = 0
+                self.num_train_hacks = 0
 
             # Run evaluation every <self.config.eval_frequency> episodes
             if episode % self.config.eval_frequency == 0:
@@ -210,6 +219,9 @@ class TabularQAgent(QAgent):
         """
         self.config.logger.info("Starting Evaluation")
         time_str = str(time.time())
+
+        self.num_eval_games = 0
+        self.num_eval_hacks = 0
 
         if len(self.eval_result.avg_episode_steps) > 0:
             self.config.logger.warning("starting eval with non-empty result object")

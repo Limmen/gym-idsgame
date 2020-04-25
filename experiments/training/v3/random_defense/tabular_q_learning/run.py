@@ -38,10 +38,10 @@ def default_config() -> ClientConfig:
     :return: Default configuration for the experiment
     """
     q_agent_config = QAgentConfig(gamma=0.9, alpha=0.0005, epsilon=1, render=False, eval_sleep=0.9,
-                                  min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
-                                  epsilon_decay=0.9999, video=False, eval_log_frequency=1,
-                                  video_fps=5, video_dir=default_output_dir() + "/results/videos", num_episodes=15001,
-                                  eval_render=False, gifs=False, gif_dir=default_output_dir() + "/results/gifs",
+                                  min_epsilon=0.01, eval_episodes=100, train_log_frequency=100,
+                                  epsilon_decay=0.9999, video=True, eval_log_frequency=1,
+                                  video_fps=5, video_dir=default_output_dir() + "/results/videos", num_episodes=20001,
+                                  eval_render=False, gifs=True, gif_dir=default_output_dir() + "/results/gifs",
                                   eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
                                   save_dir=default_output_dir() + "/results/data")
     env_name = "idsgame-random_defense-v3"

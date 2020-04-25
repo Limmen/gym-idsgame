@@ -38,9 +38,9 @@ def default_config() -> ClientConfig:
     :return: Default configuration for the experiment
     """
     q_agent_config = QAgentConfig(gamma=0.999, alpha=0.0005, epsilon=1, render=False, eval_sleep=0.9,
-                                  min_epsilon=0.01, eval_episodes=1, train_log_frequency=1,
+                                  min_epsilon=0.01, eval_episodes=100, train_log_frequency=100,
                                   epsilon_decay=0.9999, video=True, eval_log_frequency=1,
-                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=15001,
+                                  video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=20001,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
                                   eval_frequency=1000, attacker=True, defender=True,
                                   save_dir=default_output_dir() + "/data")

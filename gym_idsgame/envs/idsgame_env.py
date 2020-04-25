@@ -235,7 +235,7 @@ class IdsGameEnv(gym.Env, ABC):
 
     def hack_probability(self) -> float:
         """
-        :return: the hack-probabiltiy according to the game history
+        :return: the cumulative hack-probabiltiy according to the game history
         """
         hack_probability = 0.0
         if self.state.num_hacks > 0:

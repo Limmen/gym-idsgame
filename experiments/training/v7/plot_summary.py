@@ -28,7 +28,7 @@ def default_config_path() -> str:
     return config_path
 
 
-def plot_summary(algorithm : str, eval_freq : int, train_log_freq : int):
+def plot_summary(algorithm : str, eval_freq : int, train_log_freq : int, plot_loss : bool = False):
     seeds = [0, 999, 299, 399, 499]
 
     maximal_attack_train_csv_paths = []
@@ -91,7 +91,8 @@ def plot_summary(algorithm : str, eval_freq : int, train_log_freq : int):
                                     random_attack_train_csv_paths, random_attack_eval_csv_paths,
                                     random_defense_train_csv_paths, random_defense_eval_csv_paths,
                                     two_agents_train_csv_paths, two_agents_eval_csv_paths,
-                                    3, algorithm, default_output_dir() + "/plots", eval_freq, train_log_freq)
+                                    0, algorithm, default_output_dir() + "/plots", eval_freq, train_log_freq,
+                                    plot_loss=plot_loss)
 
 
 def plot():
@@ -100,12 +101,27 @@ def plot():
     if not os.path.exists(default_output_dir() + "/plots/data"):
         os.makedirs(default_output_dir() + "/plots/data")
 
-    hyperparam_csv_path = glob.glob(default_output_dir() +
-                                    "/random_defense/tabular_q_learning/results/hyperparameters/0/*.csv")[0]
-    hyperparameters = pd.read_csv(hyperparam_csv_path)
-    eval_freq = hyperparameters.loc[hyperparameters['parameter'] == "eval_frequency"]["value"].values[0]
-    train_log_freq = hyperparameters.loc[hyperparameters['parameter'] == "train_log_frequency"]["value"].values[0]
-    plot_summary("tabular_q_learning", int(eval_freq), int(train_log_freq))
+    try:
+        hyperparam_csv_path = glob.glob(default_output_dir() +
+                                            "/random_defense/tabular_q_learning/results/hyperparameters/0/*.csv")[0]
+        hyperparameters = pd.read_csv(hyperparam_csv_path)
+        eval_freq = hyperparameters.loc[hyperparameters['parameter'] == "eval_frequency"]["value"].values[0]
+        train_log_freq = hyperparameters.loc[hyperparameters['parameter'] == "train_log_frequency"]["value"].values[0]
+        plot_summary("tabular_q_learning", int(eval_freq), int(train_log_freq), plot_loss=False)
+    except Exception as e:
+        print("Could not plot tabular q learning summary results: ")
+        print(str(e))
+
+    try:
+        hyperparam_csv_path = glob.glob(default_output_dir() +
+                                        "/random_defense/dqn/results/hyperparameters/0/*.csv")[0]
+        hyperparameters = pd.read_csv(hyperparam_csv_path)
+        eval_freq = hyperparameters.loc[hyperparameters['parameter'] == "eval_frequency"]["value"].values[0]
+        train_log_freq = hyperparameters.loc[hyperparameters['parameter'] == "train_log_frequency"]["value"].values[0]
+        plot_summary("dqn", int(eval_freq), int(train_log_freq), plot_loss=True)
+    except Exception as e:
+        print("Could not plot DQN summary results: ")
+        print(str(e))
 
 
 if __name__ == '__main__':

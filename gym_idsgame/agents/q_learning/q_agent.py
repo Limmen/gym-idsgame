@@ -28,6 +28,9 @@ class QAgent(TrainAgent, ABC):
         self.eval_result = ExperimentResult()
         self.num_eval_games = 0
         self.num_eval_hacks = 0
+        self.num_train_games = 0
+        self.num_train_hacks = 0
+        self.train_hack_probability = 0.0
         self.eval_hack_probability = 0.0
         self.eval_attacker_cumulative_reward = 0
         self.eval_defender_cumulative_reward = 0
@@ -77,7 +80,7 @@ class QAgent(TrainAgent, ABC):
         else:
             replay_memory_size = -1
         avg_episode_steps = np.mean(episode_steps)
-        hack_probability = self.env.hack_probability() if not eval else self.eval_hack_probability
+        hack_probability = self.train_hack_probability if not eval else self.eval_hack_probability
         attacker_cumulative_reward = self.env.state.attacker_cumulative_reward if not eval \
             else self.eval_attacker_cumulative_reward
         defender_cumulative_reward = self.env.state.defender_cumulative_reward if not eval \

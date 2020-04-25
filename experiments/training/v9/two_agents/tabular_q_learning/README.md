@@ -76,7 +76,7 @@ Example configuration in `config.json`:
         "gifs": true,
         "logger": null,
         "min_epsilon": 0.01,
-        "num_episodes": 15001,
+        "num_episodes": 20001,
         "py/object": "gym_idsgame.agents.q_learning.q_agent_config.QAgentConfig",
         "random_seed": 0,
         "render": false,
