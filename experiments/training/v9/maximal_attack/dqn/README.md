@@ -1,16 +1,18 @@
-# Experiment `tabular_q_learning`_`tabular_q_learning_v8`
+# Experiment `maximal_attack-v9`_`dqn`
 
-This is an experiment in the `idsgame-v8` environment. 
-An environment where neither the attacker nor defender is part of the environment, i.e.
-it is intended for 2-agent simulations or RL training.
+This is an experiment in the `maximal_attack-v9` environment.
+An environment where the attack is following the `attack_maximal` attack policy.
+The `attack_maximal` policy entails that the attacker will always attack the attribute with
+the maximum value out of all of its neighbors. The defender is implemented with a
+random defense policy.
  
-This experiment trains both an attacker and a defender agent simultaneously against each other 
-using tabular q-learning.
+This experiment trains a defender agent using DQN to act optimally in the given
+environment and detect the attacker.
 
 The network configuration of the environment is as follows:
 
 - `num_layers=1` (number of layers between the start and end nodes)
-- `num_servers_per_layer=1`
+- `num_servers_per_layer=2`
 - `num_attack_types=10`
 - `max_value=9`  
 
@@ -24,18 +26,18 @@ The starting state for each node in the environment is initialized as follows (w
 - `attack_val=0`
 - `num_vulnerabilities_per_node=1` (which type of defense at the node that is vulnerable is selected randomly when the environment is initialized)
 - `det_val=2`
-- `vulnerability_val=0`
-- `num_vulnerabilities_per_layer=1` 
+- `vulnerability_val=0` 
+- `num_vulnerabilities_per_layer=2`
 
 The environment has dense rewards (+1,-1 given whenever the attacker reaches a new level in the network)
 
 ## Environment 
 
-- Env: `random_attack-v8`
+- Env: `random_attack-v9`
 
 ## Algorithm
 
-- Tabular Q-learning with linear exploration annealing 
+- DQN with linear exploration annealing 
  
 ## Instructions 
 
@@ -47,45 +49,63 @@ Example configuration in `config.json`:
 
 ```json
 {
-    "attacker_type": 0,
-    "defender_type": 0,
-    "env_name": "idsgame-v8",
+    "attacker_type": 6,
+    "defender_type": 1,
+    "env_name": "idsgame-maximal_attack-v9",
     "idsgame_config": null,
     "initial_state_path": null,
     "logger": null,
-    "mode": 5,
-    "output_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v8/two_agents/tabular_q_learning",
+    "mode": 0,
+    "output_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v9/maximal_attack/dqn",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
-        "alpha": 0.0005,
+        "alpha": 0.0001,
         "attacker": true,
         "attacker_load_path": null,
-        "checkpoint_freq": 100000,
-        "defender": true,
+        "checkpoint_freq": 1000,
+        "defender": false,
         "defender_load_path": null,
-        "dqn_config": null,
+        "dqn_config": {
+            "batch_size": 32,
+            "gpu": true,
+            "hidden_activation": "ReLU",
+            "hidden_dim": 64,
+            "input_dim": 44,
+            "loss_fn": "Huber",
+            "lr_decay_rate": 0.999,
+            "lr_exp_decay": true,
+            "num_hidden_layers": 1,
+            "optimizer": "Adam",
+            "output_dim": 40,
+            "py/object": "gym_idsgame.agents.q_learning.dqn.dqn_config.DQNConfig",
+            "replay_memory_size": 1000,
+            "replay_start_size": 100,
+            "target_network_update_freq": 100,
+            "tensorboard": true,
+            "tensorboard_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v9/maximal_attack/dqn/results/tensorboard"
+        },
         "epsilon": 1,
-        "epsilon_decay": 0.9999,
-        "eval_episodes": 1,
+        "epsilon_decay": 0.999,
+        "eval_episodes": 100,
         "eval_frequency": 1000,
         "eval_log_frequency": 1,
         "eval_render": false,
         "eval_sleep": 0.9,
-        "gamma": 0.999,
-        "gif_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v8/two_agents/tabular_q_learning/gifs",
+        "gamma": 0.9,
+        "gif_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v9/maximal_attack/dqn/results/gifs",
         "gifs": true,
         "logger": null,
         "min_epsilon": 0.01,
-        "num_episodes": 15001,
+        "num_episodes": 5000,
         "py/object": "gym_idsgame.agents.q_learning.q_agent_config.QAgentConfig",
         "random_seed": 0,
         "render": false,
-        "save_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v8/two_agents/tabular_q_learning/data",
+        "save_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v9/maximal_attack/dqn/results/data",
         "train_log_frequency": 1,
         "video": true,
-        "video_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v8/two_agents/tabular_q_learning/videos",
+        "video_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v9/maximal_attack/dqn/results/videos",
         "video_fps": 5,
-        "video_frequency": 1
+        "video_frequency": 101
     },
     "random_seeds": [
         0,
@@ -96,26 +116,32 @@ Example configuration in `config.json`:
     ],
     "run_many": true,
     "simulation_config": null,
-    "title": "TrainingQAgent vs TrainingQAgent"
+    "title": "AttackMaximalAttacker vs TrainingDQNAgent"
 }
 ```
 
 Example configuration in `run.py`:
 
 ```python
-q_agent_config = QAgentConfig(gamma=0.999, alpha=0.05, epsilon=1, render=False, eval_sleep=0.9,
-                              min_epsilon=0.01, eval_episodes=1, train_log_frequency=100,
+dqn_config = DQNConfig(input_dim=44, output_dim=40, hidden_dim=64, replay_memory_size=1000,
+                           num_hidden_layers=1,
+                           replay_start_size=100, batch_size=32, target_network_update_freq=100,
+                           gpu=True, tensorboard=True, tensorboard_dir=default_output_dir() + "/results/tensorboard",
+                           loss_fn="Huber", optimizer="Adam", lr_exp_decay=True, lr_decay_rate=0.999)
+q_agent_config = QAgentConfig(gamma=0.9, alpha=0.0001, epsilon=1, render=False, eval_sleep=0.9,
+                              min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
                               epsilon_decay=0.999, video=True, eval_log_frequency=1,
-                              video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=5001,
-                              eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                              eval_frequency=1000, attacker=True, defender=True,
-                              save_dir=default_output_dir() + "/data")
-env_name = "idsgame-v8"
-client_config = ClientConfig(env_name=env_name, defender_type=AgentType.TABULAR_Q_AGENT.value,
-                             attacker_type=AgentType.TABULAR_Q_AGENT.value,
-                             mode=RunnerMode.TRAIN_DEFENDER_AND_ATTACKER.value,
+                              video_fps=5, video_dir=default_output_dir() + "/results/videos", num_episodes=5000,
+                              eval_render=False, gifs=True, gif_dir=default_output_dir() + "/results/gifs",
+                              eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
+                              save_dir=default_output_dir() + "/results/data", dqn_config=dqn_config,
+                              checkpoint_freq=1000)
+env_name = "idsgame-maximal_attack-v9"
+client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.DQN_AGENT.value,
+                             mode=RunnerMode.TRAIN_ATTACKER.value,
                              q_agent_config=q_agent_config, output_dir=default_output_dir(),
-                             title="TrainingQAgent vs TrainingQAgent")
+                             title="AttackMaximalAttacker vs TrainingDQNAgent",
+                             run_many=True, random_seeds=[0, 999, 299, 399, 499])
 ```
 
 After the experiment has finished, the results are written to the following sub-directories:
@@ -126,6 +152,7 @@ After the experiment has finished, the results are written to the following sub-
 - **/logs**: Log files from the experiment
 - **/plots**: Basic plots of the results
 - **/videos**: If the video configuration-flag is set to true, the experiment will render the game during evaluation and save video files to this directory. You can control the frequency of evaluation with the configuration parameter `eval_frequency` and the frequency of video/gif recording during evaluation with the parameter `video_frequency`
+  
 
 ## Example Results
 
@@ -146,7 +173,6 @@ After the experiment has finished, the results are written to the following sub-
 <p align="center">
 <img src="docs/episode_15000.gif" width="600">
 </p>  
-  
 
 ## Commands
 

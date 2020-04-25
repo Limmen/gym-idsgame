@@ -1,4 +1,4 @@
-# Experiment `tabular_q_learning`_`tabular_q_learning`
+# Experiment `tabular_q_learning`_`tabular_q_learning-v7`
 
 This is an experiment in the `idsgame-v7` environment. 
 An environment where neither the attacker nor defender is part of the environment, i.e.
