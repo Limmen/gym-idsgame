@@ -103,7 +103,8 @@ def plot_average_results(experiment_title :str, config: ClientConfig, eval_csv_p
     plotting_util.read_and_plot_average_results(experiment_title, train_csv_paths, eval_csv_paths,
                                                 config.q_agent_config.train_log_frequency,
                                                 config.q_agent_config.eval_frequency,
-                                                config.output_dir)
+                                                config.output_dir, plot_attacker_loss = True,
+                                                plot_defender_loss = False)
 
 def run_experiment(configpath: str, random_seed: int, noconfig: bool):
     """

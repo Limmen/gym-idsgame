@@ -46,7 +46,7 @@ def default_config() -> ClientConfig:
     q_agent_config = QAgentConfig(gamma=0.9, alpha=0.0001, epsilon=1, render=False, eval_sleep=0.9,
                                   min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
                                   epsilon_decay=0.999, video=True, eval_log_frequency=1,
-                                  video_fps=5, video_dir=default_output_dir() + "/results/videos", num_episodes=5000,
+                                  video_fps=5, video_dir=default_output_dir() + "/results/videos", num_episodes=5001,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/results/gifs",
                                   eval_frequency=1000, attacker=False, defender=True, video_frequency=101,
                                   save_dir=default_output_dir() + "/results/data", dqn_config=dqn_config,
@@ -102,7 +102,8 @@ def plot_average_results(experiment_title :str, config: ClientConfig, eval_csv_p
     plotting_util.read_and_plot_average_results(experiment_title, train_csv_paths, eval_csv_paths,
                                                 config.q_agent_config.train_log_frequency,
                                                 config.q_agent_config.eval_frequency,
-                                                config.output_dir)
+                                                config.output_dir, plot_attacker_loss = False,
+                                                plot_defender_loss = True)
 
 
 def run_experiment(configpath: str, random_seed: int, noconfig: bool):

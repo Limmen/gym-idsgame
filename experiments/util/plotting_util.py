@@ -580,14 +580,165 @@ def two_line_plot_w_shades(x_1: np.ndarray, y_1: np.ndarray,
         xlims = (min(min(x_1), min(x_2)),
                  max(max(x_1), max(x_2)))
     if ylims is None:
-        ylims = (min(min(y_1), min(y_2)),
-                 max(max(y_1), max(y_2)))
+        ylims = (min(min(y_1 - stds_1), min(y_2 - stds_1)),
+                 max(max(y_1 + stds_1), max(y_2 + stds_1)))
 
     ax.plot(x_1, y_1, label=line1_label, marker="s", ls='-', color="#599ad3", markevery=markevery_1)
     ax.fill_between(x_1, y_1 - stds_1, y_1 + stds_1, alpha=0.35, color="#599ad3")
 
     ax.plot(x_2, y_2, label=line2_label, marker="o", ls='-', color='#f9a65a', markevery=markevery_2)
     ax.fill_between(x_2, y_2 - stds_2, y_2 + stds_2, alpha=0.35, color='#f9a65a')
+
+    ax.set_xlim(xlims)
+    ax.set_ylim(ylims)
+
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    # set the grid on
+    ax.grid('on')
+
+    # tweak the axis labels
+    xlab = ax.xaxis.get_label()
+    ylab = ax.yaxis.get_label()
+
+    # xlab.set_style('italic')
+    xlab.set_size(10)
+    # ylab.set_style('italic')
+    ylab.set_size(10)
+
+    # change the color of the top and right spines to opaque gray
+    ax.spines['right'].set_color((.8, .8, .8))
+    ax.spines['top'].set_color((.8, .8, .8))
+
+    plt.legend(loc=legend_loc)
+
+    fig.tight_layout()
+    fig.savefig(file_name + ".png", format="png", dpi=600)
+    fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
+    plt.close(fig)
+
+
+def three_line_plot_w_shades(x_1: np.ndarray, y_1: np.ndarray,
+                           x_2: np.ndarray, y_2: np.ndarray,
+                           x_3: np.ndarray, y_3: np.ndarray,
+                           stds_1, stds_2, stds_3,
+                           title: str = "Test", xlabel: str = "test", ylabel: str = "test",
+                           file_name: str = "test.eps", xlims: Union[float, float] = None,
+                           ylims: Union[float, float] = None,
+                           line1_label="Train", line2_label="Eval", line3_label="Eval", legend_loc='upper right',
+                           markevery_1=5, markevery_2=5, markevery_3=5) -> None:
+    """
+    Plot two line plots with shaded error bars
+
+    :param x_1: x data of line 1
+    :param y_1: y data of line 1
+    :param x_2: x data of line 2
+    :param y_2: y data of line 2
+    :param x_3: x data of line 3
+    :param y_3: y data of line 3
+    :param stds_1: standard deviations of line 1
+    :param stds_2: standard deviations of line 2
+    :param stds_3: standard deviations of line 3
+    :param title: plot title
+    :param xlabel: label on x axis
+    :param ylabel: label on y axis
+    :param file_name: name of file to save
+    :param xlims: limits on x axis
+    :param ylims: limits on y axis
+    :param line1_label: legend for line 1
+    :param line2_label: legend for line 2
+    :param legend_loc: location of the legend
+    :param markevery_1: marker frequency for line 1
+    :param markevery_2: marker frequency for line 2
+    :param markevery_3: marker frequency for line 3
+    :return:
+    """
+    plt.rc('text', usetex=True)
+    plt.rc('text.latex', preamble=r'\usepackage{amsfonts}')
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8, 3))
+    if xlims is None:
+        xlims = (min(min(x_1), min(x_2), min(x_3)),
+                 max(max(x_1), max(x_2), max(x_3)))
+    if ylims is None:
+        ylims = (min(min(y_1 - stds_2), min(y_2 - stds_2), min(y_3 - stds_3)),
+                 max(max(y_1 + stds_1), max(y_2 + stds_2), max(y_3 + stds_3)))
+
+    ax.plot(x_1, y_1, label=line1_label, marker="s", ls='-', color="#599ad3", markevery=markevery_1)
+    ax.fill_between(x_1, y_1 - stds_1, y_1 + stds_1, alpha=0.35, color="#599ad3")
+
+    ax.plot(x_2, y_2, label=line2_label, marker="o", ls='-', color='#f9a65a', markevery=markevery_2)
+    ax.fill_between(x_2, y_2 - stds_2, y_2 + stds_2, alpha=0.35, color='#f9a65a')
+
+    ax.plot(x_3, y_3, label=line3_label, marker="p", ls='-', color='#9e66ab', markevery=markevery_3)
+    ax.fill_between(x_3, y_3 - stds_3, y_3 + stds_3, alpha=0.35, color='#9e66ab')
+
+    ax.set_xlim(xlims)
+    ax.set_ylim(ylims)
+
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    # set the grid on
+    ax.grid('on')
+
+    # tweak the axis labels
+    xlab = ax.xaxis.get_label()
+    ylab = ax.yaxis.get_label()
+
+    # xlab.set_style('italic')
+    xlab.set_size(10)
+    # ylab.set_style('italic')
+    ylab.set_size(10)
+
+    # change the color of the top and right spines to opaque gray
+    ax.spines['right'].set_color((.8, .8, .8))
+    ax.spines['top'].set_color((.8, .8, .8))
+
+    plt.legend(loc=legend_loc)
+
+    fig.tight_layout()
+    fig.savefig(file_name + ".png", format="png", dpi=600)
+    fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
+    plt.close(fig)
+
+
+def one_line_plot_w_shades(x_1: np.ndarray, y_1: np.ndarray,
+                           stds_1, title: str = "Test", xlabel: str = "test", ylabel: str = "test",
+                           file_name: str = "test.eps", xlims: Union[float, float] = None,
+                           ylims: Union[float, float] = None,
+                           line1_label="Train", legend_loc='upper right',
+                           markevery_1=5) -> None:
+    """
+    Plot two line plots with shaded error bars
+
+    :param x_1: x data of line 1
+    :param y_1: y data of line 1
+    :param stds_1: standard deviations of line 1
+    :param title: plot title
+    :param xlabel: label on x axis
+    :param ylabel: label on y axis
+    :param file_name: name of file to save
+    :param xlims: limits on x axis
+    :param ylims: limits on y axis
+    :param line1_label: legend for line 1
+    :param line2_label: legend for line 2
+    :param legend_loc: location of the legend
+    :param markevery_1: marker frequency for line 1
+    :return:
+    """
+    plt.rc('text', usetex=True)
+    plt.rc('text.latex', preamble=r'\usepackage{amsfonts}')
+    fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(8, 3))
+    if xlims is None:
+        xlims = (min(x_1),
+                 max(x_1))
+    if ylims is None:
+        ylims = (min(y_1 - stds_1),
+                 max(y_1 + stds_1))
+
+    ax.plot(x_1, y_1, label=line1_label, marker="s", ls='-', color="#599ad3", markevery=markevery_1)
+    ax.fill_between(x_1, y_1 - stds_1, y_1 + stds_1, alpha=0.35, color="#599ad3")
 
     ax.set_xlim(xlims)
     ax.set_ylim(ylims)
@@ -712,16 +863,27 @@ def plot_all_avg_summary_1(x_1_1, y_1_1, x_1_2, y_1_2, x_1_3, y_1_3, x_1_4, y_1_
                            line_3_1_label, line_3_2_label, line_3_3_label, line_3_4_label,
                            line_3_5_label, title_3, xlabel_3, ylabel_3,
                            markevery_3_1, markevery_3_2, markevery_3_3, markevery_3_4, markevery_3_5,
-                           x_4_1, y_4_1, x_4_2, y_4_2, x_4_3, y_4_3, x_4_4, y_4_4, x_4_5, y_4_5,
-                           std_4_1, std_4_2, std_4_3, std_4_4, std_4_5,
-                           line_4_1_label, line_4_2_label, line_4_3_label, line_4_4_label,
-                           line_4_5_label, title_4, xlabel_4, ylabel_4,
-                           markevery_4_1, markevery_4_2, markevery_4_3, markevery_4_4, markevery_4_5,
-                           file_name
+
+                           x_4_1, y_4_1, x_4_2, y_4_2, x_4_3, y_4_3,
+                           std_4_1, std_4_2, std_4_3,
+                           line_4_1_label, line_4_2_label, line_4_3_label,
+                           title_4, xlabel_4, ylabel_4,
+                           markevery_4_1, markevery_4_2, markevery_4_3,
+
+                           x_5_1, y_5_1, x_5_2, y_5_2, x_5_3, y_5_3,
+                           std_5_1, std_5_2, std_5_3,
+                           line_5_1_label, line_5_2_label, line_5_3_label,
+                           title_5, xlabel_5, ylabel_5,
+                           markevery_5_1, markevery_5_2, markevery_5_3,
+
+                           file_name, plot_loss = False
                            ):
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts}')
-    fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(11, 2.75))
+    if plot_loss:
+        fig, ax = plt.subplots(nrows=2, ncols=3, figsize=(11, 5.5))
+    else:
+        fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(11, 2.75))
     #gs1 = gridspec.GridSpec(1, 4)
     #gs1.update(wspace=0.005, hspace=0.05)
 
@@ -730,107 +892,82 @@ def plot_all_avg_summary_1(x_1_1, y_1_1, x_1_2, y_1_2, x_1_3, y_1_3, x_1_4, y_1_
              max(max(x_1_1), max(x_1_2), max(x_1_3), max(x_1_4), max(x_1_5)))
     ylims = (0, 1)
 
-    ax[0].plot(x_1_1, y_1_1, label=line_1_1_label, marker="s", ls='-', color="#599ad3", markevery=markevery_1_1)
-    ax[0].fill_between(x_1_1, y_1_1 - std_1_1, y_1_1 + std_1_1, alpha=0.35, color="#599ad3")
+    if plot_loss:
+        hack_prob_ax1 = ax[0][0]
+        hack_prob_ax2 = ax[0][1]
+        hack_prob_ax3 = ax[0][2]
+    else:
+        hack_prob_ax1 = ax[0]
+        hack_prob_ax2 = ax[1]
+        hack_prob_ax3 = ax[2]
 
-    ax[0].plot(x_1_2, y_1_2, label=line_1_2_label, marker="o", ls='-', color='#f9a65a', markevery=markevery_1_2)
-    ax[0].fill_between(x_1_2, y_1_2 - std_1_2, y_1_2 + std_1_2, alpha=0.35, color='#f9a65a')
+    hack_prob_ax1.plot(x_1_1, y_1_1, label=line_1_1_label, marker="s", ls='-', color="#599ad3", markevery=markevery_1_1)
+    hack_prob_ax1.fill_between(x_1_1, y_1_1 - std_1_1, y_1_1 + std_1_1, alpha=0.35, color="#599ad3")
 
-    ax[0].plot(x_1_3, y_1_3, label=line_1_3_label, marker="p", ls='-', color="#9e66ab", markevery=markevery_1_3)
-    ax[0].fill_between(x_1_3, y_1_3 - std_1_3, y_1_3 + std_1_3, alpha=0.35, color="#9e66ab")
+    hack_prob_ax1.plot(x_1_2, y_1_2, label=line_1_2_label, marker="o", ls='-', color='#f9a65a', markevery=markevery_1_2)
+    hack_prob_ax1.fill_between(x_1_2, y_1_2 - std_1_2, y_1_2 + std_1_2, alpha=0.35, color='#f9a65a')
 
-    ax[0].plot(x_1_4, y_1_4, label=line_1_4_label, marker="d", ls='-', color='g', markevery=markevery_1_4)
-    ax[0].fill_between(x_1_4, y_1_4 - std_1_4, y_1_4 + std_1_4, alpha=0.35, color='g')
+    hack_prob_ax1.plot(x_1_3, y_1_3, label=line_1_3_label, marker="p", ls='-', color="#9e66ab", markevery=markevery_1_3)
+    hack_prob_ax1.fill_between(x_1_3, y_1_3 - std_1_3, y_1_3 + std_1_3, alpha=0.35, color="#9e66ab")
 
-    ax[0].plot(x_1_5, y_1_5, label=line_1_5_label, marker="^", ls='-', color='r', markevery=markevery_1_5)
-    ax[0].fill_between(x_1_5, y_1_5 - std_1_5, y_1_5 + std_1_5, alpha=0.35, color='r')
+    hack_prob_ax1.plot(x_1_4, y_1_4, label=line_1_4_label, marker="d", ls='-', color='g', markevery=markevery_1_4)
+    hack_prob_ax1.fill_between(x_1_4, y_1_4 - std_1_4, y_1_4 + std_1_4, alpha=0.35, color='g')
 
-    ax[0].set_xlim(xlims)
-    ax[0].set_ylim(ylims)
+    hack_prob_ax1.plot(x_1_5, y_1_5, label=line_1_5_label, marker="^", ls='-', color='r', markevery=markevery_1_5)
+    hack_prob_ax1.fill_between(x_1_5, y_1_5 - std_1_5, y_1_5 + std_1_5, alpha=0.35, color='r')
 
-    ax[0].set_title(title_1)
-    ax[0].set_xlabel(xlabel_1)
-    ax[0].set_ylabel(ylabel_1)
+    hack_prob_ax1.set_xlim(xlims)
+    hack_prob_ax1.set_ylim(ylims)
+
+    hack_prob_ax1.set_title(title_1)
+    hack_prob_ax1.set_xlabel(xlabel_1)
+    hack_prob_ax1.set_ylabel(ylabel_1)
     # set the grid on
-    ax[0].grid('on')
-
-    # tweak the axis labels
-    xlab = ax[0].xaxis.get_label()
-    ylab = ax[0].yaxis.get_label()
-
-    # xlab.set_style('italic')
-    #xlab.set_size(8)
-    # ylab.set_style('italic')
-    #ylab.set_size(8)
+    hack_prob_ax1.grid('on')
 
     # change the color of the top and right spines to opaque gray
-    ax[0].spines['right'].set_color((.8, .8, .8))
-    ax[0].spines['top'].set_color((.8, .8, .8))
-
-    # plt.legend(loc=legend_loc)
-
-    # Shrink current axis's height by 10% on the bottom
-    # box = ax[0].get_position()
-    # ax[0].set_position([box.x0, 0.8*box.y0,
-    #                     box.width, box.height * 0.99])
-    fig.subplots_adjust(bottom=0.4)
-
-    # Put a legend below current axis
-    # ax[0].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
-    #              fancybox=True, shadow=True, ncol=2)
+    hack_prob_ax1.spines['right'].set_color((.8, .8, .8))
+    hack_prob_ax1.spines['top'].set_color((.8, .8, .8))
 
     # Plot avg hack_probability eval
     xlims = (min(min(x_2_1), min(x_2_2), min(x_2_3), min(x_2_4), min(x_2_5)),
              max(max(x_2_1), max(x_2_2), max(x_2_3), max(x_2_4), max(x_2_5)))
     ylims = (0, 1)
 
-    ax[1].plot(x_2_1, y_2_1, label=line_2_1_label, marker="s", ls='-', color="#599ad3", markevery=markevery_2_1)
-    ax[1].fill_between(x_2_1, y_2_1 - std_2_1, y_2_1 + std_2_1, alpha=0.35, color="#599ad3")
+    hack_prob_ax2.plot(x_2_1, y_2_1, label=line_2_1_label, marker="s", ls='-', color="#599ad3", markevery=markevery_2_1)
+    hack_prob_ax2.fill_between(x_2_1, y_2_1 - std_2_1, y_2_1 + std_2_1, alpha=0.35, color="#599ad3")
 
-    ax[1].plot(x_2_2, y_2_2, label=line_2_2_label, marker="o", ls='-', color='#f9a65a', markevery=markevery_2_2)
-    ax[1].fill_between(x_2_2, y_2_2 - std_2_2, y_2_2 + std_2_2, alpha=0.35, color='#f9a65a')
+    hack_prob_ax2.plot(x_2_2, y_2_2, label=line_2_2_label, marker="o", ls='-', color='#f9a65a', markevery=markevery_2_2)
+    hack_prob_ax2.fill_between(x_2_2, y_2_2 - std_2_2, y_2_2 + std_2_2, alpha=0.35, color='#f9a65a')
 
-    ax[1].plot(x_2_3, y_2_3, label=line_2_3_label, marker="p", ls='-', color="#9e66ab", markevery=markevery_2_3)
-    ax[1].fill_between(x_2_3, y_2_3 - std_2_3, y_2_3 + std_2_3, alpha=0.35, color="#9e66ab")
+    hack_prob_ax2.plot(x_2_3, y_2_3, label=line_2_3_label, marker="p", ls='-', color="#9e66ab", markevery=markevery_2_3)
+    hack_prob_ax2.fill_between(x_2_3, y_2_3 - std_2_3, y_2_3 + std_2_3, alpha=0.35, color="#9e66ab")
 
-    ax[1].plot(x_2_4, y_2_4, label=line_2_4_label, marker="d", ls='-', color='g', markevery=markevery_2_4)
-    ax[1].fill_between(x_2_4, y_2_4 - std_2_4, y_2_4 + std_2_4, alpha=0.35, color='g')
+    hack_prob_ax2.plot(x_2_4, y_2_4, label=line_2_4_label, marker="d", ls='-', color='g', markevery=markevery_2_4)
+    hack_prob_ax2.fill_between(x_2_4, y_2_4 - std_2_4, y_2_4 + std_2_4, alpha=0.35, color='g')
 
-    ax[1].plot(x_2_5, y_2_5, label=line_2_5_label, marker="^", ls='-', color='r', markevery=markevery_2_5)
-    ax[1].fill_between(x_2_5, y_2_5 - std_2_5, y_2_5 + std_2_5, alpha=0.35, color='r')
+    hack_prob_ax2.plot(x_2_5, y_2_5, label=line_2_5_label, marker="^", ls='-', color='r', markevery=markevery_2_5)
+    hack_prob_ax2.fill_between(x_2_5, y_2_5 - std_2_5, y_2_5 + std_2_5, alpha=0.35, color='r')
 
-    ax[1].set_xlim(xlims)
-    ax[1].set_ylim(ylims)
+    hack_prob_ax2.set_xlim(xlims)
+    hack_prob_ax2.set_ylim(ylims)
 
-    ax[1].set_title(title_2)
-    ax[1].set_xlabel(xlabel_2)
-    ax[1].set_ylabel(ylabel_2)
+    hack_prob_ax2.set_title(title_2)
+    hack_prob_ax2.set_xlabel(xlabel_2)
+    hack_prob_ax2.set_ylabel(ylabel_2)
     # set the grid on
-    ax[1].grid('on')
-
-    # tweak the axis labels
-    xlab = ax[1].xaxis.get_label()
-    ylab = ax[1].yaxis.get_label()
-
-    # xlab.set_style('italic')
-    #xlab.set_size(10)
-    # ylab.set_style('italic')
-    #ylab.set_size(10)
+    hack_prob_ax2.grid('on')
 
     # change the color of the top and right spines to opaque gray
-    ax[1].spines['right'].set_color((.8, .8, .8))
-    ax[1].spines['top'].set_color((.8, .8, .8))
+    hack_prob_ax2.spines['right'].set_color((.8, .8, .8))
+    hack_prob_ax2.spines['top'].set_color((.8, .8, .8))
 
     # plt.legend(loc=legend_loc)
 
     # Shrink current axis's height by 10% on the bottom
-    box = ax[1].get_position()
-    ax[1].set_position([box.x0, box.y0 + box.height * 0.03,
+    box = hack_prob_ax2.get_position()
+    hack_prob_ax2.set_position([box.x0, box.y0 + box.height * 0.03,
                         box.width, box.height * 0.9])
-
-    # Put a legend below current axis
-    # ax[1].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
-    #              fancybox=True, shadow=True, ncol=2)
 
     # Plot attacker cumulative reward
     xlims = (min(min(x_3_1), min(x_3_2), min(x_3_3), min(x_3_4), min(x_3_5)),
@@ -838,121 +975,109 @@ def plot_all_avg_summary_1(x_1_1, y_1_1, x_1_2, y_1_2, x_1_3, y_1_3, x_1_4, y_1_
     ylims = (min(min(y_3_1), min(y_3_2), min(y_3_3), min(y_3_4), min(y_3_5)),
              max(max(y_3_1), max(y_3_2), max(y_3_3), max(y_3_4), max(y_3_5)))
 
-    ax[2].plot(x_3_1, y_3_1, label=line_3_1_label, marker="s", ls='-', color="#599ad3", markevery=markevery_3_1)
-    ax[2].fill_between(x_3_1, y_3_1 - std_3_1, y_3_1 + std_3_1, alpha=0.35, color="#599ad3")
+    hack_prob_ax3.plot(x_3_1, y_3_1, label=line_3_1_label, marker="s", ls='-', color="#599ad3", markevery=markevery_3_1)
+    hack_prob_ax3.fill_between(x_3_1, y_3_1 - std_3_1, y_3_1 + std_3_1, alpha=0.35, color="#599ad3")
 
-    ax[2].plot(x_3_2, y_3_2, label=line_3_2_label, marker="o", ls='-', color='#f9a65a', markevery=markevery_3_2)
-    ax[2].fill_between(x_3_2, y_3_2 - std_3_2, y_3_2 + std_3_2, alpha=0.35, color='#f9a65a')
+    hack_prob_ax3.plot(x_3_2, y_3_2, label=line_3_2_label, marker="o", ls='-', color='#f9a65a', markevery=markevery_3_2)
+    hack_prob_ax3.fill_between(x_3_2, y_3_2 - std_3_2, y_3_2 + std_3_2, alpha=0.35, color='#f9a65a')
 
-    ax[2].plot(x_3_3, y_3_3, label=line_3_3_label, marker="p", ls='-', color="#9e66ab", markevery=markevery_3_3)
-    ax[2].fill_between(x_3_3, y_3_3 - std_3_3, y_3_3 + std_3_3, alpha=0.35, color="#9e66ab")
+    hack_prob_ax3.plot(x_3_3, y_3_3, label=line_3_3_label, marker="p", ls='-', color="#9e66ab", markevery=markevery_3_3)
+    hack_prob_ax3.fill_between(x_3_3, y_3_3 - std_3_3, y_3_3 + std_3_3, alpha=0.35, color="#9e66ab")
 
-    ax[2].plot(x_3_4, y_3_4, label=line_3_4_label, marker="d", ls='-', color='g', markevery=markevery_3_4)
-    ax[2].fill_between(x_3_4, y_3_4 - std_3_4, y_3_4 + std_3_4, alpha=0.35, color='g')
+    hack_prob_ax3.plot(x_3_4, y_3_4, label=line_3_4_label, marker="d", ls='-', color='g', markevery=markevery_3_4)
+    hack_prob_ax3.fill_between(x_3_4, y_3_4 - std_3_4, y_3_4 + std_3_4, alpha=0.35, color='g')
 
-    ax[2].plot(x_3_5, y_3_5, label=line_3_5_label, marker="^", ls='-', color='r', markevery=markevery_3_5)
-    ax[2].fill_between(x_3_5, y_3_5 - std_3_5, y_3_5 + std_3_5, alpha=0.35, color='r')
+    hack_prob_ax3.plot(x_3_5, y_3_5, label=line_3_5_label, marker="^", ls='-', color='r', markevery=markevery_3_5)
+    hack_prob_ax3.fill_between(x_3_5, y_3_5 - std_3_5, y_3_5 + std_3_5, alpha=0.35, color='r')
 
-    ax[2].set_xlim(xlims)
-    ax[2].set_ylim(ylims)
+    hack_prob_ax3.set_xlim(xlims)
+    hack_prob_ax3.set_ylim(ylims)
 
-    ax[2].set_title(title_3)
-    ax[2].set_xlabel(xlabel_3)
-    ax[2].set_ylabel(ylabel_3)
+    hack_prob_ax3.set_title(title_3)
+    hack_prob_ax3.set_xlabel(xlabel_3)
+    hack_prob_ax3.set_ylabel(ylabel_3)
     # set the grid on
-    ax[2].grid('on')
+    hack_prob_ax3.grid('on')
 
-    # tweak the axis labels
-    xlab = ax[2].xaxis.get_label()
-    ylab = ax[2].yaxis.get_label()
-
-    ax[2].yaxis.labelpad = -5
-
-    # xlab.set_style('italic')
-    #xlab.set_size(10)
-    # ylab.set_style('italic')
-    #ylab.set_size(10)
+    hack_prob_ax3.yaxis.labelpad = -5
 
     # change the color of the top and right spines to opaque gray
-    ax[2].spines['right'].set_color((.8, .8, .8))
-    ax[2].spines['top'].set_color((.8, .8, .8))
+    hack_prob_ax3.spines['right'].set_color((.8, .8, .8))
+    hack_prob_ax3.spines['top'].set_color((.8, .8, .8))
 
     # plt.legend(loc=legend_loc)
 
     # Shrink current axis's height by 10% on the bottom
-    box = ax[2].get_position()
-    ax[2].set_position([box.x0, box.y0 + box.height * 0.03,
+    box = hack_prob_ax3.get_position()
+    hack_prob_ax3.set_position([box.x0, box.y0 + box.height * 0.03,
                         box.width, box.height * 0.9])
 
-    ax[2].get_yaxis().set_major_formatter(tkr.FuncFormatter(lambda x, p: "${:1.0f}K$".format(x * 1e-3)))
+    hack_prob_ax3.get_yaxis().set_major_formatter(tkr.FuncFormatter(lambda x, p: "${:1.0f}K$".format(x * 1e-3)))
 
-    # Put a legend below current axis
-    # ax[2].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
-    #              fancybox=True, shadow=True, ncol=2)
+    if not plot_loss:
+        hack_prob_ax3.legend(loc='upper center', bbox_to_anchor=(-0.5, -0.35), fancybox=True, shadow=True, ncol=3)
+    else:
+        hack_prob_ax3.legend(loc='upper center', bbox_to_anchor=(-0.7, -1.65), fancybox=True, shadow=True, ncol=3)
 
-    #handles, labels = ax.get_legend_handles_labels()
-    lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
-    lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
-    #fig.legend(handles, labels, loc='upper center')
-    ax[2].legend(loc='upper center', bbox_to_anchor=(-0.5, -0.35), fancybox=True, shadow=True, ncol=3)
+    if plot_loss:
+        xlims = (min(min(x_4_1), min(x_4_2), min(x_4_3)),
+                 max(max(x_4_1), max(x_4_2), max(x_4_3)))
+        ylims = (min(min(y_4_1 - std_4_1), min(y_4_2 - std_4_2), min(y_4_3 - std_4_3)),
+                 max(max(y_4_1 + std_4_1), max(y_4_2 + std_4_2), max(y_4_3 + std_4_3)))
 
-    # # Plot defender cumulative reward
-    # xlims = (min(min(x_4_1), min(x_4_2), min(x_4_3), min(x_4_4), min(x_4_5)),
-    #          max(max(x_4_1), max(x_4_2), max(x_4_3), max(x_4_4), max(x_4_5)))
-    # ylims = (min(min(y_4_1), min(y_4_2), min(y_4_3), min(y_4_4), min(y_4_5)),
-    #          max(max(y_4_1), max(y_4_2), max(y_4_3), max(y_4_4), max(y_4_5)))
-    #
-    # ax[3].plot(x_4_1, y_4_1, label=line_4_1_label, marker="s", ls='-', color="#599ad3", markevery=markevery_4_1)
-    # ax[3].fill_between(x_4_1, y_4_1 - std_4_1, y_4_1 + std_4_1, alpha=0.35, color="#599ad3")
-    #
-    # ax[3].plot(x_4_2, y_4_2, label=line_4_2_label, marker="o", ls='-', color='#f9a65a', markevery=markevery_4_2)
-    # ax[3].fill_between(x_4_2, y_4_2 - std_4_2, y_4_2 + std_4_2, alpha=0.35, color='#f9a65a')
-    #
-    # ax[3].plot(x_4_3, y_4_3, label=line_4_3_label, marker="p", ls='-', color="#9e66ab", markevery=markevery_4_3)
-    # ax[3].fill_between(x_4_3, y_4_3 - std_4_3, y_4_3 + std_4_3, alpha=0.35, color="#9e66ab")
-    #
-    # ax[3].plot(x_4_4, y_4_4, label=line_4_4_label, marker="d", ls='-', color='g', markevery=markevery_4_4)
-    # ax[3].fill_between(x_4_4, y_4_4 - std_4_4, y_4_4 + std_4_4, alpha=0.35, color='g')
-    #
-    # ax[3].plot(x_4_5, y_4_5, label=line_4_5_label, marker="^", ls='-', color='r', markevery=markevery_4_5)
-    # ax[3].fill_between(x_4_5, y_4_5 - std_4_5, y_4_5 + std_4_5, alpha=0.35, color='r')
-    #
-    # ax[3].set_xlim(xlims)
-    # ax[3].set_ylim(ylims)
-    #
-    # ax[3].set_title(title_4)
-    # ax[3].set_xlabel(xlabel_4)
-    # ax[3].set_ylabel(ylabel_4)
-    # # set the grid on
-    # ax[3].grid('on')
-    #
-    # # tweak the axis labels
-    # xlab = ax[3].xaxis.get_label()
-    # ylab = ax[3].yaxis.get_label()
-    #
-    # # xlab.set_style('italic')
-    # #xlab.set_size(10)
-    # # ylab.set_style('italic')
-    # #ylab.set_size(10)
-    #
-    # # change the color of the top and right spines to opaque gray
-    # ax[3].spines['right'].set_color((.8, .8, .8))
-    # ax[3].spines['top'].set_color((.8, .8, .8))
-    #
-    # # plt.legend(loc=legend_loc)
-    #
-    # # Shrink current axis's height by 10% on the bottom
-    # box = ax[3].get_position()
-    # ax[3].set_position([box.x0, box.y0 + box.height * 0.03,
-    #                     box.width, box.height * 0.9])
-    # ax[3].get_yaxis().set_major_formatter(tkr.FuncFormatter(lambda x, p: "${:1.0f}K$".format(x*1e-3)))
+        ax[1][0].plot(x_4_1, y_4_1, label=line_4_1_label, marker="s", ls='-', color="#599ad3", markevery=markevery_4_1)
+        ax[1][0].fill_between(x_4_1, y_4_1 - std_4_1, y_4_1 + std_4_1, alpha=0.35, color="#599ad3")
 
-    # Put a legend below current axis
-    # ax[3].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
-    #              fancybox=True, shadow=True, ncol=2)
+        ax[1][0].plot(x_4_2, y_4_2, label=line_4_2_label, marker="o", ls='-', color='#f9a65a', markevery=markevery_4_2)
+        ax[1][0].fill_between(x_4_2, y_4_2 - std_4_2, y_4_2 + std_4_2, alpha=0.35, color='#f9a65a')
+
+        ax[1][0].plot(x_4_3, y_4_3, label=line_4_3_label, marker="^", ls='-', color='r', markevery=markevery_4_3)
+        ax[1][0].fill_between(x_4_3, y_4_3 - std_4_3, y_4_3 + std_4_3, alpha=0.35, color='r')
+
+        ax[1][0].set_xlim(xlims)
+        ax[1][0].set_ylim(ylims)
+
+        ax[1][0].set_title(title_4)
+        ax[1][0].set_xlabel(xlabel_4)
+        ax[1][0].set_ylabel(ylabel_4)
+        # set the grid on
+        ax[1][0].grid('on')
+
+        # change the color of the top and right spines to opaque gray
+        ax[1][0].spines['right'].set_color((.8, .8, .8))
+        ax[1][0].spines['top'].set_color((.8, .8, .8))
+
+        xlims = (min(min(x_5_1), min(x_5_2), min(x_5_3)),
+                 max(max(x_5_1), max(x_5_2), max(x_5_3)))
+        ylims = (min(min(y_5_2 - std_5_2), min(y_5_3 - std_5_3)),
+                 max(max(y_5_2 + std_5_2), max(y_5_3 + std_5_3)))
+
+        ax[1][1].plot(x_5_1, y_5_1, label=line_5_1_label, marker="p", ls='-', color="#9e66ab", markevery=markevery_5_1)
+        ax[1][1].fill_between(x_5_1, y_5_1 - std_5_1, y_5_1 + std_5_1, alpha=0.35, color="#9e66ab")
+
+        ax[1][1].plot(x_5_2, y_5_2, label=line_5_2_label, marker="d", ls='-', color='g', markevery=markevery_5_2)
+        ax[1][1].fill_between(x_5_2, y_5_2 - std_5_2, y_5_2 + std_5_2, alpha=0.35, color='g')
+
+        ax[1][1].plot(x_5_3, y_5_3, label=line_5_3_label, marker="^", ls='-', color='r', markevery=markevery_5_3)
+        ax[1][1].fill_between(x_5_3, y_5_3 - std_5_3, y_5_3 + std_5_3, alpha=0.35, color='r')
+
+        ax[1][1].set_xlim(xlims)
+        ax[1][1].set_ylim(ylims)
+
+        ax[1][1].set_title(title_5)
+        ax[1][1].set_xlabel(xlabel_5)
+        ax[1][1].set_ylabel(ylabel_5)
+        # set the grid on
+        ax[1][1].grid('on')
+
+        # change the color of the top and right spines to opaque gray
+        ax[1][1].spines['right'].set_color((.8, .8, .8))
+        ax[1][1].spines['top'].set_color((.8, .8, .8))
 
     fig.tight_layout()
-    plt.subplots_adjust(wspace=0.2, hspace=0)
+    plt.subplots_adjust(wspace=0.2, hspace=0.4)
+    if plot_loss:
+        fig.subplots_adjust(bottom=0.2)
     fig.savefig(file_name + ".png", format="png", dpi=600)
     fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
 
@@ -3887,7 +4012,8 @@ def plot_all_averages(maximal_attack_train_csv_paths, maximal_attack_eval_csv_pa
                       random_attack_train_csv_paths, random_attack_eval_csv_paths,
                       random_defense_train_csv_paths, random_defense_eval_csv_paths,
                       two_agents_train_csv_paths, two_agents_eval_csv_paths,
-                      version, algorithm, output_dir, eval_freq : int, train_log_freq : int):
+                      version, algorithm, output_dir, eval_freq : int, train_log_freq : int,
+                      plot_loss = False):
     train_max_attack_dfs = []
     eval_max_attack_dfs = []
     for csv_path in maximal_attack_train_csv_paths:
@@ -3920,6 +4046,11 @@ def plot_all_averages(maximal_attack_train_csv_paths, maximal_attack_eval_csv_pa
         map(lambda df: df["defender_cumulative_reward"].values, eval_max_attack_dfs))
     d_cum_reward_eval_max_attack_means = np.mean(tuple(d_cum_reward_eval_max_attack_data), axis=0)
     d_cum_reward_eval_max_attack_stds = np.std(tuple(d_cum_reward_eval_max_attack_data), axis=0, ddof=1)
+
+    if plot_loss:
+        defender_loss_train_max_attack_data = list(map(lambda df: df["avg_episode_loss_defender"].values, train_max_attack_dfs))
+        defender_loss_train_max_attack_means = np.mean(tuple(defender_loss_train_max_attack_data), axis=0)
+        defender_loss_train_max_attack_stds = np.std(tuple(defender_loss_train_max_attack_data), axis=0, ddof=1)
 
     train_min_defense_dfs = []
     eval_min_defense_dfs = []
@@ -3956,6 +4087,12 @@ def plot_all_averages(maximal_attack_train_csv_paths, maximal_attack_eval_csv_pa
     d_cum_reward_eval_min_defense_means = np.mean(tuple(d_cum_reward_eval_min_defense_data), axis=0)
     d_cum_reward_eval_min_defense_stds = np.std(tuple(d_cum_reward_eval_min_defense_data), axis=0, ddof=1)
 
+    if plot_loss:
+        attacker_loss_train_min_defense_data = list(
+            map(lambda df: df["avg_episode_loss_attacker"].values, train_min_defense_dfs))
+        attacker_loss_train_min_defense_means = np.mean(tuple(attacker_loss_train_min_defense_data), axis=0)
+        attacker_loss_train_min_defense_stds = np.std(tuple(attacker_loss_train_min_defense_data), axis=0, ddof=1)
+
     train_random_attack_dfs = []
     eval_random_attack_dfs = []
     for csv_path in random_attack_train_csv_paths:
@@ -3990,6 +4127,12 @@ def plot_all_averages(maximal_attack_train_csv_paths, maximal_attack_eval_csv_pa
         map(lambda df: df["defender_cumulative_reward"].values, eval_random_attack_dfs))
     d_cum_reward_eval_random_attack_means = np.mean(tuple(d_cum_reward_eval_random_attack_data), axis=0)
     d_cum_reward_eval_random_attack_stds = np.std(tuple(d_cum_reward_eval_random_attack_data), axis=0, ddof=1)
+
+    if plot_loss:
+        defender_loss_train_random_attack_data = list(
+            map(lambda df: df["avg_episode_loss_defender"].values, train_random_attack_dfs))
+        defender_loss_train_random_attack_means = np.mean(tuple(defender_loss_train_random_attack_data), axis=0)
+        defender_loss_train_random_attack_stds = np.std(tuple(defender_loss_train_random_attack_data), axis=0, ddof=1)
 
     train_random_defense_dfs = []
     eval_random_defense_dfs = []
@@ -4026,6 +4169,12 @@ def plot_all_averages(maximal_attack_train_csv_paths, maximal_attack_eval_csv_pa
     d_cum_reward_eval_random_defense_means = np.mean(tuple(d_cum_reward_eval_random_defense_data), axis=0)
     d_cum_reward_eval_random_defense_stds = np.std(tuple(d_cum_reward_eval_random_defense_data), axis=0, ddof=1)
 
+    if plot_loss:
+        attacker_loss_train_random_defense_data = list(
+            map(lambda df: df["avg_episode_loss_attacker"].values, train_random_defense_dfs))
+        attacker_loss_train_random_defense_means = np.mean(tuple(attacker_loss_train_random_defense_data), axis=0)
+        attacker_loss_train_random_defense_stds = np.std(tuple(attacker_loss_train_random_defense_data), axis=0, ddof=1)
+
     train_two_agents_dfs = []
     eval_two_agents_dfs = []
     for csv_path in two_agents_train_csv_paths:
@@ -4061,26 +4210,86 @@ def plot_all_averages(maximal_attack_train_csv_paths, maximal_attack_eval_csv_pa
     d_cum_reward_eval_two_agents_means = np.mean(tuple(d_cum_reward_eval_two_agents_data), axis=0)
     d_cum_reward_eval_two_agents_stds = np.std(tuple(d_cum_reward_eval_two_agents_data), axis=0, ddof=1)
 
-    five_line_plot_w_shades(np.array(list(range(len(hack_prob_train_min_defense_data[0])))) * train_log_freq,
-                            hack_prob_train_min_defense_means,
-                            np.array(list(range(len(hack_prob_train_random_defense_data[0])))) * train_log_freq,
-                            hack_prob_train_random_defense_means,
-                            np.array(list(range(len(hack_prob_train_max_attack_data[0])))) * train_log_freq,
-                            hack_prob_train_max_attack_means,
-                            np.array(list(range(len(hack_prob_train_random_attack_data[0])))) * train_log_freq,
-                            hack_prob_train_random_attack_means,
-                            np.array(list(range(len(hack_prob_train_two_agents_data[0])))) * train_log_freq,
-                            hack_prob_train_two_agents_means, stds_1=hack_prob_train_min_defense_stds,
-                            stds_2=hack_prob_train_random_defense_stds, stds_3=hack_prob_train_max_attack_stds,
-                            stds_4=hack_prob_train_random_attack_stds, stds_5=hack_prob_train_two_agents_stds,
+    if plot_loss:
+        attacker_loss_train_two_agents_data = list(
+            map(lambda df: df["avg_episode_loss_attacker"].values, train_two_agents_dfs))
+        attacker_loss_train_two_agents_means = np.mean(tuple(attacker_loss_train_two_agents_data), axis=0)
+        attacker_loss_train_two_agents_stds = np.std(tuple(attacker_loss_train_two_agents_data), axis=0, ddof=1)
+
+        defender_loss_train_two_agents_data = list(
+            map(lambda df: df["avg_episode_loss_defender"].values, train_two_agents_dfs))
+        defender_loss_train_two_agents_means = np.mean(tuple(defender_loss_train_two_agents_data), axis=0)
+        defender_loss_train_two_agents_stds = np.std(tuple(defender_loss_train_two_agents_data), axis=0, ddof=1)
+
+    algorithm_pp = algorithm
+    if algorithm == "dqn":
+        algorithm_pp = "DQN"
+    if algorithm == "tabular_q_learning":
+        algorithm_pp = "Q-learning"
+
+    if plot_loss:
+        # Attacker loss
+        three_line_plot_w_shades(
+            (np.array(list(range(len(attacker_loss_train_min_defense_data[0])))) * train_log_freq)[::eval_freq],
+            attacker_loss_train_min_defense_means[::eval_freq],
+            (np.array(list(range(len(attacker_loss_train_random_defense_data[0])))) * train_log_freq)[::eval_freq],
+            attacker_loss_train_random_defense_means[::eval_freq],
+            (np.array(list(range(len(attacker_loss_train_two_agents_data[0])))) * train_log_freq)[::eval_freq],
+            attacker_loss_train_two_agents_means[::eval_freq],
+            stds_1=attacker_loss_train_min_defense_stds[::eval_freq],
+            stds_2=attacker_loss_train_random_defense_stds[::eval_freq],
+            stds_3=attacker_loss_train_two_agents_stds[::eval_freq],
+            title="Avg Episode Loss [Attacker]",
+            xlabel="Episode \#", ylabel="Loss",
+            line1_label=algorithm_pp + " vs minimal defense",
+            line2_label=algorithm_pp + " vs random defense",
+            line3_label=algorithm_pp + " vs " + algorithm_pp,
+            legend_loc="upper left",
+            markevery_1=1, markevery_2=1, markevery_3=1,
+            file_name=output_dir + "/avg_attacker_loss_" + algorithm + "_" + str(version)
+            )
+
+        # Defender loss
+        three_line_plot_w_shades(
+            (np.array(list(range(len(defender_loss_train_max_attack_data[0])))) * train_log_freq)[::eval_freq],
+            defender_loss_train_max_attack_means[::eval_freq],
+            (np.array(list(range(len(defender_loss_train_random_attack_data[0])))) * train_log_freq)[::eval_freq],
+            defender_loss_train_random_attack_means[::eval_freq],
+            (np.array(list(range(len(defender_loss_train_two_agents_data[0])))) * train_log_freq)[::eval_freq],
+            defender_loss_train_two_agents_means[::eval_freq],
+            stds_1=defender_loss_train_max_attack_stds[::eval_freq],
+            stds_2=defender_loss_train_random_attack_stds[::eval_freq],
+            stds_3=defender_loss_train_two_agents_stds[::eval_freq],
+            title="Avg Episode Loss [Defender]",
+            xlabel="Episode \#", ylabel="Loss",
+            line1_label="maximal attack vs " + algorithm_pp,
+            line2_label="random attack vs " + algorithm_pp,
+            line3_label=algorithm_pp + " vs " + algorithm_pp,
+            legend_loc="upper left",
+            markevery_1=1, markevery_2=1, markevery_3=1,
+            file_name=output_dir + "/avg_defender_loss_" + algorithm + "_" + str(version)
+        )
+
+    five_line_plot_w_shades((np.array(list(range(len(hack_prob_train_min_defense_data[0])))) * train_log_freq)[::eval_freq],
+                            hack_prob_train_min_defense_means[::eval_freq],
+                            (np.array(list(range(len(hack_prob_train_random_defense_data[0])))) * train_log_freq)[::eval_freq],
+                            hack_prob_train_random_defense_means[::eval_freq],
+                            (np.array(list(range(len(hack_prob_train_max_attack_data[0])))) * train_log_freq)[::eval_freq],
+                            hack_prob_train_max_attack_means[::eval_freq],
+                            (np.array(list(range(len(hack_prob_train_random_attack_data[0])))) * train_log_freq)[::eval_freq],
+                            hack_prob_train_random_attack_means[::eval_freq],
+                            (np.array(list(range(len(hack_prob_train_two_agents_data[0])))) * train_log_freq)[::eval_freq],
+                            hack_prob_train_two_agents_means[::eval_freq], stds_1=hack_prob_train_min_defense_stds[::eval_freq],
+                            stds_2=hack_prob_train_random_defense_stds[::eval_freq], stds_3=hack_prob_train_max_attack_stds[::eval_freq],
+                            stds_4=hack_prob_train_random_attack_stds[::eval_freq], stds_5=hack_prob_train_two_agents_stds[::eval_freq],
                             title="Likelihood of Successful Hack [Train] (v" + str(version) + ")",
                             xlabel="Episode \#", ylabel="$\mathbb{P}[Hacked]$",
                             file_name=output_dir + "/avg_hack_prob_train_" + algorithm + "_" + str(version),
-                            line1_label="Q-learning vs minimal defense", line2_label="Q-learning vs random defense",
-                            line3_label="maximal attack vs Q-learning", line4_label="random attack vs Q-learning",
-                            line5_label="Q-learning vs Q-learning", legend_loc="lower right",
-                            ylims=(0, 1), markevery_1=eval_freq, markevery_2=eval_freq, markevery_3=eval_freq,
-                            markevery_4=eval_freq, markevery_5=eval_freq)
+                            line1_label=algorithm_pp + " vs minimal defense", line2_label=algorithm_pp + " vs random defense",
+                            line3_label="maximal attack vs " + algorithm_pp, line4_label="random attack vs " + algorithm_pp,
+                            line5_label=algorithm_pp + " vs " + algorithm_pp, legend_loc="lower right",
+                            ylims=(0, 1), markevery_1=1, markevery_2=1, markevery_3=1,
+                            markevery_4=1, markevery_5=1)
 
     five_line_plot_w_shades(np.array(list(range(len(hack_prob_eval_min_defense_data[0])))) * eval_freq,
                             hack_prob_eval_min_defense_means,
@@ -4097,123 +4306,209 @@ def plot_all_averages(maximal_attack_train_csv_paths, maximal_attack_eval_csv_pa
                             title="Likelihood of Successful Hack [Eval] (v" + str(version) + ")",
                             xlabel="Episode \#", ylabel="$\mathbb{P}[Hacked]$",
                             file_name=output_dir + "/avg_hack_prob_eval_" + algorithm + "_" + str(version),
-                            line1_label="Q-learning vs minimal defense", line2_label="Q-learning vs random defense",
-                            line3_label="maximal attack vs Q-learning", line4_label="random attack vs Q-learning",
-                            line5_label="Q-learning vs Q-learning", legend_loc="lower right",
+                            line1_label=algorithm_pp + " vs minimal defense", line2_label=algorithm_pp + " vs random defense",
+                            line3_label="maximal attack vs " + algorithm_pp, line4_label="random attack vs " + algorithm_pp,
+                            line5_label=algorithm_pp + " vs " + algorithm_pp, legend_loc="lower right",
                             ylims=(0, 1), markevery_1=1, markevery_2=1, markevery_3=1, markevery_4=1,
                             markevery_5=1)
 
-    five_line_plot_w_shades(np.array(list(range(len(a_cum_reward_train_min_defense_data[0])))) * train_log_freq,
-                            a_cum_reward_train_min_defense_means,
-                            np.array(list(range(len(a_cum_reward_train_random_defense_data[0])))) * train_log_freq,
-                            a_cum_reward_train_random_defense_means,
-                            np.array(list(range(len(a_cum_reward_train_max_attack_data[0])))) * train_log_freq,
-                            a_cum_reward_train_max_attack_means,
-                            np.array(list(range(len(a_cum_reward_train_random_attack_data[0])))) * train_log_freq,
-                            a_cum_reward_train_random_attack_means,
-                            np.array(list(range(len(a_cum_reward_train_two_agents_data[0])))) * train_log_freq,
-                            a_cum_reward_train_two_agents_means, stds_1=a_cum_reward_train_min_defense_stds,
-                            stds_2=a_cum_reward_train_random_defense_stds, stds_3=a_cum_reward_train_max_attack_stds,
-                            stds_4=a_cum_reward_train_random_attack_stds, stds_5=a_cum_reward_train_two_agents_stds,
+    five_line_plot_w_shades((np.array(list(range(len(a_cum_reward_train_min_defense_data[0])))) * train_log_freq)[::eval_freq],
+                            a_cum_reward_train_min_defense_means[::eval_freq],
+                            (np.array(list(range(len(a_cum_reward_train_random_defense_data[0])))) * train_log_freq)[::eval_freq],
+                            a_cum_reward_train_random_defense_means[::eval_freq],
+                            (np.array(list(range(len(a_cum_reward_train_max_attack_data[0])))) * train_log_freq)[::eval_freq],
+                            a_cum_reward_train_max_attack_means[::eval_freq],
+                            (np.array(list(range(len(a_cum_reward_train_random_attack_data[0])))) * train_log_freq)[::eval_freq],
+                            a_cum_reward_train_random_attack_means[::eval_freq],
+                            (np.array(list(range(len(a_cum_reward_train_two_agents_data[0])))) * train_log_freq)[::eval_freq],
+                            a_cum_reward_train_two_agents_means[::eval_freq], stds_1=a_cum_reward_train_min_defense_stds[::eval_freq],
+                            stds_2=a_cum_reward_train_random_defense_stds[::eval_freq], stds_3=a_cum_reward_train_max_attack_stds[::eval_freq],
+                            stds_4=a_cum_reward_train_random_attack_stds[::eval_freq], stds_5=a_cum_reward_train_two_agents_stds[::eval_freq],
                             title="Cumulative Reward for Attacker [Train] (v" + str(version) + ")",
                             xlabel="Episode \#", ylabel="Cumulative Reward",
                             file_name=output_dir + "/avg_a_cum_reward_train_" + algorithm + "_" + str(version),
-                            line1_label="Q-learning vs minimal defense", line2_label="Q-learning vs random defense",
-                            line3_label="maximal attack vs Q-learning", line4_label="random attack vs Q-learning",
-                            line5_label="Q-learning vs Q-learning", legend_loc="lower right",
-                            markevery_1=eval_freq, markevery_2=eval_freq, markevery_3=eval_freq,
-                            markevery_4=eval_freq, markevery_5=eval_freq)
+                            line1_label=algorithm_pp + " vs minimal defense", line2_label=algorithm_pp + " vs random defense",
+                            line3_label="maximal attack vs " + algorithm_pp, line4_label="random attack vs " + algorithm_pp,
+                            line5_label=algorithm_pp + " vs " + algorithm_pp, legend_loc="lower right",
+                            markevery_1=1, markevery_2=1, markevery_3=1,
+                            markevery_4=1, markevery_5=1)
 
-    five_line_plot_w_shades(np.array(list(range(len(d_cum_reward_train_min_defense_data[0])))) * train_log_freq,
-                            d_cum_reward_train_min_defense_means,
-                            np.array(list(range(len(d_cum_reward_train_random_defense_data[0])))) * train_log_freq,
-                            d_cum_reward_train_random_defense_means,
-                            np.array(list(range(len(d_cum_reward_train_max_attack_data[0])))) * train_log_freq,
-                            d_cum_reward_train_max_attack_means,
-                            np.array(list(range(len(d_cum_reward_train_random_attack_data[0])))) * train_log_freq,
-                            d_cum_reward_train_random_attack_means,
-                            np.array(list(range(len(d_cum_reward_train_two_agents_data[0])))) * train_log_freq,
-                            d_cum_reward_train_two_agents_means, stds_1=d_cum_reward_train_min_defense_stds,
-                            stds_2=d_cum_reward_train_random_defense_stds, stds_3=d_cum_reward_train_max_attack_stds,
-                            stds_4=d_cum_reward_train_random_attack_stds, stds_5=d_cum_reward_train_two_agents_stds,
+    five_line_plot_w_shades((np.array(list(range(len(d_cum_reward_train_min_defense_data[0])))) * train_log_freq)[::eval_freq],
+                            d_cum_reward_train_min_defense_means[::eval_freq],
+                            (np.array(list(range(len(d_cum_reward_train_random_defense_data[0])))) * train_log_freq)[::eval_freq],
+                            d_cum_reward_train_random_defense_means[::eval_freq],
+                            (np.array(list(range(len(d_cum_reward_train_max_attack_data[0])))) * train_log_freq)[::eval_freq],
+                            d_cum_reward_train_max_attack_means[::eval_freq],
+                            (np.array(list(range(len(d_cum_reward_train_random_attack_data[0])))) * train_log_freq)[::eval_freq],
+                            d_cum_reward_train_random_attack_means[::eval_freq],
+                            (np.array(list(range(len(d_cum_reward_train_two_agents_data[0])))) * train_log_freq)[::eval_freq],
+                            d_cum_reward_train_two_agents_means[::eval_freq], stds_1=d_cum_reward_train_min_defense_stds[::eval_freq],
+                            stds_2=d_cum_reward_train_random_defense_stds[::eval_freq], stds_3=d_cum_reward_train_max_attack_stds[::eval_freq],
+                            stds_4=d_cum_reward_train_random_attack_stds[::eval_freq], stds_5=d_cum_reward_train_two_agents_stds[::eval_freq],
                             title="Cumulative Reward for Defender [Train] (v" + str(version) + ")",
                             xlabel="Episode \#", ylabel="Cumulative Reward",
                             file_name=output_dir + "/avg_d_cum_reward_train_" + algorithm + "_" + str(version),
-                            line1_label="Q-learning vs minimal defense", line2_label="Q-learning vs random defense",
-                            line3_label="maximal attack vs Q-learning", line4_label="random attack vs Q-learning",
-                            line5_label="Q-learning vs Q-learning", legend_loc="lower right",
-                            markevery_1=eval_freq, markevery_2=eval_freq, markevery_3=eval_freq,
-                            markevery_4=eval_freq, markevery_5=eval_freq)
+                            line1_label=algorithm_pp + " vs minimal defense", line2_label=algorithm_pp + " vs random defense",
+                            line3_label="maximal attack vs " + algorithm_pp, line4_label="random attack vs " + algorithm_pp,
+                            line5_label=algorithm_pp + " vs " + algorithm_pp, legend_loc="lower right",
+                            markevery_1=1, markevery_2=1, markevery_3=1,
+                            markevery_4=1, markevery_5=1)
+    try:
+        plot_all_avg_summary_1((np.array(list(range(len(hack_prob_train_min_defense_data[0])))) * train_log_freq)[::eval_freq],
+                                hack_prob_train_min_defense_means[::eval_freq],
+                               (np.array(list(range(len(hack_prob_train_random_defense_data[0])))) * train_log_freq)[::eval_freq],
+                                hack_prob_train_random_defense_means[::eval_freq],
+                               (np.array(list(range(len(hack_prob_train_max_attack_data[0])))) * train_log_freq)[::eval_freq],
+                                hack_prob_train_max_attack_means[::eval_freq],
+                               (np.array(list(range(len(hack_prob_train_random_attack_data[0])))) * train_log_freq)[::eval_freq],
+                                hack_prob_train_random_attack_means[::eval_freq],
+                               (np.array(list(range(len(hack_prob_train_two_agents_data[0])))) * train_log_freq)[::eval_freq],
+                                hack_prob_train_two_agents_means[::eval_freq], hack_prob_train_min_defense_stds[::eval_freq],
+                                hack_prob_train_random_defense_stds[::eval_freq], hack_prob_train_max_attack_stds[::eval_freq],
+                                hack_prob_train_random_attack_stds[::eval_freq], hack_prob_train_two_agents_stds[::eval_freq],
+                                algorithm_pp + " vs minimal defense", algorithm_pp + " vs random defense",
+                                "maximal attack vs " + algorithm_pp, "random attack vs " + algorithm_pp,
+                                algorithm_pp + " vs " + algorithm_pp, "Hack probability (train, v" + str(version) + ")",
+                               "Episode \#", "$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1,
 
-    plot_all_avg_summary_1(np.array(list(range(len(hack_prob_train_min_defense_data[0])))) * train_log_freq,
-                            hack_prob_train_min_defense_means,
-                            np.array(list(range(len(hack_prob_train_random_defense_data[0])))) * train_log_freq,
-                            hack_prob_train_random_defense_means,
-                            np.array(list(range(len(hack_prob_train_max_attack_data[0])))) * train_log_freq,
-                            hack_prob_train_max_attack_means,
-                            np.array(list(range(len(hack_prob_train_random_attack_data[0])))) * train_log_freq,
-                            hack_prob_train_random_attack_means,
-                            np.array(list(range(len(hack_prob_train_two_agents_data[0])))) * train_log_freq,
-                            hack_prob_train_two_agents_means, hack_prob_train_min_defense_stds,
-                            hack_prob_train_random_defense_stds, hack_prob_train_max_attack_stds,
-                            hack_prob_train_random_attack_stds, hack_prob_train_two_agents_stds,
-                            "Q-learning vs minimal defense", "Q-learning vs random defense",
-                            "maximal attack vs Q-learning", "random attack vs Q-learning",
-                            "Q-learning vs Q-learning", "Hack probability (train, v" + str(version) + ")",
-                           "Episode \#", "$\mathbb{P}[Hacked]$", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+                               np.array(list(range(len(hack_prob_eval_min_defense_data[0])))) * eval_freq,
+                               hack_prob_eval_min_defense_means,
+                               np.array(list(range(len(hack_prob_eval_random_defense_data[0])))) * eval_freq,
+                               hack_prob_eval_random_defense_means,
+                               np.array(list(range(len(hack_prob_eval_max_attack_data[0])))) * eval_freq,
+                               hack_prob_eval_max_attack_means,
+                               np.array(list(range(len(hack_prob_eval_random_attack_data[0])))) * eval_freq,
+                               hack_prob_eval_random_attack_means,
+                               np.array(list(range(len(hack_prob_eval_two_agents_data[0])))) * eval_freq,
+                               hack_prob_eval_two_agents_means, hack_prob_eval_min_defense_stds,
+                               hack_prob_eval_random_defense_stds, hack_prob_eval_max_attack_stds,
+                               hack_prob_eval_random_attack_stds, hack_prob_eval_two_agents_stds,
+                               algorithm_pp + " vs minimal defense", algorithm_pp + " vs random defense",
+                               "maximal attack vs " + algorithm_pp, "random attack vs " + algorithm_pp,
+                               algorithm_pp + " vs " + algorithm_pp, "Hack probability (eval v" + str(version) + ")",
+                                "Episode \#", "$\mathbb{P}[Hacked]$", 1,1, 1, 1,1,
 
-                           np.array(list(range(len(hack_prob_eval_min_defense_data[0])))) * eval_freq,
-                           hack_prob_eval_min_defense_means,
-                           np.array(list(range(len(hack_prob_eval_random_defense_data[0])))) * eval_freq,
-                           hack_prob_eval_random_defense_means,
-                           np.array(list(range(len(hack_prob_eval_max_attack_data[0])))) * eval_freq,
-                           hack_prob_eval_max_attack_means,
-                           np.array(list(range(len(hack_prob_eval_random_attack_data[0])))) * eval_freq,
-                           hack_prob_eval_random_attack_means,
-                           np.array(list(range(len(hack_prob_eval_two_agents_data[0])))) * eval_freq,
-                           hack_prob_eval_two_agents_means, hack_prob_eval_min_defense_stds,
-                           hack_prob_eval_random_defense_stds, hack_prob_eval_max_attack_stds,
-                           hack_prob_eval_random_attack_stds, hack_prob_eval_two_agents_stds,
-                           "Q-learning vs minimal defense", "Q-learning vs random defense",
-                           "maximal attack vs Q-learning", "random attack vs Q-learning",
-                           "Q-learning vs Q-learning", "Hack probability (eval v" + str(version) + ")",
-                            "Episode \#", "$\mathbb{P}[Hacked]$", 1,1, 1, 1,1,
+                               (np.array(list(range(len(a_cum_reward_train_min_defense_data[0])))) * train_log_freq)[::eval_freq],
+                               a_cum_reward_train_min_defense_means[::eval_freq],
+                               (np.array(list(range(len(a_cum_reward_train_random_defense_data[0])))) * train_log_freq)[::eval_freq],
+                               a_cum_reward_train_random_defense_means[::eval_freq],
+                               (np.array(list(range(len(a_cum_reward_train_max_attack_data[0])))) * train_log_freq)[::eval_freq],
+                               a_cum_reward_train_max_attack_means[::eval_freq],
+                               (np.array(list(range(len(a_cum_reward_train_random_attack_data[0])))) * train_log_freq)[::eval_freq],
+                               a_cum_reward_train_random_attack_means[::eval_freq],
+                               (np.array(list(range(len(a_cum_reward_train_two_agents_data[0])))) * train_log_freq)[::eval_freq],
+                               a_cum_reward_train_two_agents_means[::eval_freq], a_cum_reward_train_min_defense_stds[::eval_freq],
+                               a_cum_reward_train_random_defense_stds[::eval_freq], a_cum_reward_train_max_attack_stds[::eval_freq],
+                               a_cum_reward_train_random_attack_stds[::eval_freq], a_cum_reward_train_two_agents_stds[::eval_freq],
+                               algorithm_pp + " vs minimal defense", algorithm_pp + " vs random defense",
+                               "maximal attack vs " + algorithm_pp, "random attack vs " + algorithm_pp,
+                               algorithm_pp + " vs " + algorithm_pp, "Attacker reward (train v" + str(version) + ")",
+                               "Episode \#", "Cumulative Reward", 1, 1, 1, 1, 1,
 
-                           np.array(list(range(len(a_cum_reward_train_min_defense_data[0])))) * train_log_freq,
-                           a_cum_reward_train_min_defense_means,
-                           np.array(list(range(len(a_cum_reward_train_random_defense_data[0])))) * train_log_freq,
-                           a_cum_reward_train_random_defense_means,
-                           np.array(list(range(len(a_cum_reward_train_max_attack_data[0])))) * train_log_freq,
-                           a_cum_reward_train_max_attack_means,
-                           np.array(list(range(len(a_cum_reward_train_random_attack_data[0])))) * train_log_freq,
-                           a_cum_reward_train_random_attack_means,
-                           np.array(list(range(len(a_cum_reward_train_two_agents_data[0])))) * train_log_freq,
-                           a_cum_reward_train_two_agents_means, a_cum_reward_train_min_defense_stds,
-                           a_cum_reward_train_random_defense_stds, a_cum_reward_train_max_attack_stds,
-                           a_cum_reward_train_random_attack_stds, a_cum_reward_train_two_agents_stds,
-                           "Q-learning vs minimal defense", "Q-learning vs random defense",
-                           "maximal attack vs Q-learning", "random attack vs Q-learning",
-                           "Q-learning vs Q-learning", "Attacker reward (train v" + str(version) + ")",
-                           "Episode \#", "Cumulative Reward", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
+                               (np.array(list(range(len(attacker_loss_train_min_defense_data[0])))) * train_log_freq)[::eval_freq],
+                               attacker_loss_train_min_defense_means[::eval_freq],
+                               (np.array(list(range(len(attacker_loss_train_random_defense_data[0])))) * train_log_freq)[::eval_freq],
+                               attacker_loss_train_random_defense_means[::eval_freq],
+                               (np.array(list(range(len(attacker_loss_train_two_agents_data[0])))) * train_log_freq)[::eval_freq],
+                               attacker_loss_train_two_agents_means[::eval_freq], attacker_loss_train_min_defense_stds[::eval_freq],
+                               attacker_loss_train_random_defense_stds[::eval_freq],
+                               attacker_loss_train_two_agents_stds[::eval_freq],
+                               algorithm_pp + " vs minimal defense", algorithm_pp + " vs random defense",
+                               algorithm_pp + " vs " + algorithm_pp,
+                               "Avg Episode Loss [Attacker]", "Episode \#", "Loss", 1, 1, 1,
 
-                           np.array(list(range(len(d_cum_reward_train_min_defense_data[0])))) * train_log_freq,
-                           d_cum_reward_train_min_defense_means,
-                           np.array(list(range(len(d_cum_reward_train_random_defense_data[0])))) * train_log_freq,
-                           d_cum_reward_train_random_defense_means,
-                           np.array(list(range(len(d_cum_reward_train_max_attack_data[0])))) * train_log_freq,
-                           d_cum_reward_train_max_attack_means,
-                           np.array(list(range(len(d_cum_reward_train_random_attack_data[0])))) * train_log_freq,
-                           d_cum_reward_train_random_attack_means,
-                           np.array(list(range(len(d_cum_reward_train_two_agents_data[0])))) * train_log_freq,
-                           d_cum_reward_train_two_agents_means, d_cum_reward_train_min_defense_stds,
-                           d_cum_reward_train_random_defense_stds, d_cum_reward_train_max_attack_stds,
-                           d_cum_reward_train_random_attack_stds, d_cum_reward_train_two_agents_stds,
-                           "Q-learning vs minimal defense", "Q-learning vs random defense",
-                           "maximal attack vs Q-learning", "random attack vs Q-learning", "Q-learning vs Q-learning",
-                           "Defender reward (train v" + str(version) + ")", "Episode \#",
-                           "Cumulative Reward", eval_freq, eval_freq, eval_freq, eval_freq, eval_freq,
-                           output_dir + "/combined_plot_" + algorithm + "_" + str(version)
-                           )
+                               (np.array(list(range(len(defender_loss_train_max_attack_data[0])))) * train_log_freq)[::eval_freq],
+                               defender_loss_train_max_attack_means[::eval_freq],
+                               (np.array(list(range(len(defender_loss_train_random_attack_data[0])))) * train_log_freq)[::eval_freq],
+                               defender_loss_train_random_attack_means[::eval_freq],
+                               (np.array(list(range(len(defender_loss_train_two_agents_data[0])))) * train_log_freq)[::eval_freq],
+                               defender_loss_train_two_agents_means[::eval_freq], defender_loss_train_max_attack_stds[::eval_freq],
+                               defender_loss_train_random_attack_stds[::eval_freq], defender_loss_train_two_agents_stds[::eval_freq],
+                               "maximal attack vs " + algorithm_pp, "random attack vs " + algorithm_pp,
+                               algorithm_pp + " vs " + algorithm_pp,
+                               "Avg Episode Loss [Defender]", "Episode \#", "Loss", 1, 1, 1,
+
+                               output_dir + "/combined_plot_" + algorithm + "_" + str(version), plot_loss=plot_loss
+                               )
+    except Exception as e:
+        plot_all_avg_summary_1(
+            (np.array(list(range(len(hack_prob_train_min_defense_data[0])))) * train_log_freq)[::eval_freq],
+            hack_prob_train_min_defense_means[::eval_freq],
+            (np.array(list(range(len(hack_prob_train_random_defense_data[0])))) * train_log_freq)[::eval_freq],
+            hack_prob_train_random_defense_means[::eval_freq],
+            (np.array(list(range(len(hack_prob_train_max_attack_data[0])))) * train_log_freq)[::eval_freq],
+            hack_prob_train_max_attack_means[::eval_freq],
+            (np.array(list(range(len(hack_prob_train_random_attack_data[0])))) * train_log_freq)[::eval_freq],
+            hack_prob_train_random_attack_means[::eval_freq],
+            (np.array(list(range(len(hack_prob_train_two_agents_data[0])))) * train_log_freq)[::eval_freq],
+            hack_prob_train_two_agents_means[::eval_freq], hack_prob_train_min_defense_stds[::eval_freq],
+            hack_prob_train_random_defense_stds[::eval_freq], hack_prob_train_max_attack_stds[::eval_freq],
+            hack_prob_train_random_attack_stds[::eval_freq], hack_prob_train_two_agents_stds[::eval_freq],
+            algorithm_pp + " vs minimal defense", algorithm_pp + " vs random defense",
+            "maximal attack vs " + algorithm_pp, "random attack vs " + algorithm_pp,
+            algorithm_pp + " vs " + algorithm_pp, "Hack probability (train, v" + str(version) + ")",
+            "Episode \#", "$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1,
+
+            np.array(list(range(len(hack_prob_eval_min_defense_data[0])))) * eval_freq,
+            hack_prob_eval_min_defense_means,
+            np.array(list(range(len(hack_prob_eval_random_defense_data[0])))) * eval_freq,
+            hack_prob_eval_random_defense_means,
+            np.array(list(range(len(hack_prob_eval_max_attack_data[0])))) * eval_freq,
+            hack_prob_eval_max_attack_means,
+            np.array(list(range(len(hack_prob_eval_random_attack_data[0])))) * eval_freq,
+            hack_prob_eval_random_attack_means,
+            np.array(list(range(len(hack_prob_eval_two_agents_data[0])))) * eval_freq,
+            hack_prob_eval_two_agents_means, hack_prob_eval_min_defense_stds,
+            hack_prob_eval_random_defense_stds, hack_prob_eval_max_attack_stds,
+            hack_prob_eval_random_attack_stds, hack_prob_eval_two_agents_stds,
+            algorithm_pp + " vs minimal defense", algorithm_pp + " vs random defense",
+            "maximal attack vs " + algorithm_pp, "random attack vs " + algorithm_pp,
+            algorithm_pp + " vs " + algorithm_pp, "Hack probability (eval v" + str(version) + ")",
+            "Episode \#", "$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1,
+
+            (np.array(list(range(len(a_cum_reward_train_min_defense_data[0])))) * train_log_freq)[::eval_freq],
+            a_cum_reward_train_min_defense_means[::eval_freq],
+            (np.array(list(range(len(a_cum_reward_train_random_defense_data[0])))) * train_log_freq)[::eval_freq],
+            a_cum_reward_train_random_defense_means[::eval_freq],
+            (np.array(list(range(len(a_cum_reward_train_max_attack_data[0])))) * train_log_freq)[::eval_freq],
+            a_cum_reward_train_max_attack_means[::eval_freq],
+            (np.array(list(range(len(a_cum_reward_train_random_attack_data[0])))) * train_log_freq)[::eval_freq],
+            a_cum_reward_train_random_attack_means[::eval_freq],
+            (np.array(list(range(len(a_cum_reward_train_two_agents_data[0])))) * train_log_freq)[::eval_freq],
+            a_cum_reward_train_two_agents_means[::eval_freq], a_cum_reward_train_min_defense_stds[::eval_freq],
+            a_cum_reward_train_random_defense_stds[::eval_freq], a_cum_reward_train_max_attack_stds[::eval_freq],
+            a_cum_reward_train_random_attack_stds[::eval_freq], a_cum_reward_train_two_agents_stds[::eval_freq],
+            algorithm_pp + " vs minimal defense", algorithm_pp + " vs random defense",
+            "maximal attack vs " + algorithm_pp, "random attack vs " + algorithm_pp,
+            algorithm_pp + " vs " + algorithm_pp, "Attacker reward (train v" + str(version) + ")",
+            "Episode \#", "Cumulative Reward", 1, 1, 1, 1, 1,
+
+            (np.array(list(range(len(a_cum_reward_train_min_defense_data[0])))) * train_log_freq)[::eval_freq],
+            a_cum_reward_train_min_defense_means[::eval_freq],
+            (np.array(list(range(len(a_cum_reward_train_random_defense_data[0])))) * train_log_freq)[::eval_freq],
+            a_cum_reward_train_random_defense_means[::eval_freq],
+            (np.array(list(range(len(a_cum_reward_train_max_attack_data[0])))) * train_log_freq)[::eval_freq],
+            a_cum_reward_train_max_attack_means[::eval_freq],
+            a_cum_reward_train_min_defense_stds[::eval_freq],
+            a_cum_reward_train_random_defense_stds[::eval_freq], a_cum_reward_train_max_attack_stds[::eval_freq],
+            algorithm_pp + " vs minimal defense", algorithm_pp + " vs random defense",
+            "maximal attack vs " + algorithm_pp, "Attacker reward (train v" + str(version) + ")",
+            "Episode \#", "Cumulative Reward", 1, 1, 1,
+
+            (np.array(list(range(len(a_cum_reward_train_min_defense_data[0])))) * train_log_freq)[::eval_freq],
+            a_cum_reward_train_min_defense_means[::eval_freq],
+            (np.array(list(range(len(a_cum_reward_train_random_defense_data[0])))) * train_log_freq)[::eval_freq],
+            a_cum_reward_train_random_defense_means[::eval_freq],
+            (np.array(list(range(len(a_cum_reward_train_max_attack_data[0])))) * train_log_freq)[::eval_freq],
+            a_cum_reward_train_random_attack_means[::eval_freq],
+            a_cum_reward_train_min_defense_stds[::eval_freq],
+            a_cum_reward_train_random_defense_stds[::eval_freq], a_cum_reward_train_max_attack_stds[::eval_freq],
+            algorithm_pp + " vs minimal defense", algorithm_pp + " vs random defense",
+            "maximal attack vs " + algorithm_pp, "Attacker reward (train v" + str(version) + ")",
+            "Episode \#", "Cumulative Reward", 1, 1, 1,
+
+            output_dir + "/combined_plot_" + algorithm + "_" + str(version), plot_loss=plot_loss
+            )
 
     # Save mean and std data
     with open(output_dir + "/data/hack_prob_train_min_defense_means.csv", "w") as f:
@@ -4337,7 +4632,8 @@ def plot_all_averages(maximal_attack_train_csv_paths, maximal_attack_eval_csv_pa
             writer.writerow([row])
 
 
-def plot_average_results(train_dfs, eval_dfs, train_log_frequency, eval_frequency, experiment_title, output_dir):
+def plot_average_results(train_dfs, eval_dfs, train_log_frequency, eval_frequency, experiment_title, output_dir,
+                         plot_attacker_loss : bool = False, plot_defender_loss : bool = False):
     hack_prob_train_data = list(map(lambda df: df["hack_probability"].values, train_dfs))
     hack_prob_train_means = np.mean(tuple(hack_prob_train_data), axis=0)
     hack_prob_train_stds = np.std(tuple(hack_prob_train_data), axis=0, ddof=1)
@@ -4345,11 +4641,11 @@ def plot_average_results(train_dfs, eval_dfs, train_log_frequency, eval_frequenc
     hack_prob_eval_means = np.mean(tuple(hack_prob_eval_data), axis=0)
     hack_prob_eval_stds = np.std(tuple(hack_prob_eval_data), axis=0, ddof=1)
 
-    two_line_plot_w_shades(np.array(list(range(len(hack_prob_train_data[0])))) * train_log_frequency,
-                           hack_prob_train_means,
+    two_line_plot_w_shades((np.array(list(range(len(hack_prob_train_data[0])))) * train_log_frequency)[::eval_frequency],
+                           hack_prob_train_means[::eval_frequency],
                            np.array(list(range(len(hack_prob_eval_data[0])))) * eval_frequency,
                            hack_prob_eval_means,
-                           stds_1=hack_prob_train_stds, stds_2=hack_prob_eval_stds,
+                           stds_1=hack_prob_train_stds[::eval_frequency], stds_2=hack_prob_eval_stds,
                            title="Likelihood of Successful Hack",
                            xlabel="Episode \#", ylabel="$\mathbb{P}[Hacked]$",
                            line1_label=experiment_title + " [Train]",
@@ -4365,16 +4661,17 @@ def plot_average_results(train_dfs, eval_dfs, train_log_frequency, eval_frequenc
     cumulative_reward_defender_means = np.mean(tuple(cumulative_reward_defender_data), axis=0)
     cumulative_reward_defender_stds = np.std(tuple(cumulative_reward_defender_data), axis=0, ddof=1)
 
-    two_line_plot_w_shades(np.array(list(range(len(cumulative_reward_attacker_data[0])))) * train_log_frequency,
-                           cumulative_reward_attacker_means,
-                           np.array(list(range(len(cumulative_reward_defender_data[0])))) * train_log_frequency,
-                           cumulative_reward_defender_means,
-                           stds_1=cumulative_reward_attacker_stds, stds_2=cumulative_reward_defender_stds,
+    two_line_plot_w_shades((np.array(list(range(len(cumulative_reward_attacker_data[0])))) * train_log_frequency)[::eval_frequency],
+                           cumulative_reward_attacker_means[::eval_frequency],
+                           (np.array(list(range(len(cumulative_reward_defender_data[0])))) * train_log_frequency)[::eval_frequency],
+                           cumulative_reward_defender_means[::eval_frequency],
+                           stds_1=cumulative_reward_attacker_stds[::eval_frequency],
+                           stds_2=cumulative_reward_defender_stds[::eval_frequency],
                            title="Cumulative Reward (Train)",
                            xlabel="Episode \#", ylabel="Cumulative Reward",
                            line1_label=experiment_title + " [Attacker]",
                            line2_label=experiment_title + " [Defender]", legend_loc="upper left",
-                           markevery_1=eval_frequency, markevery_2=eval_frequency,
+                           markevery_1=1, markevery_2=1,
                            file_name=output_dir + "/results/plots/avg_cumulative_rewards"
                            )
 
@@ -4385,24 +4682,76 @@ def plot_average_results(train_dfs, eval_dfs, train_log_frequency, eval_frequenc
     avg_episode_len_eval_means = np.mean(tuple(avg_episode_len_eval_data), axis=0)
     avg_episode_len_eval_stds = np.std(tuple(avg_episode_len_eval_data), axis=0, ddof=1)
 
-    two_line_plot_w_shades(np.array(list(range(len(avg_episode_len_train_data[0])))) * train_log_frequency,
-                           avg_episode_len_train_means,
+    two_line_plot_w_shades((np.array(list(range(len(avg_episode_len_train_data[0])))) * train_log_frequency)[::eval_frequency],
+                           avg_episode_len_train_means[::eval_frequency],
                            np.array(list(range(len(avg_episode_len_eval_data[0])))) * eval_frequency,
                            avg_episode_len_eval_means,
-                           stds_1=avg_episode_len_train_stds, stds_2=avg_episode_len_eval_stds,
+                           stds_1=avg_episode_len_train_stds[::eval_frequency], stds_2=avg_episode_len_eval_stds,
                            title="Avg Episode Lengths",
                            xlabel="Episode \#", ylabel="Avg Length (num steps)",
                            line1_label=experiment_title + " [Train]",
                            line2_label=experiment_title + " [Eval]", legend_loc="upper left",
-                           markevery_1=eval_frequency, markevery_2=1,
+                           markevery_1=1, markevery_2=1,
                            file_name=output_dir + "/results/plots/avg_episode_length"
                            )
+    if plot_attacker_loss:
+        avg_episode_loss_attacker_train_data = list(map(lambda df: df["avg_episode_loss_attacker"].values, train_dfs))
+        avg_episode_loss_attacker_train_means = np.mean(tuple(avg_episode_loss_attacker_train_data), axis=0)
+        avg_episode_loss_attacker_train_stds = np.std(tuple(avg_episode_loss_attacker_train_data), axis=0, ddof=1)
+
+        one_line_plot_w_shades(
+            (np.array(list(range(len(avg_episode_loss_attacker_train_data[0])))) * train_log_frequency)[::eval_frequency],
+            avg_episode_loss_attacker_train_means[::eval_frequency],
+            stds_1=avg_episode_loss_attacker_train_stds[::eval_frequency],
+            title="Avg Episode Loss",
+            xlabel="Episode \#", ylabel="Loss",
+            line1_label=experiment_title + " [Attacker]", legend_loc="upper left",
+            markevery_1=1,
+            file_name=output_dir + "/results/plots/avg_episode_loss_attacker"
+            )
+
+    if plot_defender_loss:
+        avg_episode_loss_defender_train_data = list(map(lambda df: df["avg_episode_loss_defender"].values, train_dfs))
+        avg_episode_loss_defender_train_means = np.mean(tuple(avg_episode_loss_defender_train_data), axis=0)
+        avg_episode_loss_defender_train_stds = np.std(tuple(avg_episode_loss_defender_train_data), axis=0, ddof=1)
+
+        one_line_plot_w_shades(
+            (np.array(list(range(len(avg_episode_loss_defender_train_data[0])))) * train_log_frequency)[
+            ::eval_frequency],
+            avg_episode_loss_defender_train_means[::eval_frequency],
+            stds_1=avg_episode_loss_defender_train_stds[::eval_frequency],
+            title="Avg Episode Loss",
+            xlabel="Episode \#", ylabel="Loss",
+            line1_label=experiment_title + " [defender]", legend_loc="upper left",
+            markevery_1=1,
+            file_name=output_dir + "/results/plots/avg_episode_loss_defender"
+        )
+
+    if plot_attacker_loss and plot_defender_loss:
+        two_line_plot_w_shades(
+            (np.array(list(range(len(avg_episode_loss_attacker_train_data[0])))) * train_log_frequency)[::eval_frequency],
+            avg_episode_loss_attacker_train_means[::eval_frequency],
+            (np.array(list(range(len(avg_episode_loss_defender_train_data[0])))) * train_log_frequency)[::eval_frequency],
+            avg_episode_loss_defender_train_means[::eval_frequency],
+            stds_1=avg_episode_loss_attacker_train_stds[::eval_frequency],
+            stds_2=avg_episode_loss_defender_train_stds[::eval_frequency],
+            title="Avg Episode Loss",
+            xlabel="Episode \#", ylabel="Loss",
+            line1_label=experiment_title + " [Attacker]",
+            line2_label=experiment_title + " [Defender]", legend_loc="upper left",
+            markevery_1=1, markevery_2=1,
+            file_name=output_dir + "/results/plots/avg_episode_loss_attacker_and_defender"
+            )
 
 
-def plot_avg_summary(train_dfs, eval_dfs, train_log_frequency, eval_frequency, experiment_title, file_name):
+def plot_avg_summary(train_dfs, eval_dfs, train_log_frequency, eval_frequency, experiment_title, file_name,
+                     plot_attacker_loss : bool = False, plot_defender_loss : bool = False):
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts}')
-    fig, ax = plt.subplots(nrows=3, ncols=1, figsize=(6, 8))
+    if plot_attacker_loss or plot_defender_loss:
+        fig, ax = plt.subplots(nrows=4, ncols=1, figsize=(6, 10))
+    else:
+        fig, ax = plt.subplots(nrows=3, ncols=1, figsize=(6, 8))
 
     # Plot avg hack_probability
 
@@ -4413,19 +4762,20 @@ def plot_avg_summary(train_dfs, eval_dfs, train_log_frequency, eval_frequency, e
     hack_prob_eval_means = np.mean(tuple(hack_prob_eval_data), axis=0)
     hack_prob_eval_stds = np.std(tuple(hack_prob_eval_data), axis=0, ddof=1)
 
-    xlims = (min(min(np.array(list(range(len(hack_prob_train_data[0])))) * train_log_frequency),
+    xlims = (min(min((np.array(list(range(len(hack_prob_train_data[0])))) * train_log_frequency)[::eval_frequency]),
                  min(np.array(list(range(len(hack_prob_eval_data[0])))) * eval_frequency)),
-             max(max(np.array(list(range(len(hack_prob_train_data[0])))) * train_log_frequency),
+             max(max((np.array(list(range(len(hack_prob_train_data[0])))) * train_log_frequency)[::eval_frequency]),
                  max(np.array(list(range(len(hack_prob_eval_data[0])))) * eval_frequency)))
     ylims = (0, 1)
 
-    ax[0].plot(np.array(list(range(len(hack_prob_train_data[0])))) * train_log_frequency,
-               hack_prob_train_means, label=experiment_title + " [Train]",
+    ax[0].plot((np.array(list(range(len(hack_prob_train_data[0])))) * train_log_frequency)[::eval_frequency],
+               hack_prob_train_means[::eval_frequency], label=experiment_title + " [Train]",
                marker="s", ls='-', color="#599ad3",
-               markevery=eval_frequency)
-    ax[0].fill_between(np.array(list(range(len(hack_prob_train_data[0])))) * train_log_frequency,
-                       hack_prob_train_means - hack_prob_train_stds,
-                       hack_prob_train_means + hack_prob_train_stds, alpha=0.35, color="#599ad3")
+               markevery=1)
+    ax[0].fill_between((np.array(list(range(len(hack_prob_train_data[0])))) * train_log_frequency)[::eval_frequency],
+                       hack_prob_train_means[::eval_frequency] - hack_prob_train_stds[::eval_frequency],
+                       hack_prob_train_means[::eval_frequency] + hack_prob_train_stds[::eval_frequency],
+                       alpha=0.35, color="#599ad3")
 
     ax[0].plot(np.array(list(range(len(hack_prob_eval_data[0])))) * eval_frequency,
                hack_prob_eval_means, label=experiment_title + " [Eval]",
@@ -4465,31 +4815,31 @@ def plot_avg_summary(train_dfs, eval_dfs, train_log_frequency, eval_frequency, e
     cumulative_reward_defender_means = np.mean(tuple(cumulative_reward_defender_data), axis=0)
     cumulative_reward_defender_stds = np.std(tuple(cumulative_reward_defender_data), axis=0, ddof=1)
 
-    xlims = (min(min(np.array(list(range(len(cumulative_reward_attacker_data[0])))) * train_log_frequency),
-                 min(np.array(list(range(len(cumulative_reward_defender_data[0])))) * train_log_frequency)),
-             max(max(np.array(list(range(len(cumulative_reward_attacker_data[0])))) * train_log_frequency),
-                 max(np.array(list(range(len(cumulative_reward_defender_data[0])))) * train_log_frequency)))
-    ylims = (min(min(cumulative_reward_attacker_means - cumulative_reward_attacker_stds),
-                 min(cumulative_reward_defender_means - cumulative_reward_defender_stds)),
-             max(max(cumulative_reward_attacker_means + cumulative_reward_attacker_stds),
-                 max(cumulative_reward_defender_means + cumulative_reward_defender_stds)))
+    xlims = (min(min((np.array(list(range(len(cumulative_reward_attacker_data[0])))) * train_log_frequency)[::eval_frequency]),
+                 min((np.array(list(range(len(cumulative_reward_defender_data[0])))) * train_log_frequency)[::eval_frequency])),
+             max(max((np.array(list(range(len(cumulative_reward_attacker_data[0])))) * train_log_frequency)[::eval_frequency]),
+                 max((np.array(list(range(len(cumulative_reward_defender_data[0])))) * train_log_frequency)[::eval_frequency])))
+    ylims = (min(min(cumulative_reward_attacker_means[::eval_frequency] - cumulative_reward_attacker_stds[::eval_frequency]),
+                 min(cumulative_reward_defender_means[::eval_frequency] - cumulative_reward_defender_stds[::eval_frequency])),
+             max(max(cumulative_reward_attacker_means[::eval_frequency] + cumulative_reward_attacker_stds[::eval_frequency]),
+                 max(cumulative_reward_defender_means[::eval_frequency] + cumulative_reward_defender_stds[::eval_frequency])))
 
-    ax[1].plot(np.array(list(range(len(cumulative_reward_attacker_data[0])))) * train_log_frequency,
-               cumulative_reward_attacker_means, label=experiment_title + " [Attacker]",
+    ax[1].plot((np.array(list(range(len(cumulative_reward_attacker_data[0])))) * train_log_frequency)[::eval_frequency],
+               cumulative_reward_attacker_means[::eval_frequency], label=experiment_title + " [Attacker]",
                marker="s", ls='-', color="#599ad3",
-               markevery=eval_frequency)
-    ax[1].fill_between(np.array(list(range(len(cumulative_reward_attacker_data[0])))) * train_log_frequency,
-                       cumulative_reward_attacker_means - cumulative_reward_attacker_stds,
-                       cumulative_reward_attacker_means + cumulative_reward_attacker_stds,
+               markevery=1)
+    ax[1].fill_between((np.array(list(range(len(cumulative_reward_attacker_data[0])))) * train_log_frequency)[::eval_frequency],
+                       cumulative_reward_attacker_means[::eval_frequency] - cumulative_reward_attacker_stds[::eval_frequency],
+                       cumulative_reward_attacker_means[::eval_frequency] + cumulative_reward_attacker_stds[::eval_frequency],
                        alpha=0.35, color="#599ad3")
 
-    ax[1].plot(np.array(list(range(len(cumulative_reward_defender_data[0])))) * train_log_frequency,
-               cumulative_reward_defender_means, label=experiment_title + " [Defender]",
-               marker="o", ls='-', color='#f9a65a', markevery=eval_frequency)
-    ax[1].fill_between(np.array(list(range(len(cumulative_reward_defender_data[0])))) * train_log_frequency,
-                       cumulative_reward_defender_means - cumulative_reward_defender_stds,
-                       cumulative_reward_defender_means + cumulative_reward_defender_stds, alpha=0.35,
-                       color='#f9a65a')
+    ax[1].plot((np.array(list(range(len(cumulative_reward_defender_data[0])))) * train_log_frequency)[::eval_frequency],
+               cumulative_reward_defender_means[::eval_frequency], label=experiment_title + " [Defender]",
+               marker="o", ls='-', color='#f9a65a', markevery=1)
+    ax[1].fill_between((np.array(list(range(len(cumulative_reward_defender_data[0])))) * train_log_frequency)[::eval_frequency],
+                       cumulative_reward_defender_means[::eval_frequency] - cumulative_reward_defender_stds[::eval_frequency],
+                       cumulative_reward_defender_means[::eval_frequency] + cumulative_reward_defender_stds[::eval_frequency],
+                       alpha=0.35, color='#f9a65a')
 
     ax[1].set_xlim(xlims)
     ax[1].set_ylim(ylims)
@@ -4521,22 +4871,23 @@ def plot_avg_summary(train_dfs, eval_dfs, train_log_frequency, eval_frequency, e
     avg_episode_len_eval_means = np.mean(tuple(avg_episode_len_eval_data), axis=0)
     avg_episode_len_eval_stds = np.std(tuple(avg_episode_len_eval_data), axis=0, ddof=1)
 
-    xlims = (min(min(np.array(list(range(len(avg_episode_len_train_data[0])))) * train_log_frequency),
+    xlims = (min(min((np.array(list(range(len(avg_episode_len_train_data[0])))) * train_log_frequency)[::eval_frequency]),
                  min(np.array(list(range(len(avg_episode_len_eval_data[0])))) * eval_frequency)),
-             max(max(np.array(list(range(len(avg_episode_len_train_data[0])))) * train_log_frequency),
+             max(max((np.array(list(range(len(avg_episode_len_train_data[0])))) * train_log_frequency)[::eval_frequency]),
                  max(np.array(list(range(len(avg_episode_len_eval_data[0])))) * eval_frequency)))
-    ylims = (min(min(avg_episode_len_train_means - avg_episode_len_train_stds),
+    ylims = (min(min(avg_episode_len_train_means[::eval_frequency] - avg_episode_len_train_stds[::eval_frequency]),
                  min(avg_episode_len_eval_means - avg_episode_len_eval_stds)),
-             max(max(avg_episode_len_train_means + avg_episode_len_train_stds),
+             max(max(avg_episode_len_train_means[::eval_frequency] + avg_episode_len_train_stds[::eval_frequency]),
                  max(avg_episode_len_eval_means + avg_episode_len_eval_stds)))
 
-    ax[2].plot(np.array(list(range(len(avg_episode_len_train_data[0])))) * train_log_frequency,
-               avg_episode_len_train_means, label=experiment_title + " [Train]",
+    ax[2].plot((np.array(list(range(len(avg_episode_len_train_data[0])))) * train_log_frequency)[::eval_frequency],
+               avg_episode_len_train_means[::eval_frequency], label=experiment_title + " [Train]",
                marker="s", ls='-', color="#599ad3",
-               markevery=eval_frequency)
-    ax[2].fill_between(np.array(list(range(len(avg_episode_len_train_data[0])))) * train_log_frequency,
-                       avg_episode_len_train_means - avg_episode_len_train_stds,
-                       avg_episode_len_train_means + avg_episode_len_train_stds, alpha=0.35, color="#599ad3")
+               markevery=1)
+    ax[2].fill_between((np.array(list(range(len(avg_episode_len_train_data[0])))) * train_log_frequency)[::eval_frequency],
+                       avg_episode_len_train_means[::eval_frequency] - avg_episode_len_train_stds[::eval_frequency],
+                       avg_episode_len_train_means[::eval_frequency] + avg_episode_len_train_stds[::eval_frequency],
+                       alpha=0.35, color="#599ad3")
 
     ax[2].plot(np.array(list(range(len(avg_episode_len_eval_data[0])))) * eval_frequency,
                avg_episode_len_eval_means, label=experiment_title + " [Eval]",
@@ -4567,13 +4918,136 @@ def plot_avg_summary(train_dfs, eval_dfs, train_log_frequency, eval_frequency, e
 
     ax[2].legend(loc="upper right")
 
+    # Plot loss
+
+    if plot_attacker_loss:
+        avg_episode_loss_attacker_train_data = list(map(lambda df: df["avg_episode_loss_attacker"].values, train_dfs))
+        avg_episode_loss_attacker_train_means = np.mean(tuple(avg_episode_loss_attacker_train_data), axis=0)
+        avg_episode_loss_attacker_train_stds = np.std(tuple(avg_episode_loss_attacker_train_data), axis=0, ddof=1)
+    if plot_defender_loss:
+        avg_episode_loss_defender_train_data = list(map(lambda df: df["avg_episode_loss_defender"].values, train_dfs))
+        avg_episode_loss_defender_train_means = np.mean(tuple(avg_episode_loss_defender_train_data), axis=0)
+        avg_episode_loss_defender_train_stds = np.std(tuple(avg_episode_loss_defender_train_data), axis=0, ddof=1)
+    if plot_attacker_loss and plot_defender_loss:
+        xlims = (min(min(
+            (np.array(list(range(len(avg_episode_loss_attacker_train_data[0])))) * train_log_frequency)[::eval_frequency]),
+                     min((np.array(list(range(len(avg_episode_loss_defender_train_data[0])))) * train_log_frequency)[
+                         ::eval_frequency])),
+                 max(max((np.array(list(range(len(avg_episode_loss_attacker_train_data[0])))) * train_log_frequency)[
+                         ::eval_frequency]),
+                     max((np.array(list(range(len(avg_episode_loss_defender_train_data[0])))) * train_log_frequency)[
+                         ::eval_frequency])))
+        ylims = (
+        min(min(avg_episode_loss_attacker_train_means[::eval_frequency] - avg_episode_loss_attacker_train_stds[::eval_frequency]),
+            min(avg_episode_loss_defender_train_means[::eval_frequency] - avg_episode_loss_defender_train_stds[::eval_frequency])),
+        max(max(avg_episode_loss_attacker_train_means[::eval_frequency] + avg_episode_loss_attacker_train_stds[::eval_frequency]),
+            max(avg_episode_loss_defender_train_means[::eval_frequency] + avg_episode_loss_defender_train_stds[::eval_frequency])))
+
+        ax[3].plot(
+            (np.array(list(range(len(avg_episode_loss_attacker_train_data[0])))) * train_log_frequency)[::eval_frequency],
+            avg_episode_loss_attacker_train_means[::eval_frequency], label=experiment_title + " [Attacker]",
+            marker="s", ls='-', color="#599ad3",
+            markevery=1)
+        ax[3].fill_between(
+            (np.array(list(range(len(avg_episode_loss_attacker_train_data[0])))) * train_log_frequency)[::eval_frequency],
+            avg_episode_loss_attacker_train_means[::eval_frequency] - avg_episode_loss_attacker_train_stds[::eval_frequency],
+            avg_episode_loss_attacker_train_means[::eval_frequency] + avg_episode_loss_attacker_train_stds[::eval_frequency],
+            alpha=0.35, color="#599ad3")
+
+        ax[3].plot(
+            (np.array(list(range(len(avg_episode_loss_defender_train_data[0])))) * train_log_frequency)[::eval_frequency],
+            avg_episode_loss_defender_train_means[::eval_frequency], label=experiment_title + " [Defender]",
+            marker="o", ls='-', color='#f9a65a', markevery=1)
+        ax[3].fill_between(
+            (np.array(list(range(len(avg_episode_loss_defender_train_data[0])))) * train_log_frequency)[::eval_frequency],
+            avg_episode_loss_defender_train_means[::eval_frequency] - avg_episode_loss_defender_train_stds[::eval_frequency],
+            avg_episode_loss_defender_train_means[::eval_frequency] + avg_episode_loss_defender_train_stds[::eval_frequency],
+            alpha=0.35, color='#f9a65a')
+    if plot_attacker_loss and not plot_defender_loss:
+        xlims = (min(
+            (np.array(list(range(len(avg_episode_loss_attacker_train_data[0])))) * train_log_frequency)[
+            ::eval_frequency]),
+                 max((np.array(list(range(len(avg_episode_loss_attacker_train_data[0])))) * train_log_frequency)[
+                         ::eval_frequency]))
+        ylims = (
+            min(avg_episode_loss_attacker_train_means[::eval_frequency] - avg_episode_loss_attacker_train_stds[
+                                                                              ::eval_frequency]),
+            max(avg_episode_loss_attacker_train_means[::eval_frequency] + avg_episode_loss_attacker_train_stds[
+                                                                              ::eval_frequency]))
+
+        ax[3].plot(
+            (np.array(list(range(len(avg_episode_loss_attacker_train_data[0])))) * train_log_frequency)[
+            ::eval_frequency],
+            avg_episode_loss_attacker_train_means[::eval_frequency], label=experiment_title + " [Attacker]",
+            marker="s", ls='-', color="#599ad3",
+            markevery=1)
+        ax[3].fill_between(
+            (np.array(list(range(len(avg_episode_loss_attacker_train_data[0])))) * train_log_frequency)[
+            ::eval_frequency],
+            avg_episode_loss_attacker_train_means[::eval_frequency] - avg_episode_loss_attacker_train_stds[
+                                                                      ::eval_frequency],
+            avg_episode_loss_attacker_train_means[::eval_frequency] + avg_episode_loss_attacker_train_stds[
+                                                                      ::eval_frequency],
+            alpha=0.35, color="#599ad3")
+
+    if plot_defender_loss and not plot_attacker_loss:
+        xlims = (min(
+            (np.array(list(range(len(avg_episode_loss_defender_train_data[0])))) * train_log_frequency)[
+            ::eval_frequency]),
+                 max((np.array(list(range(len(avg_episode_loss_defender_train_data[0])))) * train_log_frequency)[
+                     ::eval_frequency]))
+        ylims = (
+            min(avg_episode_loss_defender_train_means[::eval_frequency] - avg_episode_loss_defender_train_stds[
+                                                                          ::eval_frequency]),
+            max(avg_episode_loss_defender_train_means[::eval_frequency] + avg_episode_loss_defender_train_stds[
+                                                                          ::eval_frequency]))
+
+        ax[3].plot(
+            (np.array(list(range(len(avg_episode_loss_defender_train_data[0])))) * train_log_frequency)[
+            ::eval_frequency],
+            avg_episode_loss_defender_train_means[::eval_frequency], label=experiment_title + " [Defender]",
+            marker="s", ls='-', color="#599ad3",
+            markevery=1)
+        ax[3].fill_between(
+            (np.array(list(range(len(avg_episode_loss_defender_train_data[0])))) * train_log_frequency)[
+            ::eval_frequency],
+            avg_episode_loss_defender_train_means[::eval_frequency] - avg_episode_loss_defender_train_stds[
+                                                                      ::eval_frequency],
+            avg_episode_loss_defender_train_means[::eval_frequency] + avg_episode_loss_defender_train_stds[
+                                                                      ::eval_frequency],
+            alpha=0.35, color="#599ad3")
+
+    if plot_attacker_loss or plot_defender_loss:
+        ax[3].set_xlim(xlims)
+        ax[3].set_ylim(ylims)
+
+        ax[3].set_title("Avg Episode Loss")
+        ax[3].set_xlabel("Episode \#")
+        ax[3].set_ylabel("Loss")
+        # set the grid on
+        ax[3].grid('on')
+
+        # tweak the axis labels
+        xlab = ax[3].xaxis.get_label()
+        ylab = ax[3].yaxis.get_label()
+
+        xlab.set_size(10)
+        ylab.set_size(10)
+
+        # change the color of the top and right spines to opaque gray
+        ax[3].spines['right'].set_color((.8, .8, .8))
+        ax[3].spines['top'].set_color((.8, .8, .8))
+
+        ax[3].legend(loc="upper left")
+
     fig.tight_layout()
     fig.savefig(file_name + ".png", format="png", dpi=600)
     fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     plt.close(fig)
 
 def read_and_plot_average_results(experiment_title: str, train_csv_paths : list, eval_csv_paths: list,
-                                  train_log_frequency : int, eval_frequency : int, output_dir: str):
+                                  train_log_frequency : int, eval_frequency : int, output_dir: str,
+                                  plot_attacker_loss : bool = False, plot_defender_loss : bool = False):
     eval_dfs = []
     train_dfs = []
     for train_path in train_csv_paths:
@@ -4584,9 +5058,11 @@ def read_and_plot_average_results(experiment_title: str, train_csv_paths : list,
         df = read_data(eval_path)
         eval_dfs.append(df)
 
-    plot_average_results(train_dfs, eval_dfs, train_log_frequency, eval_frequency, experiment_title, output_dir)
+    plot_average_results(train_dfs, eval_dfs, train_log_frequency, eval_frequency, experiment_title, output_dir,
+                         plot_attacker_loss = plot_attacker_loss, plot_defender_loss = plot_defender_loss)
     plot_avg_summary(train_dfs, eval_dfs, train_log_frequency, eval_frequency, experiment_title,
-                     output_dir + "/results/plots/avg_summary")
+                     output_dir + "/results/plots/avg_summary",
+                     plot_attacker_loss = plot_attacker_loss, plot_defender_loss = plot_defender_loss)
 
 
 def read_and_plot_results(train_csv_path : str, eval_csv_path: str, train_log_frequency : int,

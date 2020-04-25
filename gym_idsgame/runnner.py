@@ -122,6 +122,8 @@ class Runner:
         agent: TrainAgent = None
         if config.attacker_type == AgentType.TABULAR_Q_AGENT.value:
             agent = TabularQAgent(env, config.q_agent_config)
+        elif config.attacker_type == AgentType.DQN_AGENT.value:
+            agent = DQNAgent(env, config.q_agent_config)
         else:
             raise AssertionError("Train agent type not recognized: {}".format(config.attacker_type))
         agent.train()

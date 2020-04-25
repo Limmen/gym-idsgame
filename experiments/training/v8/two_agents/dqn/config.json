@@ -1,11 +1,11 @@
 {
     "attacker_type": 6,
-    "defender_type": 1,
+    "defender_type": 6,
     "env_name": "idsgame-v8",
     "idsgame_config": null,
     "initial_state_path": null,
     "logger": null,
-    "mode": 0,
+    "mode": 5,
     "output_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v8/two_agents/dqn",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
@@ -13,7 +13,7 @@
         "attacker": true,
         "attacker_load_path": null,
         "checkpoint_freq": 1000,
-        "defender": false,
+        "defender": true,
         "defender_load_path": null,
         "dqn_config": {
             "batch_size": 32,

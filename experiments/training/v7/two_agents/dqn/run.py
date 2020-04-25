@@ -48,12 +48,13 @@ def default_config() -> ClientConfig:
                                   epsilon_decay=0.999, video=True, eval_log_frequency=1,
                                   video_fps=5, video_dir=default_output_dir() + "/results/videos", num_episodes=10000,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/results/gifs",
-                                  eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
+                                  eval_frequency=1000, attacker=True, defender=True, video_frequency=101,
                                   save_dir=default_output_dir() + "/results/data", dqn_config=dqn_config,
                                   checkpoint_freq=1000)
     env_name = "idsgame-v7"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.DQN_AGENT.value,
-                                 mode=RunnerMode.TRAIN_ATTACKER.value,
+                                 defender_type=AgentType.DQN_AGENT.value,
+                                 mode=RunnerMode.TRAIN_DEFENDER_AND_ATTACKER.value,
                                  q_agent_config=q_agent_config, output_dir=default_output_dir(),
                                  title="TrainingDQNAgent vs TrainingDQNAgent",
                                  run_many=True, random_seeds=[0, 999, 299, 399, 499])
@@ -102,7 +103,8 @@ def plot_average_results(experiment_title :str, config: ClientConfig, eval_csv_p
     plotting_util.read_and_plot_average_results(experiment_title, train_csv_paths, eval_csv_paths,
                                                 config.q_agent_config.train_log_frequency,
                                                 config.q_agent_config.eval_frequency,
-                                                config.output_dir)
+                                                config.output_dir, plot_attacker_loss = True,
+                                                plot_defender_loss = True)
 
 def run_experiment(configpath: str, random_seed: int, noconfig: bool):
     """
