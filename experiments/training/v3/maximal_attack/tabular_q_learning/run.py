@@ -41,7 +41,7 @@ def default_config() -> ClientConfig:
                                   epsilon_decay=0.9999, video=True, eval_log_frequency=1,
                                   video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=20001,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
-                                  eval_frequency=1000, attacker=False, defender=True,
+                                  eval_frequency=1000, attacker=False, defender=True, video_frequency=101,
                                   save_dir=default_output_dir() + "/data")
     env_name = "idsgame-maximal_attack-v3"
     client_config = ClientConfig(env_name=env_name, defender_type=AgentType.TABULAR_Q_AGENT.value,

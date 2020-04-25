@@ -16,7 +16,7 @@ class QAgentConfig:
                  eval_log_frequency :int =1, video :bool = False, video_fps :int = 5, video_dir :bool = None,
                  num_episodes :int = 5000,
                  eval_render :bool = False, gifs :bool = False, gif_dir: str = None, eval_frequency :int =1000,
-                 video_frequency :int = 1, attacker :bool = True, defender :bool = False,
+                 video_frequency :int = 101, attacker :bool = True, defender :bool = False,
                  save_dir :str = None, attacker_load_path : str = None, defender_load_path : str = None,
                  dqn_config: DQNConfig = None,
                  checkpoint_freq : int = 100000, random_seed: int = 0):

@@ -42,7 +42,7 @@ def default_config() -> ClientConfig:
                                   video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=20001,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/gifs",
                                   eval_frequency=1000, attacker=False, defender=True,
-                                  save_dir=default_output_dir() + "/data")
+                                  save_dir=default_output_dir() + "/data", video_frequency=101)
     env_name = "idsgame-maximal_attack-v7"
     client_config = ClientConfig(env_name=env_name, defender_type=AgentType.TABULAR_Q_AGENT.value,
                                  mode=RunnerMode.TRAIN_DEFENDER.value,
