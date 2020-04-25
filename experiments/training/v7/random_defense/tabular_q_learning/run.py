@@ -109,9 +109,9 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
     :return: (train_csv_path, eval_csv_path)
     """
     if configpath is not None and not noconfig:
-        if not os.path.exists(args.configpath):
+        if not os.path.exists(configpath):
             write_default_config()
-        config = util.read_config(args.configpath)
+        config = util.read_config(configpath)
     else:
         config = default_config()
     time_str = str(time.time())

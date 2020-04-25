@@ -177,6 +177,3 @@ if __name__ == '__main__':
                 plot_average_results(experiment_title, config, eval_csv_paths, train_csv_paths)
             except Exception as e:
                 print("Error when trying to plot summary: " + str(e))
-
-
-

@@ -98,7 +98,7 @@ def plot_average_results(experiment_title :str, config: ClientConfig, eval_csv_p
                                                 config.output_dir)
 
 
-def run_experiment(configpath: str, random_seed: int, noconfig: bool):
+def run_experiment(configpath: str, random_seed: int,  noconfig: bool):
     """
     Runs one experiment and saves results and plots
 

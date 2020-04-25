@@ -96,7 +96,7 @@ if __name__ == '__main__':
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir)
-    logger = util.setup_logger("tabular_q_learning_vs_random_defense-v0", config.output_dir + "/logs/",
+    logger = util.setup_logger("dqn_vs_random_defense-v0", config.output_dir + "/logs/",
                                time_str=time_str)
     config.logger = logger
     config.q_agent_config.logger = logger

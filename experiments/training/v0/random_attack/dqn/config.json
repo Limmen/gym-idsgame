@@ -6,7 +6,7 @@
     "initial_state_path": null,
     "logger": null,
     "mode": 1,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_attack/dqn",
+    "output_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v0/random_attack/dqn",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
         "alpha": 0.0001,
@@ -32,7 +32,7 @@
             "replay_start_size": 100,
             "target_network_update_freq": 100,
             "tensorboard": true,
-            "tensorboard_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_attack/dqn/tensorboard"
+            "tensorboard_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v0/random_attack/dqn/results/tensorboard"
         },
         "epsilon": 1,
         "epsilon_decay": 0.999,
@@ -42,20 +42,29 @@
         "eval_render": false,
         "eval_sleep": 0.9,
         "gamma": 0.9,
-        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_attack/dqn/gifs",
+        "gif_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v0/random_attack/dqn/results/gifs",
         "gifs": true,
         "logger": null,
         "min_epsilon": 0.01,
         "num_episodes": 5000,
         "py/object": "gym_idsgame.agents.q_learning.q_agent_config.QAgentConfig",
+        "random_seed": 0,
         "render": false,
-        "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_attack/dqn/data",
+        "save_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v0/random_attack/dqn/results/data",
         "train_log_frequency": 1,
         "video": true,
-        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v0/random_attack/dqn/videos",
+        "video_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v0/random_attack/dqn/results/videos",
         "video_fps": 5,
         "video_frequency": 101
     },
+    "random_seeds": [
+        0,
+        999,
+        299,
+        399,
+        499
+    ],
+    "run_many": true,
     "simulation_config": null,
     "title": "RandomAttacker vs TrainingDQNAgent"
 }

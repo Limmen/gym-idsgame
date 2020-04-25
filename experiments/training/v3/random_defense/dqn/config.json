@@ -6,13 +6,15 @@
     "initial_state_path": null,
     "logger": null,
     "mode": 0,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v3/random_defense/dqn",
+    "output_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v3/random_defense/dqn",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
         "alpha": 1e-05,
         "attacker": true,
+        "attacker_load_path": null,
         "checkpoint_freq": 1000,
         "defender": false,
+        "defender_load_path": null,
         "dqn_config": {
             "batch_size": 32,
             "gpu": true,
@@ -30,7 +32,7 @@
             "replay_start_size": 1000,
             "target_network_update_freq": 1000,
             "tensorboard": true,
-            "tensorboard_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v3/random_defense/dqn/tensorboard"
+            "tensorboard_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v3/random_defense/dqn/results/tensorboard"
         },
         "epsilon": 1,
         "epsilon_decay": 0.999,
@@ -40,21 +42,29 @@
         "eval_render": false,
         "eval_sleep": 0.9,
         "gamma": 0.99,
-        "gif_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v3/random_defense/dqn/gifs",
+        "gif_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v3/random_defense/dqn/results/gifs",
         "gifs": true,
-        "load_path": null,
         "logger": null,
         "min_epsilon": 0.05,
         "num_episodes": 10000,
         "py/object": "gym_idsgame.agents.q_learning.q_agent_config.QAgentConfig",
+        "random_seed": 0,
         "render": false,
-        "save_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v3/random_defense/dqn/data",
+        "save_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v3/random_defense/dqn/results/data",
         "train_log_frequency": 100,
         "video": true,
-        "video_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/training/v3/random_defense/dqn/videos",
+        "video_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v3/random_defense/dqn/results/videos",
         "video_fps": 5,
         "video_frequency": 101
     },
+    "random_seeds": [
+        0,
+        999,
+        299,
+        399,
+        499
+    ],
+    "run_many": true,
     "simulation_config": null,
     "title": "TrainingDQNAgent vs RandomDefender"
 }

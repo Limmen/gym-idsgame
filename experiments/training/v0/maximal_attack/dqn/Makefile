@@ -9,6 +9,9 @@ plots:
 run_server: run.py run_server.sh
 	./run_server.sh
 
+run_server_no_config: run.py run_server_no_config.sh
+	./run_server_no_config.sh
+
 tensorboard:
 	tensorboard --logdir=./tensorboard
 
