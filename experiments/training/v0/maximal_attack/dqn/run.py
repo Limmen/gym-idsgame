@@ -43,7 +43,7 @@ def default_config() -> ClientConfig:
                            replay_start_size=100, batch_size=32, target_network_update_freq=100,
                            gpu=True, tensorboard=True, tensorboard_dir=default_output_dir() + "/results/tensorboard",
                            loss_fn="Huber", optimizer="Adam", lr_exp_decay=True, lr_decay_rate=0.999)
-    q_agent_config = QAgentConfig(gamma=0.9, alpha=0.0001, epsilon=1, render=False, eval_sleep=0.9,
+    q_agent_config = QAgentConfig(gamma=0.999, alpha=0.0001, epsilon=1, render=False, eval_sleep=0.9,
                                   min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
                                   epsilon_decay=0.999, video=True, eval_log_frequency=1,
                                   video_fps=5, video_dir=default_output_dir() + "/results/videos", num_episodes=5000,

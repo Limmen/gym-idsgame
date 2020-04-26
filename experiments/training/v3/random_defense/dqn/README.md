@@ -114,7 +114,7 @@ dqn_config = DQNConfig(input_dim=88, output_dim=80, hidden_dim=64, replay_memory
                        replay_start_size=1000, batch_size=32, target_network_update_freq=1000,
                        gpu=True, tensorboard=True, tensorboard_dir=default_output_dir() + "/tensorboard",
                        loss_fn="Huber", optimizer="Adam", lr_exp_decay=True, lr_decay_rate=0.9999)
-q_agent_config = QAgentConfig(gamma=0.99, alpha=0.00001, epsilon=1, render=False, eval_sleep=0.9,
+q_agent_config = QAgentConfig(gamma=0.999, alpha=0.00001, epsilon=1, render=False, eval_sleep=0.9,
                               min_epsilon=0.05, eval_episodes=100, train_log_frequency=100,
                               epsilon_decay=0.999, video=True, eval_log_frequency=1,
                               video_fps=5, video_dir=default_output_dir() + "/videos", num_episodes=10000,
