@@ -134,7 +134,7 @@ def plot_all(train_df, eval_df, eval_step, a_state_values, file_name):
     ax[1][0].set_ylabel("$\mathbb{P}[Hacked]$")
     ax[1][0].set_title("Likelihood of Successful Hack (Train)")
 
-    ax[1][0].set_ylim(0, 1)
+    #ax[1][0].set_ylim(0, 1)
 
     # set the grid on
     ax[1][0].grid('on')
@@ -169,7 +169,7 @@ def plot_all(train_df, eval_df, eval_step, a_state_values, file_name):
     ax[1][1].set_ylabel("$\mathbb{P}[Hacked]$")
     ax[1][1].set_title("Likelihood of Successful Hack (Eval)")
 
-    ax[1][1].set_ylim(0, 1)
+    #ax[1][1].set_ylim(0, 1)
 
     # set the grid on
     ax[1][1].grid('on')
@@ -389,7 +389,7 @@ def two_line_plot(x_1: np.ndarray, y_1: np.ndarray, x_2: np.ndarray, y_2: np.nda
     ax.errorbar(x_2, y_2, yerr=None, ls='--', color='#f9a65a', label=line2_label)
 
     ax.set_xlim(xlims)
-    ax.set_ylim(ylims)
+    #ax.set_ylim(ylims)
 
     ax.set_title(title)
     ax.set_xlabel(xlabel)
@@ -448,7 +448,7 @@ def simple_line_plot(x: np.ndarray, y: np.ndarray, title: str = "Test", xlabel: 
         ax.errorbar(x_smooth, smooth(x_smooth), yerr=None, color="black", ls='-', ecolor='black')
 
     ax.set_xlim(xlims)
-    ax.set_ylim(ylims)
+    #ax.set_ylim(ylims)
 
     ax.set_title(title)
     ax.set_xlabel(xlabel)
@@ -508,7 +508,7 @@ def probability_plot(x: np.ndarray, y: np.ndarray, title: str = "Test", xlabel: 
     ax.set_title(title)
 
     ax.set_xlim(xlims)
-    ax.set_ylim(ylims)
+    #ax.set_ylim(ylims)
 
     # set the grid on
     ax.grid('on')
@@ -590,7 +590,7 @@ def two_line_plot_w_shades(x_1: np.ndarray, y_1: np.ndarray,
     ax.fill_between(x_2, y_2 - stds_2, y_2 + stds_2, alpha=0.35, color='#f9a65a')
 
     ax.set_xlim(xlims)
-    ax.set_ylim(ylims)
+    #ax.set_ylim(ylims)
 
     ax.set_title(title)
     ax.set_xlabel(xlabel)
@@ -674,7 +674,7 @@ def three_line_plot_w_shades(x_1: np.ndarray, y_1: np.ndarray,
     ax.fill_between(x_3, y_3 - stds_3, y_3 + stds_3, alpha=0.35, color='#9e66ab')
 
     ax.set_xlim(xlims)
-    ax.set_ylim(ylims)
+    # ax.set_ylim(ylims)
 
     ax.set_title(title)
     ax.set_xlabel(xlabel)
@@ -741,7 +741,7 @@ def one_line_plot_w_shades(x_1: np.ndarray, y_1: np.ndarray,
     ax.fill_between(x_1, y_1 - stds_1, y_1 + stds_1, alpha=0.35, color="#599ad3")
 
     ax.set_xlim(xlims)
-    ax.set_ylim(ylims)
+    # ax.set_ylim(ylims)
 
     ax.set_title(title)
     ax.set_xlabel(xlabel)
@@ -810,7 +810,7 @@ def five_line_plot_w_shades(x_1: np.ndarray, y_1: np.ndarray,
     ax.fill_between(x_5, y_5 - stds_5, y_5 + stds_5, alpha=0.35, color='r')
 
     ax.set_xlim(xlims)
-    ax.set_ylim(ylims)
+    # ax.set_ylim(ylims)
 
     ax.set_title(title)
     ax.set_xlabel(xlabel)
@@ -917,7 +917,7 @@ def plot_all_avg_summary_1(x_1_1, y_1_1, x_1_2, y_1_2, x_1_3, y_1_3, x_1_4, y_1_
     hack_prob_ax1.fill_between(x_1_5, y_1_5 - std_1_5, y_1_5 + std_1_5, alpha=0.35, color='r')
 
     hack_prob_ax1.set_xlim(xlims)
-    hack_prob_ax1.set_ylim(ylims)
+    # hack_prob_ax1.set_ylim(ylims)
 
     hack_prob_ax1.set_title(title_1)
     hack_prob_ax1.set_xlabel(xlabel_1)
@@ -950,7 +950,7 @@ def plot_all_avg_summary_1(x_1_1, y_1_1, x_1_2, y_1_2, x_1_3, y_1_3, x_1_4, y_1_
     hack_prob_ax2.fill_between(x_2_5, y_2_5 - std_2_5, y_2_5 + std_2_5, alpha=0.35, color='r')
 
     hack_prob_ax2.set_xlim(xlims)
-    hack_prob_ax2.set_ylim(ylims)
+    # hack_prob_ax2.set_ylim(ylims)
 
     hack_prob_ax2.set_title(title_2)
     hack_prob_ax2.set_xlabel(xlabel_2)
@@ -991,7 +991,7 @@ def plot_all_avg_summary_1(x_1_1, y_1_1, x_1_2, y_1_2, x_1_3, y_1_3, x_1_4, y_1_
     hack_prob_ax3.fill_between(x_3_5, y_3_5 - std_3_5, y_3_5 + std_3_5, alpha=0.35, color='r')
 
     hack_prob_ax3.set_xlim(xlims)
-    hack_prob_ax3.set_ylim(ylims)
+    # hack_prob_ax3.set_ylim(ylims)
 
     hack_prob_ax3.set_title(title_3)
     hack_prob_ax3.set_xlabel(xlabel_3)
@@ -1035,7 +1035,7 @@ def plot_all_avg_summary_1(x_1_1, y_1_1, x_1_2, y_1_2, x_1_3, y_1_3, x_1_4, y_1_
         ax[1][0].fill_between(x_4_3, y_4_3 - std_4_3, y_4_3 + std_4_3, alpha=0.35, color='r')
 
         ax[1][0].set_xlim(xlims)
-        ax[1][0].set_ylim(ylims)
+        # ax[1][0].set_ylim(ylims)
 
         ax[1][0].set_title(title_4)
         ax[1][0].set_xlabel(xlabel_4)
@@ -1062,7 +1062,7 @@ def plot_all_avg_summary_1(x_1_1, y_1_1, x_1_2, y_1_2, x_1_3, y_1_3, x_1_4, y_1_
         ax[1][1].fill_between(x_5_3, y_5_3 - std_5_3, y_5_3 + std_5_3, alpha=0.35, color='r')
 
         ax[1][1].set_xlim(xlims)
-        ax[1][1].set_ylim(ylims)
+        # ax[1][1].set_ylim(ylims)
 
         ax[1][1].set_title(title_5)
         ax[1][1].set_xlabel(xlabel_5)
@@ -1107,9 +1107,30 @@ def plot_all_avg_summary_2(x_1_1, y_1_1, x_1_2, y_1_2, x_1_3, y_1_3, x_1_4, y_1_
                            ):
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts}')
-    fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(11, 2.75))
+    fig, ax = plt.subplots(nrows=1, ncols=3, figsize=(9, 3))
     #gs1 = gridspec.GridSpec(1, 4)
     #gs1.update(wspace=0.005, hspace=0.05)
+
+    if len(x_1_1) / markevery_1_1 > 15:
+        markevery_1_1 = 3
+        markevery_1_2 = 3
+        markevery_1_3 = 3
+        markevery_1_4 = 3
+        markevery_1_5 = 3
+
+    if len(x_2_1) / markevery_2_1 > 15:
+        markevery_2_1 = 3
+        markevery_2_2 = 3
+        markevery_2_3 = 3
+        markevery_2_4 = 3
+        markevery_2_5 = 3
+
+    if len(x_3_1) / markevery_3_1 > 15:
+        markevery_3_1 = 3
+        markevery_3_2 = 3
+        markevery_3_3 = 3
+        markevery_3_4 = 3
+        markevery_3_5 = 3
 
     # Plot avg hack_probability train
     xlims = (min(min(x_1_1), min(x_1_2), min(x_1_3), min(x_1_4), min(x_1_5)),
@@ -1133,7 +1154,7 @@ def plot_all_avg_summary_2(x_1_1, y_1_1, x_1_2, y_1_2, x_1_3, y_1_3, x_1_4, y_1_
     ax[0].fill_between(x_1_5, y_1_5 - std_1_5, y_1_5 + std_1_5, alpha=0.35, color='r')
 
     ax[0].set_xlim(xlims)
-    ax[0].set_ylim(ylims)
+    # ax[0].set_ylim(ylims)
 
     ax[0].set_title(title_1)
     ax[0].set_xlabel(xlabel_1)
@@ -1188,7 +1209,7 @@ def plot_all_avg_summary_2(x_1_1, y_1_1, x_1_2, y_1_2, x_1_3, y_1_3, x_1_4, y_1_
     ax[1].fill_between(x_2_5, y_2_5 - std_2_5, y_2_5 + std_2_5, alpha=0.35, color='r')
 
     ax[1].set_xlim(xlims)
-    ax[1].set_ylim(ylims)
+    # ax[1].set_ylim(ylims)
 
     ax[1].set_title(title_2)
     ax[1].set_xlabel(xlabel_2)
@@ -1216,10 +1237,6 @@ def plot_all_avg_summary_2(x_1_1, y_1_1, x_1_2, y_1_2, x_1_3, y_1_3, x_1_4, y_1_
     ax[1].set_position([box.x0, box.y0 + box.height * 0.03,
                         box.width, box.height * 0.9])
 
-    # Put a legend below current axis
-    # ax[1].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
-    #              fancybox=True, shadow=True, ncol=2)
-
     # Plot attacker cumulative reward
     xlims = (min(min(x_3_1), min(x_3_2), min(x_3_3), min(x_3_4), min(x_3_5)),
              max(max(x_3_1), max(x_3_2), max(x_3_3), max(x_3_4), max(x_3_5)))
@@ -1242,7 +1259,7 @@ def plot_all_avg_summary_2(x_1_1, y_1_1, x_1_2, y_1_2, x_1_3, y_1_3, x_1_4, y_1_
     ax[2].fill_between(x_3_5, y_3_5 - std_3_5, y_3_5 + std_3_5, alpha=0.35, color='r')
 
     ax[2].set_xlim(xlims)
-    ax[2].set_ylim(ylims)
+    # ax[2].set_ylim(ylims)
 
     ax[2].set_title(title_3)
     ax[2].set_xlabel(xlabel_3)
@@ -1250,97 +1267,18 @@ def plot_all_avg_summary_2(x_1_1, y_1_1, x_1_2, y_1_2, x_1_3, y_1_3, x_1_4, y_1_
     # set the grid on
     ax[2].grid('on')
 
-    # tweak the axis labels
-    xlab = ax[2].xaxis.get_label()
-    ylab = ax[2].yaxis.get_label()
-
-    ax[2].yaxis.labelpad = -5
-
-    # xlab.set_style('italic')
-    #xlab.set_size(10)
-    # ylab.set_style('italic')
-    #ylab.set_size(10)
+    #ax[2].yaxis.labelpad = -5
 
     # change the color of the top and right spines to opaque gray
     ax[2].spines['right'].set_color((.8, .8, .8))
     ax[2].spines['top'].set_color((.8, .8, .8))
 
-    # plt.legend(loc=legend_loc)
 
-    # Shrink current axis's height by 10% on the bottom
-    box = ax[2].get_position()
-    ax[2].set_position([box.x0, box.y0 + box.height * 0.03,
-                        box.width, box.height * 0.9])
-
-    ax[2].get_yaxis().set_major_formatter(tkr.FuncFormatter(lambda x, p: "${:1.0f}K$".format(x * 1e-3)))
-
-    # Put a legend below current axis
-    # ax[2].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
-    #              fancybox=True, shadow=True, ncol=2)
-
-    #handles, labels = ax.get_legend_handles_labels()
-    lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
-    lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
-    #fig.legend(handles, labels, loc='upper center')
-    ax[1].legend(loc='upper center', bbox_to_anchor=(0.5, -0.35), fancybox=True, shadow=True, ncol=3)
-
-    # # Plot defender cumulative reward
-    # xlims = (min(min(x_4_1), min(x_4_2), min(x_4_3), min(x_4_4), min(x_4_5)),
-    #          max(max(x_4_1), max(x_4_2), max(x_4_3), max(x_4_4), max(x_4_5)))
-    # ylims = (min(min(y_4_1), min(y_4_2), min(y_4_3), min(y_4_4), min(y_4_5)),
-    #          max(max(y_4_1), max(y_4_2), max(y_4_3), max(y_4_4), max(y_4_5)))
-    #
-    # ax[3].plot(x_4_1, y_4_1, label=line_4_1_label, marker="s", ls='-', color="#599ad3", markevery=markevery_4_1)
-    # ax[3].fill_between(x_4_1, y_4_1 - std_4_1, y_4_1 + std_4_1, alpha=0.35, color="#599ad3")
-    #
-    # ax[3].plot(x_4_2, y_4_2, label=line_4_2_label, marker="o", ls='-', color='#f9a65a', markevery=markevery_4_2)
-    # ax[3].fill_between(x_4_2, y_4_2 - std_4_2, y_4_2 + std_4_2, alpha=0.35, color='#f9a65a')
-    #
-    # ax[3].plot(x_4_3, y_4_3, label=line_4_3_label, marker="p", ls='-', color="#9e66ab", markevery=markevery_4_3)
-    # ax[3].fill_between(x_4_3, y_4_3 - std_4_3, y_4_3 + std_4_3, alpha=0.35, color="#9e66ab")
-    #
-    # ax[3].plot(x_4_4, y_4_4, label=line_4_4_label, marker="d", ls='-', color='g', markevery=markevery_4_4)
-    # ax[3].fill_between(x_4_4, y_4_4 - std_4_4, y_4_4 + std_4_4, alpha=0.35, color='g')
-    #
-    # ax[3].plot(x_4_5, y_4_5, label=line_4_5_label, marker="^", ls='-', color='r', markevery=markevery_4_5)
-    # ax[3].fill_between(x_4_5, y_4_5 - std_4_5, y_4_5 + std_4_5, alpha=0.35, color='r')
-    #
-    # ax[3].set_xlim(xlims)
-    # ax[3].set_ylim(ylims)
-    #
-    # ax[3].set_title(title_4)
-    # ax[3].set_xlabel(xlabel_4)
-    # ax[3].set_ylabel(ylabel_4)
-    # # set the grid on
-    # ax[3].grid('on')
-    #
-    # # tweak the axis labels
-    # xlab = ax[3].xaxis.get_label()
-    # ylab = ax[3].yaxis.get_label()
-    #
-    # # xlab.set_style('italic')
-    # #xlab.set_size(10)
-    # # ylab.set_style('italic')
-    # #ylab.set_size(10)
-    #
-    # # change the color of the top and right spines to opaque gray
-    # ax[3].spines['right'].set_color((.8, .8, .8))
-    # ax[3].spines['top'].set_color((.8, .8, .8))
-    #
-    # # plt.legend(loc=legend_loc)
-    #
-    # # Shrink current axis's height by 10% on the bottom
-    # box = ax[3].get_position()
-    # ax[3].set_position([box.x0, box.y0 + box.height * 0.03,
-    #                     box.width, box.height * 0.9])
-    # ax[3].get_yaxis().set_major_formatter(tkr.FuncFormatter(lambda x, p: "${:1.0f}K$".format(x*1e-3)))
-
-    # Put a legend below current axis
-    # ax[3].legend(loc='upper center', bbox_to_anchor=(0.5, -0.25),
-    #              fancybox=True, shadow=True, ncol=2)
+    ax[1].legend(loc='upper center', bbox_to_anchor=(0.5, -0.22), fancybox=True, shadow=True, ncol=2)
 
     fig.tight_layout()
     plt.subplots_adjust(wspace=0.2, hspace=0)
+    fig.subplots_adjust(bottom=0.37)
     fig.savefig(file_name + ".png", format="png", dpi=600)
     fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
 
@@ -1410,28 +1348,94 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     #gs1 = gridspec.GridSpec(1, 4)
     #gs1.update(wspace=0.005, hspace=0.05)
 
+    if len(x_1_1_v0) / markevery_1_1_v0 > 15:
+        markevery_1_1_v0 = 2
+        markevery_1_2_v0 = 2
+        markevery_1_3_v0 = 2
+        markevery_1_4_v0 = 2
+        markevery_1_5_v0 = 2
+
+    if len(x_1_1_v2) / markevery_1_1_v2 > 15:
+        markevery_1_1_v2 = 2
+        markevery_1_2_v2 = 2
+        markevery_1_3_v2 = 2
+        markevery_1_4_v2 = 2
+        markevery_1_5_v2 = 2
+
+    if len(x_1_1_v3) / markevery_1_1_v3 > 15:
+        markevery_1_1_v3 = 2
+        markevery_1_2_v3 = 2
+        markevery_1_3_v3 = 2
+        markevery_1_4_v3 = 2
+        markevery_1_5_v3 = 2
+
+
+    # 2
+    if len(x_2_1_v0) / markevery_2_1_v0 > 15:
+        markevery_2_1_v0 = 2
+        markevery_2_2_v0 = 2
+        markevery_2_3_v0 = 2
+        markevery_2_4_v0 = 2
+        markevery_2_5_v0 = 2
+
+    if len(x_2_1_v2) / markevery_2_1_v2 > 15:
+        markevery_2_1_v2 = 2
+        markevery_2_2_v2 = 2
+        markevery_2_3_v2 = 2
+        markevery_2_4_v2 = 2
+        markevery_2_5_v2 = 2
+
+    if len(x_2_1_v3) / markevery_2_1_v3 > 15:
+        markevery_2_1_v3 = 2
+        markevery_2_2_v3 = 2
+        markevery_2_3_v3 = 2
+        markevery_2_4_v3 = 2
+        markevery_2_5_v3 = 2
+
+    # 3
+    if len(x_3_1_v0) / markevery_3_1_v0 > 15:
+        markevery_3_1_v0 = 2
+        markevery_3_2_v0 = 2
+        markevery_3_3_v0 = 2
+        markevery_3_4_v0 = 2
+        markevery_3_5_v0 = 2
+
+    if len(x_3_1_v2) / markevery_3_1_v2 > 15:
+        markevery_3_1_v2 = 2
+        markevery_3_2_v2 = 2
+        markevery_3_3_v2 = 2
+        markevery_3_4_v2 = 2
+        markevery_3_5_v2 = 2
+
+    if len(x_3_1_v3) / markevery_3_1_v3 > 15:
+        markevery_3_1_v3 = 2
+        markevery_3_2_v3 = 2
+        markevery_3_3_v3 = 2
+        markevery_3_4_v3 = 2
+        markevery_3_5_v3 = 2
+
     # Plot avg hack_probability train
     xlims = (min(min(x_1_1_v0), min(x_1_2_v0), min(x_1_3_v0), min(x_1_4_v0), min(x_1_5_v0)),
              max(max(x_1_1_v0), max(x_1_2_v0), max(x_1_3_v0), max(x_1_4_v0), max(x_1_5_v0)))
     ylims = (0, 1)
 
     ax[0][0].plot(x_1_1_v0, y_1_1_v0, label=line_1_1_label_v0, marker="s", ls='-', color="#599ad3", markevery=markevery_1_1_v0)
-    ax[0][0].fill_between(x_1_1_v0, y_1_1_v0 - std_1_1_v0, y_1_1_v0 + std_1_1_v0, alpha=0.35, color="#599ad3")
+    ax[0][0].fill_between(x_1_1_v0, np.maximum(y_1_1_v0 - std_1_1_v0, np.zeros(len(y_1_1_v0))), y_1_1_v0 + std_1_1_v0, alpha=0.35, color="#599ad3")
 
     ax[0][0].plot(x_1_2_v0, y_1_2_v0, label=line_1_2_label_v0, marker="o", ls='-', color='#f9a65a', markevery=markevery_1_2_v0)
-    ax[0][0].fill_between(x_1_2_v0, y_1_2_v0 - std_1_2_v0, y_1_2_v0 + std_1_2_v0, alpha=0.35, color='#f9a65a')
+    ax[0][0].fill_between(x_1_2_v0, np.maximum(y_1_2_v0 - std_1_2_v0, np.zeros(len(y_1_2_v0))), y_1_2_v0 + std_1_2_v0, alpha=0.35, color='#f9a65a')
 
     ax[0][0].plot(x_1_3_v0, y_1_3_v0, label=line_1_3_label_v0, marker="p", ls='-', color="#9e66ab", markevery=markevery_1_3_v0)
-    ax[0][0].fill_between(x_1_3_v0, y_1_3_v0 - std_1_3_v0, y_1_3_v0 + std_1_3_v0, alpha=0.35, color="#9e66ab")
+    ax[0][0].fill_between(x_1_3_v0, np.maximum(y_1_3_v0 - std_1_3_v0, np.zeros(len(y_1_3_v0))), y_1_3_v0 + std_1_3_v0, alpha=0.35, color="#9e66ab")
 
     ax[0][0].plot(x_1_4_v0, y_1_4_v0, label=line_1_4_label_v0, marker="d", ls='-', color='g', markevery=markevery_1_4_v0)
-    ax[0][0].fill_between(x_1_4_v0, y_1_4_v0 - std_1_4_v0, y_1_4_v0 + std_1_4_v0, alpha=0.35, color='g')
+    ax[0][0].fill_between(x_1_4_v0, np.maximum(y_1_4_v0 - std_1_4_v0, np.zeros(len(y_1_4_v0))), y_1_4_v0 + std_1_4_v0, alpha=0.35, color='g')
 
     ax[0][0].plot(x_1_5_v0, y_1_5_v0, label=line_1_5_label_v0, marker="^", ls='-', color='r', markevery=markevery_1_5_v0)
-    ax[0][0].fill_between(x_1_5_v0, y_1_5_v0 - std_1_5_v0, y_1_5_v0 + std_1_5_v0, alpha=0.35, color='r')
+    ax[0][0].fill_between(x_1_5_v0, np.maximum(y_1_5_v0 - std_1_5_v0, np.zeros(len(y_1_5_v0))), y_1_5_v0 + std_1_5_v0, alpha=0.35, color='r')
 
     ax[0][0].set_xlim(xlims)
-    ax[0][0].set_ylim(ylims)
+    #ax[0][0].set_ylim(ylims)
 
     ax[0][0].set_title(title_1_v0)
     ax[0][0].set_xlabel(xlabel_1_v0)
@@ -1470,22 +1474,22 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     ylims = (0, 1)
 
     ax[0][1].plot(x_2_1_v0, y_2_1_v0, label=line_2_1_label_v0, marker="s", ls='-', color="#599ad3", markevery=markevery_2_1_v0)
-    ax[0][1].fill_between(x_2_1_v0, y_2_1_v0 - std_2_1_v0, y_2_1_v0 + std_2_1_v0, alpha=0.35, color="#599ad3")
+    ax[0][1].fill_between(x_2_1_v0, np.maximum(y_2_1_v0 - std_2_1_v0, np.zeros(len(y_2_1_v0))), y_2_1_v0 + std_2_1_v0, alpha=0.35, color="#599ad3")
 
     ax[0][1].plot(x_2_2_v0, y_2_2_v0, label=line_2_2_label_v0, marker="o", ls='-', color='#f9a65a', markevery=markevery_2_2_v0)
-    ax[0][1].fill_between(x_2_2_v0, y_2_2_v0 - std_2_2_v0, y_2_2_v0 + std_2_2_v0, alpha=0.35, color='#f9a65a')
+    ax[0][1].fill_between(x_2_2_v0, np.maximum(y_2_2_v0 - std_2_2_v0, np.zeros(len(y_2_2_v0))), y_2_2_v0 + std_2_2_v0, alpha=0.35, color='#f9a65a')
 
     ax[0][1].plot(x_2_3_v0, y_2_3_v0, label=line_2_3_label_v0, marker="p", ls='-', color="#9e66ab", markevery=markevery_2_3_v0)
-    ax[0][1].fill_between(x_2_3_v0, y_2_3_v0 - std_2_3_v0, y_2_3_v0 + std_2_3_v0, alpha=0.35, color="#9e66ab")
+    ax[0][1].fill_between(x_2_3_v0, np.maximum(y_2_3_v0 - std_2_3_v0, np.zeros(len(y_2_3_v0))), y_2_3_v0 + std_2_3_v0, alpha=0.35, color="#9e66ab")
 
     ax[0][1].plot(x_2_4_v0, y_2_4_v0, label=line_2_4_label_v0, marker="d", ls='-', color='g', markevery=markevery_2_4_v0)
-    ax[0][1].fill_between(x_2_4_v0, y_2_4_v0 - std_2_4_v0, y_2_4_v0 + std_2_4_v0, alpha=0.35, color='g')
+    ax[0][1].fill_between(x_2_4_v0, np.maximum(y_2_4_v0 - std_2_4_v0, np.zeros(len(y_2_4_v0))), y_2_4_v0 + std_2_4_v0, alpha=0.35, color='g')
 
     ax[0][1].plot(x_2_5_v0, y_2_5_v0, label=line_2_5_label_v0, marker="^", ls='-', color='r', markevery=markevery_2_5_v0)
-    ax[0][1].fill_between(x_2_5_v0, y_2_5_v0 - std_2_5_v0, y_2_5_v0 + std_2_5_v0, alpha=0.35, color='r')
+    ax[0][1].fill_between(x_2_5_v0, np.maximum(y_2_5_v0 - std_2_5_v0, np.zeros(len(y_2_5_v0))), y_2_5_v0 + std_2_5_v0, alpha=0.35, color='r')
 
     ax[0][1].set_xlim(xlims)
-    ax[0][1].set_ylim(ylims)
+    #ax[0][1].set_ylim(ylims)
 
     ax[0][1].set_title(title_2_v0)
     ax[0][1].set_xlabel(xlabel_2_v0)
@@ -1537,7 +1541,7 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     ax[0][2].fill_between(x_3_5_v0, y_3_5_v0 - std_3_5_v0, y_3_5_v0 + std_3_5_v0, alpha=0.35, color='r')
 
     ax[0][2].set_xlim(xlims)
-    ax[0][2].set_ylim(ylims)
+    #ax[0][2].set_ylim(ylims)
 
     ax[0][2].set_title(title_3_v0)
     ax[0][2].set_xlabel(xlabel_3_v0)
@@ -1578,26 +1582,26 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
 
     ax[1][0].plot(x_1_1_v2, y_1_1_v2, label=line_1_1_label_v2, marker="s", ls='-', color="#599ad3",
                   markevery=markevery_1_1_v2)
-    ax[1][0].fill_between(x_1_1_v2, y_1_1_v2 - std_1_1_v2, y_1_1_v2 + std_1_1_v2, alpha=0.35, color="#599ad3")
+    ax[1][0].fill_between(x_1_1_v2, np.maximum(y_1_1_v2 - std_1_1_v2, np.zeros(len(y_1_1_v2))), y_1_1_v2 + std_1_1_v2, alpha=0.35, color="#599ad3")
 
     ax[1][0].plot(x_1_2_v2, y_1_2_v2, label=line_1_2_label_v2, marker="o", ls='-', color='#f9a65a',
                   markevery=markevery_1_2_v2)
-    ax[1][0].fill_between(x_1_2_v2, y_1_2_v2 - std_1_2_v2, y_1_2_v2 + std_1_2_v2, alpha=0.35, color='#f9a65a')
+    ax[1][0].fill_between(x_1_2_v2, np.maximum(y_1_2_v2 - std_1_2_v2, np.zeros(len(y_1_2_v2))), y_1_2_v2 + std_1_2_v2, alpha=0.35, color='#f9a65a')
 
     ax[1][0].plot(x_1_3_v2, y_1_3_v2, label=line_1_3_label_v2, marker="p", ls='-', color="#9e66ab",
                   markevery=markevery_1_3_v2)
-    ax[1][0].fill_between(x_1_3_v2, y_1_3_v2 - std_1_3_v2, y_1_3_v2 + std_1_3_v2, alpha=0.35, color="#9e66ab")
+    ax[1][0].fill_between(x_1_3_v2, np.maximum(y_1_3_v2 - std_1_3_v2, np.zeros(len(y_1_3_v2))), y_1_3_v2 + std_1_3_v2, alpha=0.35, color="#9e66ab")
 
     ax[1][0].plot(x_1_4_v2, y_1_4_v2, label=line_1_4_label_v2, marker="d", ls='-', color='g',
                   markevery=markevery_1_4_v2)
-    ax[1][0].fill_between(x_1_4_v2, y_1_4_v2 - std_1_4_v2, y_1_4_v2 + std_1_4_v2, alpha=0.35, color='g')
+    ax[1][0].fill_between(x_1_4_v2, np.maximum(y_1_4_v2 - std_1_4_v2, np.zeros(len(y_1_4_v2))), y_1_4_v2 + std_1_4_v2, alpha=0.35, color='g')
 
     ax[1][0].plot(x_1_5_v2, y_1_5_v2, label=line_1_5_label_v2, marker="^", ls='-', color='r',
                   markevery=markevery_1_5_v2)
-    ax[1][0].fill_between(x_1_5_v2, y_1_5_v2 - std_1_5_v2, y_1_5_v2 + std_1_5_v2, alpha=0.35, color='r')
+    ax[1][0].fill_between(x_1_5_v2, np.maximum(y_1_5_v2 - std_1_5_v2, np.zeros(len(y_1_5_v2))), y_1_5_v2 + std_1_5_v2, alpha=0.35, color='r')
 
     ax[1][0].set_xlim(xlims)
-    ax[1][0].set_ylim(ylims)
+    #ax[1][0].set_ylim(ylims)
 
     ax[1][0].set_title(title_1_v2)
     ax[1][0].set_xlabel(xlabel_1_v2)
@@ -1621,26 +1625,26 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
 
     ax[1][1].plot(x_2_1_v2, y_2_1_v2, label=line_2_1_label_v2, marker="s", ls='-', color="#599ad3",
                   markevery=markevery_2_1_v2)
-    ax[1][1].fill_between(x_2_1_v2, y_2_1_v2 - std_2_1_v2, y_2_1_v2 + std_2_1_v2, alpha=0.35, color="#599ad3")
+    ax[1][1].fill_between(x_2_1_v2, np.maximum(y_2_1_v2 - std_2_1_v2, np.zeros(len(y_2_1_v2))), y_2_1_v2 + std_2_1_v2, alpha=0.35, color="#599ad3")
 
     ax[1][1].plot(x_2_2_v2, y_2_2_v2, label=line_2_2_label_v2, marker="o", ls='-', color='#f9a65a',
                   markevery=markevery_2_2_v2)
-    ax[1][1].fill_between(x_2_2_v2, y_2_2_v2 - std_2_2_v2, y_2_2_v2 + std_2_2_v2, alpha=0.35, color='#f9a65a')
+    ax[1][1].fill_between(x_2_2_v2, np.maximum(y_2_2_v2 - std_2_2_v2, np.zeros(len(y_2_2_v2))), y_2_2_v2 + std_2_2_v2, alpha=0.35, color='#f9a65a')
 
     ax[1][1].plot(x_2_3_v2, y_2_3_v2, label=line_2_3_label_v2, marker="p", ls='-', color="#9e66ab",
                   markevery=markevery_2_3_v2)
-    ax[1][1].fill_between(x_2_3_v2, y_2_3_v2 - std_2_3_v2, y_2_3_v2 + std_2_3_v2, alpha=0.35, color="#9e66ab")
+    ax[1][1].fill_between(x_2_3_v2, np.maximum(y_2_3_v2 - std_2_3_v2, np.zeros(len(y_2_3_v2))), y_2_3_v2 + std_2_3_v2, alpha=0.35, color="#9e66ab")
 
     ax[1][1].plot(x_2_4_v2, y_2_4_v2, label=line_2_4_label_v2, marker="d", ls='-', color='g',
                   markevery=markevery_2_4_v2)
-    ax[1][1].fill_between(x_2_4_v2, y_2_4_v2 - std_2_4_v2, y_2_4_v2 + std_2_4_v2, alpha=0.35, color='g')
+    ax[1][1].fill_between(x_2_4_v2, np.maximum(y_2_4_v2 - std_2_4_v2, np.zeros(len(y_2_4_v2))), y_2_4_v2 + std_2_4_v2, alpha=0.35, color='g')
 
     ax[1][1].plot(x_2_5_v2, y_2_5_v2, label=line_2_5_label_v2, marker="^", ls='-', color='r',
                   markevery=markevery_2_5_v2)
-    ax[1][1].fill_between(x_2_5_v2, y_2_5_v2 - std_2_5_v2, y_2_5_v2 + std_2_5_v2, alpha=0.35, color='r')
+    ax[1][1].fill_between(x_2_5_v2, np.maximum(y_2_5_v2 - std_2_5_v2, np.zeros(len(y_2_5_v2))), y_2_5_v2 + std_2_5_v2, alpha=0.35, color='r')
 
     ax[1][1].set_xlim(xlims)
-    ax[1][1].set_ylim(ylims)
+    #ax[1][1].set_ylim(ylims)
 
     ax[1][1].set_title(title_2_v2)
     ax[1][1].set_xlabel(xlabel_2_v2)
@@ -1660,11 +1664,6 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     # change the color of the top and right spines to opaque gray
     ax[1][1].spines['right'].set_color((.8, .8, .8))
     ax[1][1].spines['top'].set_color((.8, .8, .8))
-
-    # Shrink current axis's height by 10% on the bottom
-    box = ax[1][1].get_position()
-    ax[1][1].set_position([box.x0, box.y0 + box.height * 0.03,
-                           box.width, box.height * 0.9])
 
     # Plot attacker cumulative reward
     xlims = (min(min(x_3_1_v2), min(x_3_2_v2), min(x_3_3_v2), min(x_3_4_v2), min(x_3_5_v2)),
@@ -1693,7 +1692,7 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     ax[1][2].fill_between(x_3_5_v2, y_3_5_v2 - std_3_5_v2, y_3_5_v2 + std_3_5_v2, alpha=0.35, color='r')
 
     ax[1][2].set_xlim(xlims)
-    ax[1][2].set_ylim(ylims)
+    #ax[1][2].set_ylim(ylims)
 
     ax[1][2].set_title(title_3_v2)
     ax[1][2].set_xlabel(xlabel_3_v2)
@@ -1733,26 +1732,26 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
 
     ax[2][0].plot(x_1_1_v3, y_1_1_v3, label=line_1_1_label_v3, marker="s", ls='-', color="#599ad3",
                   markevery=markevery_1_1_v3)
-    ax[2][0].fill_between(x_1_1_v3, y_1_1_v3 - std_1_1_v3, y_1_1_v3 + std_1_1_v3, alpha=0.35, color="#599ad3")
+    ax[2][0].fill_between(x_1_1_v3, np.maximum(y_1_1_v3 - std_1_1_v3, np.zeros(len(y_1_1_v3))), y_1_1_v3 + std_1_1_v3, alpha=0.35, color="#599ad3")
 
     ax[2][0].plot(x_1_2_v3, y_1_2_v3, label=line_1_2_label_v3, marker="o", ls='-', color='#f9a65a',
                   markevery=markevery_1_2_v3)
-    ax[2][0].fill_between(x_1_2_v3, y_1_2_v3 - std_1_2_v3, y_1_2_v3 + std_1_2_v3, alpha=0.35, color='#f9a65a')
+    ax[2][0].fill_between(x_1_2_v3, np.maximum(y_1_2_v3 - std_1_2_v3, np.zeros(len(y_1_2_v3))), y_1_2_v3 + std_1_2_v3, alpha=0.35, color='#f9a65a')
 
     ax[2][0].plot(x_1_3_v3, y_1_3_v3, label=line_1_3_label_v3, marker="p", ls='-', color="#9e66ab",
                   markevery=markevery_1_3_v3)
-    ax[2][0].fill_between(x_1_3_v3, y_1_3_v3 - std_1_3_v3, y_1_3_v3 + std_1_3_v3, alpha=0.35, color="#9e66ab")
+    ax[2][0].fill_between(x_1_3_v3, np.maximum(y_1_3_v3 - std_1_3_v3, np.zeros(len(y_1_3_v3))), y_1_3_v3 + std_1_3_v3, alpha=0.35, color="#9e66ab")
 
     ax[2][0].plot(x_1_4_v3, y_1_4_v3, label=line_1_4_label_v3, marker="d", ls='-', color='g',
                   markevery=markevery_1_4_v3)
-    ax[2][0].fill_between(x_1_4_v3, y_1_4_v3 - std_1_4_v3, y_1_4_v3 + std_1_4_v3, alpha=0.35, color='g')
+    ax[2][0].fill_between(x_1_4_v3, np.maximum(y_1_4_v3 - std_1_4_v3, np.zeros(len(y_1_4_v3))), y_1_4_v3 + std_1_4_v3, alpha=0.35, color='g')
 
     ax[2][0].plot(x_1_5_v3, y_1_5_v3, label=line_1_5_label_v3, marker="^", ls='-', color='r',
                   markevery=markevery_1_5_v3)
-    ax[2][0].fill_between(x_1_5_v3, y_1_5_v3 - std_1_5_v3, y_1_5_v3 + std_1_5_v3, alpha=0.35, color='r')
+    ax[2][0].fill_between(x_1_5_v3, np.maximum(y_1_5_v3 - std_1_5_v3, np.zeros(len(y_1_5_v3))), y_1_5_v3 + std_1_5_v3, alpha=0.35, color='r')
 
     ax[2][0].set_xlim(xlims)
-    ax[2][0].set_ylim(ylims)
+    #ax[2][0].set_ylim(ylims)
 
     ax[2][0].set_title(title_1_v3)
     ax[2][0].set_xlabel(xlabel_1_v3)
@@ -1780,26 +1779,26 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
 
     ax[2][1].plot(x_2_1_v3, y_2_1_v3, label=line_2_1_label_v3, marker="s", ls='-', color="#599ad3",
                   markevery=markevery_2_1_v3)
-    ax[2][1].fill_between(x_2_1_v3, y_2_1_v3 - std_2_1_v3, y_2_1_v3 + std_2_1_v3, alpha=0.35, color="#599ad3")
+    ax[2][1].fill_between(x_2_1_v3, np.maximum(y_2_1_v3 - std_2_1_v3, np.zeros(len(y_2_1_v3))), y_2_1_v3 + std_2_1_v3, alpha=0.35, color="#599ad3")
 
     ax[2][1].plot(x_2_2_v3, y_2_2_v3, label=line_2_2_label_v3, marker="o", ls='-', color='#f9a65a',
                   markevery=markevery_2_2_v3)
-    ax[2][1].fill_between(x_2_2_v3, y_2_2_v3 - std_2_2_v3, y_2_2_v3 + std_2_2_v3, alpha=0.35, color='#f9a65a')
+    ax[2][1].fill_between(x_2_2_v3, np.maximum(y_2_2_v3 - std_2_2_v3, np.zeros(len(y_2_1_v3))), y_2_2_v3 + std_2_2_v3, alpha=0.35, color='#f9a65a')
 
     ax[2][1].plot(x_2_3_v3, y_2_3_v3, label=line_2_3_label_v3, marker="p", ls='-', color="#9e66ab",
                   markevery=markevery_2_3_v3)
-    ax[2][1].fill_between(x_2_3_v3, y_2_3_v3 - std_2_3_v3, y_2_3_v3 + std_2_3_v3, alpha=0.35, color="#9e66ab")
+    ax[2][1].fill_between(x_2_3_v3, np.maximum(y_2_3_v3 - std_2_3_v3, np.zeros(len(y_2_1_v3))), y_2_3_v3 + std_2_3_v3, alpha=0.35, color="#9e66ab")
 
     ax[2][1].plot(x_2_4_v3, y_2_4_v3, label=line_2_4_label_v3, marker="d", ls='-', color='g',
                   markevery=markevery_2_4_v3)
-    ax[2][1].fill_between(x_2_4_v3, y_2_4_v3 - std_2_4_v3, y_2_4_v3 + std_2_4_v3, alpha=0.35, color='g')
+    ax[2][1].fill_between(x_2_4_v3, np.maximum(y_2_4_v3 - std_2_4_v3, np.zeros(len(y_2_1_v3))), y_2_4_v3 + std_2_4_v3, alpha=0.35, color='g')
 
     ax[2][1].plot(x_2_5_v3, y_2_5_v3, label=line_2_5_label_v3, marker="^", ls='-', color='r',
                   markevery=markevery_2_5_v3)
-    ax[2][1].fill_between(x_2_5_v3, y_2_5_v3 - std_2_5_v3, y_2_5_v3 + std_2_5_v3, alpha=0.35, color='r')
+    ax[2][1].fill_between(x_2_5_v3, np.maximum(y_2_5_v3 - std_2_5_v3, np.zeros(len(y_2_1_v3))), y_2_5_v3 + std_2_5_v3, alpha=0.35, color='r')
 
     ax[2][1].set_xlim(xlims)
-    ax[2][1].set_ylim(ylims)
+    #ax[2][1].set_ylim(ylims)
 
     ax[2][1].set_title(title_2_v3)
     ax[2][1].set_xlabel(xlabel_2_v3)
@@ -1850,7 +1849,7 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     ax[2][2].fill_between(x_3_5_v3, y_3_5_v3 - std_3_5_v3, y_3_5_v3 + std_3_5_v3, alpha=0.35, color='r')
 
     ax[2][2].set_xlim(xlims)
-    ax[2][2].set_ylim(ylims)
+    #ax[2][2].set_ylim(ylims)
 
     ax[2][2].set_title(title_3_v3)
     ax[2][2].set_xlabel(xlabel_3_v3)
@@ -1944,6 +1943,55 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     #gs1 = gridspec.GridSpec(1, 4)
     #gs1.update(wspace=0.005, hspace=0.05)
 
+    if len(x_1_1_v0) / markevery_1_1_v0 > 15:
+        markevery_1_1_v0 = 2
+        markevery_1_2_v0 = 2
+        markevery_1_3_v0 = 2
+        markevery_1_4_v0 = 2
+        markevery_1_5_v0 = 2
+        markevery_1_6_v0 = 2
+
+    if len(x_1_1_v1) / markevery_1_1_v1 > 15:
+        markevery_1_1_v1 = 2
+        markevery_1_2_v1 = 2
+        markevery_1_3_v1 = 2
+        markevery_1_4_v1 = 2
+        markevery_1_5_v1 = 2
+        markevery_1_6_v1 = 2
+
+    if len(x_1_1_v2) / markevery_1_1_v2 > 15:
+        markevery_1_1_v2 = 2
+        markevery_1_2_v2 = 2
+        markevery_1_3_v2 = 2
+        markevery_1_4_v2 = 2
+        markevery_1_5_v2 = 2
+        markevery_1_6_v2 = 2
+
+    if len(x_1_1_v3) / markevery_1_1_v3 > 15:
+        markevery_1_1_v3 = 2
+        markevery_1_2_v3 = 2
+        markevery_1_3_v3 = 2
+        markevery_1_4_v3 = 2
+        markevery_1_5_v3 = 2
+        markevery_1_6_v3 = 2
+
+    if len(x_1_1_v4) / markevery_1_1_v4 > 15:
+        markevery_1_1_v4 = 2
+        markevery_1_2_v4 = 2
+        markevery_1_3_v4 = 2
+        markevery_1_4_v4 = 2
+        markevery_1_5_v4 = 2
+        markevery_1_6_v4 = 2
+
+    # if len(x_1_1_v5) / markevery_1_1_v5 > 15:
+    #     markevery_1_1_v5 = 2
+    #     markevery_1_2_v5 = 2
+    #     markevery_1_3_v5 = 2
+    #     markevery_1_4_v5 = 2
+    #     markevery_1_5_v5 = 2
+    #     markevery_1_6_v5 = 2
+
+
     # TabQ vs TabQ
     # Plot avg hack_probability
     xlims = (min(min(x_1_1_v0), min(x_1_4_v0)),
@@ -1952,13 +2000,13 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
              max(max(y_1_1_v0 + std_1_1_v0), max(y_1_4_v0 + std_1_4_v0)))
 
     ax[0][0].plot(x_1_1_v0, y_1_1_v0, label=line_1_1_label_v0, marker="s", ls='-', color="#599ad3", markevery=markevery_1_1_v0)
-    ax[0][0].fill_between(x_1_1_v0, y_1_1_v0 - std_1_1_v0, y_1_1_v0 + std_1_1_v0, alpha=0.35, color="#599ad3")
+    ax[0][0].fill_between(x_1_1_v0, np.maximum(y_1_1_v0 - std_1_1_v0, np.zeros(len(y_1_1_v0))), y_1_1_v0 + std_1_1_v0, alpha=0.35, color="#599ad3")
 
     ax[0][0].plot(x_1_4_v0, y_1_4_v0, label=line_1_4_label_v0, marker="o", ls='-', color='#f9a65a', markevery=markevery_1_4_v0)
-    ax[0][0].fill_between(x_1_4_v0, y_1_4_v0 - std_1_4_v0, y_1_4_v0 + std_1_4_v0, alpha=0.35, color='#f9a65a')
+    ax[0][0].fill_between(x_1_4_v0, np.maximum(y_1_4_v0 - std_1_4_v0, np.zeros(len(y_1_4_v0))), y_1_4_v0 + std_1_4_v0, alpha=0.35, color='#f9a65a')
 
     ax[0][0].set_xlim(xlims)
-    ax[0][0].set_ylim(ylims)
+    # ax[0][0].set_ylim(ylims)
 
     ax[0][0].set_title(title_1_v0 + " v0")
     ax[0][0].set_xlabel(xlabel_1_v0)
@@ -1981,13 +2029,13 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
              max(max(y_1_2_v0 + std_1_2_v0), max(y_1_5_v0 + std_1_5_v0)))
 
     ax[0][1].plot(x_1_2_v0, y_1_2_v0, label=line_1_2_label_v0, marker="s", ls='-', color="#599ad3", markevery=markevery_1_2_v0)
-    ax[0][1].fill_between(x_1_2_v0, y_1_2_v0 - std_1_2_v0, y_1_2_v0 + std_1_2_v0, alpha=0.35, color="#599ad3")
+    ax[0][1].fill_between(x_1_2_v0, np.maximum(y_1_2_v0 - std_1_2_v0, np.zeros(len(y_1_2_v0))), y_1_2_v0 + std_1_2_v0, alpha=0.35, color="#599ad3")
 
     ax[0][1].plot(x_1_5_v0, y_1_5_v0, label=line_1_5_label_v0, marker="o", ls='-', color='#f9a65a', markevery=markevery_1_5_v0)
-    ax[0][1].fill_between(x_1_5_v0, y_1_5_v0 - std_1_5_v0, y_1_5_v0 + std_1_5_v0, alpha=0.35, color='#f9a65a')
+    ax[0][1].fill_between(x_1_5_v0, np.maximum(y_1_5_v0 - std_1_5_v0, np.zeros(len(y_1_5_v0))), y_1_5_v0 + std_1_5_v0, alpha=0.35, color='#f9a65a')
 
     ax[0][1].set_xlim(xlims)
-    ax[0][1].set_ylim(ylims)
+    # ax[0][1].set_ylim(ylims)
 
     ax[0][1].set_title(title_1_v0 + " v1")
     ax[0][1].set_xlabel(xlabel_1_v0)
@@ -2011,13 +2059,13 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
 
 
     ax[0][2].plot(x_1_3_v0, y_1_3_v0, label=line_1_3_label_v0, marker="s", ls='-', color="#599ad3", markevery=markevery_1_3_v0)
-    ax[0][2].fill_between(x_1_3_v0, y_1_3_v0 - std_1_3_v0, y_1_3_v0 + std_1_3_v0, alpha=0.35, color="#599ad3")
+    ax[0][2].fill_between(x_1_3_v0, np.maximum(y_1_3_v0 - std_1_3_v0, np.zeros(len(y_1_3_v0))), y_1_3_v0 + std_1_3_v0, alpha=0.35, color="#599ad3")
 
     ax[0][2].plot(x_1_6_v0, y_1_6_v0, label=line_1_6_label_v0, marker="o", ls='-', color='#f9a65a', markevery=markevery_1_4_v0)
-    ax[0][2].fill_between(x_1_6_v0, y_1_6_v0 - std_1_6_v0, y_1_6_v0 + std_1_6_v0, alpha=0.35, color='#f9a65a')
+    ax[0][2].fill_between(x_1_6_v0, np.maximum(y_1_6_v0 - std_1_6_v0, np.zeros(len(y_1_6_v0))), y_1_6_v0 + std_1_6_v0, alpha=0.35, color='#f9a65a')
 
     ax[0][2].set_xlim(xlims)
-    ax[0][2].set_ylim(ylims)
+    # ax[0][2].set_ylim(ylims)
 
     ax[0][2].set_title(title_1_v0 + " v2")
     ax[0][2].set_xlabel(xlabel_1_v0)
@@ -2042,14 +2090,14 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
 
     ax[1][0].plot(x_1_1_v1, y_1_1_v1, label=line_1_1_label_v1, marker="s", ls='-', color="#599ad3",
                   markevery=markevery_1_1_v1)
-    ax[1][0].fill_between(x_1_1_v1, y_1_1_v1 - std_1_1_v1, y_1_1_v1 + std_1_1_v1, alpha=0.35, color="#599ad3")
+    ax[1][0].fill_between(x_1_1_v1, np.maximum(y_1_1_v1 - std_1_1_v1, np.zeros(len(y_1_1_v1))), y_1_1_v1 + std_1_1_v1, alpha=0.35, color="#599ad3")
 
     ax[1][0].plot(x_1_4_v1, y_1_4_v1, label=line_1_4_label_v1, marker="o", ls='-', color='#f9a65a',
                   markevery=markevery_1_4_v1)
-    ax[1][0].fill_between(x_1_4_v1, y_1_4_v1 - std_1_4_v1, y_1_4_v1 + std_1_4_v1, alpha=0.35, color='#f9a65a')
+    ax[1][0].fill_between(x_1_4_v1, np.maximum(y_1_4_v1 - std_1_4_v1, np.zeros(len(y_1_4_v1))), y_1_4_v1 + std_1_4_v1, alpha=0.35, color='#f9a65a')
 
     ax[1][0].set_xlim(xlims)
-    ax[1][0].set_ylim(ylims)
+    # ax[1][0].set_ylim(ylims)
 
     ax[1][0].set_title(title_1_v1 + " v0")
     ax[1][0].set_xlabel(xlabel_1_v1)
@@ -2073,14 +2121,14 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
 
     ax[1][1].plot(x_1_2_v1, y_1_2_v1, label=line_1_2_label_v1, marker="s", ls='-', color="#599ad3",
                   markevery=markevery_1_2_v1)
-    ax[1][1].fill_between(x_1_2_v1, y_1_2_v1 - std_1_2_v1, y_1_2_v1 + std_1_2_v1, alpha=0.35, color="#599ad3")
+    ax[1][1].fill_between(x_1_2_v1, np.maximum(y_1_2_v1 - std_1_2_v1, np.zeros(len(y_1_2_v1))), y_1_2_v1 + std_1_2_v1, alpha=0.35, color="#599ad3")
 
     ax[1][1].plot(x_1_5_v1, y_1_5_v1, label=line_1_5_label_v1, marker="o", ls='-', color='#f9a65a',
                   markevery=markevery_1_5_v1)
-    ax[1][1].fill_between(x_1_5_v1, y_1_5_v1 - std_1_5_v1, y_1_5_v1 + std_1_5_v1, alpha=0.35, color='#f9a65a')
+    ax[1][1].fill_between(x_1_5_v1, np.maximum(y_1_5_v1 - std_1_5_v1, np.zeros(len(y_1_5_v1))), y_1_5_v1 + std_1_5_v1, alpha=0.35, color='#f9a65a')
 
     ax[1][1].set_xlim(xlims)
-    ax[1][1].set_ylim(ylims)
+    # ax[1][1].set_ylim(ylims)
 
     ax[1][1].set_title(title_1_v1 + " v1")
     ax[1][1].set_xlabel(xlabel_1_v1)
@@ -2104,14 +2152,14 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
 
     ax[1][2].plot(x_1_3_v1, y_1_3_v1, label=line_1_3_label_v1, marker="s", ls='-', color="#599ad3",
                   markevery=markevery_1_3_v1)
-    ax[1][2].fill_between(x_1_3_v1, y_1_3_v1 - std_1_3_v1, y_1_3_v1 + std_1_3_v1, alpha=0.35, color="#599ad3")
+    ax[1][2].fill_between(x_1_3_v1, np.maximum(y_1_3_v1 - std_1_3_v1, np.zeros(len(y_1_3_v1))), y_1_3_v1 + std_1_3_v1, alpha=0.35, color="#599ad3")
 
     ax[1][2].plot(x_1_6_v1, y_1_6_v1, label=line_1_6_label_v1, marker="o", ls='-', color='#f9a65a',
                   markevery=markevery_1_4_v1)
-    ax[1][2].fill_between(x_1_6_v1, y_1_6_v1 - std_1_6_v1, y_1_6_v1 + std_1_6_v1, alpha=0.35, color='#f9a65a')
+    ax[1][2].fill_between(x_1_6_v1, np.maximum(y_1_6_v1 - std_1_6_v1, np.zeros(len(y_1_6_v1))), y_1_6_v1 + std_1_6_v1, alpha=0.35, color='#f9a65a')
 
     ax[1][2].set_xlim(xlims)
-    ax[1][2].set_ylim(ylims)
+    # ax[1][2].set_ylim(ylims)
 
     ax[1][2].set_title(title_1_v1 + " v2")
     ax[1][2].set_xlabel(xlabel_1_v1)
@@ -2136,14 +2184,14 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
 
     ax[2][0].plot(x_1_1_v2, y_1_1_v2, label=line_1_1_label_v2, marker="s", ls='-', color="#599ad3",
                   markevery=markevery_1_1_v2)
-    ax[2][0].fill_between(x_1_1_v2, y_1_1_v2 - std_1_1_v2, y_1_1_v2 + std_1_1_v2, alpha=0.35, color="#599ad3")
+    ax[2][0].fill_between(x_1_1_v2, np.maximum(y_1_1_v2 - std_1_1_v2, np.zeros(len(y_1_1_v2))), y_1_1_v2 + std_1_1_v2, alpha=0.35, color="#599ad3")
 
     ax[2][0].plot(x_1_4_v2, y_1_4_v2, label=line_1_4_label_v2, marker="o", ls='-', color='#f9a65a',
                   markevery=markevery_1_4_v2)
-    ax[2][0].fill_between(x_1_4_v2, y_1_4_v2 - std_1_4_v2, y_1_4_v2 + std_1_4_v2, alpha=0.35, color='#f9a65a')
+    ax[2][0].fill_between(x_1_4_v2, np.maximum(y_1_4_v2 - std_1_4_v2, np.zeros(len(y_1_4_v2))), y_1_4_v2 + std_1_4_v2, alpha=0.35, color='#f9a65a')
 
     ax[2][0].set_xlim(xlims)
-    ax[2][0].set_ylim(ylims)
+    # ax[2][0].set_ylim(ylims)
 
     ax[2][0].set_title(title_1_v2 + " v0")
     ax[2][0].set_xlabel(xlabel_1_v2)
@@ -2167,14 +2215,14 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
 
     ax[2][1].plot(x_1_2_v2, y_1_2_v2, label=line_1_2_label_v2, marker="s", ls='-', color="#599ad3",
                   markevery=markevery_1_2_v2)
-    ax[2][1].fill_between(x_1_2_v2, y_1_2_v2 - std_1_2_v2, y_1_2_v2 + std_1_2_v2, alpha=0.35, color="#599ad3")
+    ax[2][1].fill_between(x_1_2_v2, np.maximum(y_1_2_v2 - std_1_2_v2, np.zeros(len(y_1_2_v2))), y_1_2_v2 + std_1_2_v2, alpha=0.35, color="#599ad3")
 
     ax[2][1].plot(x_1_5_v2, y_1_5_v2, label=line_1_5_label_v2, marker="o", ls='-', color='#f9a65a',
                   markevery=markevery_1_5_v2)
-    ax[2][1].fill_between(x_1_5_v2, y_1_5_v2 - std_1_5_v2, y_1_5_v2 + std_1_5_v2, alpha=0.35, color='#f9a65a')
+    ax[2][1].fill_between(x_1_5_v2, np.maximum(y_1_5_v2 - std_1_5_v2, np.zeros(len(y_1_5_v2))), y_1_5_v2 + std_1_5_v2, alpha=0.35, color='#f9a65a')
 
     ax[2][1].set_xlim(xlims)
-    ax[2][1].set_ylim(ylims)
+    # ax[2][1].set_ylim(ylims)
 
     ax[2][1].set_title(title_1_v2 + " v1")
     ax[2][1].set_xlabel(xlabel_1_v2)
@@ -2198,14 +2246,14 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
 
     ax[2][2].plot(x_1_3_v2, y_1_3_v2, label=line_1_3_label_v2, marker="s", ls='-', color="#599ad3",
                   markevery=markevery_1_3_v2)
-    ax[2][2].fill_between(x_1_3_v2, y_1_3_v2 - std_1_3_v2, y_1_3_v2 + std_1_3_v2, alpha=0.35, color="#599ad3")
+    ax[2][2].fill_between(x_1_3_v2, np.maximum(y_1_3_v2 - std_1_3_v2, np.zeros(len(y_1_3_v2))), y_1_3_v2 + std_1_3_v2, alpha=0.35, color="#599ad3")
 
     ax[2][2].plot(x_1_6_v2, y_1_6_v2, label=line_1_6_label_v2, marker="o", ls='-', color='#f9a65a',
                   markevery=markevery_1_4_v2)
-    ax[2][2].fill_between(x_1_6_v2, y_1_6_v2 - std_1_6_v2, y_1_6_v2 + std_1_6_v2, alpha=0.35, color='#f9a65a')
+    ax[2][2].fill_between(x_1_6_v2, np.maximum(y_1_6_v2 - std_1_6_v2, np.zeros(len(y_1_6_v2))), y_1_6_v2 + std_1_6_v2, alpha=0.35, color='#f9a65a')
 
     ax[2][2].set_xlim(xlims)
-    ax[2][2].set_ylim(ylims)
+    # ax[2][2].set_ylim(ylims)
 
     ax[2][2].set_title(title_1_v2 + " v2")
     ax[2][2].set_xlabel(xlabel_1_v2)
@@ -2230,14 +2278,14 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
 
     ax[3][0].plot(x_1_1_v3, y_1_1_v3, label=line_1_1_label_v3, marker="s", ls='-', color="#599ad3",
                   markevery=markevery_1_1_v3)
-    ax[3][0].fill_between(x_1_1_v3, y_1_1_v3 - std_1_1_v3, y_1_1_v3 + std_1_1_v3, alpha=0.35, color="#599ad3")
+    ax[3][0].fill_between(x_1_1_v3, np.maximum(y_1_1_v3 - std_1_1_v3, np.zeros(len(y_1_1_v3))), y_1_1_v3 + std_1_1_v3, alpha=0.35, color="#599ad3")
 
     ax[3][0].plot(x_1_4_v3, y_1_4_v3, label=line_1_4_label_v3, marker="o", ls='-', color='#f9a65a',
                   markevery=markevery_1_4_v3)
-    ax[3][0].fill_between(x_1_4_v3, y_1_4_v3 - std_1_4_v3, y_1_4_v3 + std_1_4_v3, alpha=0.35, color='#f9a65a')
+    ax[3][0].fill_between(x_1_4_v3, np.maximum(y_1_4_v3 - std_1_4_v3, np.zeros(len(y_1_4_v3))), y_1_4_v3 + std_1_4_v3, alpha=0.35, color='#f9a65a')
 
     ax[3][0].set_xlim(xlims)
-    ax[3][0].set_ylim(ylims)
+    # ax[3][0].set_ylim(ylims)
 
     ax[3][0].set_title(title_1_v3 + " v0")
     ax[3][0].set_xlabel(xlabel_1_v3)
@@ -2261,14 +2309,14 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
 
     ax[3][1].plot(x_1_2_v3, y_1_2_v3, label=line_1_2_label_v3, marker="s", ls='-', color="#599ad3",
                   markevery=markevery_1_2_v3)
-    ax[3][1].fill_between(x_1_2_v3, y_1_2_v3 - std_1_2_v3, y_1_2_v3 + std_1_2_v3, alpha=0.35, color="#599ad3")
+    ax[3][1].fill_between(x_1_2_v3, np.maximum(y_1_2_v3 - std_1_2_v3, np.zeros(len(y_1_2_v3))), y_1_2_v3 + std_1_2_v3, alpha=0.35, color="#599ad3")
 
     ax[3][1].plot(x_1_5_v3, y_1_5_v3, label=line_1_5_label_v3, marker="o", ls='-', color='#f9a65a',
                   markevery=markevery_1_5_v3)
-    ax[3][1].fill_between(x_1_5_v3, y_1_5_v3 - std_1_5_v3, y_1_5_v3 + std_1_5_v3, alpha=0.35, color='#f9a65a')
+    ax[3][1].fill_between(x_1_5_v3, np.maximum(y_1_5_v3 - std_1_5_v3, np.zeros(len(y_1_5_v3))), y_1_5_v3 + std_1_5_v3, alpha=0.35, color='#f9a65a')
 
     ax[3][1].set_xlim(xlims)
-    ax[3][1].set_ylim(ylims)
+    # ax[3][1].set_ylim(ylims)
 
     ax[3][1].set_title(title_1_v3 + " v1")
     ax[3][1].set_xlabel(xlabel_1_v3)
@@ -2292,14 +2340,14 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
 
     ax[3][2].plot(x_1_3_v3, y_1_3_v3, label=line_1_3_label_v3, marker="s", ls='-', color="#599ad3",
                   markevery=markevery_1_3_v3)
-    ax[3][2].fill_between(x_1_3_v3, y_1_3_v3 - std_1_3_v3, y_1_3_v3 + std_1_3_v3, alpha=0.35, color="#599ad3")
+    ax[3][2].fill_between(x_1_3_v3, np.maximum(y_1_3_v3 - std_1_3_v3, np.zeros(len(y_1_3_v3))), y_1_3_v3 + std_1_3_v3, alpha=0.35, color="#599ad3")
 
     ax[3][2].plot(x_1_6_v3, y_1_6_v3, label=line_1_6_label_v3, marker="o", ls='-', color='#f9a65a',
                   markevery=markevery_1_4_v3)
-    ax[3][2].fill_between(x_1_6_v3, y_1_6_v3 - std_1_6_v3, y_1_6_v3 + std_1_6_v3, alpha=0.35, color='#f9a65a')
+    ax[3][2].fill_between(x_1_6_v3, np.maximum(y_1_6_v3 - std_1_6_v3, np.zeros(len(y_1_6_v3))), y_1_6_v3 + std_1_6_v3, alpha=0.35, color='#f9a65a')
 
     ax[3][2].set_xlim(xlims)
-    ax[3][2].set_ylim(ylims)
+    # ax[3][2].set_ylim(ylims)
 
     ax[3][2].set_title(title_1_v3 + " v2")
     ax[3][2].set_xlabel(xlabel_1_v3)
@@ -2326,14 +2374,14 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
 
     ax[4][0].plot(x_1_1_v4, y_1_1_v4, label=line_1_1_label_v4, marker="s", ls='-', color="#599ad3",
                   markevery=markevery_1_1_v4)
-    ax[4][0].fill_between(x_1_1_v4, y_1_1_v4 - std_1_1_v4, y_1_1_v4 + std_1_1_v4, alpha=0.35, color="#599ad3")
+    ax[4][0].fill_between(x_1_1_v4, np.maximum(y_1_1_v4 - std_1_1_v4, np.zeros(len(y_1_1_v4))), y_1_1_v4 + std_1_1_v4, alpha=0.35, color="#599ad3")
 
     ax[4][0].plot(x_1_4_v4, y_1_4_v4, label=line_1_4_label_v4, marker="o", ls='-', color='#f9a65a',
                   markevery=markevery_1_4_v4)
-    ax[4][0].fill_between(x_1_4_v4, y_1_4_v4 - std_1_4_v4, y_1_4_v4 + std_1_4_v4, alpha=0.35, color='#f9a65a')
+    ax[4][0].fill_between(x_1_4_v4, np.maximum(y_1_4_v4 - std_1_4_v4, np.zeros(len(y_1_4_v4))), y_1_4_v4 + std_1_4_v4, alpha=0.35, color='#f9a65a')
 
     ax[4][0].set_xlim(xlims)
-    ax[4][0].set_ylim(ylims)
+    # ax[4][0].set_ylim(ylims)
 
     ax[4][0].set_title(title_1_v4 + " v0")
     ax[4][0].set_xlabel(xlabel_1_v4)
@@ -2357,14 +2405,14 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
 
     ax[4][1].plot(x_1_2_v4, y_1_2_v4, label=line_1_2_label_v4, marker="s", ls='-', color="#599ad3",
                   markevery=markevery_1_2_v4)
-    ax[4][1].fill_between(x_1_2_v4, y_1_2_v4 - std_1_2_v4, y_1_2_v4 + std_1_2_v4, alpha=0.35, color="#599ad3")
+    ax[4][1].fill_between(x_1_2_v4, np.maximum(y_1_2_v4 - std_1_2_v4, np.zeros(len(y_1_2_v4))), y_1_2_v4 + std_1_2_v4, alpha=0.35, color="#599ad3")
 
     ax[4][1].plot(x_1_5_v4, y_1_5_v4, label=line_1_5_label_v4, marker="o", ls='-', color='#f9a65a',
                   markevery=markevery_1_5_v4)
-    ax[4][1].fill_between(x_1_5_v4, y_1_5_v4 - std_1_5_v4, y_1_5_v4 + std_1_5_v4, alpha=0.35, color='#f9a65a')
+    ax[4][1].fill_between(x_1_5_v4, np.maximum(y_1_5_v4 - std_1_5_v4, np.zeros(len(y_1_5_v4))), y_1_5_v4 + std_1_5_v4, alpha=0.35, color='#f9a65a')
 
     ax[4][1].set_xlim(xlims)
-    ax[4][1].set_ylim(ylims)
+    # ax[4][1].set_ylim(ylims)
 
     ax[4][1].set_title(title_1_v4 + " v1")
     ax[4][1].set_xlabel(xlabel_1_v4)
@@ -2388,14 +2436,14 @@ def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
 
     ax[4][2].plot(x_1_3_v4, y_1_3_v4, label=line_1_3_label_v4, marker="s", ls='-', color="#599ad3",
                   markevery=markevery_1_3_v4)
-    ax[4][2].fill_between(x_1_3_v4, y_1_3_v4 - std_1_3_v4, y_1_3_v4 + std_1_3_v4, alpha=0.35, color="#599ad3")
+    ax[4][2].fill_between(x_1_3_v4, np.maximum(y_1_3_v4 - std_1_3_v4, np.zeros(len(y_1_3_v4))), y_1_3_v4 + std_1_3_v4, alpha=0.35, color="#599ad3")
 
     ax[4][2].plot(x_1_6_v4, y_1_6_v4, label=line_1_6_label_v4, marker="o", ls='-', color='#f9a65a',
                   markevery=markevery_1_4_v4)
-    ax[4][2].fill_between(x_1_6_v4, y_1_6_v4 - std_1_6_v4, y_1_6_v4 + std_1_6_v4, alpha=0.35, color='#f9a65a')
+    ax[4][2].fill_between(x_1_6_v4, np.maximum(y_1_6_v4 - std_1_6_v4, np.zeros(len(y_1_6_v4))), y_1_6_v4 + std_1_6_v4, alpha=0.35, color='#f9a65a')
 
     ax[4][2].set_xlim(xlims)
-    ax[4][2].set_ylim(ylims)
+    # ax[4][2].set_ylim(ylims)
 
     ax[4][2].set_title(title_1_v4 + " v2")
     ax[4][2].set_xlabel(xlabel_1_v4)
@@ -2690,6 +2738,7 @@ def plot_sparse_dense_difference(maximal_attack_train_csv_paths_v0, maximal_atta
     for csv_path in maximal_attack_eval_csv_paths_v8:
         df = read_data(csv_path)
         eval_max_attack_dfs_v8.append(df)
+
     hack_prob_eval_max_attack_data_v8 = list(map(lambda df: df["hack_probability"].values, eval_max_attack_dfs_v8))
     hack_prob_eval_max_attack_means_v8 = np.mean(tuple(hack_prob_eval_max_attack_data_v8), axis=0)
     hack_prob_eval_max_attack_stds_v8 = np.std(tuple(hack_prob_eval_max_attack_data_v8), axis=0, ddof=1)
@@ -2840,6 +2889,8 @@ def plot_sparse_dense_difference(maximal_attack_train_csv_paths_v0, maximal_atta
     hack_prob_eval_max_attack_means_v7 = np.mean(tuple(hack_prob_eval_max_attack_data_v7), axis=0)
     hack_prob_eval_max_attack_stds_v7 = np.std(tuple(hack_prob_eval_max_attack_data_v7), axis=0, ddof=1)
 
+    ##print("max attack data v2 : {}".format(hack_prob_eval_max_attack_data_v2[5][-5:]))
+
     train_min_defense_dfs_v7 = []
     eval_min_defense_dfs_v7 = []
     for csv_path in minimal_defense_train_csv_paths_v7:
@@ -2976,9 +3027,9 @@ def plot_sparse_dense_difference(maximal_attack_train_csv_paths_v0, maximal_atta
                            hack_prob_eval_random_defense_stds_v0, hack_prob_eval_random_defense_stds_v2,
                            hack_prob_eval_random_defense_stds_v3, hack_prob_eval_random_defense_stds_v8,
                            hack_prob_eval_random_defense_stds_v9, hack_prob_eval_random_defense_stds_v7,
-                           r"Sparse $\mathcal{R}$", r"Sparse $\mathcal{R}$",
-                           r"Sparse $\mathcal{R}$", r"Dense $\mathcal{R}$",
-                           r"Dense $\mathcal{R}$", r"Dense $\mathcal{R}$",
+                           r"Sparse $\mathcal{R}_{sparse}$", r"Sparse $\mathcal{R}_{sparse}$",
+                           r"Sparse $\mathcal{R}_{sparse}$", r"Dense $\mathcal{R}_{dense}$",
+                           r"Dense $\mathcal{R}_{dense}$", r"Dense $\mathcal{R}_{dense}$",
                            r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
                            r"Episode \#", r"$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1, 1,
 
@@ -2997,9 +3048,9 @@ def plot_sparse_dense_difference(maximal_attack_train_csv_paths_v0, maximal_atta
                            hack_prob_eval_two_agents_stds_v0, hack_prob_eval_two_agents_stds_v2,
                            hack_prob_eval_two_agents_stds_v3, hack_prob_eval_two_agents_stds_v8,
                            hack_prob_eval_two_agents_stds_v9, hack_prob_eval_two_agents_stds_v7,
-                           r"Sparse Reward Function $\mathcal{R}$", r"Sparse Reward Function $\mathcal{R}$",
-                           r"Sparse Reward Function $\mathcal{R}$", r"Dense Reward Function $\mathcal{R}$",
-                           r"Dense Reward Function $\mathcal{R}$", r"Dense Reward Function $\mathcal{R}$",
+                           r"Sparse Reward Function $\mathcal{R}_{sparse}$", r"Sparse Reward Function $\mathcal{R}_{sparse}$",
+                           r"Sparse Reward Function $\mathcal{R}_{sparse}$", r"Dense Reward Function $\mathcal{R}_{dense}$",
+                           r"Dense Reward Function $\mathcal{R}_{dense}$", r"Dense Reward Function $\mathcal{R}_{dense}$",
                            r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}",
                            r"Episode \#", r"$\mathbb{P}[Hacked]$", 1, 1, 1, 1, 1, 1,
 
@@ -4784,7 +4835,7 @@ def plot_avg_summary(train_dfs, eval_dfs, train_log_frequency, eval_frequency, e
                        hack_prob_eval_means + hack_prob_eval_stds, alpha=0.35, color='#f9a65a')
 
     ax[0].set_xlim(xlims)
-    ax[0].set_ylim(ylims)
+    #ax[0].set_ylim(ylims)
 
     ax[0].set_title("Likelihood of Successful Hack")
     ax[0].set_xlabel("Episode \#")
@@ -4841,7 +4892,7 @@ def plot_avg_summary(train_dfs, eval_dfs, train_log_frequency, eval_frequency, e
                        alpha=0.35, color='#f9a65a')
 
     ax[1].set_xlim(xlims)
-    ax[1].set_ylim(ylims)
+    #ax[1].set_ylim(ylims)
 
     ax[1].set_title("Cumulative Reward (Train)")
     ax[1].set_xlabel("Episode \#")
@@ -4896,7 +4947,7 @@ def plot_avg_summary(train_dfs, eval_dfs, train_log_frequency, eval_frequency, e
                        avg_episode_len_eval_means + avg_episode_len_eval_stds, alpha=0.35, color='#f9a65a')
 
     ax[2].set_xlim(xlims)
-    ax[2].set_ylim(ylims)
+    #ax[2].set_ylim(ylims)
 
     ax[2].set_title("Avg Episode Lengths")
     ax[2].set_xlabel("Episode \#")
@@ -5018,7 +5069,7 @@ def plot_avg_summary(train_dfs, eval_dfs, train_log_frequency, eval_frequency, e
 
     if plot_attacker_loss or plot_defender_loss:
         ax[3].set_xlim(xlims)
-        ax[3].set_ylim(ylims)
+        #ax[3].set_ylim(ylims)
 
         ax[3].set_title("Avg Episode Loss")
         ax[3].set_xlabel("Episode \#")

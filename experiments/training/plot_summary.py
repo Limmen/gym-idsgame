@@ -202,8 +202,8 @@ def plot_summary(algorithm : str, eval_freq : int, train_log_freq : int):
             two_agents_eval_csv_paths_v3.append(two_agents_eval_csv_path)
 
         plotting_util.plot_all_averages_multiple_versions(
-            maximal_attack_train_csv_paths_v0,  maximal_attack_eval_csv_paths_v0, minimal_defense_train_csv_paths_v0,
-            minimal_defense_eval_csv_paths_v0,random_attack_train_csv_paths_v0, random_attack_eval_csv_paths_v0,
+            maximal_attack_train_csv_paths_v0, maximal_attack_eval_csv_paths_v0, minimal_defense_train_csv_paths_v0,
+            minimal_defense_eval_csv_paths_v0, random_attack_train_csv_paths_v0, random_attack_eval_csv_paths_v0,
             random_defense_train_csv_paths_v0, random_defense_eval_csv_paths_v0,
             two_agents_train_csv_paths_v0, two_agents_eval_csv_paths_v0,
             maximal_attack_train_csv_paths_v2, maximal_attack_eval_csv_paths_v2,
@@ -216,8 +216,9 @@ def plot_summary(algorithm : str, eval_freq : int, train_log_freq : int):
             random_attack_train_csv_paths_v3, random_attack_eval_csv_paths_v3,
             random_defense_train_csv_paths_v3, random_defense_eval_csv_paths_v3,
             two_agents_train_csv_paths_v3, two_agents_eval_csv_paths_v3,
-            algorithm, default_output_dir() + "/plots", eval_freq, train_log_freq, [0,1,2],
-            wspace=0.28, file_name="combined_plot_mult_versions_" + "_".join(["0","2","3"]))
+            algorithm, default_output_dir() + "/plots", eval_freq, train_log_freq, [0, 1, 2],
+            wspace=0.28, file_name="combined_plot_mult_versions_" + "_".join(["0", "2", "3"]))
+
     except Exception as e:
         print(str(e))
         print("Could not plot v0,v2,v3")
@@ -408,8 +409,9 @@ def plot_summary(algorithm : str, eval_freq : int, train_log_freq : int):
             two_agents_train_csv_paths_v7, two_agents_eval_csv_paths_v7,
             algorithm, default_output_dir() + "/plots", eval_freq, train_log_freq, [0,1,2],
             wspace=0.35, file_name = "combined_plot_mult_versions_" + "_".join(["7","8","9"]))
-    except:
+    except Exception as e:
         print("could not plot v7,v8,v9")
+        print(str(e))
 
     try:
         plotting_util.plot_sparse_dense_difference(
