@@ -48,15 +48,15 @@ def default_config() -> ClientConfig:
                                   epsilon_decay=0.9999, video=True, eval_log_frequency=1,
                                   video_fps=5, video_dir=default_output_dir() + "/results/videos", num_episodes=20001,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/results/gifs",
-                                  eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
+                                  eval_frequency=1000, attacker=False, defender=True, video_frequency=101,
                                   save_dir=default_output_dir() + "/results/data", dqn_config=dqn_config,
                                   checkpoint_freq=5000)
-    env_name = "idsgame-random_defense-v3"
-    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.DQN_AGENT.value,
-                                 mode=RunnerMode.TRAIN_ATTACKER.value,
+    env_name = "idsgame-random_attack-v3"
+    client_config = ClientConfig(env_name=env_name, defender_type=AgentType.DQN_AGENT.value,
+                                 mode=RunnerMode.TRAIN_DEFENDER.value,
                                  q_agent_config=q_agent_config, output_dir=default_output_dir(),
-                                 title="TrainingDQNAgent vs RandomDefender",
-                                 random_seeds=[0, 999, 299, 399, 499], run_many=True)
+                                 title="RandomAttacker vs DQN",
+                                 run_many=True, random_seeds=[0, 999, 299, 399, 499])
     return client_config
 
 def write_default_config(path:str = None) -> None:
@@ -102,15 +102,14 @@ def plot_average_results(experiment_title :str, config: ClientConfig, eval_csv_p
     plotting_util.read_and_plot_average_results(experiment_title, train_csv_paths, eval_csv_paths,
                                                 config.q_agent_config.train_log_frequency,
                                                 config.q_agent_config.eval_frequency,
-                                                config.output_dir, plot_attacker_loss = True,
-                                                plot_defender_loss = False)
-
+                                                config.output_dir, plot_attacker_loss = False,
+                                                plot_defender_loss = True)
 
 def run_experiment(configpath: str, random_seed: int, noconfig: bool):
     """
     Runs one experiment and saves results and plots
 
-    :param configpath: path to experiment config file
+    :param configpath: path to configfile
     :param noconfig: whether to override config
     :return: (train_csv_path, eval_csv_path)
     """
@@ -146,11 +145,10 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
 
     return train_csv_path, eval_csv_path
 
-
 # Program entrypoint
 if __name__ == '__main__':
     args = util.parse_args(default_config_path())
-    experiment_title = "DQN vs random defense"
+    experiment_title = "random attack vs DQN"
     if args.configpath is not None and not args.noconfig:
         if not os.path.exists(args.configpath):
             write_default_config()
@@ -172,7 +170,6 @@ if __name__ == '__main__':
             plot_average_results(experiment_title, config, eval_csv_paths, train_csv_paths)
         except Exception as e:
             print("Error when trying to plot summary: " + str(e))
-
     else:
         if not config.run_many:
             run_experiment(args.configpath, 0, args.noconfig)
@@ -187,3 +184,6 @@ if __name__ == '__main__':
                 plot_average_results(experiment_title, config, eval_csv_paths, train_csv_paths)
             except Exception as e:
                 print("Error when trying to plot summary: " + str(e))
+
+
+

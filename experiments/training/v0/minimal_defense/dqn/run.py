@@ -38,19 +38,19 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    dqn_config = DQNConfig(input_dim=33, output_dim=30, hidden_dim=64, replay_memory_size=1000,
+    dqn_config = DQNConfig(input_dim=33, output_dim=30, hidden_dim=64, replay_memory_size=10000,
                            num_hidden_layers=1,
-                           replay_start_size=100, batch_size=32, target_network_update_freq=100,
+                           replay_start_size=1000, batch_size=32, target_network_update_freq=1000,
                            gpu=True, tensorboard=True, tensorboard_dir=default_output_dir() + "/results/tensorboard",
                            loss_fn="Huber", optimizer="Adam", lr_exp_decay=True, lr_decay_rate=0.999)
-    q_agent_config = QAgentConfig(gamma=0.999, alpha=0.0001, epsilon=1, render=False, eval_sleep=0.9,
-                                  min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
-                                  epsilon_decay=0.999, video=True, eval_log_frequency=1,
+    q_agent_config = QAgentConfig(gamma=0.999, alpha=0.00001, epsilon=1, render=False, eval_sleep=0.9,
+                                  min_epsilon=0.01, eval_episodes=100, train_log_frequency=100,
+                                  epsilon_decay=0.9999, video=True, eval_log_frequency=1,
                                   video_fps=5, video_dir=default_output_dir() + "/results/videos", num_episodes=20001,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/results/gifs",
                                   eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
                                   save_dir=default_output_dir() + "/results/data", dqn_config=dqn_config,
-                                  checkpoint_freq=1000)
+                                  checkpoint_freq=5000)
     env_name = "idsgame-minimal_defense-v0"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.DQN_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
@@ -58,7 +58,6 @@ def default_config() -> ClientConfig:
                                  title="TrainingDQNAgent vs DefendMinimalDefender",
                                  run_many=True, random_seeds=[0, 999, 299, 399, 499])
     return client_config
-
 
 def write_default_config(path:str = None) -> None:
     """
@@ -103,7 +102,8 @@ def plot_average_results(experiment_title :str, config: ClientConfig, eval_csv_p
     plotting_util.read_and_plot_average_results(experiment_title, train_csv_paths, eval_csv_paths,
                                                 config.q_agent_config.train_log_frequency,
                                                 config.q_agent_config.eval_frequency,
-                                                config.output_dir)
+                                                config.output_dir,
+                                                plot_attacker_loss = True, plot_defender_loss = False)
 
 def run_experiment(configpath: str, random_seed: int, noconfig: bool):
     """
@@ -121,7 +121,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir, random_seed)
-    logger = util.setup_logger("dqn_vs_minimal_defense-v0", config.output_dir + "/results/logs/" +
+    logger = util.setup_logger("tabular_q_learning_vs_random_defense-v0", config.output_dir + "/results/logs/" +
                                str(random_seed) + "/",
                                time_str=time_str)
     config.q_agent_config.save_dir = default_output_dir() + "/results/data/" + str(random_seed) + "/"
@@ -148,7 +148,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
 # Program entrypoint
 if __name__ == '__main__':
     args = util.parse_args(default_config_path())
-    experiment_title = "Q-learning vs minimal defense"
+    experiment_title = "DQN vs minimal defense"
     if args.configpath is not None and not args.noconfig:
         if not os.path.exists(args.configpath):
             write_default_config()
@@ -165,7 +165,6 @@ if __name__ == '__main__':
             train_csv_paths.append(train_csv_path)
             eval_csv_paths.append(eval_csv_path)
             plot_csv(config, eval_csv_path, train_csv_path, random_seed=seed)
-
         try:
             plot_average_results(experiment_title, config, eval_csv_paths, train_csv_paths)
         except Exception as e:

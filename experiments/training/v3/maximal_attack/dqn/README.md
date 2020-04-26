@@ -1,18 +1,20 @@
-# Experiment `dqn`_`dqn-v7`
+# Experiment `maximal_attack-v3`_`dqn`
 
-This is an experiment in the `idsgame-v7` environment. 
-An environment where neither the attacker nor defender is part of the environment, i.e.
-it is intended for 2-agent simulations or RL training.
+This is an experiment in the `maximal_attack-v3` environment.
+An environment where the attack is following the `attack_maximal` attack policy.
+The `attack_maximal` policy entails that the attacker will always attack the attribute with
+the maximum value out of all of its neighbors. The defender is implemented with a
+random defense policy.
  
-This experiment trains both an attacker and a defender agent simultaneously against each other 
-using dqn.
+This experiment trains a defender agent using DQN to act optimally in the given
+environment and detect the attacker.
 
 The network configuration of the environment is as follows:
 
 - `num_layers=2` (number of layers between the start and end nodes)
 - `num_servers_per_layer=3`
 - `num_attack_types=10`
-- `max_value=9`  
+- `max_value=9`
 
 <p align="center">
 <img src="docs/env.png" width="600">
@@ -27,11 +29,11 @@ The starting state for each node in the environment is initialized as follows (w
 - `vulnerability_val=0` 
 - `num_vulnerabilities_per_layer=3`
 
-The environment has dense rewards (+1,-1 given whenever the attacker reaches a new level in the network)
+The environment has sparse rewards (+1,-1 rewards are given at the terminal state of each episode)
 
 ## Environment 
 
-- Env: `random_defense-v7`
+- Env: `random_attack-v3`
 
 ## Algorithm
 
@@ -49,12 +51,12 @@ Example configuration in `config.json`:
 {
     "attacker_type": 6,
     "defender_type": 1,
-    "env_name": "idsgame-v7",
+    "env_name": "idsgame-maximal_attack-v3",
     "idsgame_config": null,
     "initial_state_path": null,
     "logger": null,
     "mode": 0,
-    "output_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v7/two_agents/dqn",
+    "output_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v3/maximal_attack/dqn",
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": {
         "alpha": 1e-05,
@@ -80,7 +82,7 @@ Example configuration in `config.json`:
             "replay_start_size": 1000,
             "target_network_update_freq": 1000,
             "tensorboard": true,
-            "tensorboard_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v7/two_agents/dqn/results/tensorboard"
+            "tensorboard_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v3/maximal_attack/dqn/results/tensorboard"
         },
         "epsilon": 1,
         "epsilon_decay": 0.999,
@@ -90,7 +92,7 @@ Example configuration in `config.json`:
         "eval_render": false,
         "eval_sleep": 0.9,
         "gamma": 0.99,
-        "gif_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v7/two_agents/dqn/results/gifs",
+        "gif_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v3/maximal_attack/dqn/results/gifs",
         "gifs": true,
         "logger": null,
         "min_epsilon": 0.05,
@@ -98,10 +100,10 @@ Example configuration in `config.json`:
         "py/object": "gym_idsgame.agents.q_learning.q_agent_config.QAgentConfig",
         "random_seed": 0,
         "render": false,
-        "save_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v7/two_agents/dqn/results/data",
+        "save_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v3/maximal_attack/dqn/results/data",
         "train_log_frequency": 100,
         "video": true,
-        "video_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v7/two_agents/dqn/results/videos",
+        "video_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v3/maximal_attack/dqn/results/videos",
         "video_fps": 5,
         "video_frequency": 101
     },
@@ -114,7 +116,7 @@ Example configuration in `config.json`:
     ],
     "run_many": true,
     "simulation_config": null,
-    "title": "TrainingDQNAgent vs TrainingDQNAgent"
+    "title": "TrainingDQNAgent vs DefendMinimalDefender"
 }
 ```
 
@@ -134,11 +136,11 @@ q_agent_config = QAgentConfig(gamma=0.999, alpha=0.00001, epsilon=1, render=Fals
                               eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
                               save_dir=default_output_dir() + "/results/data", dqn_config=dqn_config,
                               checkpoint_freq=1000)
-env_name = "idsgame-v7"
+env_name = "idsgame-maximal_attack-v3"
 client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.DQN_AGENT.value,
                              mode=RunnerMode.TRAIN_ATTACKER.value,
                              q_agent_config=q_agent_config, output_dir=default_output_dir(),
-                             title="TrainingDQNAgent vs TrainingDQNAgent",
+                             title="TrainingDQNAgent vs DefendMinimalDefender",
                              run_many=True, random_seeds=[0, 999, 299, 399, 499])
 ```
 
