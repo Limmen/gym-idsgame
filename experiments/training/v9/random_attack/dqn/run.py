@@ -53,7 +53,7 @@ def default_config() -> ClientConfig:
                                   checkpoint_freq=5000)
     env_name = "idsgame-random_attack-v9"
     client_config = ClientConfig(env_name=env_name, defender_type=AgentType.DQN_AGENT.value,
-                                 mode=RunnerMode.TRAIN_ATTACKER.value,
+                                 mode=RunnerMode.TRAIN_DEFENDER.value,
                                  q_agent_config=q_agent_config, output_dir=default_output_dir(),
                                  title="RandomAttacker vs TrainingDQNAgent",
                                  run_many=True, random_seeds=[0, 999, 299, 399, 499])

@@ -847,6 +847,10 @@ An environment where the attack is following a random attack policy.
          
 - [random_attack_vs_tabular_q_learning-v7](training/v7/random_attack/tabular_q_learning/)
    * This experiment trains a defender agent using tabular q-learning to act optimally in the given
+   environment and defeat the random attacker. 
+   
+- [random_attack_vs_dqn-v7](training/v7/random_attack/dqn/)
+   * This experiment trains a defender agent using DQN to act optimally in the given
    environment and defeat the random attacker.   
 
 #### Maximal Attack
@@ -860,6 +864,10 @@ the maximum value out of all of its neighbors.
    * This experiment trains a defender agent using tabular q-learning to act optimally in the given
    environment and detect the attacker. 
 
+- [maximal_attack_vs_dqn-v7](training/v7/maximal_attack/dqn/)
+   * This experiment trains a defender agent using tabular q-learning to act optimally in the given
+   environment and detect the attacker. 
+
 #### Two Agents
 
 Experiments in the `idsgame-v7` environment. 
@@ -868,9 +876,12 @@ it is intended for 2-agent simulations or RL training.
    
 - [tabular_q_learning_vs_tabular_q_learning-v7](training/v7/two_agents/tabular_q_learning/)
    * This experiment trains both an attacker and a defender agent simultaneously against each other 
+   using tabular q-learning.
+   
+- [dqn_vs_dqn-v7](training/v7/two_agents/dqn/)
+   * This experiment trains both an attacker and a defender agent simultaneously against each other 
    using tabular q-learning.       
-   
-   
+      
 ## Experiments in Version 8 Environments 
 
 Experiment in version 8 environments. That is, evironments with the following network topology:
@@ -934,6 +945,10 @@ An environment where the attack is following a random attack policy.
 - [random_attack_vs_tabular_q_learning-v8](training/v8/random_attack/tabular_q_learning/)
    * This experiment trains a defender agent using tabular q-learning to act optimally in the given
    environment and defeat the random attacker.
+   
+- [random_attack_vs_dqn-v8](training/v8/random_attack/dqn/)
+   * This experiment trains a defender agent using DQN to act optimally in the given
+   environment and defeat the random attacker.   
 
 #### Maximal Attack
 
@@ -945,6 +960,10 @@ the maximum value out of all of its neighbors.
 - [maximal_attack_vs_tabular_q_learning-v8](training/v8/maximal_attack/tabular_q_learning/)
    * This experiment trains a defender agent using tabular q-learning to act optimally in the given
    environment and detect the attacker.
+   
+- [maximal_attack_vs_dqn-v8](training/v8/maximal_attack/dqn/)
+   * This experiment trains a defender agent using DQN to act optimally in the given
+   environment and detect the attacker.   
 
 #### Two Agents
 Experiments in the `idsgame-v8` environment. 
@@ -953,7 +972,11 @@ it is intended for 2-agent simulations or RL training.
    
 - [tabular_q_learning_vs_tabular_q_learning-v8](training/v8/two_agents/tabular_q_learning/)
    * This experiment trains both an attacker and a defender agent simultaneously against each other 
-   using tabular q-learning.     
+   using tabular q-learning.
+   
+- [tabular_q_learning_vs_dqn-v8](training/v8/two_agents/dqn/)
+   * This experiment trains both an attacker and a defender agent simultaneously against each other 
+   using DQN.        
    
 ## Experiments in Version 9 Environments 
 
@@ -1018,7 +1041,11 @@ An environment where the attack is following a random attack policy.
    
 - [random_attack_vs_tabular_q_learning-v9](training/v9/random_attack/tabular_q_learning/)
    * This experiment trains a defender agent using tabular q-learning to act optimally in the given
-   environment and defeat the random attacker.   
+   environment and defeat the random attacker.
+   
+- [random_attack_vs_dqn-v9](training/v9/random_attack/dqn/)
+   * This experiment trains a defender agent using dqn to act optimally in the given
+   environment and defeat the random attacker.      
 
 #### Maximal Attack
 
@@ -1029,7 +1056,11 @@ the maximum value out of all of its neighbors.
 
 - [maximal_attack_vs_tabular_q_learning-v9](training/v9/maximal_attack/tabular_q_learning/)
    * This experiment trains a defender agent using tabular q-learning to act optimally in the given
-   environment and detect the attacker.    
+   environment and detect the attacker.
+   
+- [maximal_attack_vs_dqn-v9](training/v9/maximal_attack/dqn/)
+   * This experiment trains a defender agent using dqn to act optimally in the given
+   environment and detect the attacker.       
 
 #### Two Agents
 This is an experiment in the `idsgame-v9` environment. 
@@ -1038,5 +1069,9 @@ it is intended for 2-agent simulations or RL training.
       
 - [tabular_q_learning_vs_tabular_q_learning-v9](training/v9/two_agents/tabular_q_learning/)
    * This experiment trains both an attacker and a defender agent simultaneously against each other 
-   using tabular q-learning.   
+   using tabular q-learning.
+   
+- [dqn_vs_dqn-v9](training/v9/two_agents/dqn/)
+   * This experiment trains both an attacker and a defender agent simultaneously against each other 
+   using DQN.       
    
