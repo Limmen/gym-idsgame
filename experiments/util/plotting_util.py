@@ -4562,121 +4562,121 @@ def plot_all_averages(maximal_attack_train_csv_paths, maximal_attack_eval_csv_pa
             )
 
     # Save mean and std data
-    with open(output_dir + "/data/hack_prob_train_min_defense_means.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_train_min_defense_means_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_train_min_defense_means"])
         for row in hack_prob_train_min_defense_means.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_train_min_defense_stds.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_train_min_defense_stds_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_train_min_defense_stds"])
         for row in hack_prob_train_min_defense_stds.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_train_random_defense_means.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_train_random_defense_means_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_train_random_defense_means"])
         for row in hack_prob_train_random_defense_means.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_train_random_defense_stds.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_train_random_defense_stds_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_train_random_defense_stds"])
         for row in hack_prob_train_random_defense_stds.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_train_max_attack_means.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_train_max_attack_means_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_train_max_attack_means"])
         for row in hack_prob_train_max_attack_means.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_train_max_attack_stds.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_train_max_attack_stds_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_train_max_attack_stds"])
         for row in hack_prob_train_max_attack_stds.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_train_random_attack_means.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_train_random_attack_means_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_train_random_attack_means"])
         for row in hack_prob_train_random_attack_means.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_train_random_attack_stds.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_train_random_attack_stds_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_train_random_attack_stds"])
         for row in hack_prob_train_random_attack_stds.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_train_two_agents_means.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_train_two_agents_means_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_train_two_agents_means"])
         for row in hack_prob_train_two_agents_means.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_train_two_agents_stds.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_train_two_agents_stds_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_train_two_agents_stds"])
         for row in hack_prob_train_two_agents_stds.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_eval_min_defense_means.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_eval_min_defense_means_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_eval_min_defense_means"])
         for row in hack_prob_eval_min_defense_means.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_eval_min_defense_stds.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_eval_min_defense_stds_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_eval_min_defense_stds"])
         for row in hack_prob_eval_min_defense_stds.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_eval_random_defense_means.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_eval_random_defense_means_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_eval_random_defense_means"])
         for row in hack_prob_eval_random_defense_means.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_eval_random_defense_stds.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_eval_random_defense_stds_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_eval_random_defense_stds"])
         for row in hack_prob_eval_random_defense_stds.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_eval_max_attack_means.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_eval_max_attack_means_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_eval_max_attack_means"])
         for row in hack_prob_eval_max_attack_means.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_eval_max_attack_stds.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_eval_max_attack_stds_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_eval_max_attack_stds"])
         for row in hack_prob_eval_max_attack_stds.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_eval_random_attack_means.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_eval_random_attack_means_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_eval_random_attack_means"])
         for row in hack_prob_eval_random_attack_means.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_eval_random_attack_stds.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_eval_random_attack_stds_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_eval_random_attack_stds"])
         for row in hack_prob_eval_random_attack_stds.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_eval_two_agents_means.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_eval_two_agents_means_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_eval_two_agents_means"])
         for row in hack_prob_eval_two_agents_means.tolist():
             writer.writerow([row])
 
-    with open(output_dir + "/data/hack_prob_eval_two_agents_stds.csv", "w") as f:
+    with open(output_dir + "/data/hack_prob_eval_two_agents_stds_" + algorithm + ".csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["hack_prob_eval_two_agents_stds"])
         for row in hack_prob_eval_two_agents_stds.tolist():
