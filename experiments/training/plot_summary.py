@@ -279,7 +279,6 @@ def plot_summary(algorithm : str, eval_freq : int, train_log_freq : int):
             two_agents_train_csv_paths_v7.append(two_agents_train_csv_path)
             two_agents_eval_csv_paths_v7.append(two_agents_eval_csv_path)
 
-
         # V8
         maximal_attack_train_csv_paths_v8 = []
         maximal_attack_eval_csv_paths_v8 = []
@@ -466,7 +465,16 @@ def plot():
         hyperparameters = pd.read_csv(hyperparam_csv_path)
     eval_freq = hyperparameters.loc[hyperparameters['parameter'] == "eval_frequency"]["value"].values[0]
     train_log_freq = hyperparameters.loc[hyperparameters['parameter'] == "train_log_frequency"]["value"].values[0]
-    plot_summary("tabular_q_learning", int(eval_freq), int(train_log_freq))
+    # try:
+    #     plot_summary("tabular_q_learning", int(eval_freq), int(train_log_freq))
+    # except Exception as e:
+    #     print("there was an error plotting summary of tabular Q learning results")
+    #     print(str(e))
+    try:
+        plot_summary("dqn", int(eval_freq), int(train_log_freq))
+    except Exception as e:
+        print("there was an error plotting summary of DQN results")
+        print(str(e))
 
 
 if __name__ == '__main__':
