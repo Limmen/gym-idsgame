@@ -1896,6 +1896,458 @@ def plot_all_avg_summary_3(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1
     fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight')
 
 
+def plot_all_avg_summary_5(x_1_a_v0, x_1_d_v0, y_1_a_v0, y_1_d_v0, x_2_a_v0, x_2_d_v0, y_2_a_v0, y_2_d_v0,
+                           x_3_a_v0, x_3_d_v0, y_3_a_v0, y_3_d_v0,
+                           std_1_a_v0, std_1_d_v0, std_2_a_v0, std_2_d_v0, std_3_a_v0, std_3_d_v0,
+
+                           x_1_a_v1, x_1_d_v1, y_1_a_v1, y_1_d_v1, x_2_a_v1, x_2_d_v1, y_2_a_v1, y_2_d_v1,
+                           x_3_a_v1, x_3_d_v1, y_3_a_v1, y_3_d_v1,
+                           std_1_a_v1, std_1_d_v1, std_2_a_v1, std_2_d_v1, std_3_a_v1, std_3_d_v1,
+
+                           x_1_a_v2, x_1_d_v2, y_1_a_v2, y_1_d_v2, x_2_a_v2, x_2_d_v2, y_2_a_v2, y_2_d_v2,
+                           x_3_a_v2, x_3_d_v2, y_3_a_v2, y_3_d_v2,
+                           std_1_a_v2, std_1_d_v2, std_2_a_v2, std_2_d_v2, std_3_a_v2, std_3_d_v2,
+
+                           x_1_a_v3, x_1_d_v3, y_1_a_v3, y_1_d_v3, x_2_a_v3, x_2_d_v3, y_2_a_v3, y_2_d_v3,
+                           x_3_a_v3, x_3_d_v3, y_3_a_v3, y_3_d_v3,
+                           std_1_a_v3, std_1_d_v3, std_2_a_v3, std_2_d_v3, std_3_a_v3, std_3_d_v3,
+
+                           x_1_a_v4, x_1_d_v4, y_1_a_v4, y_1_d_v4, x_2_a_v4, x_2_d_v4, y_2_a_v4, y_2_d_v4,
+                           x_3_a_v4, x_3_d_v4, y_3_a_v4, y_3_d_v4,
+                           std_1_a_v4, std_1_d_v4, std_2_a_v4, std_2_d_v4, std_3_a_v4, std_3_d_v4,
+
+                           markevery,line_label_1, line_label_2, title_1, title_2, title_3, title_4, title_5,
+                           xlabel, ylabel,
+                           file_name,
+                           wspace=0.28
+                           ):
+
+    plt.rc('text', usetex=True)
+    plt.rc('text.latex', preamble=r'\usepackage{amsfonts}')
+    plt.rcParams.update({'font.size': 6})
+    fig, ax = plt.subplots(nrows=5, ncols=3, figsize=(8, 7))
+
+    # MaxAttack vs DQN
+    # V8
+    xlims = (min(x_1_d_v0), max(x_1_d_v0))
+    ylims = (min(y_1_d_v0-std_1_d_v0), max(y_1_d_v0+std_1_d_v0))
+
+    ax[0][0].plot(x_1_d_v0, y_1_d_v0, label=line_label_2, marker="s", ls='-', color='#f9a65a',
+                  markevery=markevery)
+    ax[0][0].fill_between(x_1_d_v0, y_1_d_v0-std_1_d_v0, y_1_d_v0 + std_1_d_v0,
+                          alpha=0.35, color='#f9a65a')
+
+    ax[0][0].set_xlim(xlims)
+    #ax[0][0].set_ylim(ylims)
+
+    ax[0][0].set_title(title_1 + " v0")
+    ax[0][0].set_xlabel(xlabel)
+    ax[0][0].set_ylabel(ylabel)
+    # set the grid on
+    ax[0][0].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[0][0].xaxis.get_label()
+    ylab = ax[0][0].yaxis.get_label()
+
+    # change the color of the top and right spines to opaque gray
+    ax[0][0].spines['right'].set_color((.8, .8, .8))
+    ax[0][0].spines['top'].set_color((.8, .8, .8))
+
+    # V9
+    xlims = (min(x_2_d_v0), max(x_2_d_v0))
+    ylims = (min(y_2_d_v0-std_2_d_v0), max(y_2_d_v0+std_2_d_v0))
+
+    ax[0][1].plot(x_2_d_v0, y_2_d_v0, label=line_label_2, marker="s", ls='-', color='#f9a65a',
+                  markevery=markevery)
+    ax[0][1].fill_between(x_2_d_v0, y_2_d_v0-std_2_d_v0, y_2_d_v0 + std_2_d_v0,
+                          alpha=0.35, color='#f9a65a')
+
+    ax[0][1].set_xlim(xlims)
+    #ax[0][1].set_ylim(ylims)
+
+    ax[0][1].set_title(title_1 + " v1")
+    ax[0][1].set_xlabel(xlabel)
+    ax[0][1].set_ylabel(ylabel)
+    # set the grid on
+    ax[0][1].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[0][1].xaxis.get_label()
+    ylab = ax[0][1].yaxis.get_label()
+
+    # change the color of the top and right spines to opaque gray
+    ax[0][1].spines['right'].set_color((.8, .8, .8))
+    ax[0][1].spines['top'].set_color((.8, .8, .8))
+
+    # V7
+    xlims = (min(x_3_d_v0), max(x_3_d_v0))
+    ylims = (min(y_3_d_v0 - std_3_d_v0), max(y_3_d_v0 + std_3_d_v0))
+
+    ax[0][2].plot(x_3_d_v0, y_3_d_v0, label=line_label_2, marker="s", ls='-', color='#f9a65a',
+                  markevery=markevery)
+    ax[0][2].fill_between(x_3_d_v0, y_3_d_v0 - std_3_d_v0, y_3_d_v0 + std_3_d_v0,
+                          alpha=0.35, color='#f9a65a')
+
+    ax[0][2].set_xlim(xlims)
+    # ax[0][2].set_ylim(ylims)
+
+    ax[0][2].set_title(title_1 + " v2")
+    ax[0][2].set_xlabel(xlabel)
+    ax[0][2].set_ylabel(ylabel)
+    # set the grid on
+    ax[0][2].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[0][2].xaxis.get_label()
+    ylab = ax[0][2].yaxis.get_label()
+
+    # change the color of the top and right spines to opaque gray
+    ax[0][2].spines['right'].set_color((.8, .8, .8))
+    ax[0][2].spines['top'].set_color((.8, .8, .8))
+
+    # DQN vs MinDefense
+    # V8
+    xlims = (min(x_1_a_v1), max(x_1_a_v1))
+    ylims = (min(y_1_a_v1 - std_1_a_v1), max(y_1_a_v1 + std_1_a_v1))
+
+    ax[1][0].plot(x_1_a_v1, y_1_a_v1, label=line_label_2, marker="s", ls='-', color='#599ad3',
+                  markevery=markevery)
+    ax[1][0].fill_between(x_1_a_v1, y_1_a_v1 - std_1_a_v1, y_1_a_v1 + std_1_a_v1,
+                          alpha=0.35, color='#599ad3')
+
+    ax[1][0].set_xlim(xlims)
+    # ax[1][0].set_ylim(ylims)
+
+    ax[1][0].set_title(title_2 + " v0")
+    ax[1][0].set_xlabel(xlabel)
+    ax[1][0].set_ylabel(ylabel)
+    # set the grid on
+    ax[1][0].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[1][0].xaxis.get_label()
+    ylab = ax[1][0].yaxis.get_label()
+
+    # change the color of the top and right spines to opaque gray
+    ax[1][0].spines['right'].set_color((.8, .8, .8))
+    ax[1][0].spines['top'].set_color((.8, .8, .8))
+
+    # V9
+    xlims = (min(x_2_a_v1), max(x_2_a_v1))
+    ylims = (min(y_2_a_v1 - std_2_a_v1), max(y_2_a_v1 + std_2_a_v1))
+
+    ax[1][1].plot(x_2_a_v1, y_2_a_v1, label=line_label_2, marker="s", ls='-', color='#599ad3',
+                  markevery=markevery)
+    ax[1][1].fill_between(x_2_a_v1, y_2_a_v1 - std_2_a_v1, y_2_a_v1 + std_2_a_v1,
+                          alpha=0.35, color='#599ad3')
+
+    ax[1][1].set_xlim(xlims)
+    # ax[1][1].set_ylim(ylims)
+
+    ax[1][1].set_title(title_2 + " v1")
+    ax[1][1].set_xlabel(xlabel)
+    ax[1][1].set_ylabel(ylabel)
+    # set the grid on
+    ax[1][1].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[1][1].xaxis.get_label()
+    ylab = ax[1][1].yaxis.get_label()
+
+    # change the color of the top and right spines to opaque gray
+    ax[1][1].spines['right'].set_color((.8, .8, .8))
+    ax[1][1].spines['top'].set_color((.8, .8, .8))
+
+    # V7
+    xlims = (min(x_3_a_v1), max(x_3_a_v1))
+    ylims = (min(y_3_a_v1 - std_3_a_v1), max(y_3_a_v1 + std_3_a_v1))
+
+    ax[1][2].plot(x_3_a_v1, y_3_a_v1, label=line_label_2, marker="s", ls='-', color='#599ad3',
+                  markevery=markevery)
+    ax[1][2].fill_between(x_3_a_v1, y_3_a_v1 - std_3_a_v1, y_3_a_v1 + std_3_a_v1,
+                          alpha=0.35, color='#599ad3')
+
+    ax[1][2].set_xlim(xlims)
+    # ax[1][2].set_ylim(ylims)
+
+    ax[1][2].set_title(title_2 + " v2")
+    ax[1][2].set_xlabel(xlabel)
+    ax[1][2].set_ylabel(ylabel)
+    # set the grid on
+    ax[1][2].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[1][2].xaxis.get_label()
+    ylab = ax[1][2].yaxis.get_label()
+
+    # change the color of the top and right spines to opaque gray
+    ax[1][2].spines['right'].set_color((.8, .8, .8))
+    ax[1][2].spines['top'].set_color((.8, .8, .8))
+
+    # RandomAttack vs DQN
+    # V8
+    xlims = (min(x_1_d_v2), max(x_1_d_v2))
+    ylims = (min(y_1_d_v2 - std_1_d_v2), max(y_1_d_v2 + std_1_d_v2))
+
+    ax[2][0].plot(x_1_d_v2, y_1_d_v2, label=line_label_2, marker="s", ls='-', color='#f9a65a',
+                  markevery=markevery)
+    ax[2][0].fill_between(x_1_d_v2, y_1_d_v2 - std_1_d_v2, y_1_d_v2 + std_1_d_v2,
+                          alpha=0.35, color='#f9a65a')
+
+    ax[2][0].set_xlim(xlims)
+    # ax[2][0].set_ylim(ylims)
+
+    ax[2][0].set_title(title_3 + " v0")
+    ax[2][0].set_xlabel(xlabel)
+    ax[2][0].set_ylabel(ylabel)
+    # set the grid on
+    ax[2][0].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[2][0].xaxis.get_label()
+    ylab = ax[2][0].yaxis.get_label()
+
+    # change the color of the top and right spines to opaque gray
+    ax[2][0].spines['right'].set_color((.8, .8, .8))
+    ax[2][0].spines['top'].set_color((.8, .8, .8))
+
+    # V9
+    xlims = (min(x_2_d_v2), max(x_2_d_v2))
+    ylims = (min(y_2_d_v2 - std_2_d_v2), max(y_2_d_v2 + std_2_d_v2))
+
+    ax[2][1].plot(x_2_d_v2, y_2_d_v2, label=line_label_2, marker="s", ls='-', color='#f9a65a',
+                  markevery=markevery)
+    ax[2][1].fill_between(x_2_d_v2, y_2_d_v2 - std_2_d_v2, y_2_d_v2 + std_2_d_v2,
+                          alpha=0.35, color='#f9a65a')
+
+    ax[2][1].set_xlim(xlims)
+    # ax[2][1].set_ylim(ylims)
+
+    ax[2][1].set_title(title_3 + " v1")
+    ax[2][1].set_xlabel(xlabel)
+    ax[2][1].set_ylabel(ylabel)
+    # set the grid on
+    ax[2][1].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[2][1].xaxis.get_label()
+    ylab = ax[2][1].yaxis.get_label()
+
+    # change the color of the top and right spines to opaque gray
+    ax[2][1].spines['right'].set_color((.8, .8, .8))
+    ax[2][1].spines['top'].set_color((.8, .8, .8))
+
+    # V7
+    xlims = (min(x_3_d_v2), max(x_3_d_v2))
+    ylims = (min(y_3_d_v2 - std_3_d_v2), max(y_3_d_v2 + std_3_d_v2))
+
+    ax[2][2].plot(x_3_d_v2, y_3_d_v2, label=line_label_2, marker="s", ls='-', color='#f9a65a',
+                  markevery=markevery)
+    ax[2][2].fill_between(x_3_d_v2, y_3_d_v2 - std_3_d_v2, y_3_d_v2 + std_3_d_v2,
+                          alpha=0.35, color='#f9a65a')
+
+    ax[2][2].set_xlim(xlims)
+    # ax[2][2].set_ylim(ylims)
+
+    ax[2][2].set_title(title_3 + " v2")
+    ax[2][2].set_xlabel(xlabel)
+    ax[2][2].set_ylabel(ylabel)
+    # set the grid on
+    ax[2][2].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[2][2].xaxis.get_label()
+    ylab = ax[2][2].yaxis.get_label()
+
+    # change the color of the top and right spines to opaque gray
+    ax[2][2].spines['right'].set_color((.8, .8, .8))
+    ax[2][2].spines['top'].set_color((.8, .8, .8))
+
+    # DQN vs RandomDefense
+    # V8
+    xlims = (min(x_1_a_v3), max(x_1_a_v3))
+    ylims = (min(y_1_a_v3 - std_1_a_v3), max(y_1_a_v3 + std_1_a_v3))
+
+    ax[3][0].plot(x_1_a_v3, y_1_a_v3, label=line_label_2, marker="s", ls='-', color='#599ad3',
+                  markevery=markevery)
+    ax[3][0].fill_between(x_1_a_v3, y_1_a_v3 - std_1_a_v3, y_1_a_v3 + std_1_a_v3,
+                          alpha=0.35, color='#599ad3')
+
+    ax[3][0].set_xlim(xlims)
+    # ax[3][0].set_ylim(ylims)
+
+    ax[3][0].set_title(title_4 + " v0")
+    ax[3][0].set_xlabel(xlabel)
+    ax[3][0].set_ylabel(ylabel)
+    # set the grid on
+    ax[3][0].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[3][0].xaxis.get_label()
+    ylab = ax[3][0].yaxis.get_label()
+
+    # change the color of the top and right spines to opaque gray
+    ax[3][0].spines['right'].set_color((.8, .8, .8))
+    ax[3][0].spines['top'].set_color((.8, .8, .8))
+
+    # V9
+    xlims = (min(x_2_a_v3), max(x_2_a_v3))
+    #ylims = (min(y_2_a_v3 - std_2_a_v3), max(y_2_a_v3 + std_2_a_v3))
+
+    ax[3][1].plot(x_2_a_v3, y_2_a_v3, label=line_label_2, marker="s", ls='-', color='#599ad3',
+                  markevery=markevery)
+    ax[3][1].fill_between(x_2_a_v3, y_2_a_v3 - std_2_a_v3, y_2_a_v3 + std_2_a_v3,
+                          alpha=0.35, color='#599ad3')
+
+    ax[3][1].set_xlim(xlims)
+    # ax[3][1].set_ylim(ylims)
+
+    ax[3][1].set_title(title_4 + " v1")
+    ax[3][1].set_xlabel(xlabel)
+    ax[3][1].set_ylabel(ylabel)
+    # set the grid on
+    ax[3][1].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[3][1].xaxis.get_label()
+    ylab = ax[3][1].yaxis.get_label()
+
+    # change the color of the top and right spines to opaque gray
+    ax[3][1].spines['right'].set_color((.8, .8, .8))
+    ax[3][1].spines['top'].set_color((.8, .8, .8))
+
+    # V7
+    xlims = (min(x_3_a_v3), max(x_3_a_v3))
+    ylims = (min(y_3_a_v3 - std_3_a_v3), max(y_3_a_v3 + std_3_a_v3))
+
+    ax[3][2].plot(x_3_a_v3, y_3_a_v3, label=line_label_2, marker="s", ls='-', color='#599ad3',
+                  markevery=markevery)
+    ax[3][2].fill_between(x_3_a_v3, y_3_a_v3 - std_3_a_v3, y_3_a_v3 + std_3_a_v4,
+                          alpha=0.35, color='#599ad3')
+
+    ax[3][2].set_xlim(xlims)
+    # ax[3][2].set_ylim(ylims)
+
+    ax[3][2].set_title(title_4 + " v2")
+    ax[3][2].set_xlabel(xlabel)
+    ax[3][2].set_ylabel(ylabel)
+    # set the grid on
+    ax[3][2].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[3][2].xaxis.get_label()
+    ylab = ax[3][2].yaxis.get_label()
+
+    # change the color of the top and right spines to opaque gray
+    ax[3][2].spines['right'].set_color((.8, .8, .8))
+    ax[3][2].spines['top'].set_color((.8, .8, .8))
+
+    # DQN vs DQN
+    # V8
+    xlims = (min(x_1_a_v4), max(x_1_a_v4))
+    ylims = (min(y_1_a_v4 - std_1_a_v4), max(y_1_a_v4 + std_1_a_v4))
+
+    ax[4][0].plot(x_1_a_v4, y_1_a_v4, label=line_label_1, marker="s", ls='-', color='#599ad3',
+                  markevery=markevery)
+    ax[4][0].fill_between(x_1_a_v4, y_1_a_v4 - std_1_a_v4, y_1_a_v4 + std_1_a_v4,
+                          alpha=0.35, color='#599ad3')
+
+    ax[4][0].plot(x_1_d_v4, y_1_d_v4, label=line_label_2, marker="s", ls='-', color='#f9a65a',
+                  markevery=markevery)
+    ax[4][0].fill_between(x_1_d_v4, y_1_d_v4 - std_1_d_v4, y_1_d_v4 + std_1_d_v4,
+                          alpha=0.35, color='#f9a65a')
+
+    ax[4][0].set_xlim(xlims)
+    # ax[4][0].set_ylim(ylims)
+
+    ax[4][0].set_title(title_4 + " v0")
+    ax[4][0].set_xlabel(xlabel)
+    ax[4][0].set_ylabel(ylabel)
+    # set the grid on
+    ax[4][0].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[4][0].xaxis.get_label()
+    ylab = ax[4][0].yaxis.get_label()
+
+    # change the color of the top and right spines to opaque gray
+    ax[4][0].spines['right'].set_color((.8, .8, .8))
+    ax[4][0].spines['top'].set_color((.8, .8, .8))
+
+    # V9
+    xlims = (min(x_2_a_v4), max(x_2_a_v4))
+    ylims = (min(y_2_a_v4 - std_2_a_v4), max(y_2_a_v4 + std_2_a_v4))
+
+    ax[4][1].plot(x_2_a_v4, y_2_a_v4, label=line_label_1, marker="s", ls='-', color='#599ad3',
+                  markevery=markevery)
+    ax[4][1].fill_between(x_2_a_v4, y_2_a_v4 - std_2_a_v4, y_2_a_v4 + std_2_a_v4,
+                          alpha=0.35, color='#599ad3')
+
+    ax[4][1].plot(x_2_d_v4, y_2_d_v4, label=line_label_2, marker="s", ls='-', color='#f9a65a',
+                  markevery=markevery)
+    ax[4][1].fill_between(x_2_d_v4, y_2_d_v4 - std_2_d_v4, y_2_d_v4 + std_2_d_v4,
+                          alpha=0.35, color='#f9a65a')
+
+    ax[4][1].set_xlim(xlims)
+    # ax[4][1].set_ylim(ylims)
+
+    ax[4][1].set_title(title_4 + " v1")
+    ax[4][1].set_xlabel(xlabel)
+    ax[4][1].set_ylabel(ylabel)
+    # set the grid on
+    ax[4][1].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[4][1].xaxis.get_label()
+    ylab = ax[4][1].yaxis.get_label()
+
+    # change the color of the top and right spines to opaque gray
+    ax[4][1].spines['right'].set_color((.8, .8, .8))
+    ax[4][1].spines['top'].set_color((.8, .8, .8))
+
+    # V7
+    xlims = (min(x_3_a_v4), max(x_3_a_v4))
+    ylims = (min(y_3_a_v4 - std_3_a_v4), max(y_3_a_v4 + std_3_a_v4))
+
+    ax[4][2].plot(x_3_a_v4, y_3_a_v4, label=line_label_1, marker="s", ls='-', color='#599ad3',
+                  markevery=markevery)
+    ax[4][2].fill_between(x_3_a_v4, y_3_a_v4 - std_3_a_v4, y_3_a_v4 + std_3_a_v4,
+                          alpha=0.35, color='#599ad3')
+
+    ax[4][2].plot(x_3_d_v4, y_3_d_v4, label=line_label_2, marker="s", ls='-', color='#f9a65a',
+                  markevery=markevery)
+    ax[4][2].fill_between(x_3_d_v4, y_3_d_v4 - std_3_d_v4, y_3_d_v4 + std_3_d_v4,
+                          alpha=0.35, color='#f9a65a')
+
+    ax[4][2].set_xlim(xlims)
+    # ax[4][2].set_ylim(ylims)
+
+    ax[4][2].set_title(title_4 + " v2")
+    ax[4][2].set_xlabel(xlabel)
+    ax[4][2].set_ylabel(ylabel)
+    # set the grid on
+    ax[4][2].grid('on')
+
+    # tweak the axis labels
+    xlab = ax[4][2].xaxis.get_label()
+    ylab = ax[4][2].yaxis.get_label()
+
+    # change the color of the top and right spines to opaque gray
+    ax[4][2].spines['right'].set_color((.8, .8, .8))
+    ax[4][2].spines['top'].set_color((.8, .8, .8))
+
+    lines_labels = [ax[4][1].get_legend_handles_labels()]
+    lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
+    # ax = fig.add_axes([0.1, 0.1, 0.6, 0.75])
+    fig.legend(lines, labels, loc=(0.4, 0.012), ncol=2, borderaxespad=0.)
+
+    fig.tight_layout()
+    plt.subplots_adjust(wspace=wspace, hspace=0.7)
+    fig.subplots_adjust(bottom=0.08)
+    fig.savefig(file_name + ".png", format="png", dpi=600, bbox_inches='tight')
+    fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight')
+
 def plot_all_avg_summary_4(x_1_1_v0, y_1_1_v0, x_1_2_v0, y_1_2_v0, x_1_3_v0, y_1_3_v0, x_1_4_v0, y_1_4_v0,
                            x_1_5_v0, y_1_5_v0, x_1_6_v0, y_1_6_v0,
                            std_1_1_v0, std_1_2_v0, std_1_3_v0, std_1_4_v0, std_1_5_v0, std_1_6_v0,
@@ -2892,8 +3344,6 @@ def plot_sparse_dense_difference(maximal_attack_train_csv_paths_v0, maximal_atta
     hack_prob_eval_max_attack_means_v7 = np.mean(tuple(hack_prob_eval_max_attack_data_v7), axis=0)
     hack_prob_eval_max_attack_stds_v7 = np.std(tuple(hack_prob_eval_max_attack_data_v7), axis=0, ddof=1)
 
-    ##print("max attack data v2 : {}".format(hack_prob_eval_max_attack_data_v2[5][-5:]))
-
     train_min_defense_dfs_v7 = []
     eval_min_defense_dfs_v7 = []
     for csv_path in minimal_defense_train_csv_paths_v7:
@@ -3060,6 +3510,397 @@ def plot_sparse_dense_difference(maximal_attack_train_csv_paths_v0, maximal_atta
                            output_dir + "/" + file_name + algorithm + "_" + str(0),
                            wspace=wspace
                            )
+
+
+def plot_loss_functions_summary(maximal_attack_train_csv_paths_v8, maximal_attack_eval_csv_paths_v8,
+                                minimal_defense_train_csv_paths_v8, minimal_defense_eval_csv_paths_v8,
+                                random_attack_train_csv_paths_v8, random_attack_eval_csv_paths_v8,
+                                random_defense_train_csv_paths_v8, random_defense_eval_csv_paths_v8,
+                                two_agents_train_csv_paths_v8, two_agents_eval_csv_paths_v8,
+
+                                maximal_attack_train_csv_paths_v9, maximal_attack_eval_csv_paths_v9,
+                                minimal_defense_train_csv_paths_v9, minimal_defense_eval_csv_paths_v9,
+                                random_attack_train_csv_paths_v9, random_attack_eval_csv_paths_v9,
+                                random_defense_train_csv_paths_v9, random_defense_eval_csv_paths_v9,
+                                two_agents_train_csv_paths_v9, two_agents_eval_csv_paths_v9,
+
+                                maximal_attack_train_csv_paths_v7, maximal_attack_eval_csv_paths_v7,
+                                minimal_defense_train_csv_paths_v7, minimal_defense_eval_csv_paths_v7,
+                                random_attack_train_csv_paths_v7, random_attack_eval_csv_paths_v7,
+                                random_defense_train_csv_paths_v7, random_defense_eval_csv_paths_v7,
+                                two_agents_train_csv_paths_v7, two_agents_eval_csv_paths_v7,
+
+                                algorithm, output_dir, eval_freq : int, train_log_freq : int, versions: list,
+                                wspace=0.28, file_name = "combined_plot_mult_versions_"):
+
+    # V8
+    train_max_attack_dfs_v8 = []
+    eval_max_attack_dfs_v8 = []
+    for csv_path in maximal_attack_train_csv_paths_v8:
+        df = read_data(csv_path)
+        train_max_attack_dfs_v8.append(df)
+
+    for csv_path in maximal_attack_eval_csv_paths_v8:
+        df = read_data(csv_path)
+        eval_max_attack_dfs_v8.append(df)
+
+    a_loss_train_max_attack_data_v8 = list(map(lambda df: df["avg_episode_loss_attacker"].values, train_max_attack_dfs_v8))
+    a_loss_train_max_attack_means_v8 = np.mean(tuple(a_loss_train_max_attack_data_v8), axis=0)
+    a_loss_train_max_attack_stds_v8 = np.std(tuple(a_loss_train_max_attack_data_v8), axis=0, ddof=1)
+
+    d_loss_train_max_attack_data_v8 = list(
+        map(lambda df: df["avg_episode_loss_defender"].values, train_max_attack_dfs_v8))
+    d_loss_train_max_attack_means_v8 = np.mean(tuple(d_loss_train_max_attack_data_v8), axis=0)
+    d_loss_train_max_attack_stds_v8 = np.std(tuple(d_loss_train_max_attack_data_v8), axis=0, ddof=1)
+
+    train_min_defense_dfs_v8 = []
+    eval_min_defense_dfs_v8 = []
+    for csv_path in minimal_defense_train_csv_paths_v8:
+        df = read_data(csv_path)
+        train_min_defense_dfs_v8.append(df)
+
+    for csv_path in minimal_defense_eval_csv_paths_v8:
+        df = read_data(csv_path)
+        eval_min_defense_dfs_v8.append(df)
+
+    a_loss_train_min_defense_data_v8 = list(map(lambda df: df["avg_episode_loss_attacker"].values, train_min_defense_dfs_v8))
+    a_loss_train_min_defense_means_v8 = np.mean(tuple(a_loss_train_min_defense_data_v8), axis=0)
+    a_loss_train_min_defense_stds_v8 = np.std(tuple(a_loss_train_min_defense_data_v8), axis=0, ddof=1)
+
+    d_loss_train_min_defense_data_v8 = list(
+        map(lambda df: df["avg_episode_loss_defender"].values, train_min_defense_dfs_v8))
+    d_loss_train_min_defense_means_v8 = np.mean(tuple(d_loss_train_min_defense_data_v8), axis=0)
+    d_loss_train_min_defense_stds_v8 = np.std(tuple(d_loss_train_min_defense_data_v8), axis=0, ddof=1)
+
+    train_random_attack_dfs_v8 = []
+    eval_random_attack_dfs_v8 = []
+    for csv_path in random_attack_train_csv_paths_v8:
+        df = read_data(csv_path)
+        train_random_attack_dfs_v8.append(df)
+
+    for csv_path in random_attack_eval_csv_paths_v8:
+        df = read_data(csv_path)
+        eval_random_attack_dfs_v8.append(df)
+
+    a_loss_train_random_attack_data_v8 = list(
+        map(lambda df: df["avg_episode_loss_attacker"].values, train_random_attack_dfs_v8))
+    a_loss_train_random_attack_means_v8 = np.mean(tuple(a_loss_train_random_attack_data_v8), axis=0)
+    a_loss_train_random_attack_stds_v8 = np.std(tuple(a_loss_train_random_attack_data_v8), axis=0, ddof=1)
+
+    d_loss_train_random_attack_data_v8 = list(
+        map(lambda df: df["avg_episode_loss_defender"].values, train_random_attack_dfs_v8))
+    d_loss_train_random_attack_means_v8 = np.mean(tuple(d_loss_train_random_attack_data_v8), axis=0)
+    d_loss_train_random_attack_stds_v8 = np.std(tuple(d_loss_train_random_attack_data_v8), axis=0, ddof=1)
+
+    train_random_defense_dfs_v8 = []
+    eval_random_defense_dfs_v8 = []
+    for csv_path in random_defense_train_csv_paths_v8:
+        df = read_data(csv_path)
+        train_random_defense_dfs_v8.append(df)
+
+    for csv_path in random_defense_eval_csv_paths_v8:
+        df = read_data(csv_path)
+        eval_random_defense_dfs_v8.append(df)
+
+    a_loss_train_random_defense_data_v8 = list(
+        map(lambda df: df["avg_episode_loss_attacker"].values, train_random_defense_dfs_v8))
+    a_loss_train_random_defense_means_v8 = np.mean(tuple(a_loss_train_random_defense_data_v8), axis=0)
+    a_loss_train_random_defense_stds_v8 = np.std(tuple(a_loss_train_random_defense_data_v8), axis=0, ddof=1)
+
+    d_loss_train_random_defense_data_v8 = list(
+        map(lambda df: df["avg_episode_loss_defender"].values, train_random_defense_dfs_v8))
+    d_loss_train_random_defense_means_v8 = np.mean(tuple(d_loss_train_random_defense_data_v8), axis=0)
+    d_loss_train_random_defense_stds_v8 = np.std(tuple(d_loss_train_random_defense_data_v8), axis=0, ddof=1)
+
+    train_two_agents_dfs_v8 = []
+    eval_two_agents_dfs_v8 = []
+    for csv_path in two_agents_train_csv_paths_v8:
+        df = read_data(csv_path)
+        train_two_agents_dfs_v8.append(df)
+
+    for csv_path in two_agents_eval_csv_paths_v8:
+        df = read_data(csv_path)
+        eval_two_agents_dfs_v8.append(df)
+
+    a_loss_train_two_agents_data_v8 = list(map(lambda df: df["avg_episode_loss_attacker"].values, train_two_agents_dfs_v8))
+    a_loss_train_two_agents_means_v8 = np.mean(tuple(a_loss_train_two_agents_data_v8), axis=0)
+    a_loss_train_two_agents_stds_v8 = np.std(tuple(a_loss_train_two_agents_data_v8), axis=0, ddof=1)
+
+    d_loss_train_two_agents_data_v8 = list(
+        map(lambda df: df["avg_episode_loss_defender"].values, train_two_agents_dfs_v8))
+    d_loss_train_two_agents_means_v8 = np.mean(tuple(d_loss_train_two_agents_data_v8), axis=0)
+    d_loss_train_two_agents_stds_v8 = np.std(tuple(d_loss_train_two_agents_data_v8), axis=0, ddof=1)
+
+    # V9
+    train_max_attack_dfs_v9 = []
+    eval_max_attack_dfs_v9 = []
+    for csv_path in maximal_attack_train_csv_paths_v9:
+        df = read_data(csv_path)
+        train_max_attack_dfs_v9.append(df)
+
+    for csv_path in maximal_attack_eval_csv_paths_v9:
+        df = read_data(csv_path)
+        eval_max_attack_dfs_v9.append(df)
+
+    a_loss_train_max_attack_data_v9 = list(map(lambda df: df["avg_episode_loss_attacker"].values, train_max_attack_dfs_v9))
+    a_loss_train_max_attack_means_v9 = np.mean(tuple(a_loss_train_max_attack_data_v9), axis=0)
+    a_loss_train_max_attack_stds_v9 = np.std(tuple(a_loss_train_max_attack_data_v9), axis=0, ddof=1)
+
+    d_loss_train_max_attack_data_v9 = list(
+        map(lambda df: df["avg_episode_loss_defender"].values, train_max_attack_dfs_v9))
+    d_loss_train_max_attack_means_v9 = np.mean(tuple(d_loss_train_max_attack_data_v9), axis=0)
+    d_loss_train_max_attack_stds_v9 = np.std(tuple(d_loss_train_max_attack_data_v9), axis=0, ddof=1)
+
+    train_min_defense_dfs_v9 = []
+    eval_min_defense_dfs_v9 = []
+    for csv_path in minimal_defense_train_csv_paths_v9:
+        df = read_data(csv_path)
+        train_min_defense_dfs_v9.append(df)
+
+    for csv_path in minimal_defense_eval_csv_paths_v9:
+        df = read_data(csv_path)
+        eval_min_defense_dfs_v9.append(df)
+
+    a_loss_train_min_defense_data_v9 = list(map(lambda df: df["avg_episode_loss_attacker"].values, train_min_defense_dfs_v9))
+    a_loss_train_min_defense_means_v9 = np.mean(tuple(a_loss_train_min_defense_data_v9), axis=0)
+    a_loss_train_min_defense_stds_v9 = np.std(tuple(a_loss_train_min_defense_data_v9), axis=0, ddof=1)
+
+    d_loss_train_min_defense_data_v9 = list(
+        map(lambda df: df["avg_episode_loss_defender"].values, train_min_defense_dfs_v9))
+    d_loss_train_min_defense_means_v9 = np.mean(tuple(d_loss_train_min_defense_data_v9), axis=0)
+    d_loss_train_min_defense_stds_v9 = np.std(tuple(d_loss_train_min_defense_data_v9), axis=0, ddof=1)
+
+    train_random_attack_dfs_v9 = []
+    eval_random_attack_dfs_v9 = []
+    for csv_path in random_attack_train_csv_paths_v9:
+        df = read_data(csv_path)
+        train_random_attack_dfs_v9.append(df)
+
+    for csv_path in random_attack_eval_csv_paths_v9:
+        df = read_data(csv_path)
+        eval_random_attack_dfs_v9.append(df)
+
+    a_loss_train_random_attack_data_v9 = list(
+        map(lambda df: df["avg_episode_loss_attacker"].values, train_random_attack_dfs_v9))
+    a_loss_train_random_attack_means_v9 = np.mean(tuple(a_loss_train_random_attack_data_v9), axis=0)
+    a_loss_train_random_attack_stds_v9 = np.std(tuple(a_loss_train_random_attack_data_v9), axis=0, ddof=1)
+
+    d_loss_train_random_attack_data_v9 = list(
+        map(lambda df: df["avg_episode_loss_defender"].values, train_random_attack_dfs_v9))
+    d_loss_train_random_attack_means_v9 = np.mean(tuple(d_loss_train_random_attack_data_v9), axis=0)
+    d_loss_train_random_attack_stds_v9 = np.std(tuple(d_loss_train_random_attack_data_v9), axis=0, ddof=1)
+
+    train_random_defense_dfs_v9 = []
+    eval_random_defense_dfs_v9 = []
+    for csv_path in random_defense_train_csv_paths_v9:
+        df = read_data(csv_path)
+        train_random_defense_dfs_v9.append(df)
+
+    for csv_path in random_defense_eval_csv_paths_v9:
+        df = read_data(csv_path)
+        eval_random_defense_dfs_v9.append(df)
+
+    a_loss_train_random_defense_data_v9 = list(
+        map(lambda df: df["avg_episode_loss_attacker"].values, train_random_defense_dfs_v9))
+    a_loss_train_random_defense_means_v9 = np.mean(tuple(a_loss_train_random_defense_data_v9), axis=0)
+    a_loss_train_random_defense_stds_v9 = np.std(tuple(a_loss_train_random_defense_data_v9), axis=0, ddof=1)
+
+    d_loss_train_random_defense_data_v9 = list(
+        map(lambda df: df["avg_episode_loss_defender"].values, train_random_defense_dfs_v9))
+    d_loss_train_random_defense_means_v9 = np.mean(tuple(d_loss_train_random_defense_data_v9), axis=0)
+    d_loss_train_random_defense_stds_v9 = np.std(tuple(d_loss_train_random_defense_data_v9), axis=0, ddof=1)
+
+    train_two_agents_dfs_v9 = []
+    eval_two_agents_dfs_v9 = []
+    for csv_path in two_agents_train_csv_paths_v9:
+        df = read_data(csv_path)
+        train_two_agents_dfs_v9.append(df)
+
+    for csv_path in two_agents_eval_csv_paths_v9:
+        df = read_data(csv_path)
+        eval_two_agents_dfs_v9.append(df)
+
+    a_loss_train_two_agents_data_v9 = list(map(lambda df: df["avg_episode_loss_attacker"].values, train_two_agents_dfs_v9))
+    a_loss_train_two_agents_means_v9 = np.mean(tuple(a_loss_train_two_agents_data_v9), axis=0)
+    a_loss_train_two_agents_stds_v9 = np.std(tuple(a_loss_train_two_agents_data_v9), axis=0, ddof=1)
+
+    d_loss_train_two_agents_data_v9 = list(
+        map(lambda df: df["avg_episode_loss_defender"].values, train_two_agents_dfs_v9))
+    d_loss_train_two_agents_means_v9 = np.mean(tuple(d_loss_train_two_agents_data_v9), axis=0)
+    d_loss_train_two_agents_stds_v9 = np.std(tuple(d_loss_train_two_agents_data_v9), axis=0, ddof=1)
+
+    # V7
+    train_max_attack_dfs_v7 = []
+    eval_max_attack_dfs_v7 = []
+    for csv_path in maximal_attack_train_csv_paths_v7:
+        df = read_data(csv_path)
+        train_max_attack_dfs_v7.append(df)
+
+    for csv_path in maximal_attack_eval_csv_paths_v7:
+        df = read_data(csv_path)
+        eval_max_attack_dfs_v7.append(df)
+
+    a_loss_train_max_attack_data_v7 = list(map(lambda df: df["avg_episode_loss_attacker"].values, train_max_attack_dfs_v7))
+    a_loss_train_max_attack_means_v7 = np.mean(tuple(a_loss_train_max_attack_data_v7), axis=0)
+    a_loss_train_max_attack_stds_v7 = np.std(tuple(a_loss_train_max_attack_data_v7), axis=0, ddof=1)
+
+    d_loss_train_max_attack_data_v7 = list(
+        map(lambda df: df["avg_episode_loss_defender"].values, train_max_attack_dfs_v7))
+    d_loss_train_max_attack_means_v7 = np.mean(tuple(d_loss_train_max_attack_data_v7), axis=0)
+    d_loss_train_max_attack_stds_v7 = np.std(tuple(d_loss_train_max_attack_data_v7), axis=0, ddof=1)
+
+
+    train_min_defense_dfs_v7 = []
+    eval_min_defense_dfs_v7 = []
+    for csv_path in minimal_defense_train_csv_paths_v7:
+        df = read_data(csv_path)
+        train_min_defense_dfs_v7.append(df)
+
+    for csv_path in minimal_defense_eval_csv_paths_v7:
+        df = read_data(csv_path)
+        eval_min_defense_dfs_v7.append(df)
+
+    a_loss_train_min_defense_data_v7 = list(map(lambda df: df["avg_episode_loss_attacker"].values, train_min_defense_dfs_v7))
+    a_loss_train_min_defense_means_v7 = np.mean(tuple(a_loss_train_min_defense_data_v7), axis=0)
+    a_loss_train_min_defense_stds_v7 = np.std(tuple(a_loss_train_min_defense_data_v7), axis=0, ddof=1)
+
+    d_loss_train_min_defense_data_v7 = list(
+        map(lambda df: df["avg_episode_loss_defender"].values, train_min_defense_dfs_v7))
+    d_loss_train_min_defense_means_v7 = np.mean(tuple(d_loss_train_min_defense_data_v7), axis=0)
+    d_loss_train_min_defense_stds_v7 = np.std(tuple(d_loss_train_min_defense_data_v7), axis=0, ddof=1)
+
+    train_random_attack_dfs_v7 = []
+    eval_random_attack_dfs_v7 = []
+    for csv_path in random_attack_train_csv_paths_v7:
+        df = read_data(csv_path)
+        train_random_attack_dfs_v7.append(df)
+
+    for csv_path in random_attack_eval_csv_paths_v7:
+        df = read_data(csv_path)
+        eval_random_attack_dfs_v7.append(df)
+
+    a_loss_train_random_attack_data_v7 = list(
+        map(lambda df: df["avg_episode_loss_attacker"].values, train_random_attack_dfs_v7))
+    a_loss_train_random_attack_means_v7 = np.mean(tuple(a_loss_train_random_attack_data_v7), axis=0)
+    a_loss_train_random_attack_stds_v7 = np.std(tuple(a_loss_train_random_attack_data_v7), axis=0, ddof=1)
+
+    d_loss_train_random_attack_data_v7 = list(
+        map(lambda df: df["avg_episode_loss_defender"].values, train_random_attack_dfs_v7))
+    d_loss_train_random_attack_means_v7 = np.mean(tuple(d_loss_train_random_attack_data_v7), axis=0)
+    d_loss_train_random_attack_stds_v7 = np.std(tuple(d_loss_train_random_attack_data_v7), axis=0, ddof=1)
+
+    train_random_defense_dfs_v7 = []
+    eval_random_defense_dfs_v7 = []
+    for csv_path in random_defense_train_csv_paths_v7:
+        df = read_data(csv_path)
+        train_random_defense_dfs_v7.append(df)
+
+    for csv_path in random_defense_eval_csv_paths_v7:
+        df = read_data(csv_path)
+        eval_random_defense_dfs_v7.append(df)
+
+    a_loss_train_random_defense_data_v7 = list(
+        map(lambda df: df["avg_episode_loss_attacker"].values, train_random_defense_dfs_v7))
+    a_loss_train_random_defense_means_v7 = np.mean(tuple(a_loss_train_random_defense_data_v7), axis=0)
+    a_loss_train_random_defense_stds_v7 = np.std(tuple(a_loss_train_random_defense_data_v7), axis=0, ddof=1)
+
+    d_loss_train_random_defense_data_v7 = list(
+        map(lambda df: df["avg_episode_loss_defender"].values, train_random_defense_dfs_v7))
+    d_loss_train_random_defense_means_v7 = np.mean(tuple(d_loss_train_random_defense_data_v7), axis=0)
+    d_loss_train_random_defense_stds_v7 = np.std(tuple(d_loss_train_random_defense_data_v7), axis=0, ddof=1)
+
+    train_two_agents_dfs_v7 = []
+    eval_two_agents_dfs_v7 = []
+    for csv_path in two_agents_train_csv_paths_v7:
+        df = read_data(csv_path)
+        train_two_agents_dfs_v7.append(df)
+
+    for csv_path in two_agents_eval_csv_paths_v7:
+        df = read_data(csv_path)
+        eval_two_agents_dfs_v7.append(df)
+
+    a_loss_train_two_agents_data_v7 = list(map(lambda df: df["avg_episode_loss_attacker"].values, train_two_agents_dfs_v7))
+    a_loss_train_two_agents_means_v7 = np.mean(tuple(a_loss_train_two_agents_data_v7), axis=0)
+    a_loss_train_two_agents_stds_v7 = np.std(tuple(a_loss_train_two_agents_data_v7), axis=0, ddof=1)
+
+    d_loss_train_two_agents_data_v7 = list(
+        map(lambda df: df["avg_episode_loss_defender"].values, train_two_agents_dfs_v7))
+    d_loss_train_two_agents_means_v7 = np.mean(tuple(d_loss_train_two_agents_data_v7), axis=0)
+    d_loss_train_two_agents_stds_v7 = np.std(tuple(d_loss_train_two_agents_data_v7), axis=0, ddof=1)
+
+    plot_all_avg_summary_5(
+        (np.array(list(range(len(a_loss_train_max_attack_data_v8[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        (np.array(list(range(len(d_loss_train_max_attack_data_v8[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        a_loss_train_max_attack_means_v8[::eval_freq // train_log_freq], d_loss_train_max_attack_means_v8[::eval_freq // train_log_freq],
+        (np.array(list(range(len(a_loss_train_max_attack_data_v9[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        (np.array(list(range(len(d_loss_train_max_attack_data_v9[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        a_loss_train_max_attack_means_v9[::eval_freq // train_log_freq], d_loss_train_max_attack_means_v9[::eval_freq // train_log_freq],
+        (np.array(list(range(len(a_loss_train_max_attack_data_v7[0])))) * train_log_freq)[::eval_freq//train_log_freq],
+        (np.array(list(range(len(d_loss_train_max_attack_data_v7[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        a_loss_train_max_attack_means_v7[::eval_freq // train_log_freq], d_loss_train_max_attack_means_v7[::eval_freq // train_log_freq],
+        a_loss_train_max_attack_stds_v8[::eval_freq // train_log_freq], d_loss_train_max_attack_stds_v8[::eval_freq // train_log_freq],
+        a_loss_train_max_attack_stds_v9[::eval_freq // train_log_freq], d_loss_train_max_attack_stds_v9[::eval_freq // train_log_freq],
+        a_loss_train_max_attack_stds_v7[::eval_freq // train_log_freq], d_loss_train_max_attack_stds_v7[::eval_freq // train_log_freq],
+
+        (np.array(list(range(len(a_loss_train_min_defense_data_v8[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        (np.array(list(range(len(d_loss_train_min_defense_data_v8[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        a_loss_train_min_defense_means_v8[::eval_freq // train_log_freq], d_loss_train_min_defense_means_v8[::eval_freq // train_log_freq],
+        (np.array(list(range(len(a_loss_train_min_defense_data_v9[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        (np.array(list(range(len(d_loss_train_min_defense_data_v9[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        a_loss_train_min_defense_means_v9[::eval_freq // train_log_freq], d_loss_train_min_defense_means_v9[::eval_freq // train_log_freq],
+        (np.array(list(range(len(a_loss_train_min_defense_data_v7[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        (np.array(list(range(len(d_loss_train_min_defense_data_v7[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        a_loss_train_min_defense_means_v7[::eval_freq // train_log_freq], d_loss_train_min_defense_means_v7[::eval_freq // train_log_freq],
+        a_loss_train_min_defense_stds_v8[::eval_freq // train_log_freq], d_loss_train_min_defense_stds_v8[::eval_freq // train_log_freq],
+        a_loss_train_min_defense_stds_v9[::eval_freq // train_log_freq], d_loss_train_min_defense_stds_v9[::eval_freq // train_log_freq],
+        a_loss_train_min_defense_stds_v7[::eval_freq // train_log_freq], d_loss_train_min_defense_stds_v7[::eval_freq // train_log_freq],
+
+        (np.array(list(range(len(a_loss_train_random_attack_data_v8[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        (np.array(list(range(len(d_loss_train_random_attack_data_v8[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        a_loss_train_random_attack_means_v8[::eval_freq // train_log_freq], d_loss_train_random_attack_means_v8[::eval_freq // train_log_freq],
+        (np.array(list(range(len(a_loss_train_random_attack_data_v9[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        (np.array(list(range(len(d_loss_train_random_attack_data_v9[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        a_loss_train_random_attack_means_v9[::eval_freq // train_log_freq], d_loss_train_random_attack_means_v9[::eval_freq // train_log_freq],
+        (np.array(list(range(len(a_loss_train_random_attack_data_v7[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        (np.array(list(range(len(d_loss_train_random_attack_data_v7[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        a_loss_train_random_attack_means_v7[::eval_freq // train_log_freq], d_loss_train_random_attack_means_v7[::eval_freq // train_log_freq],
+        a_loss_train_random_attack_stds_v8[::eval_freq // train_log_freq], d_loss_train_random_attack_stds_v8[::eval_freq // train_log_freq],
+        a_loss_train_random_attack_stds_v9[::eval_freq // train_log_freq], d_loss_train_random_attack_stds_v9[::eval_freq // train_log_freq],
+        a_loss_train_random_attack_stds_v7[::eval_freq // train_log_freq], d_loss_train_random_attack_stds_v7[::eval_freq // train_log_freq],
+
+        (np.array(list(range(len(a_loss_train_random_defense_data_v8[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        (np.array(list(range(len(d_loss_train_random_defense_data_v8[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        a_loss_train_random_defense_means_v8[::eval_freq // train_log_freq], d_loss_train_random_defense_means_v8[::eval_freq // train_log_freq],
+        (np.array(list(range(len(a_loss_train_random_defense_data_v9[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        (np.array(list(range(len(d_loss_train_random_defense_data_v9[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        a_loss_train_random_defense_means_v9[::eval_freq // train_log_freq], d_loss_train_random_defense_means_v9[::eval_freq // train_log_freq],
+        (np.array(list(range(len(a_loss_train_random_defense_data_v7[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        (np.array(list(range(len(d_loss_train_random_defense_data_v7[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        a_loss_train_random_defense_means_v7[::eval_freq // train_log_freq], d_loss_train_random_defense_means_v7[::eval_freq // train_log_freq],
+        a_loss_train_random_defense_stds_v8[::eval_freq // train_log_freq], d_loss_train_random_defense_stds_v8[::eval_freq // train_log_freq],
+        a_loss_train_random_defense_stds_v9[::eval_freq // train_log_freq], d_loss_train_random_defense_stds_v9[::eval_freq // train_log_freq],
+        a_loss_train_random_defense_stds_v7[::eval_freq // train_log_freq], d_loss_train_random_defense_stds_v7[::eval_freq // train_log_freq],
+
+        (np.array(list(range(len(a_loss_train_two_agents_data_v8[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        (np.array(list(range(len(d_loss_train_two_agents_data_v8[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        a_loss_train_two_agents_means_v8[::eval_freq // train_log_freq], d_loss_train_two_agents_means_v8[::eval_freq // train_log_freq],
+        (np.array(list(range(len(a_loss_train_two_agents_data_v9[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        (np.array(list(range(len(d_loss_train_two_agents_data_v9[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        a_loss_train_two_agents_means_v9[::eval_freq // train_log_freq], d_loss_train_two_agents_means_v9[::eval_freq // train_log_freq],
+        (np.array(list(range(len(a_loss_train_two_agents_data_v7[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        (np.array(list(range(len(d_loss_train_two_agents_data_v7[0])))) * train_log_freq)[::eval_freq // train_log_freq],
+        a_loss_train_two_agents_means_v7[::eval_freq // train_log_freq], d_loss_train_two_agents_means_v7[::eval_freq // train_log_freq],
+        a_loss_train_two_agents_stds_v8[::eval_freq // train_log_freq], d_loss_train_two_agents_stds_v8[::eval_freq // train_log_freq],
+        a_loss_train_two_agents_stds_v9[::eval_freq // train_log_freq], d_loss_train_two_agents_stds_v9[::eval_freq // train_log_freq],
+        a_loss_train_two_agents_stds_v7[::eval_freq // train_log_freq], d_loss_train_two_agents_stds_v7[::eval_freq // train_log_freq],
+
+        2, r"Attacker Loss", r"Defender Loss",
+        r"\textsc{MaxAttack} vs \textsc{DQN}",
+        r"\textsc{DQN} vs \textsc{MinDefense}",
+        r"\textsc{RandomAttack} vs \textsc{DQN}",
+        r"\textsc{DQN} vs \textsc{RandomDefense}",
+        r"\textsc{DQN} vs \textsc{DQN}",
+        r"Episode \#", "Loss", output_dir + "/" + file_name + algorithm + "_" + str(0), wspace=wspace)
 
 
 
@@ -3943,12 +4784,12 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                             title=r"Avg Episode Lengths [Eval] (v" + str(versions[0]) + ")",
                             xlabel=r"Episode \#", ylabel=r"Avg Length (num steps)",
                             file_name=output_dir + "/avg_episode_length_eval_" + algorithm + "_" + str(0),
-                            line1_label=r"\textsc{MaxAttack} vs \textsc{TabularQLearning}",
-                            line2_label=r"\textsc{TabularQLearning} vs \textsc{MinDefense}",
-                            line3_label=r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
-                            line4_label=r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
-                            line5_label=r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", legend_loc="lower right",
-                            markevery_1=1, markevery_2=1, markevery_3=1,
+                            line1_label=r"\textsc{MaxAttack} vs \textsc{" + algorithm_label + r"}",
+                            line2_label=r"\textsc{" + algorithm_label + r"} vs \textsc{MinDefense}",
+                            line3_label=r"\textsc{RandomAttack} vs \textsc{" + algorithm_label + r"}",
+                            line4_label=r"\textsc{" + algorithm_label + r"} vs \textsc{RandomDefense}",
+                            line5_label=r"\textsc{" + algorithm_label + r"} vs \textsc{" + algorithm_label + r"}",
+                            legend_loc="lower right", markevery_1=1, markevery_2=1, markevery_3=1,
                             markevery_4=1, markevery_5=1)
 
     five_line_plot_w_shades(np.array(list(range(len(episode_len_eval_max_attack_data_v2[0])))) * eval_freq,
@@ -3966,11 +4807,12 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                             title=r"Avg Episode Lengths [Eval] (v" + str(versions[1]) + ")",
                             xlabel=r"Episode \#", ylabel=r"Avg Length (num steps)",
                             file_name=output_dir + "/avg_episode_length_eval_" + algorithm + "_" + str(1),
-                            line1_label=r"\textsc{MaxAttack} vs \textsc{TabularQLearning}",
-                            line2_label=r"\textsc{TabularQLearning} vs \textsc{MinDefense}",
-                            line3_label=r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
-                            line4_label=r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
-                            line5_label=r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", legend_loc="lower right",
+                            line1_label=r"\textsc{MaxAttack} vs \textsc{" + algorithm_label + r"}",
+                            line2_label=r"\textsc{" + algorithm_label + r"} vs \textsc{MinDefense}",
+                            line3_label=r"\textsc{RandomAttack} vs \textsc{" + algorithm_label + r"}",
+                            line4_label=r"\textsc{" + algorithm_label + r"} vs \textsc{RandomDefense}",
+                            line5_label=r"\textsc{" + algorithm_label + r"} vs \textsc{" + algorithm_label + r"}",
+                            legend_loc="lower right",
                             markevery_1=1, markevery_2=1, markevery_3=1,
                             markevery_4=1, markevery_5=1)
 
@@ -3989,11 +4831,11 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                             title=r"Avg Episode Lengths [Eval] (v" + str(versions[2]) + ")",
                             xlabel=r"Episode \#", ylabel=r"Avg Length (num steps)",
                             file_name=output_dir + "/avg_episode_length_eval_" + algorithm + "_" + str(2),
-                            line1_label=r"\textsc{MaxAttack} vs \textsc{TabularQLearning}",
-                            line2_label=r"\textsc{TabularQLearning} vs \textsc{MinDefense}",
-                            line3_label=r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
-                            line4_label=r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
-                            line5_label=r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}",
+                            line1_label=r"\textsc{MaxAttack} vs \textsc{" + algorithm_label + r"}",
+                            line2_label=r"\textsc{" + algorithm_label + r"} vs \textsc{MinDefense}",
+                            line3_label=r"\textsc{RandomAttack} vs \textsc{" + algorithm_label + r"}",
+                            line4_label=r"\textsc{" + algorithm_label + r"} vs \textsc{RandomDefense}",
+                            line5_label=r"\textsc{" + algorithm_label + r"} vs \textsc{" + algorithm_label + r"}",
                             legend_loc="lower right",
                             markevery_1=1, markevery_2=1, markevery_3=1,
                             markevery_4=1, markevery_5=1)
@@ -4010,9 +4852,12 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            episode_len_eval_two_agents_means_v0, episode_len_eval_min_defense_stds_v0,
                            episode_len_eval_random_defense_stds_v0, episode_len_eval_max_attack_stds_v0,
                            episode_len_eval_random_attack_stds_v0, episode_len_eval_two_agents_stds_v0,
-                           r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
-                           r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
-                           r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Avg Episode Lengths [Eval] (v" + str(versions[0]) + ")",
+                           r"\textsc{" + algorithm_label + r"} vs \textsc{MinDefense}",
+                           r"\textsc{" + algorithm_label + r"} vs \textsc{RandomDefense}",
+                           r"\textsc{MaxAttack} vs \textsc{" + algorithm_label + r"}",
+                           r"\textsc{RandomAttack} vs \textsc{" + algorithm_label + r"}",
+                           r"\textsc{" + algorithm_label + r"} vs \textsc{" + algorithm_label + r"}",
+                           r"Avg Episode Lengths [Eval] (v" + str(versions[0]) + ")",
                            r"Episode \#", r"Avg Length (num steps)", 1, 1, 1, 1, 1,
 
                            np.array(list(range(len(episode_len_eval_min_defense_data_v2[0])))) * eval_freq,
@@ -4027,9 +4872,12 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            episode_len_eval_two_agents_means_v2, episode_len_eval_min_defense_stds_v2,
                            episode_len_eval_random_defense_stds_v2, episode_len_eval_max_attack_stds_v2,
                            episode_len_eval_random_attack_stds_v2, episode_len_eval_two_agents_stds_v2,
-                           r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
-                           r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
-                           r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Avg Episode Lengths [Eval] (v" + str(versions[1]) + ")",
+                           r"\textsc{" + algorithm_label + r"} vs \textsc{MinDefense}",
+                           r"\textsc{" + algorithm_label + r"} vs \textsc{RandomDefense}",
+                           r"\textsc{MaxAttack} vs \textsc{" + algorithm_label + r"}",
+                           r"\textsc{RandomAttack} vs \textsc{" + algorithm_label + r"}",
+                           r"\textsc{" + algorithm_label + r"} vs \textsc{" + algorithm_label + r"}",
+                           r"Avg Episode Lengths [Eval] (v" + str(versions[1]) + ")",
                            r"Episode \#", r"Avg Length (num steps)", 1, 1, 1, 1, 1,
 
                            np.array(list(range(len(episode_len_eval_min_defense_data_v3[0])))) * eval_freq,
@@ -4044,9 +4892,12 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            episode_len_eval_two_agents_means_v3, episode_len_eval_min_defense_stds_v3,
                            episode_len_eval_random_defense_stds_v3, episode_len_eval_max_attack_stds_v3,
                            episode_len_eval_random_attack_stds_v3, episode_len_eval_two_agents_stds_v3,
-                           r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
-                           r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
-                           r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Avg Episode Lengths [Eval] (v" + str(versions[2]) + ")",
+                           r"\textsc{" + algorithm_label + r"} vs \textsc{MinDefense}",
+                           r"\textsc{" + algorithm_label + r"} vs \textsc{RandomDefense}",
+                           r"\textsc{MaxAttack} vs \textsc{" + algorithm_label + r"}",
+                           r"\textsc{RandomAttack} vs \textsc{" + algorithm_label + r"}",
+                           r"\textsc{" + algorithm_label + r"} vs \textsc{" + algorithm_label + r"}",
+                           r"Avg Episode Lengths [Eval] (v" + str(versions[2]) + ")",
                            r"Episode \#", r"Avg Length (num steps)", 1, 1, 1, 1, 1,
 
                            np.array(list(range(len(episode_len_eval_min_defense_data_v3[0])))) * eval_freq,
@@ -4061,9 +4912,12 @@ def plot_all_averages_multiple_versions(maximal_attack_train_csv_paths_v0, maxim
                            episode_len_eval_two_agents_means_v3, episode_len_eval_min_defense_stds_v3,
                            episode_len_eval_random_defense_stds_v3, episode_len_eval_max_attack_stds_v3,
                            episode_len_eval_random_attack_stds_v3, episode_len_eval_two_agents_stds_v3,
-                           r"\textsc{TabularQLearning} vs \textsc{MinDefense}", r"\textsc{TabularQLearning} vs \textsc{RandomDefense}",
-                           r"\textsc{MaxAttack} vs \textsc{TabularQLearning}", r"\textsc{RandomAttack} vs \textsc{TabularQLearning}",
-                           r"\textsc{TabularQLearning} vs \textsc{TabularQLearning}", r"Avg Episode Lengths [Eval] (v" + str(versions[2]) + ")",
+                           r"\textsc{" + algorithm_label + r"} vs \textsc{MinDefense}",
+                           r"\textsc{" + algorithm_label + r"} vs \textsc{RandomDefense}",
+                           r"\textsc{MaxAttack} vs \textsc{" + algorithm_label + r"}",
+                           r"\textsc{RandomAttack} vs \textsc{" + algorithm_label + r"}",
+                           r"\textsc{" + algorithm_label + r"} vs \textsc{" + algorithm_label + r"}",
+                           r"Avg Episode Lengths [Eval] (v" + str(versions[2]) + ")",
                            r"Episode \#", r"Avg Length (num steps)", 1, 1, 1, 1, 1,
 
                            output_dir + "/" + file_name + "_avg_length_" + algorithm
