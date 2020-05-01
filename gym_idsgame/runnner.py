@@ -65,7 +65,8 @@ class Runner:
         :return: trainresult, evalresult
         """
         env: IdsGameEnv = None
-        env = gym.make(config.env_name, idsgame_config = config.idsgame_config, save_dir=config.output_dir + "/data",
+        env = gym.make(config.env_name, idsgame_config = config.idsgame_config,
+                       save_dir=config.output_dir + "/results/data/" + str(config.random_seed),
                        initial_state_path = config.initial_state_path)
         if config.title is not None:
             env.idsgame_config.render_config.title = config.title
@@ -89,7 +90,8 @@ class Runner:
         :param config: the training configuration
         :return: trainresult, evalresult
         """
-        env = gym.make(config.env_name, idsgame_config = config.idsgame_config, save_dir=config.output_dir + "/data",
+        env = gym.make(config.env_name, idsgame_config = config.idsgame_config,
+                       save_dir=config.output_dir + "/results/data/" + str(config.random_seed),
                        initial_state_path = config.initial_state_path)
         if config.title is not None:
             env.idsgame_config.render_config.title = config.title
@@ -115,7 +117,8 @@ class Runner:
         :return: trainresult, evalresult
         """
         env: IdsGameEnv = None
-        env = gym.make(config.env_name, idsgame_config = config.idsgame_config, save_dir=config.output_dir + "/data",
+        env = gym.make(config.env_name, idsgame_config = config.idsgame_config,
+                       save_dir=config.output_dir + "/results/data/" + str(config.random_seed),
                        initial_state_path = config.initial_state_path)
         if config.title is not None:
             env.idsgame_config.render_config.title = config.title
@@ -140,7 +143,8 @@ class Runner:
         :return: experiment result
         """
         env: IdsGameEnv = None
-        env = gym.make(config.env_name, idsgame_config = config.idsgame_config, save_dir=config.output_dir + "/data",
+        env = gym.make(config.env_name, idsgame_config = config.idsgame_config,
+                       save_dir=config.output_dir + "/results/data",
                        initial_state_path = config.initial_state_path)
         if config.title is not None:
             env.idsgame_config.render_config.title = config.title
@@ -187,7 +191,7 @@ class Runner:
         :return: the created environment
         """
         env: IdsGameEnv = gym.make(config.env_name, idsgame_config = config.idsgame_config,
-                                   save_dir=config.output_dir + "/data", initial_state_path = config.initial_state_path)
+                                   save_dir=config.output_dir + "/results/data", initial_state_path = config.initial_state_path)
         if config.title is not None:
             env.idsgame_config.render_config.title = config.title
         if not issubclass(type(env), AttackerEnv):
@@ -205,7 +209,8 @@ class Runner:
         :return: the created environment
         """
         env: IdsGameEnv = gym.make(config.env_name, idsgame_config = config.idsgame_config,
-                                   save_dir=config.output_dir + "/data", initial_state_path = config.initial_state_path)
+                                   save_dir=config.output_dir + "/results/data",
+                                   initial_state_path = config.initial_state_path)
         if config.title is not None:
             env.idsgame_config.render_config.title = config.title
         if not issubclass(type(env), DefenderEnv):

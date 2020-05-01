@@ -132,6 +132,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
     config.logger = logger
     config.q_agent_config.logger = logger
     config.q_agent_config.random_seed = random_seed
+    config.random_seed = random_seed
     config.q_agent_config.to_csv(config.output_dir + "/results/hyperparameters/" + str(random_seed) + "/" + time_str + ".csv")
     train_result, eval_result = Runner.run(config)
     train_csv_path = ""

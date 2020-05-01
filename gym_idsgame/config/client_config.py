@@ -14,7 +14,7 @@ class ClientConfig:
                  defender_type: int = 1, mode: int = 0, q_agent_config: QAgentConfig = None,
                  output_dir:str = None, simulation_config: SimulationConfig = None, title = None,
                  idsgame_config : IdsGameConfig = None, initial_state_path: str = None, run_many :bool = False,
-                 random_seeds : list = None):
+                 random_seeds : list = None, random_seed = 0):
         """
         Class constructor, initializes the DTO
 
@@ -30,6 +30,7 @@ class ClientConfig:
         :param initial_state_path: path to initial state
         :param run_many: if this is true, it will try to run many experiments in a row, using different random seeds
         :param random_seeds: list of random seeds when running several experiments in a row
+        :param random_seed: specific random seed
         """
         self.env_name = env_name
         self.attacker_type = attacker_type
@@ -44,3 +45,4 @@ class ClientConfig:
         self.initial_state_path = initial_state_path
         self.run_many = run_many
         self.random_seeds = random_seeds
+        self.random_seed = random_seed

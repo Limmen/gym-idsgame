@@ -399,6 +399,9 @@ class DQNAgent(QAgent):
                 attacker_obs = obs_prime_attacker
                 defender_obs = obs_prime_defender
 
+            # Render final frame
+            if self.config.render:
+                self.env.render(mode="human")
 
             # Decay LR after every episode
             lr = self.config.alpha

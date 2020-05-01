@@ -121,6 +121,10 @@ class TabularQAgent(QAgent):
                 attacker_obs = obs_prime_attacker
                 defender_obs = obs_prime_defender
 
+            # Render final frame
+            if self.config.render:
+                self.env.render(mode="human")
+
             # Record episode metrics
             self.num_train_games += 1
             if self.env.state.hacked:
