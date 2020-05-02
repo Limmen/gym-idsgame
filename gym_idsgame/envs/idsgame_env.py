@@ -20,7 +20,7 @@ from gym_idsgame.envs.constants import constants
 class IdsGameEnv(gym.Env, ABC):
     """
     Implementation of the RL environment from the paper
-    "Adversarial Reinforcement Learning in a Cyber Security Simulation" by Edlerman et. al.
+    "Adversarial Reinforcement Learning in a Cyber Security Simulation" by Elderman et. al.
 
     It is an abstract very simple cyber security simulation where there is an attacker agent that tries to penetrate
     a network and a defender agent that tries to defend the network.
@@ -271,18 +271,34 @@ class IdsGameEnv(gym.Env, ABC):
             GameState.save(self.save_dir, self.state)
 
     def get_hack_reward(self) -> Union[int, int]:
+        """
+        Returns the attacker and defender reward in the case when the hacker manages to reach the target node
+
+        :return: (attacker_reward, defender_reward)
+        """
         if not self.idsgame_config.game_config.dense_rewards:
             return constants.GAME_CONFIG.POSITIVE_REWARD, -constants.GAME_CONFIG.POSITIVE_REWARD
         else:
-            return 100*constants.GAME_CONFIG.POSITIVE_REWARD, -100*constants.GAME_CONFIG.POSITIVE_REWARD
+            return 2*constants.GAME_CONFIG.POSITIVE_REWARD, -2*constants.GAME_CONFIG.POSITIVE_REWARD
 
     def get_detect_reward(self) -> Union[int, int]:
+        """
+        Returns the attacker and defender reward in the case when the attacker was detected.
+
+        :return: (attacker_reward, defender_reward)
+        """
         if not self.idsgame_config.game_config.dense_rewards:
             return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
         else:
-            return -100*constants.GAME_CONFIG.POSITIVE_REWARD, 0
+            return -2*constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
 
     def get_successful_attack_reward(self) -> Union[int, int]:
+        """
+        Returns the reward for the attacker and defender after a successful attack on some server in
+        the network
+
+        :return:(attacker_reward, defender_reward)
+        """
         if not self.idsgame_config.game_config.dense_rewards:
             return 0, 0
         else:
@@ -290,9 +306,16 @@ class IdsGameEnv(gym.Env, ABC):
             if attack_row < self.furthest_hack:
                 self.furthest_hack = attack_row
                 return constants.GAME_CONFIG.POSITIVE_REWARD, -constants.GAME_CONFIG.POSITIVE_REWARD
+            elif attack_row > self.furthest_hack:
+                return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
             return 0,0
 
     def get_observation(self) -> Union[np.ndarray, np.ndarray]:
+        """
+        Returns an observation of the state
+
+        :return: (attacker_obs, defender_obs)
+        """
         attacker_obs = self.state.get_attacker_observation(self.idsgame_config.game_config.network_config)
         defender_obs = self.state.get_defender_observation(self.idsgame_config.game_config.network_config)
         return attacker_obs, defender_obs

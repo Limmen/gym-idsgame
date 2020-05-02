@@ -26,12 +26,18 @@ class QAgent(TrainAgent, ABC):
         self.config = config
         self.train_result = ExperimentResult()
         self.eval_result = ExperimentResult()
+        self.num_eval_games_total = 0
+        self.num_eval_hacks_total = 0
         self.num_eval_games = 0
         self.num_eval_hacks = 0
         self.num_train_games = 0
         self.num_train_hacks = 0
+        self.num_train_games_total = 0
+        self.num_train_hacks_total = 0
         self.train_hack_probability = 0.0
+        self.train_cumulative_hack_probability = 0.0
         self.eval_hack_probability = 0.0
+        self.eval_cumulative_hack_probability = 0.0
         self.eval_attacker_cumulative_reward = 0
         self.eval_defender_cumulative_reward = 0
         self.outer_train = tqdm.tqdm(total=self.config.num_episodes, desc='Train Episode', position=0)
@@ -81,22 +87,24 @@ class QAgent(TrainAgent, ABC):
             replay_memory_size = -1
         avg_episode_steps = np.mean(episode_steps)
         hack_probability = self.train_hack_probability if not eval else self.eval_hack_probability
+        hack_probability_total = self.train_cumulative_hack_probability if not eval else self.eval_cumulative_hack_probability
         attacker_cumulative_reward = self.env.state.attacker_cumulative_reward if not eval \
             else self.eval_attacker_cumulative_reward
         defender_cumulative_reward = self.env.state.defender_cumulative_reward if not eval \
             else self.eval_defender_cumulative_reward
         if eval:
             log_str = "[Eval] episode:{},avg_a_R:{:.2f},avg_d_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
-                      "acc_D_R:{:.2f},replay_s:{},lr:{:.2E}".format(
+                      "acc_D_R:{:.2f},replay_s:{},lr:{:.2E},c_h:{:.2f}".format(
                 episode, avg_attacker_episode_rewards, avg_defender_episode_rewards, avg_episode_steps, hack_probability,
-                attacker_cumulative_reward, defender_cumulative_reward, replay_memory_size, lr)
+                attacker_cumulative_reward, defender_cumulative_reward, replay_memory_size, lr,
+                hack_probability_total)
             self.outer_eval.set_description_str(log_str)
         else:
             log_str = "[Train] episode: {:.2f} epsilon:{:.2f},avg_a_R:{:.2f},avg_d_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
-                      "acc_D_R:{:.2f},A_loss:{:.6f},D_loss:{:.6f},replay_s:{},lr:{:.2E}".format(
+                      "acc_D_R:{:.2f},A_loss:{:.6f},D_loss:{:.6f},replay_s:{},lr:{:.2E},c_h:{:.2f}".format(
                 episode, self.config.epsilon, avg_attacker_episode_rewards, avg_defender_episode_rewards,
                 avg_episode_steps, hack_probability, attacker_cumulative_reward, defender_cumulative_reward,
-                avg_episode_attacker_loss, avg_episode_defender_loss, replay_memory_size, lr)
+                avg_episode_attacker_loss, avg_episode_defender_loss, replay_memory_size, lr, hack_probability_total)
             self.outer_train.set_description_str(log_str)
         self.config.logger.info(log_str)
         if update_stats and self.config.dqn_config is not None and self.config.dqn_config.tensorboard:
@@ -109,6 +117,7 @@ class QAgent(TrainAgent, ABC):
             result.avg_defender_episode_rewards.append(avg_defender_episode_rewards)
             result.epsilon_values.append(self.config.epsilon)
             result.hack_probability.append(hack_probability)
+            result.cumulative_hack_probabiltiy.append(hack_probability_total)
             result.attacker_cumulative_reward.append(attacker_cumulative_reward)
             result.defender_cumulative_reward.append(defender_cumulative_reward)
             result.avg_episode_loss_attacker.append(avg_episode_attacker_loss)

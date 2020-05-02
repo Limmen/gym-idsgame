@@ -127,18 +127,22 @@ class TabularQAgent(QAgent):
 
             # Record episode metrics
             self.num_train_games += 1
+            self.num_train_games_total += 1
             if self.env.state.hacked:
                 self.num_train_hacks += 1
+                self.num_train_hacks_total += 1
             episode_attacker_rewards.append(episode_attacker_reward)
             episode_defender_rewards.append(episode_defender_reward)
             episode_steps.append(episode_step)
 
             # Log average metrics every <self.config.train_log_frequency> episodes
             if episode % self.config.train_log_frequency == 0:
-                if self.num_train_games > 0:
+                if self.num_train_games > 0 and self.num_train_games_total > 0:
                     self.train_hack_probability = self.num_train_hacks / self.num_train_games
+                    self.train_cumulative_hack_probability = self.num_train_hacks_total / self.num_train_games_total
                 else:
                     self.train_hack_probability = 0.0
+                    self.train_cumulative_hack_probability = 0.0
                 self.log_metrics(episode, self.train_result, episode_attacker_rewards, episode_defender_rewards,
                                  episode_steps, None, None, lr=self.config.alpha)
                 episode_attacker_rewards = []
@@ -340,15 +344,20 @@ class TabularQAgent(QAgent):
 
             # Update eval stats
             self.num_eval_games +=1
+            self.num_eval_games_total += 1
             self.eval_attacker_cumulative_reward += episode_attacker_reward
             self.eval_defender_cumulative_reward += episode_defender_reward
             if self.env.state.hacked:
                 self.num_eval_hacks += 1
+                self.num_eval_hacks_total += 1
 
             # Log average metrics every <self.config.eval_log_frequency> episodes
             if episode % self.config.eval_log_frequency == 0 and log:
-                if self.num_eval_hacks > 0:
+                if self.num_eval_games > 0:
                     self.eval_hack_probability = float(self.num_eval_hacks) / float(self.num_eval_games)
+                if self.num_eval_games_total > 0:
+                    self.eval_cumulative_hack_probability = float(self.num_eval_hacks_total) / float(
+                        self.num_eval_games_total)
                 self.log_metrics(episode, self.eval_result, episode_attacker_rewards, episode_defender_rewards,
                                  episode_steps, update_stats=False, eval = True)
 
@@ -388,8 +397,10 @@ class TabularQAgent(QAgent):
 
         # Log average eval statistics
         if log:
-            if self.num_eval_hacks > 0:
+            if self.num_eval_games > 0:
                 self.eval_hack_probability = float(self.num_eval_hacks) / float(self.num_eval_games)
+            if self.num_eval_games_total > 0:
+                self.eval_cumulative_hack_probability = float(self.num_eval_hacks_total) / float(self.num_eval_games_total)
             self.log_metrics(train_episode, self.eval_result, episode_attacker_rewards, episode_defender_rewards,
                              episode_steps, update_stats=True, eval=True)
 
@@ -400,7 +411,8 @@ class TabularQAgent(QAgent):
     def log_state_values(self) -> None:
         """
         Utility function for printing the state-values according to the learned Q-function
-        :return:
+
+        :return: None
         """
         if self.config.attacker:
             self.config.logger.info("--- Attacker State Values ---")

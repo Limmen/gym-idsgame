@@ -411,8 +411,10 @@ class DQNAgent(QAgent):
 
             # Record episode metrics
             self.num_train_games += 1
+            self.num_train_games_total += 1
             if self.env.state.hacked:
                 self.num_train_hacks += 1
+                self.num_train_hacks_total += 1
             episode_attacker_rewards.append(episode_attacker_reward)
             episode_defender_rewards.append(episode_defender_reward)
             if episode_step > 0:
@@ -430,10 +432,12 @@ class DQNAgent(QAgent):
 
             # Log average metrics every <self.config.train_log_frequency> episodes
             if episode % self.config.train_log_frequency == 0:
-                if self.num_train_games > 0:
+                if self.num_train_games > 0 and self.num_train_games_total > 0:
                     self.train_hack_probability = self.num_train_hacks / self.num_train_games
+                    self.train_cumulative_hack_probability = self.num_train_hacks_total / self.num_train_games_total
                 else:
                     self.train_hack_probability = 0.0
+                    self.train_cumulative_hack_probability = 0.0
                 self.log_metrics(episode, self.train_result, episode_attacker_rewards, episode_defender_rewards, episode_steps,
                                  episode_avg_attacker_loss, episode_avg_defender_loss, lr=lr)
 
@@ -594,6 +598,7 @@ class DQNAgent(QAgent):
 
             # Update eval stats
             self.num_eval_games +=1
+            self.num_eval_games_total += 1
             if self.env.state.detected:
                 self.eval_attacker_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
                 self.eval_defender_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
@@ -601,11 +606,15 @@ class DQNAgent(QAgent):
                 self.eval_attacker_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
                 self.eval_defender_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
                 self.num_eval_hacks += 1
+                self.num_eval_hacks_total +=1
 
             # Log average metrics every <self.config.eval_log_frequency> episodes
             if episode % self.config.eval_log_frequency == 0 and log:
                 if self.num_eval_hacks > 0:
                     self.eval_hack_probability = float(self.num_eval_hacks) / float(self.num_eval_games)
+                if self.num_eval_games_total > 0:
+                    self.eval_cumulative_hack_probability = float(self.num_eval_hacks_total) / float(
+                        self.num_eval_games_total)
                 self.log_metrics(episode, self.eval_result, episode_attacker_rewards, episode_defender_rewards, episode_steps,
                                  eval = True, update_stats=False)
 
@@ -630,6 +639,9 @@ class DQNAgent(QAgent):
         if log:
             if self.num_eval_hacks > 0:
                 self.eval_hack_probability = float(self.num_eval_hacks) / float(self.num_eval_games)
+            if self.num_eval_games_total > 0:
+                self.eval_cumulative_hack_probability = float(self.num_eval_hacks_total) / float(
+                    self.num_eval_games_total)
 
             self.log_metrics(train_episode, self.eval_result, episode_attacker_rewards, episode_defender_rewards,
                              episode_steps, eval=True, update_stats=True)
