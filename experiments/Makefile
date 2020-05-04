@@ -342,10 +342,21 @@ random_attack_vs_dqn-v8: training/v8/random_attack/dqn/run.py training/v8/random
 dqn_vs_dqn-v8: training/v8/two_agents/dqn/run.py training/v8/two_agents/dqn/run.sh
 	cd training/v8/two_agents/dqn/ && $(MAKE) run
 
+reinforce_vs_minimal_defense-v8: training/v8/minimal_defense/reinforce/run.py training/v8/minimal_defense/reinforce/run.sh
+	cd training/v8/minimal_defense/reinforce/ && $(MAKE) run
+
+actor_critic_vs_minimal_defense-v8: training/v8/minimal_defense/actor_critic/run.py training/v8/minimal_defense/actor_critic/run.sh
+	cd training/v8/minimal_defense/actor_critic/ && $(MAKE) run
+
+reinforce_vs_reinforce-v8: training/v8/two_agents/reinforce/run.py training/v8/two_agents/reinforce/run.sh
+	cd training/v8/two_agents/reinforce/ && $(MAKE) run
+
 
 v8: tabular_q_learning_vs_random_defense-v8 tabular_q_learning_vs_minimal_defense-v8 random_attack_vs_tabular_q_learning-v8
 v8: maximal_attack_vs_tabular_q_learning-v8 tabular_q_learning_vs_tabular_q_learning-v8 dqn_vs_tabular_random_defense-v8
-v8: dqn_vs_minimal_defense-v8 maximal_attack_vs_dqn-v8 random_attack_vs_dqn-v8 dqn_vs_dqn-v8
+v8: dqn_vs_minimal_defense-v8 maximal_attack_vs_dqn-v8 random_attack_vs_dqn-v8 dqn_vs_dqn-v8 reinforce_vs_minimal_defense-v8
+v8: reinforce_vs_reinforce-v8 actor_critic_vs_minimal_defense-v8
+
 
 # v9 Experiments
 
@@ -502,12 +513,15 @@ clean:
 	cd ./training/v8/random_defense/dqn/ && $(MAKE) clean
 	cd ./training/v8/minimal_defense/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/v8/minimal_defense/dqn/ && $(MAKE) clean
+	cd ./training/v8/minimal_defense/reinforce/ && $(MAKE) clean
+	cd ./training/v8/minimal_defense/actor_critic/ && $(MAKE) clean
 	cd ./training/v8/random_attack/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/v8/random_attack/dqn/ && $(MAKE) clean
 	cd ./training/v8/maximal_attack/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/v8/maximal_attack/dqn/ && $(MAKE) clean
 	cd ./training/v8/two_agents/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/v8/two_agents/dqn/ && $(MAKE) clean
+	cd ./training/v8/two_agents/reinforce/ && $(MAKE) clean
 
 	# V9
 	cd ./training/v9/random_defense/tabular_q_learning/ && $(MAKE) clean

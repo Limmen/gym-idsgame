@@ -7,10 +7,10 @@ import gym
 import os
 from abc import ABC, abstractmethod
 from gym_idsgame.envs.dao.game_config import GameConfig
-from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
-from gym_idsgame.agents.random_attack_bot_agent import RandomAttackBotAgent
-from gym_idsgame.agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
-from gym_idsgame.agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
+from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
+from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
+from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
+from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
 from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.dao.network_config import NetworkConfig
@@ -138,8 +138,8 @@ class IdsGameEnv(gym.Env, ABC):
                     self.state.done = True
                     self.state.detected = True
                     reward = self.get_detect_reward()
-        else:
-            print("illegal action: {},{}, action: {}".format(target_pos, attacker_pos, action))
+        #else:
+            #print("illegal action: {},{}, action: {}".format(target_pos, attacker_pos, action))
         if self.state.done:
             if self.steps_beyond_done is None:
                 self.steps_beyond_done = 0
@@ -279,7 +279,7 @@ class IdsGameEnv(gym.Env, ABC):
         if not self.idsgame_config.game_config.dense_rewards:
             return constants.GAME_CONFIG.POSITIVE_REWARD, -constants.GAME_CONFIG.POSITIVE_REWARD
         else:
-            return 2*constants.GAME_CONFIG.POSITIVE_REWARD, -2*constants.GAME_CONFIG.POSITIVE_REWARD
+            return 100*constants.GAME_CONFIG.POSITIVE_REWARD, -2*constants.GAME_CONFIG.POSITIVE_REWARD
 
     def get_detect_reward(self) -> Union[int, int]:
         """

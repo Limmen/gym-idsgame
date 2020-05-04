@@ -1,3 +1,6 @@
+"""
+Utility script for hyperparameter tuning
+"""
 import os
 import time
 import csv
@@ -38,8 +41,20 @@ def hype_grid(client_config: ClientConfig):
             hparam_str = "{}={},{}={}".format(client_config.hp_tuning_config.param_1, p_1,
                                               client_config.hp_tuning_config.param_2, p_2)
             create_dirs(client_config.output_dir + "/results/hpo", hparam_str)
-            setattr(client_config.q_agent_config, client_config.hp_tuning_config.param_1, p_1)
-            setattr(client_config.q_agent_config, client_config.hp_tuning_config.param_2, p_2)
+
+            try:
+                setattr(client_config.q_agent_config, client_config.hp_tuning_config.param_1, p_1)
+                setattr(client_config.q_agent_config, client_config.hp_tuning_config.param_2, p_2)
+            except:
+                try:
+                    setattr(client_config.q_agent_config.dqn_config, client_config.hp_tuning_config.param_1, p_1)
+                    setattr(client_config.q_agent_config.dqn_config, client_config.hp_tuning_config.param_2, p_2)
+                except:
+                    try:
+                        setattr(client_config.pg_agent_config, client_config.hp_tuning_config.param_1, p_1)
+                        setattr(client_config.pg_agent_config, client_config.hp_tuning_config.param_2, p_2)
+                    except Exception as e:
+                        raise ValueError("Could not find hparams")
             train_result, eval_result = Runner.run(client_config)
             if client_config.logger is not None:
                 client_config.logger.info("Hyperparameter tuning with {}: {}, {}: {}, yielded hack prob:{}".format(
@@ -54,13 +69,18 @@ def hype_grid(client_config: ClientConfig):
                 if client_config.q_agent_config is not None:
                     client_config.q_agent_config.to_csv(
                         client_config.output_dir + "/results/hpo/" + hparam_str + "/hparams_" + time_str + ".csv")
-            summary_results.append([p_1, p_2, eval_result.hack_probability[-1]])
+                if client_config.pg_agent_config is not None:
+                    client_config.pg_agent_config.to_csv(
+                        client_config.output_dir + "/results/hpo/" + hparam_str + "/hparams_" + time_str + ".csv")
+            summary_results.append([p_1, p_2, eval_result.hack_probability[-1],
+                                    train_result.cumulative_hack_probability[-1]])
 
     file_name = client_config.output_dir + "/results/hpo/" + "grid_" + client_config.hp_tuning_config.param_1 + "_" \
                 + client_config.hp_tuning_config.param_2 + "_summary.csv"
     with open(file_name, "w") as f:
         writer = csv.writer(f)
-        writer.writerow([client_config.hp_tuning_config.param_1, client_config.hp_tuning_config.param_2, "eval_hp"])
+        writer.writerow([client_config.hp_tuning_config.param_1, client_config.hp_tuning_config.param_2, "eval_hp",
+                         "cumulative_hp"])
         for row_d in summary_results:
             writer.writerow(row_d)
 

@@ -88,8 +88,6 @@ def interpret_attack_action(action: int, game_config: GameConfig) -> Union[int, 
     server_id = action // game_config.num_attack_types
     server_pos = game_config.network_config.get_node_pos(server_id)
     attack_type = get_attack_type(action, game_config)
-    # print("interpret action: {}, attack_type:{},server_pos:{}, server_id:{}".format(action, attack_type, server_pos,
-    #                                                                                 server_id))
     return server_id, server_pos, attack_type
 
 def interpret_defense_action(action: int, game_config: GameConfig) -> Union[int, Union[int, int], int]:

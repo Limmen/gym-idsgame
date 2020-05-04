@@ -6,27 +6,29 @@ import gym
 
 # In case running on server without screen
 try:
-    from gym_idsgame.agents.manual_attack_agent import ManualAttackAgent
-    from gym_idsgame.agents.manual_defense_agent import ManualDefenseAgent
+    from gym_idsgame.agents.manual_agents.manual_attack_agent import ManualAttackAgent
+    from gym_idsgame.agents.manual_agents.manual_defense_agent import ManualDefenseAgent
 except:
     pass
 
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.config.runner_mode import RunnerMode
 from gym_idsgame.agents.dao.agent_type import AgentType
-from gym_idsgame.agents.q_learning.tabular_q_learning.tabular_q_agent import TabularQAgent
-from gym_idsgame.agents.q_learning.dqn.dqn import DQNAgent
-from gym_idsgame.agents.train_agent import TrainAgent
-from gym_idsgame.agents.bot_agent import BotAgent
+from gym_idsgame.agents.training_agents.q_learning.tabular_q_learning.tabular_q_agent import TabularQAgent
+from gym_idsgame.agents.training_agents.q_learning.dqn.dqn import DQNAgent
+from gym_idsgame.agents.training_agents.policy_gradient.reinforce.reinforce import ReinforceAgent
+from gym_idsgame.agents.training_agents.policy_gradient.actor_critic.actor_critic import ActorCriticAgent
+from gym_idsgame.agents.training_agents.train_agent import TrainAgent
+from gym_idsgame.agents.bot_agents.bot_agent import BotAgent
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
 from gym_idsgame.envs.idsgame_env import IdsGameEnv, AttackDefenseEnv, AttackerEnv, DefenderEnv
 from gym_idsgame.simulation.simulator import Simulator
-from gym_idsgame.agents.random_defense_bot_agent import RandomDefenseBotAgent
-from gym_idsgame.agents.random_attack_bot_agent import RandomAttackBotAgent
-from gym_idsgame.agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
-from gym_idsgame.agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
-from gym_idsgame.agents.q_learning.tabular_q_learning.tabular_q_attacker_bot_agent import TabularQAttackerBotAgent
-from gym_idsgame.agents.q_learning.tabular_q_learning.tabular_q_defender_bot_agent import TabularQDefenderBotAgent
+from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
+from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
+from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
+from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
+from gym_idsgame.agents.training_agents.q_learning.tabular_q_learning.tabular_q_attacker_bot_agent import TabularQAttackerBotAgent
+from gym_idsgame.agents.training_agents.q_learning.tabular_q_learning.tabular_q_defender_bot_agent import TabularQDefenderBotAgent
 
 class Runner:
     """
@@ -75,6 +77,10 @@ class Runner:
             attacker = TabularQAgent(env, config.q_agent_config)
         elif config.attacker_type == AgentType.DQN_AGENT.value:
             attacker = DQNAgent(env, config.q_agent_config)
+        elif config.attacker_type == AgentType.REINFORCE_AGENT.value:
+            attacker = ReinforceAgent(env, config.pg_agent_config)
+        elif config.attacker_type == AgentType.ACTOR_CRITIC_AGENT.value:
+            attacker = ActorCriticAgent(env, config.pg_agent_config)
         else:
             raise AssertionError("Attacker train agent type not recognized: {}".format(config.attacker_type))
         attacker.train()
@@ -100,6 +106,10 @@ class Runner:
             defender = TabularQAgent(env, config.q_agent_config)
         elif config.defender_type == AgentType.DQN_AGENT.value:
             defender = DQNAgent(env, config.q_agent_config)
+        elif config.defender_type == AgentType.REINFORCE_AGENT.value:
+            defender = ReinforceAgent(env, config.pg_agent_config)
+        elif config.defender_type == AgentType.ACTOR_CRITIC_AGENT.value:
+            defender = ActorCriticAgent(env, config.pg_agent_config)
         else:
             raise AssertionError("Defender train agent type not recognized: {}".format(config.defender_type))
         defender.train()
@@ -127,6 +137,10 @@ class Runner:
             agent = TabularQAgent(env, config.q_agent_config)
         elif config.attacker_type == AgentType.DQN_AGENT.value:
             agent = DQNAgent(env, config.q_agent_config)
+        elif config.attacker_type == AgentType.REINFORCE_AGENT.value:
+            agent = ReinforceAgent(env, config.pg_agent_config)
+        elif config.attacker_type == AgentType.ACTOR_CRITIC_AGENT.value:
+            agent = ActorCriticAgent(env, config.pg_agent_config)
         else:
             raise AssertionError("Train agent type not recognized: {}".format(config.attacker_type))
         agent.train()

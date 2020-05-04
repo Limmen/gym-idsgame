@@ -8,3 +8,5 @@ class AgentType(Enum):
     MANUAL_DEFENSE = 4
     ATTACK_MAXIMAL_VALUE = 5
     DQN_AGENT = 6
+    REINFORCE_AGENT = 7
+    ACTOR_CRITIC_AGENT = 8

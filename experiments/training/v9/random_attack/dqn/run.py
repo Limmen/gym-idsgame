@@ -3,12 +3,12 @@ import time
 import sys
 import glob
 from gym_idsgame.config.runner_mode import RunnerMode
-from gym_idsgame.agents.q_learning.q_agent_config import QAgentConfig
+from gym_idsgame.agents.training_agents.q_learning.q_agent_config import QAgentConfig
 from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.runnner import Runner
 from experiments.util import plotting_util, util
-from gym_idsgame.agents.q_learning.dqn.dqn_config import DQNConfig
+from gym_idsgame.agents.training_agents.q_learning.dqn.dqn_config import DQNConfig
 
 
 def get_script_path():
@@ -38,7 +38,7 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    dqn_config = DQNConfig(input_dim=44, output_dim=40, hidden_dim=64, replay_memory_size=10000,
+    dqn_config = DQNConfig(input_dim=44, defender_output_dim=44, hidden_dim=64, replay_memory_size=10000,
                            num_hidden_layers=1,
                            replay_start_size=1000, batch_size=32, target_network_update_freq=1000,
                            gpu=True, tensorboard=True, tensorboard_dir=default_output_dir() + "/results/tensorboard",
@@ -133,7 +133,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
     config.logger = logger
     config.q_agent_config.logger = logger
     config.q_agent_config.random_seed = random_seed
-config.random_seed = random_seed
+    config.random_seed = random_seed
     config.q_agent_config.to_csv(config.output_dir + "/results/hyperparameters/" + str(random_seed) + "/" + time_str + ".csv")
     train_result, eval_result = Runner.run(config)
     train_csv_path = ""

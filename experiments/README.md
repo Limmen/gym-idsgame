@@ -935,7 +935,15 @@ defend the attribute with the minimal value out of all of its neighbors.
    
 - [dqn_vs_minimal_defense-v8](training/v8/minimal_defense/dqn/)
    * This experiment trains an attacker agent using DQN to act optimally in the given
-   environment and defeat the random defender.             
+   environment and defeat the random defender.
+   
+- [reinforce_vs_minimal_defense-v8](training/v8/minimal_defense/reinforce/)
+   * This experiment trains an attacker agent using REINFORCE to act optimally in the given
+   environment and defeat the random defender.
+   
+- [actor_critic_vs_minimal_defense-v8](training/v8/minimal_defense/actor_critic/)
+   * This experiment trains an attacker agent using Actor-Critic to act optimally in the given
+   environment and defeat the random defender.                   
 
 #### Random Attack   
 
@@ -974,9 +982,13 @@ it is intended for 2-agent simulations or RL training.
    * This experiment trains both an attacker and a defender agent simultaneously against each other 
    using tabular q-learning.
    
-- [tabular_q_learning_vs_dqn-v8](training/v8/two_agents/dqn/)
+- [dqn_vs_dqn-v8](training/v8/two_agents/dqn/)
    * This experiment trains both an attacker and a defender agent simultaneously against each other 
-   using DQN.        
+   using DQN.
+   
+- [reinforce_vs_reinforce-v8](training/v8/two_agents/dqn/)
+   * This experiment trains both an attacker and a defender agent simultaneously against each other 
+   using REINFORCE.     
    
 ## Experiments in Version 9 Environments 
 

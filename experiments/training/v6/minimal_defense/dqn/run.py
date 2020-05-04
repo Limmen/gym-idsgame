@@ -2,12 +2,12 @@ import os
 import time
 import sys
 from gym_idsgame.config.runner_mode import RunnerMode
-from gym_idsgame.agents.q_learning.q_agent_config import QAgentConfig
+from gym_idsgame.agents.training_agents.q_learning.q_agent_config import QAgentConfig
 from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.runnner import Runner
 from experiments.util import plotting_util, util
-from gym_idsgame.agents.q_learning.dqn.dqn_config import DQNConfig
+from gym_idsgame.agents.training_agents.q_learning.dqn.dqn_config import DQNConfig
 
 
 def get_script_path():
@@ -37,7 +37,7 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    dqn_config = DQNConfig(input_dim=242, output_dim=220, hidden_dim=64, replay_memory_size=10000,
+    dqn_config = DQNConfig(input_dim=242, attacker_output_dim=220, hidden_dim=64, replay_memory_size=10000,
                            num_hidden_layers=1,
                            replay_start_size=1000, batch_size=32, target_network_update_freq=5000,
                            gpu=True, tensorboard=True, tensorboard_dir=default_output_dir() + "/tensorboard",
