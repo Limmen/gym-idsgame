@@ -5,8 +5,9 @@ from gym_idsgame.config.runner_mode import RunnerMode
 from gym_idsgame.agents.q_learning.q_agent_config import QAgentConfig
 from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.config.client_config import ClientConfig
+from gym_idsgame.config.hp_tuning_config import HpTuningConfig
 from gym_idsgame.runnner import Runner
-from experiments.util import plotting_util, util
+from experiments.util import plotting_util, util, hp_tuning
 import glob
 
 def get_script_path():
@@ -50,6 +51,13 @@ def default_config() -> ClientConfig:
                                  q_agent_config=q_agent_config, output_dir=default_output_dir(),
                                  title="AttackMaximalAttacker vs TrainingQAgent",
                                  run_many=True, random_seeds=[0, 999, 299, 399, 499])
+
+    # client_config.hp_tuning = True
+    # client_config.hp_tuning_config = HpTuningConfig(param_1="alpha", param_2="epsilon_decay",
+    #                                                 alpha=[0.0001, 0.001, 0.003, 0.05, 0.03],
+    #                                                 epsilon_decay=[0.99999, 0.9999, 0.999, 0.99, 0.9])
+    # client_config.run_many = False
+
     return client_config
 
 
@@ -126,15 +134,19 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
     config.q_agent_config.random_seed = random_seed
     config.random_seed = random_seed
     config.q_agent_config.to_csv(config.output_dir + "/results/hyperparameters/" + str(random_seed) + "/" + time_str + ".csv")
-    train_result, eval_result = Runner.run(config)
+
     train_csv_path = ""
     eval_csv_path = ""
-    if len(train_result.avg_episode_steps) > 0 and len(eval_result.avg_episode_steps) > 0:
-        train_csv_path = config.output_dir + "/results/data/" + str(random_seed) + "/" + time_str + "_train" + ".csv"
-        train_result.to_csv(train_csv_path)
-        eval_csv_path = config.output_dir + "/results/data/" + str(random_seed) + "/" + time_str + "_eval" + ".csv"
-        eval_result.to_csv(eval_csv_path)
-        plot_csv(config, eval_csv_path, train_csv_path, random_seed)
+    if config.hp_tuning:
+        hp_tuning.hype_grid(config)
+    else:
+        train_result, eval_result = Runner.run(config)
+        if len(train_result.avg_episode_steps) > 0 and len(eval_result.avg_episode_steps) > 0:
+            train_csv_path = config.output_dir + "/results/data/" + str(random_seed) + "/" + time_str + "_train" + ".csv"
+            train_result.to_csv(train_csv_path)
+            eval_csv_path = config.output_dir + "/results/data/" + str(random_seed) + "/" + time_str + "_eval" + ".csv"
+            eval_result.to_csv(eval_csv_path)
+            plot_csv(config, eval_csv_path, train_csv_path, random_seed)
 
     return train_csv_path, eval_csv_path
 

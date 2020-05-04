@@ -109,7 +109,7 @@ class QAgent(TrainAgent, ABC):
         self.config.logger.info(log_str)
         if update_stats and self.config.dqn_config is not None and self.config.dqn_config.tensorboard:
             self.log_tensorboard(episode, avg_attacker_episode_rewards, avg_defender_episode_rewards, avg_episode_steps,
-                                 avg_episode_attacker_loss, hack_probability, attacker_cumulative_reward,
+                                 avg_episode_attacker_loss, avg_episode_defender_loss, hack_probability, attacker_cumulative_reward,
                                  defender_cumulative_reward, self.config.epsilon, lr, eval=eval)
         if update_stats:
             result.avg_episode_steps.append(avg_episode_steps)
@@ -125,10 +125,9 @@ class QAgent(TrainAgent, ABC):
             result.lr_list.append(lr)
 
     def log_tensorboard(self, episode: int, avg_attacker_episode_rewards: float, avg_defender_episode_rewards: float,
-                        avg_episode_steps: float, episode_avg_loss: float, hack_probability: float,
-                        attacker_cumulative_reward: int, defender_cumulative_reward: int, epsilon: float,
-                        lr: float,
-                        eval=False) -> None:
+                        avg_episode_steps: float, episode_avg_loss_attacker: float, episode_avg_loss_defender: float,
+                        hack_probability: float, attacker_cumulative_reward: int, defender_cumulative_reward: int,
+                        epsilon: float, lr: float, eval=False) -> None:
         """
         Log metrics to tensorboard
 
@@ -136,7 +135,8 @@ class QAgent(TrainAgent, ABC):
         :param avg_attacker_episode_rewards: the average attacker episode reward
         :param avg_defender_episode_rewards: the average defender episode reward
         :param avg_episode_steps: the average number of episode steps
-        :param episode_avg_loss: the average episode loss
+        :param episode_avg_loss_attacker: the average episode loss of the attacker
+        :param episode_avg_loss_defender: the average episode loss of the defender
         :param hack_probability: the hack probability
         :param attacker_cumulative_reward: the cumulative attacker reward
         :param defender_cumulative_reward: the cumulative defender reward
@@ -151,7 +151,10 @@ class QAgent(TrainAgent, ABC):
         self.tensorboard_writer.add_scalar('avg_episode_rewards/' + train_or_eval + "/defender",
                                            avg_defender_episode_rewards, episode)
         self.tensorboard_writer.add_scalar('episode_steps/' + train_or_eval, avg_episode_steps, episode)
-        self.tensorboard_writer.add_scalar('episode_avg_loss/' + train_or_eval, episode_avg_loss, episode)
+        self.tensorboard_writer.add_scalar('episode_avg_loss/' + train_or_eval + "/attacker", episode_avg_loss_attacker,
+                                           episode)
+        self.tensorboard_writer.add_scalar('episode_avg_loss/' + train_or_eval + "/defender", episode_avg_loss_defender,
+                                           episode)
         self.tensorboard_writer.add_scalar('hack_probability/' + train_or_eval, hack_probability, episode)
         self.tensorboard_writer.add_scalar('cumulative_reward/attacker/' + train_or_eval,
                                            attacker_cumulative_reward, episode)

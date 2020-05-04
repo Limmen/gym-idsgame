@@ -303,7 +303,8 @@ class DQNAgent(QAgent):
             actions = list(range(self.env.num_defense_actions))
             legal_actions = list(filter(lambda action: self.env.is_defense_legal(action), actions))
 
-        if np.random.rand() < self.config.epsilon and not eval:
+        if (np.random.rand() < self.config.epsilon and not eval) \
+                or (eval and np.random.random() < self.config.eval_epsilon):
             return np.random.choice(legal_actions)
 
         with torch.no_grad():
