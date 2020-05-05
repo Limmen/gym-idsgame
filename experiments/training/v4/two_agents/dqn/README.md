@@ -24,7 +24,8 @@ The starting state for each node in the environment is initialized as follows (w
 - `vulnerability_val=0` 
 - `num_vulnerabilities_per_layer=5`
 
-The environment has sparse rewards (+1,-1 rewards are given at the terminal state of each episode)
+The environment has sparse rewards (+1,-1 rewards are given at the terminal state of each episode).
+ The environment is partially observed (attacker can only see attack attributes of neighboring nodes, defender can only see defense attributes)
 
 ## Environment 
 

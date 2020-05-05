@@ -134,10 +134,10 @@ class ActorCriticAgent(PolicyGradientAgent):
             # the average action.
             advantage = R - state_value.item()
 
-            # negative log prob since we are doing gradient descent (not ascent)
+            # negative log probsince we are doing gradient descent (not ascent)
             policy_loss.append(-log_prob * advantage)
 
-            # calculate critic loss using Huber loos
+            # calculate critic loss using Huber loss
             value_loss.append(self.critic_loss_fn(state_value, torch.tensor([R])))
 
         # Compute gradient and update models
@@ -237,8 +237,8 @@ class ActorCriticAgent(PolicyGradientAgent):
         obs = self.env.reset(update_stats=False)
         attacker_obs, defender_obs = obs
 
-        attacker_state = self.update_state(attacker_obs, [])
-        defender_state = self.update_state(defender_obs, [])
+        attacker_state = self.update_state(attacker_obs, defender_obs, [])
+        defender_state = self.update_state(defender_obs, attacker_obs, [])
 
         # Tracking metrics
         episode_attacker_rewards = []
@@ -304,8 +304,8 @@ class ActorCriticAgent(PolicyGradientAgent):
                 obs = obs_prime
                 attacker_obs = obs_prime_attacker
                 defender_obs = obs_prime_defender
-                attacker_state = self.update_state(attacker_obs, attacker_state)
-                defender_state = self.update_state(defender_obs, defender_state)
+                attacker_state = self.update_state(attacker_obs, defender_obs, attacker_state)
+                defender_state = self.update_state(defender_obs, attacker_obs, defender_state)
 
             # Render final frame
             if self.config.render:
@@ -393,8 +393,8 @@ class ActorCriticAgent(PolicyGradientAgent):
             # Reset environment for the next episode and update game stats
             done = False
             attacker_obs, defender_obs = self.env.reset(update_stats=True)
-            attacker_state = self.update_state(attacker_obs, [])
-            defender_state = self.update_state(defender_obs, [])
+            attacker_state = self.update_state(attacker_obs, defender_obs, [])
+            defender_state = self.update_state(defender_obs, attacker_obs, [])
             self.outer_train.update(1)
 
             # Anneal epsilon linearly
@@ -410,20 +410,31 @@ class ActorCriticAgent(PolicyGradientAgent):
 
         return self.train_result
 
-    def update_state(self, observation: np.ndarray, state: np.ndarray) -> np.ndarray:
+    def update_state(self, observation_1: np.ndarray, observation_2: np.ndarray, state: np.ndarray) -> np.ndarray:
         """
         Update approximative Markov state
 
-        :param observation: latest observation
+        :param observation_1: latest observation
         :param state: current state
         :return: new state
         """
-        if self.config.state_length == 1:
-            return np.array(observation)
-        if len(state) == 0:
-            return np.array([observation]*self.config.state_length)
-        state = np.append(state[1:], np.array([observation]), axis=0)
-        return state
+        if self.env.fully_observed():
+            if self.config.state_length == 1:
+                return np.array(observation_1 + observation_2)
+            if len(state) == 0:
+                temp = np.append(observation_1, observation_2)
+                s = np.array([temp] * self.config.state_length)
+                return s
+            temp = np.append(observation_1, observation_2)
+            state = np.append(state[1:], np.array([temp]), axis=0)
+            return state
+        else:
+            if self.config.state_length == 1:
+                return np.array(observation_1)
+            if len(state) == 0:
+                return np.array([observation_1] * self.config.state_length)
+            state = np.append(state[1:], np.array([observation_1]), axis=0)
+            return state
 
     def eval(self, train_episode, log=True) -> ExperimentResult:
         """
@@ -467,8 +478,8 @@ class ActorCriticAgent(PolicyGradientAgent):
 
         # Eval
         attacker_obs, defender_obs = self.env.reset(update_stats=False)
-        attacker_state = self.update_state(attacker_obs, [])
-        defender_state = self.update_state(defender_obs, [])
+        attacker_state = self.update_state(attacker_obs, defender_obs, [])
+        defender_state = self.update_state(defender_obs, attacker_obs, [])
 
         for episode in range(self.config.eval_episodes):
             episode_attacker_reward = 0
@@ -501,8 +512,8 @@ class ActorCriticAgent(PolicyGradientAgent):
                 episode_step += 1
                 attacker_obs = obs_prime_attacker
                 defender_obs = obs_prime_defender
-                attacker_state = self.update_state(attacker_obs, attacker_state)
-                defender_state = self.update_state(defender_obs, defender_state)
+                attacker_state = self.update_state(attacker_obs, defender_obs, attacker_state)
+                defender_state = self.update_state(defender_obs, attacker_obs, defender_state)
 
             # Render final frame when game completed
             if self.config.eval_render:
@@ -552,8 +563,8 @@ class ActorCriticAgent(PolicyGradientAgent):
             # Reset for new eval episode
             done = False
             attacker_obs, defender_obs = self.env.reset(update_stats=False)
-            attacker_state = self.update_state(attacker_obs, attacker_state)
-            defender_state = self.update_state(defender_obs, defender_state)
+            attacker_state = self.update_state(attacker_obs, defender_obs, attacker_state)
+            defender_state = self.update_state(defender_obs, attacker_obs, defender_state)
             self.outer_eval.update(1)
 
         # Log average eval statistics

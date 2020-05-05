@@ -9,19 +9,22 @@ class NetworkConfig:
     """
     DTO with configuration of the network for the game, i.e. the servers and their connectivity
     """
-    def __init__(self, num_rows: int, num_cols: int, connected_layers : bool = False):
+    def __init__(self, num_rows: int, num_cols: int, connected_layers : bool = False, fully_observed = False):
         """
         Constructor
 
         :param num_rows: the number of rows in the network layout (think like a grid)
         :param num_cols: the number of columns in the network layout
         :param connected_layers: whether layers are connected with horizontal links or not
+        :param fully_observed: boolean flag that indicates whether the environment
+                              is fully observed or not (by default the environment is partially observed)
         """
         self.num_rows = num_rows
         self.num_cols = num_cols
         self.connected_layers = connected_layers
         self.graph_layout = self.__default_graph_layout()
         self.adjacency_matrix = self.__default_adjacency_matrix()
+        self.fully_observed = fully_observed
 
     def __default_graph_layout(self) -> np.ndarray:
         """

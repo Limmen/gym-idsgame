@@ -73,7 +73,7 @@ def default_config() -> ClientConfig:
                                  defender_type=AgentType.ACTOR_CRITIC_AGENT.value,
                                  mode=RunnerMode.TRAIN_DEFENDER_AND_ATTACKER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),
-                                 title="Actor-Critic vs DefendMinimalDefender",
+                                 title="Actor-Critic vs Actor-Critic",
                                  run_many=False, random_seeds=[0, 999, 299, 399, 499])
     #client_config = hp_tuning_config(client_config)
     return client_config

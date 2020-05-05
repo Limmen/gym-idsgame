@@ -28,6 +28,7 @@ The starting state for each node in the environment is initialized as follows (w
 - `num_vulnerabilities_per_layer=3`
 
 The environment has dense rewards (+1,-1 given whenever the attacker reaches a new level in the network)
+ The environment is partially observed (attacker can only see attack attributes of neighboring nodes, defender can only see defense attributes).
 
 ## Environment 
 

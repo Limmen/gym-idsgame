@@ -252,18 +252,21 @@ class GameState():
         :return: An observation of the environment
         """
         # +1 to have an extra feature that indicates if this is the node that the attacker is currently in
-        attack_observation = np.zeros((len(network_config.node_list), self.attack_values.shape[1]+1))
+        attack_observation = np.zeros((len(network_config.node_list), self.attack_values.shape[1] + 1))
         current_pos = self.attacker_pos
         current_node_id = network_config.get_node_id(current_pos)
         current_row, current_col = current_pos
         current_adjacency_matrix_id = network_config.get_adjacency_matrix_id(current_row, current_col)
+
         for node_id in range(len(network_config.node_list)):
             pos = network_config.get_node_pos(node_id)
             node_row, node_col = pos
             node_adjacency_matrix_id = network_config.get_adjacency_matrix_id(node_row, node_col)
             if node_id == current_node_id:
                 attack_observation[node_id] = np.append(self.attack_values[node_id], 1)
-            if network_config.adjacency_matrix[current_adjacency_matrix_id][node_adjacency_matrix_id]:
+            if network_config.fully_observed:
+                attack_observation[node_id] = np.append(self.attack_values[node_id], 0)
+            elif network_config.adjacency_matrix[current_adjacency_matrix_id][node_adjacency_matrix_id]:
                 attack_observation[node_id] = np.append(self.attack_values[node_id], 0)
         return attack_observation
 

@@ -10,4 +10,6 @@ from gym_idsgame.envs.idsgame_env import IdsGameEnv, IdsGameRandomAttackV0Env, \
     IdsGameV6Env, IdsGameMaximalAttackV7Env, IdsGameMinimalDefenseV7Env, IdsGameRandomAttackV7Env, \
     IdsGameRandomDefenseV7Env, IdsGameV7Env, IdsGameMaximalAttackV8Env, IdsGameMinimalDefenseV8Env, \
     IdsGameRandomAttackV8Env, IdsGameRandomDefenseV8Env, IdsGameV8Env, IdsGameMaximalAttackV9Env, \
-    IdsGameMinimalDefenseV9Env, IdsGameRandomAttackV9Env, IdsGameRandomDefenseV9Env, IdsGameV9Env
+    IdsGameMinimalDefenseV9Env, IdsGameRandomAttackV9Env, IdsGameRandomDefenseV9Env, IdsGameV9Env, \
+    IdsGameMaximalAttackV10Env, IdsGameMinimalDefenseV10Env, IdsGameRandomAttackV10Env, IdsGameRandomDefenseV10Env, \
+    IdsGameV10Env
