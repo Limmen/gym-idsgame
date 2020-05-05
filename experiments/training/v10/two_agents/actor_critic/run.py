@@ -60,14 +60,14 @@ def default_config() -> ClientConfig:
                                                 gif_dir=default_output_dir() + "/results/gifs",
                                                 eval_frequency=10000, attacker=True, defender=True, video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=5000, input_dim=33*4*2, output_dim_attacker=30,
+                                                checkpoint_freq=5000, input_dim=33*2, output_dim_attacker=30,
                                                 output_dim_defender=33,
                                                 hidden_dim=64,
                                                 num_hidden_layers=4, batch_size=32,
                                                 gpu=False, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
-                                                state_length=4)
+                                                state_length=1)
     env_name = "idsgame-v10"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.ACTOR_CRITIC_AGENT.value,
                                  defender_type=AgentType.ACTOR_CRITIC_AGENT.value,

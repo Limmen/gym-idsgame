@@ -420,7 +420,7 @@ class ActorCriticAgent(PolicyGradientAgent):
         """
         if self.env.fully_observed():
             if self.config.state_length == 1:
-                return np.array(observation_1 + observation_2)
+                return np.append(observation_1, observation_2)
             if len(state) == 0:
                 temp = np.append(observation_1, observation_2)
                 s = np.array([temp] * self.config.state_length)
