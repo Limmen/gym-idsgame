@@ -38,7 +38,8 @@ class ActorCriticAgent(PolicyGradientAgent):
         self.initialize_models()
         self.tensorboard_writer.add_hparams(self.config.hparams_dict(), {})
         self.machine_eps = np.finfo(np.float32).eps.item()
-        self.env.idsgame_config.save_trajectories = True
+        self.env.idsgame_config.save_trajectories = False
+        self.env.idsgame_config.save_attack_stats = False
 
     def initialize_models(self) -> None:
         """
@@ -391,6 +392,7 @@ class ActorCriticAgent(PolicyGradientAgent):
             if episode % self.config.checkpoint_freq == 0:
                 self.save_model()
                 self.env.save_trajectories()
+                self.env.save_attack_data(checkpoint=True)
                 if self.config.save_dir is not None:
                     time_str = str(time.time())
                     self.train_result.to_csv(self.config.save_dir + "/" + time_str + "_train_results_checkpoint.csv")
@@ -413,6 +415,14 @@ class ActorCriticAgent(PolicyGradientAgent):
 
         # Save networks
         self.save_model()
+
+        # Save other game data
+        self.env.save_trajectories(checkpoint=False)
+        self.env.save_attack_data(checkpoint=False)
+        if self.config.save_dir is not None:
+            time_str = str(time.time())
+            self.train_result.to_csv(self.config.save_dir + "/" + time_str + "_train_results_checkpoint.csv")
+            self.eval_result.to_csv(self.config.save_dir + "/" + time_str + "_eval_results_checkpoint.csv")
 
         return self.train_result
 

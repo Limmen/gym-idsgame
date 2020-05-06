@@ -848,6 +848,65 @@ def five_line_plot_w_shades(x_1: np.ndarray, y_1: np.ndarray,
     plt.close(fig)
 
 
+def plot_hist_prob_attack_stats(stats_df, file_name):
+    plt.rc('text', usetex=True)
+    plt.rc('text.latex', preamble=r'\usepackage{amsfonts}')
+    cat_1 = "successful attack"
+    cat_2 = "blocked attack"
+    nodes = set(stats_df["target_node"])
+    plot_data = []
+    for node in nodes:
+        data = stats_df.loc[stats_df['target_node'] == node]
+        total_len = len(data.values)
+        num_success = len(data.loc[data['attack_outcome'] == True].values)
+        emp_success_p = 0.0
+        if total_len > 0:
+            emp_success_p = num_success / total_len
+        emp_blocked_p = 1 - emp_success_p
+        plot_data.append([emp_success_p, emp_blocked_p])
+    plot_data = np.array(plot_data)
+
+    width = 0.25
+
+    nodes = list(range(len(plot_data)))
+    pos = list(range(len(nodes)))
+
+    labels = []
+    for node in nodes:
+        labels.append("node " + str(node))
+
+    fig, ax = plt.subplots(figsize=(10, 5))
+
+    for cat in range(2):
+        plt.bar([p + width * cat for p in pos],
+                plot_data[:, cat],
+                width,
+                alpha=0.5)
+
+        # Set the y axis label
+    ax.set_ylabel(r'Empirical $\mathbb{P}$')
+
+    # Set the chart's title
+    ax.set_title('Attack success rates')
+
+    # Set the position of the x ticks
+    ax.set_xticks([p + 1.5 * width for p in pos])
+
+    # Set the labels for the x ticks
+    ax.set_xticklabels(labels)
+
+    # Setting the x-axis and y-axis limits
+    plt.xlim(min(pos) - width, max(pos) + width * 4)
+
+    ax.legend([cat_1, cat_2], loc='upper center', bbox_to_anchor=(0.5, -0.1),
+              fancybox=True, shadow=True, ncol=2)
+
+    plt.grid()
+    fig.tight_layout()
+    fig.savefig(file_name + ".png", format="png", dpi=600)
+    fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
+    plt.close(fig)
+
 def plot_all_avg_summary_1(x_1_1, y_1_1, x_1_2, y_1_2, x_1_3, y_1_3, x_1_4, y_1_4, x_1_5, y_1_5,
                            std_1_1, std_1_2, std_1_3, std_1_4, std_1_5,
                            line_1_1_label, line_1_2_label, line_1_3_label, line_1_4_label,
@@ -6005,7 +6064,7 @@ def read_and_plot_average_results(experiment_title: str, train_csv_paths : list,
 
 def read_and_plot_results(train_csv_path : str, eval_csv_path: str, train_log_frequency : int,
                           eval_frequency : int, eval_log_frequency : int, eval_episodes: int, output_dir: str, sim=False,
-                          random_seed : int = 0):
+                          random_seed : int = 0, attack_stats_csv_path : str = None):
     eval_df = read_data(eval_csv_path)
     train_df = read_data(train_csv_path)
     avg_episode_loss_attacker = None
@@ -6126,6 +6185,11 @@ def read_and_plot_results(train_csv_path : str, eval_csv_path: str, train_log_fr
                       file_name=output_dir + "/results/plots/" + str(random_seed) +
                                 "/cumulative_reward_train_attack_defend",
                       line1_label="Attacker", line2_label="Defender", legend_loc="upper left")
+
+        if attack_stats_csv_path is not None:
+            attack_stats_df = read_data(attack_stats_csv_path)
+            plot_hist_prob_attack_stats(attack_stats_df, output_dir + "/results/plots/" + str(random_seed) +
+                                "/attack_attempts_hist")
 
 
 def save_image(data, filename):

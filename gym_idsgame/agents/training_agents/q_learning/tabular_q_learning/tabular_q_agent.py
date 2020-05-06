@@ -26,6 +26,8 @@ class TabularQAgent(QAgent):
         super(TabularQAgent, self).__init__(env, config)
         self.Q_attacker = np.zeros((self.env.num_states, self.env.num_attack_actions))
         self.Q_defender = np.zeros((1, self.env.num_defense_actions))
+        self.env.idsgame_config.save_trajectories = False
+        self.env.idsgame_config.save_attack_stats = True
 
     def get_action(self, s, eval=False, attacker=True) -> int:
         """
@@ -159,7 +161,8 @@ class TabularQAgent(QAgent):
             # Save Q table every <self.config.checkpoint_frequency> episodes
             if episode % self.config.checkpoint_freq == 0:
                 self.save_q_table()
-                self.env.save_trajectories()
+                self.env.save_trajectories(checkpoint = True)
+                self.env.save_attack_data(checkpoint = True)
                 if self.config.save_dir is not None:
                     time_str = str(time.time())
                     self.train_result.to_csv(self.config.save_dir + "/" + time_str + "_train_results_checkpoint.csv")
@@ -183,6 +186,14 @@ class TabularQAgent(QAgent):
 
         # Save Q Table
         self.save_q_table()
+
+        # Save other game data
+        self.env.save_trajectories(checkpoint = False)
+        self.env.save_attack_data(checkpoint = False)
+        if self.config.save_dir is not None:
+            time_str = str(time.time())
+            self.train_result.to_csv(self.config.save_dir + "/" + time_str + "_train_results_checkpoint.csv")
+            self.eval_result.to_csv(self.config.save_dir + "/" + time_str + "_eval_results_checkpoint.csv")
 
         return self.train_result
 

@@ -12,7 +12,7 @@ class IdsGameConfig:
 
     def __init__(self, render_config: RenderConfig = None, game_config: GameConfig = None,
                  defender_agent: Agent = None, attacker_agent: Agent = None, initial_state_path: str = None,
-                 save_trajectories :bool = False):
+                 save_trajectories :bool = False, save_attack_stats : bool = False):
         """
         Constructor, initializes the config
 
@@ -22,6 +22,7 @@ class IdsGameConfig:
         :param attacker_agent: the attacker agent
         :param initial_state_path: path to the initial state
         :param save_trajectories: boolean flag whether trajectories should be saved to create a self-play-dataset
+        :param save_attack_stats: boolean flag whether to save attack statistics or not
         """
         self.render_config = render_config
         self.game_config = game_config
@@ -34,3 +35,4 @@ class IdsGameConfig:
         self.render_config.set_height(self.game_config.num_rows)
         self.render_config.set_width(self.game_config.num_cols)
         self.save_trajectories = save_trajectories
+        self.save_attack_stats = save_attack_stats

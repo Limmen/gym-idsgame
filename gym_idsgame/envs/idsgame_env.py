@@ -7,6 +7,7 @@ import gym
 import os
 import time
 import pickle
+import csv
 from abc import ABC, abstractmethod
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
@@ -75,6 +76,8 @@ class IdsGameEnv(gym.Env, ABC):
         self.d_cumulative_reward = 0
         self.game_trajectories = []
         self.game_trajectory = []
+        self.attack_detections = []
+        self.total_attacks = []
 
     # -------- API ------------
     def step(self, action: int) -> Union[np.ndarray, int, bool, dict]:
@@ -129,6 +132,9 @@ class IdsGameEnv(gym.Env, ABC):
             # 5. Simulate attack outcome
             attack_successful = self.state.simulate_attack(target_node_id, attack_type,
                                                            self.idsgame_config.game_config.network_config)
+            if self.idsgame_config.save_attack_stats:
+                self.total_attacks.append([target_node_id, attack_successful])
+
             # 6. Update state based on attack outcome
             if attack_successful:
                 self.past_positions.append(target_pos)
@@ -146,6 +152,8 @@ class IdsGameEnv(gym.Env, ABC):
                     self.state.done = True
                     self.state.detected = True
                     reward = self.get_detect_reward()
+                if self.idsgame_config.save_attack_stats:
+                    self.attack_detections.append([target_node_id, detected, self.state.defense_det[target_node_id]])
         #else:
             #print("illegal action: {},{}, action: {}".format(target_pos, attacker_pos, action))
         if self.state.done:
@@ -283,17 +291,49 @@ class IdsGameEnv(gym.Env, ABC):
         if self.save_dir is not None and os.path.exists(self.save_dir):
             GameState.save(self.save_dir, self.state)
 
-    def save_trajectories(self) -> None:
+    def save_trajectories(self, checkpoint = True) -> None:
         """
         Saves the current list of game trajectories to disk
 
+        :param checkpoint: boolean flag that indicates whether this is a checkpoint save or final save
         :return: None
         """
+        suffix = ".pkl"
+        if checkpoint:
+            suffix = "_checkpoint.pkl"
         if self.idsgame_config.save_trajectories:
             path = self.save_dir
             time_str = str(time.time())
-            filehandler = open(path + "/trajectories_" + time_str + ".pkl", 'wb')
+            filehandler = open(path + "/trajectories_" + time_str + suffix, 'wb')
             pickle.dump(self.game_trajectories, filehandler)
+        else:
+            self.game_trajectories = []
+
+    def save_attack_data(self, checkpoint = True) -> None:
+        """
+        Saves the attack statistics to disk
+
+        :param checkpoint: boolean flag that indicates whether this is a checkpoint save or final save
+        :return: None
+        """
+        suffix = ".csv"
+        if checkpoint:
+            suffix = "_checkpoint.csv"
+        if self.idsgame_config.save_attack_stats:
+            time_str = str(time.time())
+            with open(self.save_dir + "/attack_detections_stats_" + time_str + suffix, "w") as f:
+                writer = csv.writer(f)
+                writer.writerow(["target_node", "detected", "detection_val"])
+                for row in self.attack_detections:
+                    writer.writerow(row)
+            with open(self.save_dir + "/attack_stats_" + time_str + suffix, "w") as f:
+                writer = csv.writer(f)
+                writer.writerow(["target_node", "attack_outcome"])
+                for row in self.total_attacks:
+                    writer.writerow(row)
+        else:
+            self.attack_detections = []
+            self.total_attacks = []
 
     def get_hack_reward(self) -> Union[int, int]:
         """
