@@ -72,7 +72,8 @@ def write_default_config(path:str = None) -> None:
     util.write_config_file(config, path)
 
 
-def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str, random_seed : int = 0) -> None:
+def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str, attack_stats_csv_path : str = None,
+             random_seed : int = 0) -> None:
     """
     Plot results from csv files
 
@@ -80,12 +81,14 @@ def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str, rando
     :param eval_csv_path: path to the csv file with evaluation results
     :param train_csv_path: path to the csv file with training results
     :param random_seed: the random seed of the experiment
+    :param attack_stats_csv_path: path to attack stats
     :return: None
     """
-    plotting_util.read_and_plot_results(train_csv_path, eval_csv_path, config.q_agent_config.train_log_frequency,
+    plotting_util.read_and_plot_results(train_csv_path, eval_csv_path,
+                                        config.q_agent_config.train_log_frequency,
                                         config.q_agent_config.eval_frequency, config.q_agent_config.eval_log_frequency,
                                         config.q_agent_config.eval_episodes, config.output_dir, sim=False,
-                                        random_seed = random_seed)
+                                        random_seed = random_seed, attack_stats_csv_path = attack_stats_csv_path)
 
 
 def plot_average_results(experiment_title :str, config: ClientConfig, eval_csv_paths:list,

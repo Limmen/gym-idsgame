@@ -75,7 +75,8 @@ def write_default_config(path:str = None) -> None:
     util.write_config_file(config, path)
 
 
-def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str, random_seed : int = 0) -> None:
+def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str, attack_stats_csv_path : str = None,
+             random_seed : int = 0) -> None:
     """
     Plot results from csv files
 
@@ -83,12 +84,14 @@ def plot_csv(config: ClientConfig, eval_csv_path:str, train_csv_path: str, rando
     :param eval_csv_path: path to the csv file with evaluation results
     :param train_csv_path: path to the csv file with training results
     :param random_seed: the random seed of the experiment
+    :param attack_stats_csv_path: path to attack stats
     :return: None
     """
-    plotting_util.read_and_plot_results(train_csv_path, eval_csv_path, config.q_agent_config.train_log_frequency,
+    plotting_util.read_and_plot_results(train_csv_path, eval_csv_path,
+                                        config.q_agent_config.train_log_frequency,
                                         config.q_agent_config.eval_frequency, config.q_agent_config.eval_log_frequency,
                                         config.q_agent_config.eval_episodes, config.output_dir, sim=False,
-                                        random_seed = random_seed)
+                                        random_seed = random_seed, attack_stats_csv_path = attack_stats_csv_path)
 
 
 def plot_average_results(experiment_title :str, config: ClientConfig, eval_csv_paths:list,
@@ -163,17 +166,38 @@ if __name__ == '__main__':
         base_dir = default_output_dir() + "/results/data/"
         train_csv_paths = []
         eval_csv_paths = []
-        for seed in config.random_seeds:
-            train_csv_path = glob.glob(base_dir + str(seed) + "/*_train.csv")[0]
-            eval_csv_path = glob.glob(base_dir + str(seed) + "/*_eval.csv")[0]
+        if config.run_many:
+            for seed in config.random_seeds:
+                train_csv_path = glob.glob(base_dir + str(seed) + "/*_train.csv")[0]
+                eval_csv_path = glob.glob(base_dir + str(seed) + "/*_eval.csv")[0]
+                attack_stats_csv_path = None
+                try:
+                    attack_stats_csv_paths = glob.glob(base_dir + str(seed) + "/attack_stats_*.csv")
+                    attack_stats_csv_path = list(filter(lambda x: "checkpoint" not in attack_stats_csv_paths, attack_stats_csv_paths))[0]
+                except:
+                    pass
+                train_csv_paths.append(train_csv_path)
+                eval_csv_paths.append(eval_csv_path)
+                plot_csv(config, eval_csv_path, train_csv_path, attack_stats_csv_path, random_seed=seed)
+
+            try:
+                plot_average_results(experiment_title, config, eval_csv_paths, train_csv_paths)
+            except Exception as e:
+                print("Error when trying to plot summary: " + str(e))
+        else:
+            train_csv_path = glob.glob(base_dir + str(config.random_seed) + "/*_train.csv")[0]
+            eval_csv_path = glob.glob(base_dir + str(config.random_seed) + "/*_eval.csv")[0]
+            attack_stats_csv_path = None
+            try:
+                attack_stats_csv_paths = glob.glob(base_dir + str(config.random_seed) + "/attack_stats_*.csv")
+                attack_stats_csv_path = \
+                list(filter(lambda x: "checkpoint" not in attack_stats_csv_paths, attack_stats_csv_paths))[0]
+            except:
+                pass
             train_csv_paths.append(train_csv_path)
             eval_csv_paths.append(eval_csv_path)
-            plot_csv(config, eval_csv_path, train_csv_path, random_seed=seed)
-
-        try:
-            plot_average_results(experiment_title, config, eval_csv_paths, train_csv_paths)
-        except Exception as e:
-            print("Error when trying to plot summary: " + str(e))
+            plot_csv(config, eval_csv_path, train_csv_path, attack_stats_csv_path=attack_stats_csv_path,
+                     random_seed=config.random_seed)
     else:
         if not config.run_many:
             run_experiment(args.configpath, 0, args.noconfig)
