@@ -475,6 +475,11 @@ class DQNAgent(QAgent):
             # Save models every <self.config.checkpoint_frequency> episodes
             if episode % self.config.checkpoint_freq == 0:
                 self.save_model()
+                self.env.save_trajectories()
+                if self.config.save_dir is not None:
+                    time_str = str(time.time())
+                    self.train_result.to_csv(self.config.save_dir + "/" + time_str + "_train_results_checkpoint.csv")
+                    self.eval_result.to_csv(self.config.save_dir + "/" + time_str + "_eval_results_checkpoint.csv")
 
             # Reset environment for the next episode and update game stats
             done = False

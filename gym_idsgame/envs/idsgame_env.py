@@ -5,6 +5,8 @@ from typing import Union
 import numpy as np
 import gym
 import os
+import time
+import pickle
 from abc import ABC, abstractmethod
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
@@ -71,6 +73,8 @@ class IdsGameEnv(gym.Env, ABC):
         self.furthest_hack = self.idsgame_config.game_config.network_config.num_rows-1
         self.a_cumulative_reward = 0
         self.d_cumulative_reward = 0
+        self.game_trajectories = []
+        self.game_trajectory = []
 
     # -------- API ------------
     def step(self, action: int) -> Union[np.ndarray, int, bool, dict]:
@@ -88,6 +92,8 @@ class IdsGameEnv(gym.Env, ABC):
             info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)
         """
         # Initialization
+        trajectory = []
+        trajectory.append(self.state)
         reward = (0,0)
         info = {}
         self.state.attack_events = []
@@ -100,9 +106,11 @@ class IdsGameEnv(gym.Env, ABC):
         # 1. Interpret attacker action
         attacker_pos = self.state.attacker_pos
         target_node_id, target_pos, attack_type = self.get_attacker_action(action)
+        trajectory.append([target_node_id, target_pos, attack_type])
 
         # 2. Interpret defense action
         defense_node_id, defense_pos, defense_type,  = self.get_defender_action(action)
+        trajectory.append([defense_node_id, defense_pos, defense_type])
 
         # 3. Defend
         detect = defense_type == self.idsgame_config.game_config.num_attack_types
@@ -155,6 +163,11 @@ class IdsGameEnv(gym.Env, ABC):
             self.viewer.gameframe.set_state(self.state)
         self.a_cumulative_reward += reward[0]
         self.d_cumulative_reward += reward[1]
+        trajectory.append(reward[0])
+        trajectory.append(reward[1])
+        trajectory.append(self.state)
+        if self.idsgame_config.save_trajectories:
+            self.game_trajectories.append(trajectory)
         return observation, reward, self.state.done, info
 
     def reset(self, update_stats = False) -> np.ndarray:
@@ -269,6 +282,18 @@ class IdsGameEnv(gym.Env, ABC):
         """
         if self.save_dir is not None and os.path.exists(self.save_dir):
             GameState.save(self.save_dir, self.state)
+
+    def save_trajectories(self) -> None:
+        """
+        Saves the current list of game trajectories to disk
+
+        :return: None
+        """
+        if self.idsgame_config.save_trajectories:
+            path = self.save_dir
+            time_str = str(time.time())
+            filehandler = open(path + "/trajectories_" + time_str + ".pkl", 'wb')
+            pickle.dump(self.game_trajectories, filehandler)
 
     def get_hack_reward(self) -> Union[int, int]:
         """
