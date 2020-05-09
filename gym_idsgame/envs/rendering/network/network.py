@@ -162,7 +162,6 @@ class Network:
         :return: None
         """
         if n1.node_type == NodeType.START:
-            assert n2.node_type == NodeType.SERVER
             edge = self.__connect_start_and_server_nodes(n1, n2)
             n1.add_out_edge(edge)
             n2.add_in_edge(edge)

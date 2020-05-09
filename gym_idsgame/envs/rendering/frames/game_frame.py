@@ -218,7 +218,6 @@ class GameFrame(pyglet.window.Window):
                                 edges = []
                                 if node.node_type == NodeType.DATA:
                                     edges = self.resource_network.get(self.attacker_sprite.pos).outgoing_edges
-
                                 node.visualize_attack(self.game_state.attack_defense_type, self.game_state.attacker_pos,
                                                       edges)
 
@@ -251,25 +250,35 @@ class GameFrame(pyglet.window.Window):
         """
         if self.idsgame_config.game_config.manual_attacker or self.idsgame_config.game_config.manual_defender:
             if symbol == pyglet.window.key._1:
-                self.game_state.attack_defense_type = 1
+                if self.idsgame_config.game_config.num_attack_types > 1:
+                    self.game_state.attack_defense_type = 1
             elif symbol == pyglet.window.key._2:
-                self.game_state.attack_defense_type = 2
+                if self.idsgame_config.game_config.num_attack_types > 2:
+                    self.game_state.attack_defense_type = 2
             elif symbol == pyglet.window.key._3:
-                self.game_state.attack_defense_type = 3
+                if self.idsgame_config.game_config.num_attack_types > 3:
+                    self.game_state.attack_defense_type = 3
             elif symbol == pyglet.window.key._4:
-                self.game_state.attack_defense_type = 4
+                if self.idsgame_config.game_config.num_attack_types > 4:
+                    self.game_state.attack_defense_type = 4
             elif symbol == pyglet.window.key._5:
-                self.game_state.attack_defense_type = 5
+                if self.idsgame_config.game_config.num_attack_types > 5:
+                    self.game_state.attack_defense_type = 5
             elif symbol == pyglet.window.key._6:
-                self.game_state.attack_defense_type = 6
+                if self.idsgame_config.game_config.num_attack_types > 6:
+                    self.game_state.attack_defense_type = 6
             elif symbol == pyglet.window.key._7:
-                self.game_state.attack_defense_type = 7
+                if self.idsgame_config.game_config.num_attack_types > 7:
+                    self.game_state.attack_defense_type = 7
             elif symbol == pyglet.window.key._8:
-                self.game_state.attack_defense_type = 8
+                if self.idsgame_config.game_config.num_attack_types > 8:
+                    self.game_state.attack_defense_type = 8
             elif symbol == pyglet.window.key._9:
-                self.game_state.attack_defense_type = 9
+                if self.idsgame_config.game_config.num_attack_types > 9:
+                    self.game_state.attack_defense_type = 9
             elif symbol == pyglet.window.key._0:
-                self.game_state.attack_defense_type = 0
+                if self.idsgame_config.game_config.num_attack_types > 0:
+                    self.game_state.attack_defense_type = 0
             elif symbol == pyglet.window.key.SPACE:
                 self.reset(update_stats=True)
 
@@ -372,7 +381,10 @@ class GameFrame(pyglet.window.Window):
         :param update_stats: boolean flag whether to update the game statistics
         :return: None
         """
-        self.game_state.new_game(self.idsgame_config.game_config.initial_state, update_stats=update_stats)
+        self.game_state.new_game(self.idsgame_config.game_config.initial_state,
+                                 a_reward=constants.GAME_CONFIG.POSITIVE_REWARD,
+                                 d_reward=constants.GAME_CONFIG.POSITIVE_REWARD,
+                                 update_stats=update_stats)
         self.set_state(self.game_state)
         self.reset_events()
         self.unschedule_events()

@@ -137,20 +137,25 @@ class GameState():
         self.defense_det = det_values.astype(np.int32)
 
 
-    def new_game(self, init_state: "GameState", a_cumulative_reward : int = 0, d_cumulative_reward : int = 0,
+    def new_game(self, init_state: "GameState", a_reward : int = 0, d_reward : int = 0,
                  update_stats = True) -> None:
         """
         Updates the current state for a new game
 
         :param init_state: the initial state of the first game
+        :param a_reward: the reward delta to increment or decrement the attacker cumulative reward with
+        :param d_reward: the reward delta to increment or decrement the defender cumulative reward with
         :return: None
         """
         if update_stats:
             self.num_games += 1
-            self.attacker_cumulative_reward += a_cumulative_reward
-            self.defender_cumulative_reward += d_cumulative_reward
             if self.hacked:
+                self.attacker_cumulative_reward += a_reward
+                self.defender_cumulative_reward -= d_reward
                 self.num_hacks += 1
+            if self.detected:
+                self.attacker_cumulative_reward -= a_reward
+                self.defender_cumulative_reward += d_reward
         self.done = False
         self.attack_defense_type = 0
         self.game_step = 0
@@ -264,7 +269,7 @@ class GameState():
             node_adjacency_matrix_id = network_config.get_adjacency_matrix_id(node_row, node_col)
             if node_id == current_node_id:
                 attack_observation[node_id] = np.append(self.attack_values[node_id], 1)
-            if network_config.fully_observed:
+            elif network_config.fully_observed:
                 attack_observation[node_id] = np.append(self.attack_values[node_id], 0)
             elif network_config.adjacency_matrix[current_adjacency_matrix_id][node_adjacency_matrix_id]:
                 attack_observation[node_id] = np.append(self.attack_values[node_id], 0)

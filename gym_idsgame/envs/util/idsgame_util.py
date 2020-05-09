@@ -14,12 +14,12 @@ def validate_config(idsgame_config: IdsGameConfig) -> None:
     :param idsgame_config: the config to validate
     :return: None
     """
-    if idsgame_config.game_config.num_layers < 1:
-        raise AssertionError("The number of layers cannot be less than 1")
+    if idsgame_config.game_config.num_layers < 0:
+        raise AssertionError("The number of layers cannot be less than 0")
     if idsgame_config.game_config.num_attack_types < 1:
         raise AssertionError("The number of attack types cannot be less than 1")
-    if idsgame_config.game_config.max_value < 3:
-        raise AssertionError("The max attack/defense value cannot be less than 3")
+    if idsgame_config.game_config.max_value < 2:
+        raise AssertionError("The max attack/defense value cannot be less than 2")
 
 
 def is_defense_id_legal(defense_id: int, game_config: GameConfig) -> bool:

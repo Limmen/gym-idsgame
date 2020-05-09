@@ -39,6 +39,8 @@ class StartNode(Node):
         self.y = self.row * int(self.idsgame_config.render_config.rect_size / 1.5) \
                  + (self.idsgame_config.render_config.rect_size / 1.5) / 2
         self.radius = self.idsgame_config.render_config.rect_size / 7
+        self.outgoing_edges = []
+        self.incoming_edges = []
         self.__draw()
 
     @property
@@ -97,11 +99,23 @@ class StartNode(Node):
     def reset(self):
         pass
 
-    def add_in_edge(self, edge):
-        pass
+    def add_out_edge(self, edge) -> None:
+        """
+        Add an edge to the list of outgoing edges of the node
 
-    def add_out_edge(self, edge):
-        pass
+        :param edge: edge to add
+        :return: None
+        """
+        self.outgoing_edges.append(edge)
+
+    def add_in_edge(self, edge) -> None:
+        """
+        Add an edge to the list of ingoing edges of the node
+
+        :param edge: edge to add
+        :return: None
+        """
+        self.incoming_edges.append(edge)
 
     def add_horizontal_edge(self, edge):
         pass

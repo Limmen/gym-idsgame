@@ -6187,9 +6187,12 @@ def read_and_plot_results(train_csv_path : str, eval_csv_path: str, train_log_fr
                       line1_label="Attacker", line2_label="Defender", legend_loc="upper left")
 
         if attack_stats_csv_path is not None:
-            attack_stats_df = read_data(attack_stats_csv_path)
-            plot_hist_prob_attack_stats(attack_stats_df, output_dir + "/results/plots/" + str(random_seed) +
-                                "/attack_attempts_hist")
+            try:
+                attack_stats_df = read_data(attack_stats_csv_path)
+                plot_hist_prob_attack_stats(attack_stats_df, output_dir + "/results/plots/" + str(random_seed) +
+                                    "/attack_attempts_hist")
+            except Exception as e:
+                print("could not plot attack stats: {}".format(str(e)))
 
 
 def save_image(data, filename):

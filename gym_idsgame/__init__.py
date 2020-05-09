@@ -634,3 +634,60 @@ register(
     entry_point='gym_idsgame.envs:IdsGameV10Env',
     kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
 )
+
+# -------- Version 11 ------------
+
+# [AttackerEnv] 0 layers, 1 server per layer, 2 attack-defense-values
+# [Initial State] Defense: 0, Attack:0, Num vulnerabilities: 0, Det: 1, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 11
+# [Observations] fully observed
+register(
+    id='idsgame-random_defense-v11',
+    entry_point='gym_idsgame.envs:IdsGameRandomDefenseV11Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [AttackerEnv] 0 layers, 1 server per layer, 2 attack-defense-values
+# [Initial State] Defense: 0, Attack:0, Num vulnerabilities: 0, Det: 1, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 11
+# [Observations] fully observed
+register(
+    id='idsgame-minimal_defense-v11',
+    entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV11Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [DefenseEnv] 0 layers, 1 server per layer, 2 attack-defense-values
+# [Initial State] Defense: 0, Attack:0, Num vulnerabilities: 0, Det: 1, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 11
+# [Observations] fully observed
+register(
+    id='idsgame-random_attack-v11',
+    entry_point='gym_idsgame.envs:IdsGameRandomAttackV11Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [DefenseEnv] 0 layers, 1 server per layer, 2 attack-defense-values
+# [Initial State] Defense: 0, Attack:0, Num vulnerabilities: 0, Det: 1, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 11
+# [Observations] fully observed
+register(
+    id='idsgame-maximal_attack-v11',
+    entry_point='gym_idsgame.envs:IdsGameMaximalAttackV11Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [AttackDefenseEnv] 0 layers, 1 server per layer, 2 attack-defense-values
+# [Initial State] Defense: 0, Attack:0, Num vulnerabilities: 0, Det: 1, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 11
+# [Observations] fully observed
+register(
+    id='idsgame-v11',
+    entry_point='gym_idsgame.envs:IdsGameV11Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
