@@ -818,3 +818,65 @@ register(
     entry_point='gym_idsgame.envs:IdsGameV12Env',
     kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
 )
+
+# -------- Version 13 ------------
+
+# [AttackerEnv] 0 layers, 1 server per layer, 2 attack-defense-values
+# [Initial State] Defense: 0, Attack:0, Num vulnerabilities: 0, Det: 10, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 13
+# [Observations] fully observed
+# [Environment] Deterministic
+register(
+    id='idsgame-random_defense-v13',
+    entry_point='gym_idsgame.envs:IdsGameRandomDefenseV13Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [AttackerEnv] 0 layers, 1 server per layer, 2 attack-defense-values
+# [Initial State] Defense: 0, Attack:0, Num vulnerabilities: 0, Det: 10, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 13
+# [Observations] fully observed
+# [Environment] Deterministic
+register(
+    id='idsgame-minimal_defense-v13',
+    entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV13Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [DefenseEnv] 0 layers, 1 server per layer, 2 attack-defense-values
+# [Initial State] Defense: 0, Attack:0, Num vulnerabilities: 0, Det: 10, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 13
+# [Observations] fully observed
+# [Environment] Deterministic
+register(
+    id='idsgame-random_attack-v13',
+    entry_point='gym_idsgame.envs:IdsGameRandomAttackV13Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [DefenseEnv] 0 layers, 1 server per layer, 2 attack-defense-values
+# [Initial State] Defense: 0, Attack:0, Num vulnerabilities: 0, Det: 10, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 13
+# [Observations] fully observed
+# [Environment] Deterministic
+register(
+    id='idsgame-maximal_attack-v13',
+    entry_point='gym_idsgame.envs:IdsGameMaximalAttackV13Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [AttackDefenseEnv] 0 layers, 1 server per layer, 2 attack-defense-values
+# [Initial State] Defense: 0, Attack:0, Num vulnerabilities: 0, Det: 10, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 13
+# [Observations] fully observed
+# [Environment] Deterministic
+register(
+    id='idsgame-v13',
+    entry_point='gym_idsgame.envs:IdsGameV13Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)

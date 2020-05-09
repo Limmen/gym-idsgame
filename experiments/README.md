@@ -994,9 +994,13 @@ it is intended for 2-agent simulations or RL training.
    * This experiment trains both an attacker and a defender agent simultaneously against each other 
    using DQN.
    
-- [reinforce_vs_reinforce-v8](training/v8/two_agents/dqn/)
+- [reinforce_vs_reinforce-v8](training/v8/two_agents/reinforce/)
    * This experiment trains both an attacker and a defender agent simultaneously against each other 
-   using REINFORCE.     
+   using REINFORCE.
+   
+- [actor_critic_vs_actor_critic-v8](training/v8/two_agents/actor_critic/)
+   * This experiment trains both an attacker and a defender agent simultaneously against each other 
+   using advantage actor-critic.             
    
 ## Experiments in Version 9 Environments 
 
@@ -1096,3 +1100,220 @@ it is intended for 2-agent simulations or RL training.
    * This experiment trains both an attacker and a defender agent simultaneously against each other 
    using DQN.       
    
+   
+## Experiments in Version 10 Environments 
+
+Experiment in version 10 environments. That is, evironments with the following network topology:
+
+```
+                   Start
+		     |
+		     |
+		     v
+		   Server
+		     |
+		     |
+		     v
+		   Data
+```
+Nodes are initialized with the following state (index of the defense values to set to zero is selected randomly):
+```
+attack values: [0,0,0,0,0,0,0,0,0,0]
+defense values: [2,2,0,2,2,2,2,2,2,2]
+det: 2
+```
+
+The environment has dense rewards (+1,-1 given whenever the attacker reaches a new level in the network)
+
+The environment is fully observed for both the defender and attacker
+
+### Training Experiments
+
+Experiments where one or two of the agents are using some learning algorithm to update their policy.   
+
+#### Minimal Defense
+   
+Experiments in the `minimal_defense-v10` environment.  
+An environment where the defender is following the `defend_minimal` defense policy.
+The `defend_minimal` policy entails that the defender will always 
+defend the attribute with the minimal value out of all of its neighbors.   
+      
+- [actor_critic_vs_minimal_defense-v10](training/v10/minimal_defense/actor_critic/)
+   * This experiment trains an attacker agent using Actor-Critic to act optimally in the given
+   environment and defeat the random defender.                   
+
+#### Two Agents
+Experiments in the `idsgame-v10` environment. 
+An environment where neither the attacker nor defender is part of the environment, i.e.
+it is intended for 2-agent simulations or RL training.
+      
+- [actor_critic_vs_actor_critic-v10](training/v10/two_agents/actor_critic/)
+   * This experiment trains both an attacker and a defender agent simultaneously against each other 
+   using advantage actor-critic.   
+   
+   
+   
+## Experiments in Version 11 Environments 
+
+Experiment in version 11 environments. That is, evironments with the following network topology:
+
+```
+                   Start
+		     |
+		     |
+		     v
+		   Server
+		     |
+		     |
+		     v
+		   Data
+```
+Nodes are initialized with the following state (index of the defense values to set to zero is selected randomly):
+```
+attack values: [0,0]
+defense values: [0,0]
+det: 1
+```
+
+The environment has dense rewards (+1,-1 given whenever the attacker reaches a new level in the network)
+
+The environment is fully observed for both the defender and attacker
+
+### Training Experiments
+
+Experiments where one or two of the agents are using some learning algorithm to update their policy.   
+
+#### Minimal Defense
+   
+Experiments in the `minimal_defense-v11` environment.  
+An environment where the defender is following the `defend_minimal` defense policy.
+The `defend_minimal` policy entails that the defender will always 
+defend the attribute with the minimal value out of all of its neighbors.   
+      
+- [actor_critic_vs_minimal_defense-v11](training/v11/minimal_defense/actor_critic/)
+   * This experiment trains an attacker agent using Actor-Critic to act optimally in the given
+   environment and defeat the random defender.
+   
+- [tabular_q_learning_vs_minimal_defense-v11](training/v11/minimal_defense/tabular_q_learning/)
+   * This experiment trains an attacker agent using tabular q-learning to act optimally in the given 
+   environment and defeat the defender.  
+
+#### Two Agents
+Experiments in the `idsgame-v11` environment. 
+An environment where neither the attacker nor defender is part of the environment, i.e.
+it is intended for 2-agent simulations or RL training.
+      
+- [actor_critic_vs_actor_critic-v11](training/v11/two_agents/actor_critic/)
+   * This experiment trains both an attacker and a defender agent simultaneously against each other 
+   using advantage actor-critic.      
+   
+   
+## Experiments in Version 12 Environments 
+
+Experiment in version 12 environments. That is, evironments with the following network topology:
+
+```
+                   Start
+		     |
+		     |
+		     v
+		   Server
+		     |
+		     |
+		     v
+		   Data
+```
+Nodes are initialized with the following state (index of the defense values to set to zero is selected randomly):
+```
+attack values: [(0-1) randomized, (0-1) randomized]
+defense values: [(0-1) randomized, (0-1) randomized]
+det: (0-1) randomized
+```
+
+The environment has dense rewards (+1,-1 given whenever the attacker reaches a new level in the network)
+
+The environment is fully observed for both the defender and attacker
+
+### Training Experiments
+
+Experiments where one or two of the agents are using some learning algorithm to update their policy.   
+
+#### Minimal Defense
+   
+Experiments in the `minimal_defense-v12` environment.  
+An environment where the defender is following the `defend_minimal` defense policy.
+The `defend_minimal` policy entails that the defender will always 
+defend the attribute with the minimal value out of all of its neighbors.   
+      
+- [actor_critic_vs_minimal_defense-v12](training/v12/minimal_defense/actor_critic/)
+   * This experiment trains an attacker agent using Actor-Critic to act optimally in the given
+   environment and defeat the random defender.
+   
+- [tabular_q_learning_vs_minimal_defense-v12](training/v12/minimal_defense/tabular_q_learning/)
+   * This experiment trains an attacker agent using tabular q-learning to act optimally in the given 
+   environment and defeat the defender.  
+
+#### Two Agents
+Experiments in the `idsgame-v12` environment. 
+An environment where neither the attacker nor defender is part of the environment, i.e.
+it is intended for 2-agent simulations or RL training.
+      
+- [actor_critic_vs_actor_critic-v12](training/v11/two_agents/actor_critic/)
+   * This experiment trains both an attacker and a defender agent simultaneously against each other 
+   using advantage actor-critic.        
+   
+## Experiments in Version 13 Environments 
+
+Experiment in version 13 environments. That is, evironments with the following network topology:
+
+```
+                   Start
+		     |
+		     |
+		     v
+		   Server
+		     |
+		     |
+		     v
+		   Data
+```
+Nodes are initialized with the following state (index of the defense values to set to zero is selected randomly):
+```
+attack values: [0,0]
+defense values: [0,0]
+det: 10
+```
+
+The environment has dense rewards (+1,-1 given whenever the attacker reaches a new level in the network)
+
+The environment is fully observed for both the defender and attacker
+
+### Training Experiments
+
+Experiments where one or two of the agents are using some learning algorithm to update their policy.   
+
+#### Minimal Defense
+   
+Experiments in the `minimal_defense-v13` environment.  
+An environment where the defender is following the `defend_minimal` defense policy.
+The `defend_minimal` policy entails that the defender will always 
+defend the attribute with the minimal value out of all of its neighbors.   
+      
+- [actor_critic_vs_minimal_defense-v13](training/v13/minimal_defense/actor_critic/)
+   * This experiment trains an attacker agent using Actor-Critic to act optimally in the given
+   environment and defeat the random defender.
+   
+- [tabular_q_learning_vs_minimal_defense-v13](training/v13/minimal_defense/tabular_q_learning/)
+   * This experiment trains an attacker agent using tabular q-learning to act optimally in the given 
+   environment and defeat the defender.  
+
+#### Two Agents
+Experiments in the `idsgame-v13` environment. 
+An environment where neither the attacker nor defender is part of the environment, i.e.
+it is intended for 2-agent simulations or RL training.
+      
+- [actor_critic_vs_actor_critic-v13](training/v13/two_agents/actor_critic/)
+   * This experiment trains both an attacker and a defender agent simultaneously against each other 
+   using advantage actor-critic.          
+   
+ 

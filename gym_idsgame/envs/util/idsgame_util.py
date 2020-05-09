@@ -23,8 +23,8 @@ def validate_config(idsgame_config: IdsGameConfig) -> None:
         raise AssertionError("The number of layers cannot be less than 0")
     if idsgame_config.game_config.num_attack_types < 1:
         raise AssertionError("The number of attack types cannot be less than 1")
-    if idsgame_config.game_config.max_value < 2:
-        raise AssertionError("The max attack/defense value cannot be less than 2")
+    if idsgame_config.game_config.max_value < 1:
+        raise AssertionError("The max attack/defense value cannot be less than 1")
 
 
 def is_defense_id_legal(defense_id: int, game_config: GameConfig) -> bool:
@@ -223,8 +223,8 @@ def action_dist_hist(data: np.ndarray,
     ax.spines['top'].set_color((.8, .8, .8))
 
     fig.tight_layout()
-    fig.savefig(file_name + ".png", format="png", dpi=600)
-    fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
-    data = get_img_from_fig(fig, dpi=140)
+    #fig.savefig(file_name + ".png", format="png", dpi=600)
+    #fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
+    data = get_img_from_fig(fig, dpi=100)
     plt.close(fig)
     return data

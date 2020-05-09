@@ -8,6 +8,7 @@ from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.config.hp_tuning_config import HpTuningConfig
 from gym_idsgame.runnner import Runner
+from gym_idsgame.agents.training_agents.common.opponent_pool_config import OpponentPoolConfig
 from experiments.util import plotting_util, util, hp_tuning
 
 
@@ -51,7 +52,11 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    pg_agent_config = PolicyGradientAgentConfig(gamma=0.999, alpha=0.001, epsilon=1, render=False, eval_sleep=0.9,
+    opponent_pool_config = OpponentPoolConfig(pool_maxsize=1000,
+                                              pool_increment_period=500,
+                                              head_to_head_period=1)
+
+    pg_agent_config = PolicyGradientAgentConfig(gamma=0.999, alpha=0.0001, epsilon=1, render=False, eval_sleep=0.9,
                                                 min_epsilon=0.01, eval_episodes=100, train_log_frequency=100,
                                                 epsilon_decay=0.9999, video=True, eval_log_frequency=1,
                                                 video_fps=5, video_dir=default_output_dir() + "/results/videos",
@@ -60,7 +65,7 @@ def default_config() -> ClientConfig:
                                                 gif_dir=default_output_dir() + "/results/gifs",
                                                 eval_frequency=10000, attacker=True, defender=True, video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=5000, input_dim=6*2, output_dim_attacker=4,
+                                                checkpoint_freq=10000, input_dim=6*2, output_dim_attacker=4,
                                                 output_dim_defender=6,
                                                 hidden_dim=16,
                                                 num_hidden_layers=1, batch_size=32,
@@ -68,7 +73,8 @@ def default_config() -> ClientConfig:
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
                                                 state_length=1, alternating_optimization=True,
-                                                alternating_period=1000)
+                                                alternating_period=5000, opponent_pool=True,
+                                                opponent_pool_config=opponent_pool_config)
     env_name = "idsgame-v11"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.ACTOR_CRITIC_AGENT.value,
                                  defender_type=AgentType.ACTOR_CRITIC_AGENT.value,

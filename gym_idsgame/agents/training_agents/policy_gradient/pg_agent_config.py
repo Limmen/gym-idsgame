@@ -2,6 +2,7 @@
 Configuration for QAgent
 """
 import csv
+from gym_idsgame.agents.training_agents.common.opponent_pool_config import OpponentPoolConfig
 
 class PolicyGradientAgentConfig:
     """
@@ -25,7 +26,8 @@ class PolicyGradientAgentConfig:
                  optimizer: str = "Adam", lr_exp_decay: bool = False,
                  lr_decay_rate: float = 0.96, hidden_activation: str = "ReLU", clip_gradient = False,
                  max_gradient_norm = 40, critic_loss_fn : str = "MSE", state_length = 1,
-                 alternating_optimization : bool = False, alternating_period : int = 15000
+                 alternating_optimization : bool = False, alternating_period : int = 15000,
+                 opponent_pool : bool = False, opponent_pool_config : OpponentPoolConfig = None
                  ):
         """
         Initialize environment and hyperparameters
@@ -76,6 +78,8 @@ class PolicyGradientAgentConfig:
         :param state_length: length of observations to use for approximative Markov state
         :param alternating_optimization: boolean flag whether using alteranting optimization or not
         :param alternating_period: period for alternating between training attacker and defender
+        :param opponent_pool: boolean flag whether using opponent pool or not
+        :param opponent_pool_config: DTO with config when training against opponent pool
         """
         self.gamma = gamma
         self.alpha = alpha
@@ -124,6 +128,8 @@ class PolicyGradientAgentConfig:
         self.state_length = state_length
         self.alternating_optimization = alternating_optimization
         self.alternating_period = alternating_period
+        self.opponent_pool = opponent_pool
+        self.opponent_pool_config = opponent_pool_config
 
 
     def to_str(self) -> str:
@@ -198,6 +204,10 @@ class PolicyGradientAgentConfig:
             writer.writerow(["state_length", str(self.state_length)])
             writer.writerow(["alternating_optimization", str(self.alternating_optimization)])
             writer.writerow(["alternating_period", str(self.alternating_period)])
+            if self.opponent_pool and self.opponent_pool_config is not None:
+                writer.writerow(["pool_maxsize", str(self.opponent_pool_config.pool_maxsize)])
+                writer.writerow(["pool_increment_period", str(self.opponent_pool_config.pool_increment_period)])
+                writer.writerow(["head_to_head_period", str(self.opponent_pool_config.head_to_head_period)])
 
 
     def hparams_dict(self):
@@ -234,4 +244,8 @@ class PolicyGradientAgentConfig:
         hparams["state_length"] = self.state_length
         hparams["alternating_optimization"] = self.alternating_optimization
         hparams["alternating_period"] = self.alternating_period
+        if self.opponent_pool and self.opponent_pool_config is not None:
+            hparams["pool_maxsize"] = self.opponent_pool_config.pool_maxsize
+            hparams["pool_increment_period"] = self.opponent_pool_config.pool_increment_period
+            hparams["head_to_head_period"] = self.opponent_pool_config.head_to_head_period
         return hparams

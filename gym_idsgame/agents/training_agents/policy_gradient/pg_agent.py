@@ -62,7 +62,7 @@ class PolicyGradientAgent(TrainAgent, ABC):
                     episode_avg_defender_loss: list = None,
                     eval: bool = False,
                     update_stats : bool = True, lr: float = None, train_attacker : bool = False,
-                    train_defender : bool = False) -> None:
+                    train_defender : bool = False, a_pool: int = 0, d_pool : int = 0) -> None:
         """
         Logs average metrics for the last <self.config.log_frequency> episodes
 
@@ -78,6 +78,8 @@ class PolicyGradientAgent(TrainAgent, ABC):
         :param lr: the learning rate
         :param train_attacker: boolean flag indicating whether the attacker is being trained
         :param train_defender: boolean flag indicating whether the defender is being trained
+        :param a_pool: size of the attacker pool (if using opponent pools)
+        :param d_pool: size of the defender pool (if using opponent pools)
         :return: None
         """
         avg_attacker_episode_rewards = np.mean(attacker_episode_rewards)
@@ -109,11 +111,12 @@ class PolicyGradientAgent(TrainAgent, ABC):
             self.outer_eval.set_description_str(log_str)
         else:
             log_str = "[Train] episode: {:.2f} epsilon:{:.2f},avg_a_R:{:.2f},avg_d_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
-                      "acc_D_R:{:.2f},A_loss:{:.6f},D_loss:{:.6f},lr:{:.2E},c_h:{:.2f},Tr_A:{},Tr_D:{}".format(
+                      "acc_D_R:{:.2f},A_loss:{:.6f},D_loss:{:.6f},lr:{:.2E},c_h:{:.2f},Tr_A:{},Tr_D:{}," \
+                      "a_pool:{},d_pool:{}".format(
                 episode, self.config.epsilon, avg_attacker_episode_rewards, avg_defender_episode_rewards,
                 avg_episode_steps, hack_probability, attacker_cumulative_reward, defender_cumulative_reward,
                 avg_episode_attacker_loss, avg_episode_defender_loss, lr, hack_probability_total, train_attacker,
-                train_defender)
+                train_defender,a_pool, d_pool)
             self.outer_train.set_description_str(log_str)
         self.config.logger.info(log_str)
         if update_stats and self.config.tensorboard:

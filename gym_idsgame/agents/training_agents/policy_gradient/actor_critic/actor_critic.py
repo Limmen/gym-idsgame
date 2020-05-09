@@ -6,6 +6,9 @@ import numpy as np
 import time
 import tqdm
 import torch
+import queue
+import copy
+import random
 from torch.distributions import Categorical
 from torch.utils.tensorboard import SummaryWriter
 from gym_idsgame.envs.rendering.video.idsgame_monitor import IdsGameMonitor
@@ -36,6 +39,9 @@ class ActorCriticAgent(PolicyGradientAgent):
         self.attacker_lr_decay = None
         self.defender_lr_decay = None
         self.tensorboard_writer = SummaryWriter(self.config.tensorboard_dir)
+        if self.config.opponent_pool and self.config.opponent_pool_config is not None:
+            self.attacker_pool = queue.Queue(self.config.opponent_pool_config.pool_maxsize)
+            self.defender_pool = queue.Queue(self.config.opponent_pool_config.pool_maxsize)
         self.initialize_models()
         self.tensorboard_writer.add_hparams(self.config.hparams_dict(), {})
         self.machine_eps = np.finfo(np.float32).eps.item()
@@ -97,6 +103,33 @@ class ActorCriticAgent(PolicyGradientAgent):
             self.defender_lr_decay = torch.optim.lr_scheduler.ExponentialLR(optimizer=self.attacker_optimizer,
                                                                             gamma=self.config.lr_decay_rate)
 
+        self.add_model_to_pool(attacker=True)
+        self.add_model_to_pool(attacker=False)
+
+    def add_model_to_pool(self, attacker=True) -> None:
+        """
+        Adds a model to the pool of opponents
+
+        :param attacker: boolean flag indicating whether adding attacker model or defender model
+        :return: None
+        """
+        if self.config.opponent_pool and self.config.opponent_pool_config is not None:
+            if attacker:
+                model_copy = copy.deepcopy(self.attacker_policy_network)
+                if self.attacker_pool.full():
+                    self.attacker_pool.get()
+                self.attacker_pool.put(model_copy)
+            else:
+                model_copy = copy.deepcopy(self.defender_policy_network)
+                if self.defender_pool.full():
+                    self.defender_pool.get()
+                self.defender_pool.put(model_copy)
+
+    def sample_opponent(self, attacker=True):
+        if attacker:
+            return random.sample(list(self.attacker_pool.queue), 1)[0]
+        else:
+            return random.sample(list(self.defender_pool.queue), 1)[0]
 
     def training_step(self, saved_rewards : List[float], saved_log_probs : List[torch.Tensor],
                       saved_state_values : List[torch.Tensor], attacker=True) -> torch.Tensor:
@@ -174,12 +207,13 @@ class ActorCriticAgent(PolicyGradientAgent):
         return loss
 
 
-    def get_action(self, state: np.ndarray, attacker : bool = True) -> Union[int, torch.Tensor, torch.Tensor, np.ndarray]:
+    def get_action(self, state: np.ndarray, attacker : bool = True, opponent_pool = False) -> Union[int, torch.Tensor, torch.Tensor, np.ndarray]:
         """
         Samples an action from the policy network
 
         :param state: the state to sample an action for
         :param attacker: boolean flag whether running in attacker mode (if false assume defender)
+        :param opponent_pool: boolean flag, if true get model from opponent pool
         :return: The sampled action id, log probability of action id, state value, action distribution
         """
         state = torch.from_numpy(state.flatten()).float()
@@ -192,18 +226,24 @@ class ActorCriticAgent(PolicyGradientAgent):
         # Calculate legal actions
         if attacker:
             actions = list(range(self.env.num_attack_actions))
-            legal_actions = list(filter(lambda action: self.env.is_attack_legal(action), actions))
+            #legal_actions = list(filter(lambda action: self.env.is_attack_legal(action), actions))
             non_legal_actions = list(filter(lambda action: not self.env.is_attack_legal(action), actions))
         else:
             actions = list(range(self.env.num_defense_actions))
-            legal_actions = list(filter(lambda action: self.env.is_defense_legal(action), actions))
+            #legal_actions = list(filter(lambda action: self.env.is_defense_legal(action), actions))
             non_legal_actions = list(filter(lambda action: not self.env.is_defense_legal(action), actions))
 
         # Forward pass using the current policy network to predict P(a|s)
         if attacker:
-            action_probs, state_value = self.attacker_policy_network(state)
+            if opponent_pool:
+                action_probs, state_value = self.attacker_opponent(state)
+            else:
+                action_probs, state_value = self.attacker_policy_network(state)
         else:
-            action_probs, state_value = self.defender_policy_network(state)
+            if opponent_pool:
+                action_probs, state_value = self.defender_opponent(state)
+            else:
+                action_probs, state_value = self.defender_policy_network(state)
 
         # Set probability of non-legal actions to 0
         action_probs_1 = action_probs.clone()
@@ -260,8 +300,16 @@ class ActorCriticAgent(PolicyGradientAgent):
         train_attacker = True
         train_defender = True
         if self.config.alternating_optimization:
-            train_defender = False
+            train_attacker = False
+            if self.config.opponent_pool and self.config.opponent_pool_config is not None:
+                self.defender_opponent = self.sample_opponent(attacker=False)
+                self.attacker_opponent = self.sample_opponent(attacker=True)
+
         num_alt_episodes = 0
+        num_attacker_pool_episodes = 0
+        num_defender_pool_episodes = 0
+        num_attacker_opponent_episodes = 0
+        num_defender_opponent_episodes = 0
 
         attacker_initial_state_action_dist = np.zeros(self.config.output_dim_attacker)
         defender_initial_state_action_dist = np.zeros(self.config.output_dim_defender)
@@ -292,13 +340,26 @@ class ActorCriticAgent(PolicyGradientAgent):
 
                 # Get attacker and defender actions
                 if self.config.attacker:
-                    attacker_action, attacker_log_prob, attacker_state_value, attacker_action_dist = self.get_action(attacker_state, attacker=True)
+                    if self.config.alternating_optimization and not train_attacker \
+                            and self.config.opponent_pool and self.config.opponent_pool_config is not None:
+                        attacker_action, attacker_log_prob, attacker_state_value, attacker_action_dist = self.get_action(
+                            attacker_state, attacker=True, opponent_pool=True)
+                    else:
+                        attacker_action, attacker_log_prob, attacker_state_value, attacker_action_dist = \
+                            self.get_action(attacker_state, attacker=True, opponent_pool=False)
                     saved_attacker_log_probs.append(attacker_log_prob)
                     saved_attacker_state_values.append(attacker_state_value)
                     if episode_step == 0:
                         attacker_initial_state_action_dist = attacker_action_dist
+
                 if self.config.defender:
-                    defender_action, defender_log_prob, defender_state_value, defender_action_dist = self.get_action(defender_state, attacker=False)
+                    if self.config.alternating_optimization and not train_defender \
+                            and self.config.opponent_pool and self.config.opponent_pool_config is not None:
+                        defender_action, defender_log_prob, defender_state_value, defender_action_dist = self.get_action(
+                            defender_state, attacker=False, opponent_pool=True)
+                    else:
+                        defender_action, defender_log_prob, defender_state_value, defender_action_dist = \
+                            self.get_action(defender_state, attacker=False, opponent_pool=False)
                     saved_defender_log_probs.append(defender_log_prob)
                     saved_defender_state_values.append(defender_state_value)
                     if episode_step == 0:
@@ -370,6 +431,15 @@ class ActorCriticAgent(PolicyGradientAgent):
                 if self.config.defender:
                     episode_avg_defender_loss.append(episode_defender_loss)
 
+            if self.config.alternating_optimization and self.config.opponent_pool:
+                if train_attacker:
+                    num_attacker_pool_episodes += 1
+                    num_defender_opponent_episodes += 1
+
+                if train_defender:
+                    num_defender_pool_episodes += 1
+                    num_attacker_opponent_episodes += 1
+
             episode_steps.append(episode_step)
 
             # Log average metrics every <self.config.train_log_frequency> episodes
@@ -380,10 +450,17 @@ class ActorCriticAgent(PolicyGradientAgent):
                 else:
                     self.train_hack_probability = 0.0
                     self.train_cumulative_hack_probability = 0.0
+                a_pool = None
+                d_pool = None
+                if self.config.opponent_pool and self.config.opponent_pool_config is not None:
+                    a_pool = self.attacker_pool.qsize()
+                    d_pool = self.defender_pool.qsize()
                 self.log_metrics(episode, self.train_result, episode_attacker_rewards, episode_defender_rewards, episode_steps,
                                  episode_avg_attacker_loss, episode_avg_defender_loss, lr=lr,
                                  train_attacker = (self.config.attacker and train_attacker),
-                                 train_defender = (self.config.defender and train_defender))
+                                 train_defender = (self.config.defender and train_defender),
+                                 a_pool=a_pool,
+                                 d_pool=d_pool)
 
                 # Log values and gradients of the parameters (histogram summary) to tensorboard
 
@@ -411,8 +488,9 @@ class ActorCriticAgent(PolicyGradientAgent):
             # Run evaluation every <self.config.eval_frequency> episodes
             if episode % self.config.eval_frequency == 0:
                 self.eval(episode)
-                self.log_action_dist(attacker_initial_state_action_dist, attacker=True)
-                self.log_action_dist(defender_initial_state_action_dist, attacker=False)
+                if self.config.opponent_pool and self.config.opponent_pool_config is not None:
+                    self.log_action_dist(attacker_initial_state_action_dist, attacker=True)
+                    self.log_action_dist(defender_initial_state_action_dist, attacker=False)
 
             # Save models and other state every <self.config.checkpoint_frequency> episodes
             if episode % self.config.checkpoint_freq == 0:
@@ -423,10 +501,11 @@ class ActorCriticAgent(PolicyGradientAgent):
                     time_str = str(time.time())
                     self.train_result.to_csv(self.config.save_dir + "/" + time_str + "_train_results_checkpoint.csv")
                     self.eval_result.to_csv(self.config.save_dir + "/" + time_str + "_eval_results_checkpoint.csv")
-                self.create_policy_plot(attacker_initial_state_action_dist.data.cpu().numpy(), episode,
-                                        attacker=True)
-                self.create_policy_plot(defender_initial_state_action_dist.data.cpu().numpy(), episode,
-                                        attacker=False)
+                if self.config.opponent_pool and self.config.opponent_pool_config is not None:
+                    self.create_policy_plot(attacker_initial_state_action_dist.data.cpu().numpy(), episode,
+                                            attacker=True)
+                    self.create_policy_plot(defender_initial_state_action_dist.data.cpu().numpy(), episode,
+                                            attacker=False)
 
             # Reset environment for the next episode and update game stats
             done = False
@@ -440,6 +519,26 @@ class ActorCriticAgent(PolicyGradientAgent):
                 train_defender = not train_defender
                 train_attacker = not train_attacker
                 num_alt_episodes = 0
+
+            # If using opponent pool, update the pool
+            if self.config.opponent_pool and self.config.opponent_pool_config is not None:
+                if train_attacker:
+                    if num_attacker_pool_episodes > self.config.opponent_pool_config.pool_increment_period:
+                        self.add_model_to_pool(attacker=True)
+                        num_attacker_pool_episodes = 0
+
+                    if num_defender_opponent_episodes > self.config.opponent_pool_config.head_to_head_period:
+                        self.defender_opponent = self.sample_opponent(attacker=False)
+                        num_defender_opponent_episodes = 0
+
+                if train_defender:
+                    if num_defender_pool_episodes > self.config.opponent_pool_config.pool_increment_period:
+                        self.add_model_to_pool(attacker=False)
+                        num_defender_pool_episodes = 0
+
+                    if num_attacker_opponent_episodes > self.config.opponent_pool_config.head_to_head_period:
+                        self.attacker_opponent = self.sample_opponent(attacker=True)
+                        num_attacker_opponent_episodes = 0
 
             # Anneal epsilon linearly
             self.anneal_epsilon()
@@ -462,7 +561,6 @@ class ActorCriticAgent(PolicyGradientAgent):
 
         return self.train_result
 
-
     def create_policy_plot(self, distribution, episode, attacker = True):
         sample = np.random.choice(list(range(len(distribution))), size=1000, p=distribution)
         tag = "Attacker"
@@ -475,9 +573,6 @@ class ActorCriticAgent(PolicyGradientAgent):
                                       file_name=self.config.save_dir + "/" + file_suffix + "_" + str(episode))
         self.tensorboard_writer.add_image(str(episode) + "_initial_state_policy/" + tag,
                                           data, global_step=episode, dataformats="HWC")
-
-
-
 
     def update_state(self, observation_1: np.ndarray, observation_2: np.ndarray, state: np.ndarray) -> np.ndarray:
         """

@@ -351,11 +351,14 @@ actor_critic_vs_minimal_defense-v8: training/v8/minimal_defense/actor_critic/run
 reinforce_vs_reinforce-v8: training/v8/two_agents/reinforce/run.py training/v8/two_agents/reinforce/run.sh
 	cd training/v8/two_agents/reinforce/ && $(MAKE) run
 
+actor_critic_vs_actor_critic-v8: training/v8/two_agents/actor_critic/run.py training/v8/two_agents/actor_critic/run.sh
+	cd training/v8/two_agents/actor_critic/ && $(MAKE) run
+
 
 v8: tabular_q_learning_vs_random_defense-v8 tabular_q_learning_vs_minimal_defense-v8 random_attack_vs_tabular_q_learning-v8
 v8: maximal_attack_vs_tabular_q_learning-v8 tabular_q_learning_vs_tabular_q_learning-v8 dqn_vs_tabular_random_defense-v8
 v8: dqn_vs_minimal_defense-v8 maximal_attack_vs_dqn-v8 random_attack_vs_dqn-v8 dqn_vs_dqn-v8 reinforce_vs_minimal_defense-v8
-v8: reinforce_vs_reinforce-v8 actor_critic_vs_minimal_defense-v8
+v8: reinforce_vs_reinforce-v8 actor_critic_vs_minimal_defense-v8 actor_critic_vs_actor_critic-v8
 
 
 # v9 Experiments
@@ -390,10 +393,58 @@ random_attack_vs_dqn-v9: training/v9/random_attack/dqn/run.py training/v9/random
 dqn_vs_dqn-v9: training/v9/two_agents/dqn/run.py training/v9/two_agents/dqn/run.sh
 	cd training/v9/two_agents/dqn/ && $(MAKE) run
 
-
 v9: tabular_q_learning_vs_random_defense-v9 tabular_q_learning_vs_minimal_defense-v9 random_attack_vs_tabular_q_learning-v9
 v9: maximal_attack_vs_tabular_q_learning-v9 tabular_q_learning_vs_tabular_q_learning-v9 dqn_vs_tabular_random_defense-v9
 v9: dqn_vs_minimal_defense-v9 maximal_attack_vs_dqn-v9 random_attack_vs_dqn-v9 dqn_vs_dqn-v9
+
+# v10 Experiments
+
+actor_critic_vs_minimal_defense-v10: training/v10/minimal_defense/actor_critic/run.py training/v10/minimal_defense/actor_critic/run.sh
+	cd training/v10/minimal_defense/actor_critic/ && $(MAKE) run
+
+actor_critic_vs_actor_critic-v10: training/v10/two_agents/actor_critic/run.py training/v10/two_agents/actor_critic/run.sh
+	cd training/v10/two_agents/actor_critic/ && $(MAKE) run
+
+v10: actor_critic_vs_minimal_defense-v10 actor_critic_vs_actor_critic-v10
+
+# v11 Experiments
+
+actor_critic_vs_minimal_defense-v11: training/v11/minimal_defense/actor_critic/run.py training/v11/minimal_defense/actor_critic/run.sh
+	cd training/v11/minimal_defense/actor_critic/ && $(MAKE) run
+
+tabular_q_learning_vs_minimal_defense-v11: training/v11/minimal_defense/tabular_q_learning/run.py training/v11/minimal_defense/tabular_q_learning/run.sh
+	cd training/v11/minimal_defense/tabular_q_learning/ && $(MAKE) run
+
+actor_critic_vs_actor_critic-v11: training/v11/two_agents/actor_critic/run.py training/v11/two_agents/actor_critic/run.sh
+	cd training/v11/two_agents/actor_critic/ && $(MAKE) run
+
+v11: actor_critic_vs_minimal_defense-v11 actor_critic_vs_actor_critic-v11 tabular_q_learning_vs_minimal_defense-v11
+
+# v12 Experiments
+
+actor_critic_vs_minimal_defense-v12: training/v12/minimal_defense/actor_critic/run.py training/v12/minimal_defense/actor_critic/run.sh
+	cd training/v12/minimal_defense/actor_critic/ && $(MAKE) run
+
+tabular_q_learning_vs_minimal_defense-v12: training/v12/minimal_defense/tabular_q_learning/run.py training/v12/minimal_defense/tabular_q_learning/run.sh
+	cd training/v12/minimal_defense/tabular_q_learning/ && $(MAKE) run
+
+actor_critic_vs_actor_critic-v12: training/v12/two_agents/actor_critic/run.py training/v12/two_agents/actor_critic/run.sh
+	cd training/v12/two_agents/actor_critic/ && $(MAKE) run
+
+v12: actor_critic_vs_minimal_defense-v12 actor_critic_vs_actor_critic-v12 tabular_q_learning_vs_minimal_defense-v12
+
+# v13 Experiments
+
+actor_critic_vs_minimal_defense-v13: training/v13/minimal_defense/actor_critic/run.py training/v13/minimal_defense/actor_critic/run.sh
+	cd training/v13/minimal_defense/actor_critic/ && $(MAKE) run
+
+tabular_q_learning_vs_minimal_defense-v13: training/v13/minimal_defense/tabular_q_learning/run.py training/v13/minimal_defense/tabular_q_learning/run.sh
+	cd training/v13/minimal_defense/tabular_q_learning/ && $(MAKE) run
+
+actor_critic_vs_actor_critic-v13: training/v13/two_agents/actor_critic/run.py training/v13/two_agents/actor_critic/run.sh
+	cd training/v13/two_agents/actor_critic/ && $(MAKE) run
+
+v13: actor_critic_vs_minimal_defense-v13 actor_critic_vs_actor_critic-v13 tabular_q_learning_vs_minimal_defense-v13
 
 # Tests
 
@@ -402,7 +453,7 @@ tests: it_tests/run.py it_tests/run.sh
 
 # All
 
-all: v0 v1 v2 v3 v4 v5 v6 v7 v8 v9 tests
+all: v0 v1 v2 v3 v4 v5 v6 v7 v8 v9 v10 v11 v12 v13 tests
 
 # Clean
 
@@ -522,6 +573,7 @@ clean:
 	cd ./training/v8/two_agents/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/v8/two_agents/dqn/ && $(MAKE) clean
 	cd ./training/v8/two_agents/reinforce/ && $(MAKE) clean
+	cd ./training/v8/two_agents/actor_critic/ && $(MAKE) clean
 
 	# V9
 	cd ./training/v9/random_defense/tabular_q_learning/ && $(MAKE) clean
@@ -534,6 +586,25 @@ clean:
 	cd ./training/v9/maximal_attack/dqn/ && $(MAKE) clean
 	cd ./training/v9/two_agents/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/v9/two_agents/dqn/ && $(MAKE) clean
+
+	# V10
+	cd ./training/v10/minimal_defense/actor_critic/ && $(MAKE) clean
+	cd ./training/v10/two_agents/actor_critic/ && $(MAKE) clean
+
+	# V11
+	cd ./training/v11/minimal_defense/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v11/minimal_defense/actor_critic/ && $(MAKE) clean
+	cd ./training/v11/two_agents/actor_critic/ && $(MAKE) clean
+
+	# V12
+	cd ./training/v12/minimal_defense/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v12/minimal_defense/actor_critic/ && $(MAKE) clean
+	cd ./training/v12/two_agents/actor_critic/ && $(MAKE) clean
+
+	# V13
+	cd ./training/v13/minimal_defense/tabular_q_learning/ && $(MAKE) clean
+	cd ./training/v13/minimal_defense/actor_critic/ && $(MAKE) clean
+	cd ./training/v13/two_agents/actor_critic/ && $(MAKE) clean
 
 	# Tests
 	cd ./it_tests/ && $(MAKE) clean

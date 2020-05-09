@@ -60,4 +60,7 @@ clean:
 	cd random_defense/dqn && $(MAKE) clean
 	cd two_agents/dqn && $(MAKE) clean
 
+	cd minimal_defense/actor_critic && $(MAKE) clean
+	cd two_agents/actor_critic && $(MAKE) clean
+
 	rm -rf plots
