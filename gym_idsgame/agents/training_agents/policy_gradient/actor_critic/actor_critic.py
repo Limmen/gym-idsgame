@@ -15,10 +15,11 @@ from gym_idsgame.envs.constants import constants
 from gym_idsgame.agents.training_agents.policy_gradient.actor_critic.model import ActorCriticNN
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent import PolicyGradientAgent
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
+from gym_idsgame.envs.util import idsgame_util
 
 class ActorCriticAgent(PolicyGradientAgent):
     """
-    An implementation of the REINFORCE with Baseline Policy Gradient algorithm
+    An implementation of the REINFORCE with Advantage Baseline (Actor Critic) Policy Gradient algorithm
     """
     def __init__(self, env:IdsGameEnv, config: PolicyGradientAgentConfig):
         """
@@ -40,6 +41,8 @@ class ActorCriticAgent(PolicyGradientAgent):
         self.machine_eps = np.finfo(np.float32).eps.item()
         self.env.idsgame_config.save_trajectories = False
         self.env.idsgame_config.save_attack_stats = False
+        self.train_attacker = True
+        self.train_defender = True
 
     def initialize_models(self) -> None:
         """
@@ -171,13 +174,13 @@ class ActorCriticAgent(PolicyGradientAgent):
         return loss
 
 
-    def get_action(self, state: np.ndarray, attacker : bool = True) -> Union[int, torch.Tensor]:
+    def get_action(self, state: np.ndarray, attacker : bool = True) -> Union[int, torch.Tensor, torch.Tensor, np.ndarray]:
         """
         Samples an action from the policy network
 
         :param state: the state to sample an action for
         :param attacker: boolean flag whether running in attacker mode (if false assume defender)
-        :return: The sampled action id
+        :return: The sampled action id, log probability of action id, state value, action distribution
         """
         state = torch.from_numpy(state.flatten()).float()
 
@@ -222,7 +225,7 @@ class ActorCriticAgent(PolicyGradientAgent):
         # now and use it later to compute the gradient once the episode has finished.
         log_prob = policy_dist.log_prob(action)
 
-        return action.item(), log_prob, state_value
+        return action.item(), log_prob, state_value, action_probs
 
 
     def train(self) -> ExperimentResult:
@@ -254,6 +257,15 @@ class ActorCriticAgent(PolicyGradientAgent):
                                              "avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
                                              "acc_D_R:{:.2f}".format(self.config.epsilon, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
 
+        train_attacker = True
+        train_defender = True
+        if self.config.alternating_optimization:
+            train_defender = False
+        num_alt_episodes = 0
+
+        attacker_initial_state_action_dist = np.zeros(self.config.output_dim_attacker)
+        defender_initial_state_action_dist = np.zeros(self.config.output_dim_defender)
+
         # Training
         for episode in range(self.config.num_episodes):
             episode_attacker_reward = 0
@@ -280,13 +292,17 @@ class ActorCriticAgent(PolicyGradientAgent):
 
                 # Get attacker and defender actions
                 if self.config.attacker:
-                    attacker_action, attacker_log_prob, attacker_state_value = self.get_action(attacker_state, attacker=True)
+                    attacker_action, attacker_log_prob, attacker_state_value, attacker_action_dist = self.get_action(attacker_state, attacker=True)
                     saved_attacker_log_probs.append(attacker_log_prob)
                     saved_attacker_state_values.append(attacker_state_value)
+                    if episode_step == 0:
+                        attacker_initial_state_action_dist = attacker_action_dist
                 if self.config.defender:
-                    defender_action, defender_log_prob, defender_state_value = self.get_action(defender_state, attacker=False)
+                    defender_action, defender_log_prob, defender_state_value, defender_action_dist = self.get_action(defender_state, attacker=False)
                     saved_defender_log_probs.append(defender_log_prob)
                     saved_defender_state_values.append(defender_state_value)
+                    if episode_step == 0:
+                        defender_initial_state_action_dist = defender_action_dist
 
                 action = (attacker_action, defender_action)
 
@@ -315,14 +331,18 @@ class ActorCriticAgent(PolicyGradientAgent):
 
             # Perform Policy Gradient updates
             if self.config.attacker:
-                loss = self.training_step(saved_attacker_rewards, saved_attacker_log_probs,
-                                          saved_attacker_state_values, attacker=True)
-                episode_attacker_loss += loss.item()
+                if not self.config.alternating_optimization or \
+                        (self.config.alternating_optimization and train_attacker):
+                    loss = self.training_step(saved_attacker_rewards, saved_attacker_log_probs,
+                                              saved_attacker_state_values, attacker=True)
+                    episode_attacker_loss += loss.item()
 
             if self.config.defender:
-                loss = self.training_step(saved_defender_rewards, saved_defender_log_probs,
-                                          saved_defender_state_values, attacker=False)
-                episode_defender_loss += loss.item()
+                if not self.config.alternating_optimization or \
+                        (self.config.alternating_optimization and train_defender):
+                    loss = self.training_step(saved_defender_rewards, saved_defender_log_probs,
+                                              saved_defender_state_values, attacker=False)
+                    episode_defender_loss += loss.item()
 
             # Decay LR after every episode
             lr = self.config.alpha
@@ -331,6 +351,7 @@ class ActorCriticAgent(PolicyGradientAgent):
                 lr = self.attacker_lr_decay.get_lr()[0]
 
             # Record episode metrics
+            num_alt_episodes += 1
             self.num_train_games += 1
             self.num_train_games_total += 1
             if self.env.state.hacked:
@@ -360,23 +381,26 @@ class ActorCriticAgent(PolicyGradientAgent):
                     self.train_hack_probability = 0.0
                     self.train_cumulative_hack_probability = 0.0
                 self.log_metrics(episode, self.train_result, episode_attacker_rewards, episode_defender_rewards, episode_steps,
-                                 episode_avg_attacker_loss, episode_avg_defender_loss, lr=lr)
+                                 episode_avg_attacker_loss, episode_avg_defender_loss, lr=lr,
+                                 train_attacker = (self.config.attacker and train_attacker),
+                                 train_defender = (self.config.defender and train_defender))
 
                 # Log values and gradients of the parameters (histogram summary) to tensorboard
 
-                if self.config.attacker:
+                if self.config.attacker and train_attacker:
                     for tag, value in self.attacker_policy_network.named_parameters():
                         tag = tag.replace('.', '/')
                         self.tensorboard_writer.add_histogram(tag, value.data.cpu().numpy(), episode)
                         self.tensorboard_writer.add_histogram(tag + '_attacker/grad', value.grad.data.cpu().numpy(),
                                                               episode)
 
-                if self.config.defender:
+                if self.config.defender and train_defender:
                     for tag, value in self.defender_policy_network.named_parameters():
                         tag = tag.replace('.', '/')
                         self.tensorboard_writer.add_histogram(tag, value.data.cpu().numpy(), episode)
                         self.tensorboard_writer.add_histogram(tag + '_defender/grad', value.grad.data.cpu().numpy(),
                                                               episode)
+
 
                 episode_attacker_rewards = []
                 episode_defender_rewards = []
@@ -387,6 +411,8 @@ class ActorCriticAgent(PolicyGradientAgent):
             # Run evaluation every <self.config.eval_frequency> episodes
             if episode % self.config.eval_frequency == 0:
                 self.eval(episode)
+                self.log_action_dist(attacker_initial_state_action_dist, attacker=True)
+                self.log_action_dist(defender_initial_state_action_dist, attacker=False)
 
             # Save models and other state every <self.config.checkpoint_frequency> episodes
             if episode % self.config.checkpoint_freq == 0:
@@ -397,6 +423,10 @@ class ActorCriticAgent(PolicyGradientAgent):
                     time_str = str(time.time())
                     self.train_result.to_csv(self.config.save_dir + "/" + time_str + "_train_results_checkpoint.csv")
                     self.eval_result.to_csv(self.config.save_dir + "/" + time_str + "_eval_results_checkpoint.csv")
+                self.create_policy_plot(attacker_initial_state_action_dist.data.cpu().numpy(), episode,
+                                        attacker=True)
+                self.create_policy_plot(defender_initial_state_action_dist.data.cpu().numpy(), episode,
+                                        attacker=False)
 
             # Reset environment for the next episode and update game stats
             done = False
@@ -404,6 +434,12 @@ class ActorCriticAgent(PolicyGradientAgent):
             attacker_state = self.update_state(attacker_obs, defender_obs, [])
             defender_state = self.update_state(defender_obs, attacker_obs, [])
             self.outer_train.update(1)
+
+            # If doing alternating optimization and the alternating period is up, change agent that is optimized
+            if self.config.alternating_optimization and num_alt_episodes > self.config.alternating_period:
+                train_defender = not train_defender
+                train_attacker = not train_attacker
+                num_alt_episodes = 0
 
             # Anneal epsilon linearly
             self.anneal_epsilon()
@@ -425,6 +461,23 @@ class ActorCriticAgent(PolicyGradientAgent):
             self.eval_result.to_csv(self.config.save_dir + "/" + time_str + "_eval_results_checkpoint.csv")
 
         return self.train_result
+
+
+    def create_policy_plot(self, distribution, episode, attacker = True):
+        sample = np.random.choice(list(range(len(distribution))), size=1000, p=distribution)
+        tag = "Attacker"
+        file_suffix = "initial_state_policy_attacker"
+        if not attacker:
+            tag = "Defender"
+            file_suffix = "initial_state_policy_defender"
+        title = tag + " Initial State Policy"
+        data = idsgame_util.action_dist_hist(sample, title=title, xlabel="Action", ylabel=r"$\mathbb{P}(s|a)$",
+                                      file_name=self.config.save_dir + "/" + file_suffix + "_" + str(episode))
+        self.tensorboard_writer.add_image(str(episode) + "_initial_state_policy/" + tag,
+                                          data, global_step=episode, dataformats="HWC")
+
+
+
 
     def update_state(self, observation_1: np.ndarray, observation_2: np.ndarray, state: np.ndarray) -> np.ndarray:
         """
@@ -512,9 +565,9 @@ class ActorCriticAgent(PolicyGradientAgent):
 
                 # Get attacker and defender actions
                 if self.config.attacker:
-                    attacker_action, _, _ = self.get_action(attacker_state, attacker=True)
+                    attacker_action, _, _, _ = self.get_action(attacker_state, attacker=True)
                 if self.config.defender:
-                    defender_action, _, _ = self.get_action(defender_state, attacker=False)
+                    defender_action, _, _, _ = self.get_action(defender_state, attacker=False)
                 action = (attacker_action, defender_action)
 
                 # Take a step in the environment

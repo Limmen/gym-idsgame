@@ -25,7 +25,7 @@ class PolicyGradientAgentConfig:
                  optimizer: str = "Adam", lr_exp_decay: bool = False,
                  lr_decay_rate: float = 0.96, hidden_activation: str = "ReLU", clip_gradient = False,
                  max_gradient_norm = 40, critic_loss_fn : str = "MSE", state_length = 1,
-                 alternating_optimization : bool = False
+                 alternating_optimization : bool = False, alternating_period : int = 15000
                  ):
         """
         Initialize environment and hyperparameters
@@ -75,6 +75,7 @@ class PolicyGradientAgentConfig:
         :param critic_loss_fn: loss function for the critic
         :param state_length: length of observations to use for approximative Markov state
         :param alternating_optimization: boolean flag whether using alteranting optimization or not
+        :param alternating_period: period for alternating between training attacker and defender
         """
         self.gamma = gamma
         self.alpha = alpha
@@ -122,6 +123,7 @@ class PolicyGradientAgentConfig:
         self.critic_loss_fn = critic_loss_fn
         self.state_length = state_length
         self.alternating_optimization = alternating_optimization
+        self.alternating_period = alternating_period
 
 
     def to_str(self) -> str:
@@ -134,13 +136,14 @@ class PolicyGradientAgentConfig:
                "video_dir:{12},num_episodes:{13},eval_render:{14},gifs:{15}," \
                "gifdir:{16},eval_frequency:{17},video_frequency:{18},attacker{19},defender:{20}," \
                "checkpoint_freq:{21},random_seed:{22},eval_epsilon:{23},clip_gradient:{24},max_gradient_norm:{25}," \
-               "output_dim_defender:{26},critic_loss_fn:{27},state_length:{28}".format(
+               "output_dim_defender:{26},critic_loss_fn:{27},state_length:{28},alternating_optimization:{29}," \
+               "alternating_period:{30}".format(
             self.gamma, self.alpha, self.epsilon, self.render, self.eval_sleep, self.epsilon_decay,
             self.min_epsilon, self.eval_episodes, self.train_log_frequency, self.eval_log_frequency, self.video,
             self.video_fps, self.video_dir, self.num_episodes, self.eval_render, self.gifs, self.gif_dir,
             self.eval_frequency, self.video_frequency, self.attacker, self.defender, self.checkpoint_freq,
             self.random_seed, self.eval_epsilon, self.clip_gradient, self.max_gradient_norm, self.output_dim_defender,
-            self.critic_loss_fn, self.state_length)
+            self.critic_loss_fn, self.state_length, self.alternating_optimization, self.alternating_period)
 
     def to_csv(self, file_path: str) -> None:
         """
@@ -193,6 +196,8 @@ class PolicyGradientAgentConfig:
             writer.writerow(["output_dim_defender", str(self.output_dim_defender)])
             writer.writerow(["critic_loss_fn", str(self.critic_loss_fn)])
             writer.writerow(["state_length", str(self.state_length)])
+            writer.writerow(["alternating_optimization", str(self.alternating_optimization)])
+            writer.writerow(["alternating_period", str(self.alternating_period)])
 
 
     def hparams_dict(self):
@@ -227,4 +232,6 @@ class PolicyGradientAgentConfig:
         hparams["output_dim_defender"] = self.output_dim_defender
         hparams["critic_loss_fn"] = self.critic_loss_fn
         hparams["state_length"] = self.state_length
+        hparams["alternating_optimization"] = self.alternating_optimization
+        hparams["alternating_period"] = self.alternating_period
         return hparams

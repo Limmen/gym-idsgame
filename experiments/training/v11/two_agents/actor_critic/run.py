@@ -67,7 +67,8 @@ def default_config() -> ClientConfig:
                                                 gpu=False, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
-                                                state_length=1)
+                                                state_length=1, alternating_optimization=True,
+                                                alternating_period=1000)
     env_name = "idsgame-v11"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.ACTOR_CRITIC_AGENT.value,
                                  defender_type=AgentType.ACTOR_CRITIC_AGENT.value,

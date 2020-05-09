@@ -20,7 +20,6 @@ def read_data(file) -> pd.DataFrame:
     """
     return pd.read_csv(file)
 
-
 def plot_all(train_df, eval_df, eval_step, a_state_values, file_name):
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r'\usepackage{amsfonts}')

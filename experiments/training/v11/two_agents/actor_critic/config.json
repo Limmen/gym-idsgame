@@ -11,6 +11,8 @@
     "output_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v11/two_agents/actor_critic",
     "pg_agent_config": {
         "alpha": 0.001,
+        "alternating_optimization": true,
+        "alternating_period": 1000,
         "attacker": true,
         "attacker_load_path": null,
         "batch_size": 32,
