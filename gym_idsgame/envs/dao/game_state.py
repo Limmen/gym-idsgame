@@ -64,7 +64,7 @@ class GameState():
                                    "Exposure", "Access", "Forgery", "Vulnerabilities", "Redirects"]
 
     def default_state(self, node_list: List[int], attacker_pos: Union[int, int], num_attack_types: int,
-                      network_config: NetworkConfig) -> None:
+                      network_config: NetworkConfig, randomize_state : bool = False) -> None:
         """
         Creates a default state
 
@@ -73,10 +73,11 @@ class GameState():
         :param num_cols: the number of columns in the grid network
         :param num_attack_types: the number of attack types
         :param network_config: network config
+        :param randomize_state: boolean flag whether to create the state randomly
         :return: None
         """
         self.set_state(node_list, num_attack_types, network_config=network_config,
-                       num_vulnerabilities_per_layer=network_config.num_cols)
+                       num_vulnerabilities_per_layer=network_config.num_cols, randomize_state=randomize_state)
         self.attacker_pos = attacker_pos
         self.game_step = 0
         self.attacker_cumulative_reward = 0
@@ -91,10 +92,10 @@ class GameState():
         self.hacked = False
 
 
-    def set_state(self, node_list, num_attack_types, defense_val=2, attack_val=0,
-                  num_vulnerabilities_per_node=1, det_val=2, vulnerability_val=0, num_vulnerabilities_per_layer = 1,
-                  network_config: NetworkConfig = None
-                  ):
+    def set_state(self, node_list : List, num_attack_types : int, defense_val :int = 2, attack_val :int = 0,
+                  num_vulnerabilities_per_node : int = 1, det_val : int = 2, vulnerability_val : int = 0,
+                  num_vulnerabilities_per_layer : int = 1,
+                  network_config : NetworkConfig = None, randomize_state : bool = False):
         """
         Sets the state
 
@@ -107,12 +108,21 @@ class GameState():
         :param vulnerability_val: defense value for defense types that are vulnerable
         :param num_vulnerabilities_per_layer: number of vulnerabilities per layer
         :param network_config: network configuration
+        :param randomize_state: boolean flag whether to create the state randomly
         :return: None
         """
         num_nodes = len(node_list)
         attack_values = np.zeros((num_nodes, num_attack_types))
         defense_values = np.zeros((num_nodes, num_attack_types))
         det_values = np.zeros(num_nodes)
+
+        d_val = defense_val
+        a_val = attack_val
+        de_val = det_val
+        if randomize_state:
+            d_val = np.random.choice(d_val+1)
+            a_val = np.random.choice(a_val+1)
+            de_val = np.random.choice(de_val+1)
 
         vulnerabilities_per_layer = np.zeros((network_config.num_rows, network_config.num_cols))
         for row in range(1, network_config.num_rows-1):
@@ -127,9 +137,9 @@ class GameState():
             if vulnerabilities_per_layer[row][col] == 1 or node_list[node_id] == NodeType.DATA.value:
                 vulnerabilities = np.random.choice(num_attack_types, size=num_vuln) # random vulnerability per node
             if node_list[node_id] == NodeType.DATA.value or node_list[node_id] == NodeType.SERVER.value:
-                defense_values[node_id] = [defense_val] * num_attack_types
-                det_values[node_id] = det_val
-                attack_values[node_id] = [attack_val] * num_attack_types
+                defense_values[node_id] = [d_val] * num_attack_types
+                det_values[node_id] = de_val
+                attack_values[node_id] = [a_val] * num_attack_types
                 for vuln_id in vulnerabilities:
                     defense_values[node_id][vuln_id] = vulnerability_val  # vulnerability (lower defense)
         self.attack_values = attack_values.astype(np.int32)
@@ -138,23 +148,34 @@ class GameState():
 
 
     def new_game(self, init_state: "GameState", a_reward : int = 0, d_reward : int = 0,
-                 update_stats = True) -> None:
+                 update_stats = True, randomize_state : bool = False, network_config : NetworkConfig = None,
+                 num_attack_types : int = None, defense_val : int = None, attack_val : int = None,
+                 det_val : int = None, vulnerability_val : int = None,
+                 num_vulnerabilities_per_layer : int = None, num_vulnerabilities_per_node : int = None) -> None:
         """
         Updates the current state for a new game
 
         :param init_state: the initial state of the first game
         :param a_reward: the reward delta to increment or decrement the attacker cumulative reward with
         :param d_reward: the reward delta to increment or decrement the defender cumulative reward with
+        :param randomize_state: boolean flag whether to create the state randomly
+        :param network_config: network config (necessary if randomizing the state every game)
+        :param defense_val: defense value for defense types that are not vulnerable
+        :param attack_val: attack value for attack types
+        :param num_vulnerabilities_per_node: number of vulnerabilities per node
+        :param det_val: detection value per node
+        :param vulnerability_val: defense value for defense types that are vulnerable
+        :param num_vulnerabilities_per_layer: number of vulnerabilities per layer
         :return: None
         """
         if update_stats:
             self.num_games += 1
             if self.hacked:
                 self.attacker_cumulative_reward += a_reward
-                self.defender_cumulative_reward -= d_reward
+                self.defender_cumulative_reward += d_reward
                 self.num_hacks += 1
             if self.detected:
-                self.attacker_cumulative_reward -= a_reward
+                self.attacker_cumulative_reward += a_reward
                 self.defender_cumulative_reward += d_reward
         self.done = False
         self.attack_defense_type = 0
@@ -162,9 +183,16 @@ class GameState():
         self.attack_events = []
         self.defense_events = []
         self.attacker_pos = init_state.attacker_pos
-        self.attack_values = np.copy(init_state.attack_values)
-        self.defense_values = np.copy(init_state.defense_values)
-        self.defense_det = np.copy(init_state.defense_det)
+        if not randomize_state:
+            self.attack_values = np.copy(init_state.attack_values)
+            self.defense_values = np.copy(init_state.defense_values)
+            self.defense_det = np.copy(init_state.defense_det)
+        else:
+            self.set_state(network_config.node_list, num_attack_types, network_config=network_config,
+                           num_vulnerabilities_per_layer=num_vulnerabilities_per_layer, randomize_state=randomize_state,
+                           defense_val=defense_val,
+                           attack_val=attack_val, num_vulnerabilities_per_node=num_vulnerabilities_per_node,
+                           det_val=det_val, vulnerability_val=vulnerability_val)
         self.detected = False
         self.hacked = False
 

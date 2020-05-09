@@ -42,6 +42,12 @@ class GameConfig():
         self.num_states = self.num_nodes
         self.network_config = network_config
         self.initial_state_path = initial_state_path
+        self.defense_val = 2
+        self.attack_val = 0
+        self.num_vulnerabilities_per_node = 1
+        self.det_val = 2
+        self.vulnerabilitiy_val = 0
+        self.num_vulnerabilities_per_layer = None
         if network_config is None:
             self.network_config = NetworkConfig(self.num_rows, self.num_cols, connected_layers=False)
         self.initial_state = initial_state
@@ -78,6 +84,12 @@ class GameConfig():
         """
         if num_vulnerabilities_per_layer is None:
             num_vulnerabilities_per_layer = self.num_servers_per_layer
+        self.defense_val = defense_val
+        self.attack_val = attack_val
+        self.num_vulnerabilities_per_layer = num_vulnerabilities_per_layer
+        self.det_val = det_val
+        self.vulnerabilitiy_val = vulnerability_val
+        self.num_vulnerabilities_per_node = num_vulnerabilities_per_node
         self.initial_state.set_state(self.network_config.node_list, self.num_attack_types, defense_val=defense_val,
                                      attack_val=attack_val, num_vulnerabilities_per_node=num_vulnerabilities_per_node,
                                      det_val=det_val, vulnerability_val=vulnerability_val,

@@ -55,20 +55,20 @@ def default_config() -> ClientConfig:
                                                 min_epsilon=0.01, eval_episodes=100, train_log_frequency=100,
                                                 epsilon_decay=0.9999, video=True, eval_log_frequency=1,
                                                 video_fps=5, video_dir=default_output_dir() + "/results/videos",
-                                                num_episodes=350001,
+                                                num_episodes=1350001,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
                                                 eval_frequency=10000, attacker=True, defender=True, video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=5000, input_dim=33*2, output_dim_attacker=30,
-                                                output_dim_defender=33,
-                                                hidden_dim=64,
-                                                num_hidden_layers=4, batch_size=32,
+                                                checkpoint_freq=5000, input_dim=6*2, output_dim_attacker=4,
+                                                output_dim_defender=6,
+                                                hidden_dim=16,
+                                                num_hidden_layers=1, batch_size=32,
                                                 gpu=False, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
                                                 state_length=1)
-    env_name = "idsgame-v10"
+    env_name = "idsgame-v11"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.ACTOR_CRITIC_AGENT.value,
                                  defender_type=AgentType.ACTOR_CRITIC_AGENT.value,
                                  mode=RunnerMode.TRAIN_DEFENDER_AND_ATTACKER.value,
@@ -140,7 +140,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir, random_seed)
-    logger = util.setup_logger("actor_critic_vs_random_defense-v10", config.output_dir + "/results/logs/" +
+    logger = util.setup_logger("actor_critic_vs_random_defense-v11", config.output_dir + "/results/logs/" +
                                str(random_seed) + "/",
                                time_str=time_str)
     config.pg_agent_config.save_dir = default_output_dir() + "/results/data/" + str(random_seed) + "/"

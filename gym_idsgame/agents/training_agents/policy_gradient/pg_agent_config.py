@@ -24,7 +24,8 @@ class PolicyGradientAgentConfig:
                  gpu: bool = False, tensorboard: bool = False, tensorboard_dir: str = "",
                  optimizer: str = "Adam", lr_exp_decay: bool = False,
                  lr_decay_rate: float = 0.96, hidden_activation: str = "ReLU", clip_gradient = False,
-                 max_gradient_norm = 40, critic_loss_fn : str = "MSE", state_length = 1
+                 max_gradient_norm = 40, critic_loss_fn : str = "MSE", state_length = 1,
+                 alternating_optimization : bool = False
                  ):
         """
         Initialize environment and hyperparameters
@@ -73,6 +74,7 @@ class PolicyGradientAgentConfig:
         :param max_gradient_norm: max norm of gradient before clipping it
         :param critic_loss_fn: loss function for the critic
         :param state_length: length of observations to use for approximative Markov state
+        :param alternating_optimization: boolean flag whether using alteranting optimization or not
         """
         self.gamma = gamma
         self.alpha = alpha
@@ -119,6 +121,7 @@ class PolicyGradientAgentConfig:
         self.max_gradient_norm = max_gradient_norm
         self.critic_loss_fn = critic_loss_fn
         self.state_length = state_length
+        self.alternating_optimization = alternating_optimization
 
 
     def to_str(self) -> str:

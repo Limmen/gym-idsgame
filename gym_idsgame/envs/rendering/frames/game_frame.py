@@ -384,7 +384,18 @@ class GameFrame(pyglet.window.Window):
         self.game_state.new_game(self.idsgame_config.game_config.initial_state,
                                  a_reward=constants.GAME_CONFIG.POSITIVE_REWARD,
                                  d_reward=constants.GAME_CONFIG.POSITIVE_REWARD,
-                                 update_stats=update_stats)
+                                 update_stats=update_stats,
+                                 randomize_state=self.idsgame_config.randomize_env,
+                                 network_config=self.idsgame_config.game_config.network_config,
+                                 num_attack_types=self.idsgame_config.game_config.num_attack_types,
+                                 defense_val=self.idsgame_config.game_config.defense_val,
+                                 attack_val=self.idsgame_config.game_config.attack_val,
+                                 det_val=self.idsgame_config.game_config.det_val,
+                                 vulnerability_val=self.idsgame_config.game_config.vulnerabilitiy_val,
+                                 num_vulnerabilities_per_layer=
+                                 self.idsgame_config.game_config.num_vulnerabilities_per_layer,
+                                 num_vulnerabilities_per_node=self.idsgame_config.game_config.num_vulnerabilities_per_node
+                                 )
         self.set_state(self.game_state)
         self.reset_events()
         self.unschedule_events()

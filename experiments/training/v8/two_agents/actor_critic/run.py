@@ -171,7 +171,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
 # Program entrypoint
 if __name__ == '__main__':
     args = util.parse_args(default_config_path())
-    experiment_title = "Actor-Critic vs minimal defense"
+    experiment_title = "Actor-Critic vs Actor Critic"
     if args.configpath is not None and not args.noconfig:
         if not os.path.exists(args.configpath):
             write_default_config()
