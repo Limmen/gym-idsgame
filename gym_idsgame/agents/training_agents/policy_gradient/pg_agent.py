@@ -52,7 +52,7 @@ class PolicyGradientAgent(TrainAgent, ABC):
         if not attacker:
             suffix = "[Defender]"
         log_str = suffix + " Initial State Action Dist: ["
-        dist_str = ",".join(list(map(lambda x: str(x), dist.data.numpy().tolist())))
+        dist_str = ",".join(list(map(lambda x: str(x), dist.data.cpu().numpy().tolist())))
         log_str = log_str + dist_str + "]"
         self.config.logger.info(log_str)
 
