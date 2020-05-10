@@ -828,8 +828,13 @@ class ActorCriticAgent(PolicyGradientAgent):
                 if self.num_eval_games_total > 0:
                     self.eval_cumulative_hack_probability = float(self.num_eval_hacks_total) / float(
                         self.num_eval_games_total)
+                a_pool = None
+                d_pool = None
+                if self.config.opponent_pool and self.config.opponent_pool_config is not None:
+                    a_pool = len(self.attacker_pool)
+                    d_pool = len(self.defender_pool)
                 self.log_metrics(episode, self.eval_result, episode_attacker_rewards, episode_defender_rewards, episode_steps,
-                                 eval = True, update_stats=False)
+                                 eval = True, update_stats=False, a_pool=a_pool, d_pool = d_pool)
 
             # Save gifs
             if self.config.gifs and self.config.video:

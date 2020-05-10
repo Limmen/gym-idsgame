@@ -1,6 +1,6 @@
-# Experiment `random_defense-v2`_`tabular_q_learning`
+# Experiment `random_defense-v9`_`tabular_q_learning`
 
-This is an experiment in the `random_defense-v2` environment. 
+This is an experiment in the `random_defense-v9` environment. 
 An environment where the defender is following a random defense policy. 
 This experiment trains an attacker agent using tabular q-learning to act optimally in the given
 environment and defeat the random defender.
@@ -25,12 +25,13 @@ The starting state for each node in the environment is initialized as follows (w
 - `vulnerability_val=0` 
 - `num_vulnerabilities_per_layer=2`
 
-The environment has sparse rewards (+1,-1 rewards are given at the terminal state of each episode).
- The environment is partially observed (attacker can only see attack attributes of neighboring nodes, defender can only see defense attributes)
+The environment has dense rewards (+1,-1 given whenever the attacker reaches a new level in the network)
+
+The environment is partially observed (attacker can only see attack attributes of neighboring nodes, defender can only see defense attributes)
 
 ## Environment 
 
-- Env: `random_defense-v2`
+- Env: `random_defense-v9`
 
 ## Algorithm
 

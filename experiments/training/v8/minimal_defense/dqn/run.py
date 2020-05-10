@@ -124,7 +124,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir, random_seed)
-    logger = util.setup_logger("dqn_vs_random_defense-v8", config.output_dir + "/results/logs/" +
+    logger = util.setup_logger("dqn_vs_minimal_defense-v8", config.output_dir + "/results/logs/" +
                                str(random_seed) + "/",
                                time_str=time_str)
     config.q_agent_config.save_dir = default_output_dir() + "/results/data/" + str(random_seed) + "/"

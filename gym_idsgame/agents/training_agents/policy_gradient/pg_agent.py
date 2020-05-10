@@ -179,7 +179,7 @@ class PolicyGradientAgent(TrainAgent, ABC):
         self.tensorboard_writer.add_scalar('cumulative_reward/defender/' + train_or_eval,
                                            defender_cumulative_reward, episode)
         self.tensorboard_writer.add_scalar('epsilon', epsilon, episode)
-        if self.config.opponent_pool:
+        if self.config.opponent_pool and a_pool is not None and d_pool is not None:
             self.tensorboard_writer.add_scalar('opponent_pool_size/attacker', a_pool, episode)
             self.tensorboard_writer.add_scalar('opponent_pool_size/defender', d_pool, episode)
         if not eval:

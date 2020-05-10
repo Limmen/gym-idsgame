@@ -832,6 +832,14 @@ An environment where the defender is following a random defense policy.
 - [dqn_vs_random_defense-v7](training/v7/random_defense/dqn/)
    * This experiment trains an attacker agent using DQN to act optimally in the given
    environment and defeat the random defender.
+   
+- [reinforce_vs_random_defense-v7](training/v7/random_defense/reinforce/)
+   * This experiment trains an attacker agent using REINFORCE to act optimally in the given
+   environment and defeat the random defender.
+   
+- [actor_critic_vs_random_defense-v7](training/v7/random_defense/actor_critic/)
+   * This experiment trains an attacker agent using Actor-Critic to act optimally in the given
+   environment and defeat the random defender. 
 
 #### Minimal Defense
 This is an experiment in the `minimal_defense-v7` environment.  
@@ -845,7 +853,15 @@ defend the attribute with the minimal value out of all of its neighbors.
    
 - [dqn_vs_minimal_defense-v7](training/v7/minimal_defense/dqn/)
    * This experiment trains an attacker agent using DQN to act optimally in the given
-   environment and defeat the random defender.  
+   environment and defeat the random defender.
+   
+- [reinforce_vs_minimal_defense-v7](training/v7/minimal_defense/reinforce/)
+   * This experiment trains an attacker agent using REINFORCE to act optimally in the given
+   environment and defeat the random defender.
+   
+- [actor_critic_vs_minimal_defense-v7](training/v7/minimal_defense/actor_critic/)
+   * This experiment trains an attacker agent using Actor-Critic to act optimally in the given
+   environment and defeat the random defender.               
 
 #### Random Attack
 
@@ -858,7 +874,15 @@ An environment where the attack is following a random attack policy.
    
 - [random_attack_vs_dqn-v7](training/v7/random_attack/dqn/)
    * This experiment trains a defender agent using DQN to act optimally in the given
-   environment and defeat the random attacker.   
+   environment and defeat the random attacker.
+   
+- [random_attack_vs_reinforce-v7](training/v7/random_attack/reinforce/)
+   * This experiment trains a defender agent using REINFORCE to act optimally in the given
+   environment and defeat the random attacker.
+   
+- [random_attack_vs_actor_critic-v7](training/v7/random_attack/actor_critic/)
+   * This experiment trains a defender agent using Actor-Critic to act optimally in the given
+   environment and defeat the random attacker.     
 
 #### Maximal Attack
 
@@ -872,8 +896,16 @@ the maximum value out of all of its neighbors.
    environment and detect the attacker. 
 
 - [maximal_attack_vs_dqn-v7](training/v7/maximal_attack/dqn/)
-   * This experiment trains a defender agent using tabular q-learning to act optimally in the given
-   environment and detect the attacker. 
+   * This experiment trains a defender agent using DQN to act optimally in the given
+   environment and detect the attacker.
+   
+- [maximal_attack_vs_reinforce-v7](training/v7/maximal_attack/reinforce/)
+   * This experiment trains a defender agent using REINFORCE to act optimally in the given
+   environment and detect the attacker.
+   
+- [maximal_attack_vs_actor_critic-v7](training/v7/maximal_attack/actor_critic/)
+   * This experiment trains a defender agent using Actor-Critic to act optimally in the given
+   environment and detect the attacker.     
 
 #### Two Agents
 
@@ -887,7 +919,15 @@ it is intended for 2-agent simulations or RL training.
    
 - [dqn_vs_dqn-v7](training/v7/two_agents/dqn/)
    * This experiment trains both an attacker and a defender agent simultaneously against each other 
-   using tabular q-learning.       
+   using DQN.
+   
+- [reinforce_vs_reinforce-v7](training/v7/two_agents/reinforce/)
+   * This experiment trains both an attacker and a defender agent simultaneously against each other 
+   using REINFORCE.
+   
+- [actor_critic_vs_actor_critic-v7](training/v7/two_agents/actor_critic/)
+   * This experiment trains both an attacker and a defender agent simultaneously against each other 
+   using Actor-Critic.      
       
 ## Experiments in Version 8 Environments 
 
@@ -930,6 +970,14 @@ An environment where the defender is following a random defense policy.
    *  This experiment trains an attacker agent using DQN to act optimally in the given
    environment and defeat the random defender.   
 
+- [reinforce_vs_random_defense-v8](training/v8/random_defense/reinforce/)
+   *  This experiment trains an attacker agent using REINFORCE to act optimally in the given
+   environment and defeat the random defender.
+   
+- [actor_critic_vs_random_defense-v8](training/v8/random_defense/actor_critic/)
+   *  This experiment trains an attacker agent using Actor-Critic to act optimally in the given
+   environment and defeat the random defender.   
+
 #### Minimal Defense
    
 Experiments in the `minimal_defense-v8` environment.  
@@ -964,7 +1012,15 @@ An environment where the attack is following a random attack policy.
    
 - [random_attack_vs_dqn-v8](training/v8/random_attack/dqn/)
    * This experiment trains a defender agent using DQN to act optimally in the given
-   environment and defeat the random attacker.   
+   environment and defeat the random attacker.
+   
+- [random_attack_vs_reinforce-v8](training/v8/random_attack/reinforce/)
+   * This experiment trains a defender agent using REINFORCE to act optimally in the given
+   environment and defeat the random attacker.
+   
+- [random_attack_vs_actor_critic-v8](training/v8/random_attack/actor_critic/)
+   * This experiment trains a defender agent using Actor-Critic to act optimally in the given
+   environment and defeat the random attacker.         
 
 #### Maximal Attack
 
@@ -979,6 +1035,14 @@ the maximum value out of all of its neighbors.
    
 - [maximal_attack_vs_dqn-v8](training/v8/maximal_attack/dqn/)
    * This experiment trains a defender agent using DQN to act optimally in the given
+   environment and detect the attacker.
+   
+- [maximal_attack_vs_reinforce-v8](training/v8/maximal_attack/reinforce/)
+   * This experiment trains a defender agent using REINFORCE to act optimally in the given
+   environment and detect the attacker.
+   
+- [maximal_attack_vs_actor_critic-v8](training/v8/maximal_attack/actor_critic/)
+   * This experiment trains a defender agent using Actor-Critic to act optimally in the given
    environment and detect the attacker.   
 
 #### Two Agents
@@ -1042,6 +1106,14 @@ An environment where the defender is following a random defense policy.
    
 - [dqn_vs_random_defense-v9](training/v9/random_defense/dqn/)
    * This experiment trains an attacker agent using DQN to act optimally in the given
+   environment and defeat the random defender.
+   
+- [reinforce_vs_random_defense-v9](training/v9/random_defense/reinforce/)
+   * This experiment trains an attacker agent using REINFORCE to act optimally in the given
+   environment and defeat the random defender.
+   
+- [actor_critic_vs_random_defense-v9](training/v9/random_defense/actor_critic/)
+   * This experiment trains an attacker agent using Actor-Critic to act optimally in the given
    environment and defeat the random defender.   
 
 #### Minimal Defense
@@ -1058,6 +1130,14 @@ defend the attribute with the minimal value out of all of its neighbors.
 - [dqn_vs_minimal_defense-v9](training/v9/minimal_defense/dqn/)
    * This experiment trains an attacker agent using DQN to act optimally in the given
    environment and defeat the random defender.
+   
+- [reinforce_vs_minimal_defense-v9](training/v9/minimal_defense/reinforce/)
+   * This experiment trains an attacker agent using REINFORCE to act optimally in the given
+   environment and defeat the random defender.
+   
+- [actor_critic_vs_minimal_defense-v9](training/v9/minimal_defense/actor_critic/)
+   * This experiment trains an attacker agent using Actor-Critic to act optimally in the given
+   environment and defeat the random defender.   
 
 #### Random Attack   
 
@@ -1070,7 +1150,15 @@ An environment where the attack is following a random attack policy.
    
 - [random_attack_vs_dqn-v9](training/v9/random_attack/dqn/)
    * This experiment trains a defender agent using dqn to act optimally in the given
-   environment and defeat the random attacker.      
+   environment and defeat the random attacker.
+
+- [random_attack_vs_reinforce-v9](training/v9/random_attack/reinforce/)
+   * This experiment trains a defender agent using REINFORCE to act optimally in the given
+   environment and defeat the random attacker
+   
+- [random_attack_vs_actor_critic-v9](training/v9/random_attack/actor_critic/)
+   * This experiment trains a defender agent using Actor-Critic to act optimally in the given
+   environment and defeat the random attacker 
 
 #### Maximal Attack
 
@@ -1085,7 +1173,15 @@ the maximum value out of all of its neighbors.
    
 - [maximal_attack_vs_dqn-v9](training/v9/maximal_attack/dqn/)
    * This experiment trains a defender agent using dqn to act optimally in the given
-   environment and detect the attacker.       
+   environment and detect the attacker.
+   
+- [maximal_attack_vs_reinforce-v9](training/v9/maximal_attack/reinforce/)
+   * This experiment trains a defender agent using REINFORCE to act optimally in the given
+   environment and detect the attacker.
+   
+- [maximal_attack_vs_actor_critic-v9](training/v9/maximal_attack/actor_critic/)
+   * This experiment trains a defender agent using Actor-Critic to act optimally in the given
+   environment and detect the attacker.
 
 #### Two Agents
 This is an experiment in the `idsgame-v9` environment. 
@@ -1098,7 +1194,15 @@ it is intended for 2-agent simulations or RL training.
    
 - [dqn_vs_dqn-v9](training/v9/two_agents/dqn/)
    * This experiment trains both an attacker and a defender agent simultaneously against each other 
-   using DQN.       
+   using DQN.
+
+- [reinforce_vs_reinforce-v9](training/v9/two_agents/reinforce/)
+   * This experiment trains both an attacker and a defender agent simultaneously against each other 
+   using REINFORCE.
+   
+- [actor_critic_vs_actor_critic-v9](training/v9/two_agents/actor_critic/)
+   * This experiment trains both an attacker and a defender agent simultaneously against each other 
+   using Actor-Critic.          
    
    
 ## Experiments in Version 10 Environments 

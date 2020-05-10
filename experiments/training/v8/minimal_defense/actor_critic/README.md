@@ -5,7 +5,7 @@ An environment where the defender is following the `defend_minimal` defense poli
 The `defend_minimal` policy entails that the defender will always 
 defend the attribute with the minimal value out of all of its neighbors.
  
-This experiment trains an attacker agent using REINFORCE with advantage-baseline (actor-critic) to act optimally in the given
+This experiment trains an attacker agent using Actor-Critic with advantage-baseline (actor-critic) to act optimally in the given
 environment and defeat the defender.
 
 The network configuration of the environment is as follows:
