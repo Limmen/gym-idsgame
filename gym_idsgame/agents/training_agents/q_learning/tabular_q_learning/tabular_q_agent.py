@@ -24,8 +24,16 @@ class TabularQAgent(QAgent):
         :param config: the configuration
         """
         super(TabularQAgent, self).__init__(env, config)
-        self.Q_attacker = np.zeros((self.env.num_states, self.env.num_attack_actions))
-        self.Q_defender = np.zeros((1, self.env.num_defense_actions))
+        if not self.config.tab_full_state_space:
+            self.Q_attacker = np.zeros((self.env.num_states, self.env.num_attack_actions))
+            self.Q_defender = np.zeros((1, self.env.num_defense_actions))
+        else:
+            self.Q_attacker = np.zeros((self.env.num_states_full, self.env.num_attack_actions))
+            self.Q_defender = np.zeros((self.env.num_states_full, self.env.num_defense_actions))
+            if self.env.num_states_full < 10000:
+                self.state_to_idx = self.env._build_state_to_idx_map()
+                self.max_value = np.array(list(map(lambda x: list(x), self.state_to_idx.keys()))).flatten().max()
+
         self.env.idsgame_config.save_trajectories = False
         self.env.idsgame_config.save_attack_stats = True
 
@@ -99,21 +107,37 @@ class TabularQAgent(QAgent):
                     raise AssertionError("Must specify whether training an attacker agent or defender agent")
 
                 # Default initialization
-                attacker_state_node_id = 0
+                s_idx_a = 0
                 defender_state_node_id = 0
+                s_idx_d = defender_state_node_id
                 attacker_action = 0
                 defender_action = 0
 
                 # Get attacker and defender actions
                 if self.config.attacker:
-                    attacker_state_node_id = self.env.get_attacker_node_from_observation(attacker_obs)
-                    attacker_action = self.get_action(attacker_state_node_id, attacker=True)
+                    s_idx_a = self.env.get_attacker_node_from_observation(attacker_obs)
+                    if self.config.tab_full_state_space:
+                        if self.env.fully_observed():
+                            attacker_obs = np.append(attacker_obs, defender_obs)
+                        t = tuple(attacker_obs.astype(int).flatten().tolist())
+                        t = tuple(map(lambda x: min(x, self.max_value), t))
+                        s_idx_a = self.state_to_idx[t]
+                    attacker_action = self.get_action(s_idx_a, attacker=True)
+
                 if self.config.defender:
-                    defender_action = self.get_action(defender_state_node_id, attacker=False)
+                    s_idx_d = defender_state_node_id
+                    if self.config.tab_full_state_space:
+                        if self.env.fully_observed():
+                            defender_obs = np.append(attacker_obs, defender_obs)
+                        t = tuple(defender_obs.astype(int).flatten().tolist())
+                        t = tuple(map(lambda x: min(x, self.max_value), t))
+                        s_idx_d = self.state_to_idx[t]
+                    defender_action = self.get_action(s_idx_d, attacker=False)
+
                 action = (attacker_action, defender_action)
 
                 # Take a step in the environment
-                reward, obs_prime, done = self.step_and_update(action, attacker_state_node_id, defender_state_node_id)
+                reward, obs_prime, done = self.step_and_update(action, s_idx_a, s_idx_d)
 
                 # Update state information and metrics
                 attacker_reward, defender_reward = reward
@@ -197,20 +221,32 @@ class TabularQAgent(QAgent):
 
         return self.train_result
 
-    def step_and_update(self, action, attacker_state_node_id, defender_state_node_id) -> Union[float, np.ndarray, bool]:
+    def step_and_update(self, action, s_idx_a, defender_state_node_id) -> Union[float, np.ndarray, bool]:
         obs_prime, reward, done, info = self.env.step(action)
         attacker_reward, defender_reward = reward
         attacker_obs_prime, defender_obs_prime = obs_prime
         attacker_action, defender_action = action
 
         if self.config.attacker:
-            state_prime_node_id = self.env.get_attacker_node_from_observation(attacker_obs_prime)
-            self.q_learning_update(attacker_state_node_id, attacker_action, attacker_reward, state_prime_node_id,
+            s_prime_idx = self.env.get_attacker_node_from_observation(attacker_obs_prime)
+            if self.config.tab_full_state_space:
+                if self.env.fully_observed():
+                    attacker_obs_prime = np.append(attacker_obs_prime, defender_obs_prime)
+                t = tuple(attacker_obs_prime.astype(int).flatten().tolist())
+                t = tuple(map(lambda x: min(x, self.max_value), t))
+                s_prime_idx = self.state_to_idx[t]
+            self.q_learning_update(s_idx_a, attacker_action, attacker_reward, s_prime_idx,
                                    attacker=True)
 
         if self.config.defender:
-            state_prime_node_id = 0
-            self.q_learning_update(defender_state_node_id, defender_action, defender_reward, state_prime_node_id,
+            s_prime_idx = 0
+            if self.config.tab_full_state_space:
+                if self.env.fully_observed():
+                    defender_obs_prime = np.append(attacker_obs_prime, defender_obs_prime)
+                t = tuple(defender_obs_prime.astype(int).flatten().tolist())
+                t = tuple(map(lambda x: min(x, self.max_value), t))
+                s_prime_idx = self.state_to_idx[t]
+            self.q_learning_update(defender_state_node_id, defender_action, defender_reward, s_prime_idx,
                                    attacker=False)
 
         return reward, obs_prime, done
@@ -227,12 +263,12 @@ class TabularQAgent(QAgent):
         :return: None
         """
         if attacker:
-            self.Q_attacker[s, a] = self.Q_attacker[s, a] + self.config.alpha * (
-                    r + self.config.gamma * np.max(self.Q_attacker[s_prime]) - self.Q_attacker[s, a])
+            self.Q_attacker[s][a] = self.Q_attacker[s][a] + self.config.alpha * (
+                    r + self.config.gamma * np.max(self.Q_attacker[s_prime]) - self.Q_attacker[s][a])
         else:
-            self.Q_defender[s, a] = self.Q_defender[s, a] + self.config.alpha * (
+            self.Q_defender[s][a] = self.Q_defender[s][a] + self.config.alpha * (
                         r + self.config.gamma * np.max(self.Q_defender[s_prime])
-                        - self.Q_defender[s, a])
+                        - self.Q_defender[s][a])
 
     def eval(self, train_episode, log=True) -> ExperimentResult:
         """
@@ -316,10 +352,25 @@ class TabularQAgent(QAgent):
 
                 # Get attacker and defender actions
                 if self.config.attacker:
-                    attacker_state_node_id = self.env.get_attacker_node_from_observation(attacker_obs)
-                    attacker_action = self.get_action(attacker_state_node_id, eval=True, attacker=True)
+                    s_idx_a = self.env.get_attacker_node_from_observation(attacker_obs)
+                    if self.config.tab_full_state_space:
+                        if self.env.fully_observed():
+                            attacker_obs = np.append(attacker_obs, defender_obs)
+                        t = tuple(attacker_obs.astype(int).flatten().tolist())
+                        t = tuple(map(lambda x: min(x, self.max_value), t))
+                        s_idx_a = self.state_to_idx[t]
+                    attacker_action = self.get_action(s_idx_a, attacker=True, eval=True)
+
                 if self.config.defender:
-                    defender_action = self.get_action(defender_state_node_id, eval=True, attacker=False)
+                    s_idx_d = defender_state_node_id
+                    if self.config.tab_full_state_space:
+                        if self.env.fully_observed():
+                            defender_obs = np.append(attacker_obs, defender_obs)
+                        t = tuple(defender_obs.astype(int).flatten().tolist())
+                        t = tuple(map(lambda x: min(x, self.max_value), t))
+                        s_idx_d = self.state_to_idx[t]
+                    defender_action = self.get_action(s_idx_d, attacker=False, eval=True)
+
                 action = (attacker_action, defender_action)
 
                 # Take a step in the environment
@@ -465,3 +516,4 @@ class TabularQAgent(QAgent):
                 np.save(path, self.Q_defender)
         else:
             self.config.logger.warning("Save path not defined, not saving Q table to disk")
+

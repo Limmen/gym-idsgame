@@ -6,9 +6,9 @@ import numpy as np
 import time
 import tqdm
 import torch
-import queue
 import copy
 import random
+from scipy.special import softmax
 from torch.distributions import Categorical
 from torch.utils.tensorboard import SummaryWriter
 from gym_idsgame.envs.rendering.video.idsgame_monitor import IdsGameMonitor
@@ -40,8 +40,8 @@ class ActorCriticAgent(PolicyGradientAgent):
         self.defender_lr_decay = None
         self.tensorboard_writer = SummaryWriter(self.config.tensorboard_dir)
         if self.config.opponent_pool and self.config.opponent_pool_config is not None:
-            self.attacker_pool = queue.Queue(self.config.opponent_pool_config.pool_maxsize)
-            self.defender_pool = queue.Queue(self.config.opponent_pool_config.pool_maxsize)
+            self.attacker_pool = []
+            self.defender_pool = []
         self.initialize_models()
         self.tensorboard_writer.add_hparams(self.config.hparams_dict(), {})
         self.machine_eps = np.finfo(np.float32).eps.item()
@@ -116,20 +116,67 @@ class ActorCriticAgent(PolicyGradientAgent):
         if self.config.opponent_pool and self.config.opponent_pool_config is not None:
             if attacker:
                 model_copy = copy.deepcopy(self.attacker_policy_network)
-                if self.attacker_pool.full():
-                    self.attacker_pool.get()
-                self.attacker_pool.put(model_copy)
+                if len(self.attacker_pool) >= self.config.opponent_pool_config.pool_maxsize:
+                    self.attacker_pool.pop(0)
+                if self.config.opponent_pool_config.quality_scores:
+                    if len(self.attacker_pool) == 0:
+                        self.attacker_pool.append([model_copy, self.config.opponent_pool_config.initial_quality])
+                    elif len(self.attacker_pool) > 0:
+                        qualities = self.get_attacker_pool_quality_scores()
+                        max_q = max(qualities)
+                        self.attacker_pool.append([model_copy, max_q])
+                else:
+                    self.attacker_pool.append(model_copy)
             else:
                 model_copy = copy.deepcopy(self.defender_policy_network)
-                if self.defender_pool.full():
-                    self.defender_pool.get()
-                self.defender_pool.put(model_copy)
+                if len(self.defender_pool) >= self.config.opponent_pool_config.pool_maxsize:
+                    self.defender_pool.pop(0)
+                if self.config.opponent_pool_config.quality_scores:
+                    if len(self.defender_pool) == 0:
+                        self.defender_pool.append([model_copy, self.config.opponent_pool_config.initial_quality])
+                    elif len(self.defender_pool) > 0:
+                        qualities = self.get_defender_pool_quality_scores()
+                        max_q = max(qualities)
+                        self.defender_pool.append([model_copy, max_q])
+                else:
+                    self.defender_pool.append(model_copy)
 
     def sample_opponent(self, attacker=True):
         if attacker:
-            return random.sample(list(self.attacker_pool.queue), 1)[0]
+            if self.config.opponent_pool_config.quality_scores:
+                quality_scores = self.get_attacker_pool_quality_scores()
+                softmax_dist = self.get_softmax_distribution(quality_scores)
+                return np.random.choice(list(range(len(self.attacker_pool))), size=1, p=softmax_dist)[0]
+            else:
+                return np.random.choice(list(range(len(self.attacker_pool))), size=1)[0]
         else:
-            return random.sample(list(self.defender_pool.queue), 1)[0]
+            if self.config.opponent_pool_config.quality_scores:
+                quality_scores = self.get_defender_pool_quality_scores()
+                softmax_dist = self.get_softmax_distribution(quality_scores)
+                return np.random.choice(list(range(len(self.defender_pool))), size=1, p=softmax_dist)[0]
+            else:
+                return np.random.choice(list(range(len(self.defender_pool))), size=1)[0]
+
+    def get_softmax_distribution(self, qualities) -> np.ndarray:
+        """
+        Converts a list of quality scores into a distribution with softmax
+
+        :param qualities: the list of quality scores
+        :return: the softmax distribution
+        """
+        return softmax(qualities)
+
+    def get_attacker_pool_quality_scores(self):
+        """
+        :return: Returns the quality scores from the attacker pool
+        """
+        return list(map(lambda x: x[1], self.attacker_pool))
+
+    def get_defender_pool_quality_scores(self):
+        """
+        :return: Returns the quality scores from the defender pool
+        """
+        return list(map(lambda x: x[1], self.defender_pool))
 
     def training_step(self, saved_rewards : List[float], saved_log_probs : List[torch.Tensor],
                       saved_state_values : List[torch.Tensor], attacker=True) -> torch.Tensor:
@@ -226,11 +273,11 @@ class ActorCriticAgent(PolicyGradientAgent):
         # Calculate legal actions
         if attacker:
             actions = list(range(self.env.num_attack_actions))
-            #legal_actions = list(filter(lambda action: self.env.is_attack_legal(action), actions))
+            legal_actions = list(filter(lambda action: self.env.is_attack_legal(action), actions))
             non_legal_actions = list(filter(lambda action: not self.env.is_attack_legal(action), actions))
         else:
             actions = list(range(self.env.num_defense_actions))
-            #legal_actions = list(filter(lambda action: self.env.is_defense_legal(action), actions))
+            legal_actions = list(filter(lambda action: self.env.is_defense_legal(action), actions))
             non_legal_actions = list(filter(lambda action: not self.env.is_defense_legal(action), actions))
 
         # Forward pass using the current policy network to predict P(a|s)
@@ -302,8 +349,25 @@ class ActorCriticAgent(PolicyGradientAgent):
         if self.config.alternating_optimization:
             train_attacker = False
             if self.config.opponent_pool and self.config.opponent_pool_config is not None:
-                self.defender_opponent = self.sample_opponent(attacker=False)
-                self.attacker_opponent = self.sample_opponent(attacker=True)
+                if np.random.rand() < self.config.opponent_pool_config.pool_prob:
+                    self.defender_opponent_idx = self.sample_opponent(attacker=False)
+                    if self.config.opponent_pool_config.quality_scores:
+                        self.defender_opponent = self.defender_pool[self.defender_opponent_idx][0]
+                    else:
+                        self.defender_opponent = self.defender_pool[self.defender_opponent_idx]
+                else:
+                    self.defender_opponent = self.defender_policy_network
+                    self.defender_opponent_idx = None
+
+                if np.random.rand() < self.config.opponent_pool_config.pool_prob:
+                    self.attacker_opponent_idx = self.sample_opponent(attacker=True)
+                    if self.config.opponent_pool_config.quality_scores:
+                        self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx][0]
+                    else:
+                        self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx]
+                else:
+                    self.attacker_opponent = self.attacker_policy_network
+                    self.attacker_opponent_idx = None
 
         num_alt_episodes = 0
         num_attacker_pool_episodes = 0
@@ -439,8 +503,15 @@ class ActorCriticAgent(PolicyGradientAgent):
                 if train_defender:
                     num_defender_pool_episodes += 1
                     num_attacker_opponent_episodes += 1
-
             episode_steps.append(episode_step)
+
+            # Update opponent pool qualities
+            if self.config.opponent_pool and self.config.opponent_pool_config is not None \
+                    and self.config.opponent_pool_config.quality_scores:
+                if train_attacker and self.defender_opponent_idx is not None and self.env.state.hacked:
+                    self.update_quality_score(self.defender_opponent_idx, attacker=False)
+                if train_defender and self.attacker_opponent_idx is not None and not self.env.state.hacked:
+                    self.update_quality_score(self.attacker_opponent_idx, attacker=True)
 
             # Log average metrics every <self.config.train_log_frequency> episodes
             if episode % self.config.train_log_frequency == 0:
@@ -453,8 +524,8 @@ class ActorCriticAgent(PolicyGradientAgent):
                 a_pool = None
                 d_pool = None
                 if self.config.opponent_pool and self.config.opponent_pool_config is not None:
-                    a_pool = self.attacker_pool.qsize()
-                    d_pool = self.defender_pool.qsize()
+                    a_pool = len(self.attacker_pool)
+                    d_pool = len(self.defender_pool)
                 self.log_metrics(episode, self.train_result, episode_attacker_rewards, episode_defender_rewards, episode_steps,
                                  episode_avg_attacker_loss, episode_avg_defender_loss, lr=lr,
                                  train_attacker = (self.config.attacker and train_attacker),
@@ -463,7 +534,6 @@ class ActorCriticAgent(PolicyGradientAgent):
                                  d_pool=d_pool)
 
                 # Log values and gradients of the parameters (histogram summary) to tensorboard
-
                 if self.config.attacker and train_attacker:
                     for tag, value in self.attacker_policy_network.named_parameters():
                         tag = tag.replace('.', '/')
@@ -528,7 +598,15 @@ class ActorCriticAgent(PolicyGradientAgent):
                         num_attacker_pool_episodes = 0
 
                     if num_defender_opponent_episodes > self.config.opponent_pool_config.head_to_head_period:
-                        self.defender_opponent = self.sample_opponent(attacker=False)
+                        if np.random.rand() < self.config.opponent_pool_config.pool_prob:
+                            self.defender_opponent_idx = self.sample_opponent(attacker=False)
+                            if self.config.opponent_pool_config.quality_scores:
+                                self.defender_opponent = self.defender_pool[self.defender_opponent_idx][0]
+                            else:
+                                self.defender_opponent = self.defender_pool[self.defender_opponent_idx]
+                        else:
+                            self.defender_opponent = self.defender_policy_network
+                            self.defender_opponent_idx = None
                         num_defender_opponent_episodes = 0
 
                 if train_defender:
@@ -537,7 +615,16 @@ class ActorCriticAgent(PolicyGradientAgent):
                         num_defender_pool_episodes = 0
 
                     if num_attacker_opponent_episodes > self.config.opponent_pool_config.head_to_head_period:
-                        self.attacker_opponent = self.sample_opponent(attacker=True)
+                        if np.random.rand() < self.config.opponent_pool_config.pool_prob:
+                            self.attacker_opponent_idx = self.sample_opponent(attacker=True)
+                            if self.config.opponent_pool_config.quality_scores:
+                                self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx][0]
+                            else:
+                                self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx]
+                        else:
+                            self.attacker_opponent = self.attacker_policy_network
+                            self.attacker_opponent_idx = None
+
                         num_attacker_opponent_episodes = 0
 
             # Anneal epsilon linearly
@@ -561,7 +648,15 @@ class ActorCriticAgent(PolicyGradientAgent):
 
         return self.train_result
 
-    def create_policy_plot(self, distribution, episode, attacker = True):
+    def create_policy_plot(self, distribution, episode, attacker = True) -> None:
+        """
+        Utility function for creating a density plot of the policy distribution p(a|s) and add to Tensorboard
+
+        :param distribution: the distribution to plot
+        :param episode: the episode when the distribution was recorded
+        :param attacker: boolean flag whether it is the attacker or defender
+        :return: None
+        """
         sample = np.random.choice(list(range(len(distribution))), size=1000, p=distribution)
         tag = "Attacker"
         file_suffix = "initial_state_policy_attacker"
@@ -573,6 +668,30 @@ class ActorCriticAgent(PolicyGradientAgent):
                                       file_name=self.config.save_dir + "/" + file_suffix + "_" + str(episode))
         self.tensorboard_writer.add_image(str(episode) + "_initial_state_policy/" + tag,
                                           data, global_step=episode, dataformats="HWC")
+
+    def update_quality_score(self, opponent_idx : int, attacker : bool = True) -> None:
+        """
+        Updates the quality score of an opponent in the opponent pool. Using same update rule as was used in
+        "Dota 2 with Large Scale Deep Reinforcement Learning" by Berner et. al.
+
+        :param opponent_idx: the index of the opponent in the pool
+        :param attacker: boolean flag whether attacker or defender pool to be updated
+        :return: None
+        """
+        if attacker:
+            N = len(self.attacker_pool)
+            qualities = self.get_attacker_pool_quality_scores()
+            dist = self.get_softmax_distribution(qualities)
+            p = dist[opponent_idx]
+            self.attacker_pool[opponent_idx][1] = self.attacker_pool[opponent_idx][1] - \
+                                                  (self.config.opponent_pool_config.quality_score_eta/(N*p))
+        else:
+            N = len(self.defender_pool)
+            qualities = self.get_defender_pool_quality_scores()
+            dist = self.get_softmax_distribution(qualities)
+            p = dist[opponent_idx]
+            self.defender_pool[opponent_idx][1] = self.defender_pool[opponent_idx][1] - \
+                                                  (self.config.opponent_pool_config.quality_score_eta / (N * p))
 
     def update_state(self, observation_1: np.ndarray, observation_2: np.ndarray, state: np.ndarray) -> np.ndarray:
         """

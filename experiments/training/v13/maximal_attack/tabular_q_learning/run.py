@@ -1,14 +1,13 @@
 import os
 import time
-import glob
 import sys
 from gym_idsgame.config.runner_mode import RunnerMode
 from gym_idsgame.agents.training_agents.q_learning.q_agent_config import QAgentConfig
 from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.runnner import Runner
-from experiments.util import plotting_util, util
-
+from experiments.util import plotting_util, util, hp_tuning
+import glob
 
 def get_script_path():
     """
@@ -42,14 +41,15 @@ def default_config() -> ClientConfig:
                                   epsilon_decay=0.999, video=True, eval_log_frequency=1,
                                   video_fps=5, video_dir=default_output_dir() + "/results/videos", num_episodes=20001,
                                   eval_render=False, gifs=True, gif_dir=default_output_dir() + "/results/gifs",
-                                  eval_frequency=2000, attacker=True, defender=False, video_frequency=101,
+                                  eval_frequency=2000, attacker=False, defender=True, video_frequency=101,
                                   save_dir=default_output_dir() + "/results/data", tab_full_state_space=True)
-    env_name = "idsgame-minimal_defense-v13"
-    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.TABULAR_Q_AGENT.value,
-                                 mode=RunnerMode.TRAIN_ATTACKER.value,
+    env_name = "idsgame-maximal_attack-v13"
+    client_config = ClientConfig(env_name=env_name, defender_type=AgentType.TABULAR_Q_AGENT.value,
+                                 mode=RunnerMode.TRAIN_DEFENDER.value,
                                  q_agent_config=q_agent_config, output_dir=default_output_dir(),
-                                 title="TrainingQAgent vs DefendMinimalDefender",
+                                 title="AttackMaximalAttacker vs TrainingQAgent",
                                  run_many=False, random_seeds=[0, 999, 299, 399, 499])
+
     return client_config
 
 
@@ -101,11 +101,12 @@ def plot_average_results(experiment_title :str, config: ClientConfig, eval_csv_p
                                                 config.q_agent_config.eval_frequency,
                                                 config.output_dir)
 
+
 def run_experiment(configpath: str, random_seed: int, noconfig: bool):
     """
     Runs one experiment and saves results and plots
 
-    :param configpath: path to configfile
+    :param configpath: path to config file
     :param noconfig: whether to override config
     :return: (train_csv_path, eval_csv_path)
     """
@@ -117,7 +118,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir, random_seed)
-    logger = util.setup_logger("tabular_q_learning_vs_minimal_defense-v13", config.output_dir + "/results/logs/" +
+    logger = util.setup_logger("maximal_attack_vs_tabular_q_learning-v13", config.output_dir + "/results/logs/" +
                                str(random_seed) + "/",
                                time_str=time_str)
     config.q_agent_config.save_dir = default_output_dir() + "/results/data/" + str(random_seed) + "/"
@@ -128,22 +129,26 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
     config.q_agent_config.random_seed = random_seed
     config.random_seed = random_seed
     config.q_agent_config.to_csv(config.output_dir + "/results/hyperparameters/" + str(random_seed) + "/" + time_str + ".csv")
-    train_result, eval_result = Runner.run(config)
+
     train_csv_path = ""
     eval_csv_path = ""
-    if len(train_result.avg_episode_steps) > 0 and len(eval_result.avg_episode_steps) > 0:
-        train_csv_path = config.output_dir + "/results/data/" + str(random_seed) + "/" + time_str + "_train" + ".csv"
-        train_result.to_csv(train_csv_path)
-        eval_csv_path = config.output_dir + "/results/data/" + str(random_seed) + "/" + time_str + "_eval" + ".csv"
-        eval_result.to_csv(eval_csv_path)
-        plot_csv(config, eval_csv_path, train_csv_path, random_seed)
+    if config.hp_tuning:
+        hp_tuning.hype_grid(config)
+    else:
+        train_result, eval_result = Runner.run(config)
+        if len(train_result.avg_episode_steps) > 0 and len(eval_result.avg_episode_steps) > 0:
+            train_csv_path = config.output_dir + "/results/data/" + str(random_seed) + "/" + time_str + "_train" + ".csv"
+            train_result.to_csv(train_csv_path)
+            eval_csv_path = config.output_dir + "/results/data/" + str(random_seed) + "/" + time_str + "_eval" + ".csv"
+            eval_result.to_csv(eval_csv_path)
+            plot_csv(config, eval_csv_path, train_csv_path, random_seed)
 
     return train_csv_path, eval_csv_path
 
 # Program entrypoint
 if __name__ == '__main__':
     args = util.parse_args(default_config_path())
-    experiment_title = "Q-learning vs minimal defense"
+    experiment_title = "maximal attack vs Q-learning"
     if args.configpath is not None and not args.noconfig:
         if not os.path.exists(args.configpath):
             write_default_config()

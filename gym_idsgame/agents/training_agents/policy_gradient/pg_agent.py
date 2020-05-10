@@ -123,7 +123,7 @@ class PolicyGradientAgent(TrainAgent, ABC):
             self.log_tensorboard(episode, avg_attacker_episode_rewards, avg_defender_episode_rewards, avg_episode_steps,
                                  avg_episode_attacker_loss, avg_episode_defender_loss, hack_probability,
                                  attacker_cumulative_reward, defender_cumulative_reward, self.config.epsilon, lr,
-                                 hack_probability_total, eval=eval)
+                                 hack_probability_total, a_pool, d_pool, eval=eval)
         if update_stats:
             result.avg_episode_steps.append(avg_episode_steps)
             result.avg_attacker_episode_rewards.append(avg_attacker_episode_rewards)
@@ -140,7 +140,8 @@ class PolicyGradientAgent(TrainAgent, ABC):
     def log_tensorboard(self, episode: int, avg_attacker_episode_rewards: float, avg_defender_episode_rewards: float,
                         avg_episode_steps: float, episode_avg_loss_attacker: float, episode_avg_loss_defender: float,
                         hack_probability: float, attacker_cumulative_reward: int, defender_cumulative_reward: int,
-                        epsilon: float, lr: float, cumulative_hack_probability : float, eval=False) -> None:
+                        epsilon: float, lr: float, cumulative_hack_probability : float, a_pool : int, d_pool : int,
+                        eval=False) -> None:
         """
         Log metrics to tensorboard
 
@@ -157,6 +158,8 @@ class PolicyGradientAgent(TrainAgent, ABC):
         :param lr: the learning rate
         :param cumulative_hack_probability: the cumulative hack probability
         :param eval: boolean flag whether eval or not
+        :param a_pool: size of the attacker opponent pool
+        :param d_pool: size of the defender opponent pool
         :return: None
         """
         train_or_eval = "eval" if eval else "train"
@@ -176,6 +179,9 @@ class PolicyGradientAgent(TrainAgent, ABC):
         self.tensorboard_writer.add_scalar('cumulative_reward/defender/' + train_or_eval,
                                            defender_cumulative_reward, episode)
         self.tensorboard_writer.add_scalar('epsilon', epsilon, episode)
+        if self.config.opponent_pool:
+            self.tensorboard_writer.add_scalar('opponent_pool_size/attacker', a_pool, episode)
+            self.tensorboard_writer.add_scalar('opponent_pool_size/defender', d_pool, episode)
         if not eval:
             self.tensorboard_writer.add_scalar('lr', lr, episode)
 

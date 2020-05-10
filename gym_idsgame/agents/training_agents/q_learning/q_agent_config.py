@@ -19,7 +19,8 @@ class QAgentConfig:
                  video_frequency :int = 101, attacker :bool = True, defender :bool = False,
                  save_dir :str = None, attacker_load_path : str = None, defender_load_path : str = None,
                  dqn_config: DQNConfig = None,
-                 checkpoint_freq : int = 100000, random_seed: int = 0, eval_epsilon : float = 0.0):
+                 checkpoint_freq : int = 100000, random_seed: int = 0, eval_epsilon : float = 0.0,
+                 tab_full_state_space : bool = False):
         """
         Initialize environment and hyperparameters
 
@@ -51,6 +52,8 @@ class QAgentConfig:
         :param checkpoint_freq: frequency of checkpointing the model (episodes)
         :param random_seed: the random seed for reproducibility
         :param eval_epsilon: evaluation epsilon for implementing a "soft policy" rather than a "greedy policy"
+        :param tab_full_state_space: a boolean flag indicating whether the tabular q learning approach use full
+                                     state space or not
         """
         self.gamma = gamma
         self.alpha = alpha
@@ -81,6 +84,7 @@ class QAgentConfig:
         self.checkpoint_freq = checkpoint_freq
         self.random_seed = random_seed
         self.eval_epsilon = eval_epsilon
+        self.tab_full_state_space = tab_full_state_space
 
     def to_str(self) -> str:
         """
@@ -91,12 +95,12 @@ class QAgentConfig:
                "eval_log_frequency:{9},video:{10},video_fps:{11}," \
                "video_dir:{12},num_episodes:{13},eval_render:{14},gifs:{15}," \
                "gifdir:{16},eval_frequency:{17},video_frequency:{18},attacker{19},defender:{20}," \
-               "checkpoint_freq:{21},random_seed:{22},eval_epsilon:{23}".format(
+               "checkpoint_freq:{21},random_seed:{22},eval_epsilon:{23},tab_full_state_space:{24}".format(
             self.gamma, self.alpha, self.epsilon, self.render, self.eval_sleep, self.epsilon_decay,
             self.min_epsilon, self.eval_episodes, self.train_log_frequency, self.eval_log_frequency, self.video,
             self.video_fps, self.video_dir, self.num_episodes, self.eval_render, self.gifs, self.gif_dir,
             self.eval_frequency, self.video_frequency, self.attacker, self.defender, self.checkpoint_freq,
-            self.random_seed, self.eval_epsilon)
+            self.random_seed, self.eval_epsilon, self.tab_full_state_space)
 
     def to_csv(self, file_path: str) -> None:
         """
@@ -132,6 +136,7 @@ class QAgentConfig:
             writer.writerow(["checkpoint_freq", str(self.checkpoint_freq)])
             writer.writerow(["random_seed", str(self.random_seed)])
             writer.writerow(["eval_epsilon", str(self.eval_epsilon)])
+            writer.writerow(["tab_full_state_space", str(self.tab_full_state_space)])
             if self.dqn_config is not None:
                 writer.writerow(["input_dim", str(self.dqn_config.input_dim)])
                 writer.writerow(["output_dim", str(self.dqn_config.attacker_output_dim)])
@@ -167,6 +172,7 @@ class QAgentConfig:
         hparams["checkpoint_freq"] = self.checkpoint_freq
         hparams["random_seed"] = self.random_seed
         hparams["eval_epsilon"] = self.eval_epsilon
+        hparams["tab_full_state_space"] = self.tab_full_state_space
         if self.dqn_config is not None:
             hparams["input_dim"] = self.dqn_config.input_dim
             hparams["output_dim"] = self.dqn_config.attacker_output_dim

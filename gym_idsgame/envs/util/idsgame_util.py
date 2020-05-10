@@ -9,6 +9,7 @@ import io
 import cv2
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.dao.game_config import GameConfig
+from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.node_type import NodeType
 from gym_idsgame.envs.dao.network_config import NetworkConfig
 
@@ -27,14 +28,25 @@ def validate_config(idsgame_config: IdsGameConfig) -> None:
         raise AssertionError("The max attack/defense value cannot be less than 1")
 
 
-def is_defense_id_legal(defense_id: int, game_config: GameConfig) -> bool:
+def is_defense_id_legal(defense_id: int, game_config: GameConfig, state : GameState) -> bool:
     """
     Check if a given defense is legal or not.
 
     :param defense_id: the defense to verify
+    :param game_config: the game config
+    :param state: the game state
     :return: True if legal otherwise False
     """
     server_id, server_pos, defense_type = interpret_defense_action(defense_id, game_config)
+
+    if defense_type < game_config.num_attack_types:
+        if state.defense_values[server_id][defense_type] >= game_config.max_value:
+            return False
+
+    if defense_type >= game_config.num_attack_types:
+        if state.defense_det[server_id] >= game_config.max_value:
+            return False
+
     if (game_config.network_config.node_list[server_id] == NodeType.SERVER.value
         or game_config.network_config.node_list[server_id] == NodeType.DATA.value):
         return True
@@ -67,7 +79,7 @@ def is_attack_legal(target_pos: Union[int, int], attacker_pos: Union[int, int], 
     return network_config.adjacency_matrix[attacker_adjacency_matrix_id][target_adjacency_matrix_id] == int(1)
 
 
-def is_attack_id_legal(attack_id: int, game_config: GameConfig, attacker_pos: Union[int, int],
+def is_attack_id_legal(attack_id: int, game_config: GameConfig, attacker_pos: Union[int, int], game_state : GameState,
                        past_positions: List[int] = None) -> bool:
     """
     Check if a given attack is legal or not.
@@ -75,10 +87,13 @@ def is_attack_id_legal(attack_id: int, game_config: GameConfig, attacker_pos: Un
     :param attack_id: the attack to verify
     :param game_config: game configuration
     :param attacker_pos: the current position of the attacker
+    :param game_state: the game state
     :param past_positions: if not None, used to check whether the agent is in a periodic policy, e.g. a circle.
     :return: True if legal otherwise False
     """
     server_id, server_pos, attack_type = interpret_attack_action(attack_id, game_config)
+    if game_state.attack_values[server_id][attack_type] >= game_config.max_value:
+        return False
     return is_attack_legal(server_pos, attacker_pos, game_config.network_config, past_positions)
 
 
@@ -179,7 +194,7 @@ def get_img_from_fig(fig, dpi=180):
 
 def action_dist_hist(data: np.ndarray,
                            title: str = "Test", xlabel: str = "test", ylabel: str = "test",
-                           file_name: str = "test.eps", xlims: Union[float, float] = None) -> None:
+                           file_name: str = "test.eps", xlims: Union[float, float] = None) -> np.ndarray:
     """
     Plot a distribution of the policy
 

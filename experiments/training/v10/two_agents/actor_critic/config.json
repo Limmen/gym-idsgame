@@ -11,6 +11,8 @@
     "output_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v10/two_agents/actor_critic",
     "pg_agent_config": {
         "alpha": 0.001,
+        "alternating_optimization": true,
+        "alternating_period": 10,
         "attacker": true,
         "attacker_load_path": null,
         "batch_size": 32,
@@ -41,6 +43,17 @@
         "min_epsilon": 0.01,
         "num_episodes": 350001,
         "num_hidden_layers": 4,
+        "opponent_pool": true,
+        "opponent_pool_config": {
+            "head_to_head_period": 10,
+            "initial_quality": 1,
+            "pool_increment_period": 10,
+            "pool_maxsize": 100000,
+            "pool_prob": 0.2,
+            "py/object": "gym_idsgame.agents.training_agents.common.opponent_pool_config.OpponentPoolConfig",
+            "quality_score_eta": 0.01,
+            "quality_scores": true
+        },
         "optimizer": "Adam",
         "output_dim_attacker": 30,
         "output_dim_defender": 33,

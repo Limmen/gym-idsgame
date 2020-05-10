@@ -54,7 +54,10 @@ def default_config() -> ClientConfig:
     """
     opponent_pool_config = OpponentPoolConfig(pool_maxsize=10,
                                               pool_increment_period=500,
-                                              head_to_head_period=1)
+                                              head_to_head_period=1,
+                                              quality_scores=True,
+                                              quality_score_eta=0.01,
+                                              initial_quality=1)
 
     pg_agent_config = PolicyGradientAgentConfig(gamma=0.999, alpha=0.0001, epsilon=1, render=False, eval_sleep=0.9,
                                                 min_epsilon=0.01, eval_episodes=100, train_log_frequency=100,

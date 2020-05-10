@@ -8,6 +8,8 @@ import os
 import time
 import pickle
 import csv
+import math
+import itertools
 from abc import ABC, abstractmethod
 from gym_idsgame.envs.dao.game_config import GameConfig
 from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
@@ -65,6 +67,13 @@ class IdsGameEnv(gym.Env, ABC):
         }
         self.reward_range = (float(constants.GAME_CONFIG.NEGATIVE_REWARD), float(constants.GAME_CONFIG.POSITIVE_REWARD))
         self.num_states = self.idsgame_config.game_config.num_nodes
+        self.num_states_full = int(math.pow(self.idsgame_config.game_config.max_value+1,
+                                        self.idsgame_config.game_config.num_nodes*
+                                        (self.idsgame_config.game_config.num_attack_types+1)))
+        if self.idsgame_config.game_config.network_config.fully_observed:
+            self.num_states_full = int(math.pow(self.idsgame_config.game_config.max_value+1,
+                                            self.idsgame_config.game_config.num_nodes *
+                                            (self.idsgame_config.game_config.num_attack_types+1)* 2))
         self.num_attack_actions = self.idsgame_config.game_config.num_attack_actions
         self.num_defense_actions = self.idsgame_config.game_config.num_defense_actions
         self.past_moves = []
@@ -280,7 +289,7 @@ class IdsGameEnv(gym.Env, ABC):
         :return: True if legal otherwise False
         """
         return util.is_attack_id_legal(attack_action, self.idsgame_config.game_config, self.state.attacker_pos,
-                                       self.past_positions)
+                                       self.state, self.past_positions)
 
     def is_defense_legal(self, defense_action: int) -> bool:
         """
@@ -289,7 +298,7 @@ class IdsGameEnv(gym.Env, ABC):
         :param defense_action: the defense action to verify
         :return: True if legal otherwise False
         """
-        return util.is_defense_id_legal(defense_action, self.idsgame_config.game_config)
+        return util.is_defense_id_legal(defense_action, self.idsgame_config.game_config, self.state)
 
     def save_initial_state(self) -> None:
         """
@@ -423,6 +432,27 @@ class IdsGameEnv(gym.Env, ABC):
         self.idsgame_config.render_config.resources_dir = resource_path
         self.viewer = Viewer(idsgame_config=self.idsgame_config)
         self.viewer.agent_start()
+
+    def _build_state_to_idx_map(self):
+        """
+        Builds a map that maps states to index (useful when constructing Q-tables for example)
+
+        :return: the lookup map
+        """
+        n_state_elems = self.idsgame_config.game_config.num_nodes * \
+                        (self.idsgame_config.game_config.num_attack_types + 1)
+        if self.idsgame_config.game_config.network_config.fully_observed:
+            n_state_elems = self.idsgame_config.game_config.num_nodes * \
+                            (self.idsgame_config.game_config.num_attack_types + 1) * 2
+        states = list(
+            itertools.product(list(range(self.idsgame_config.game_config.max_value + 1)), repeat=n_state_elems))
+        #states = list(map(lambda x: list(x), states))
+        assert int(len(states)) == int(math.pow(self.idsgame_config.game_config.max_value + 1, n_state_elems))
+        state_to_idx = {}
+        for idx, s in enumerate(states):
+            state_to_idx[s] = idx
+        return state_to_idx
+
 
 class AttackerEnv(IdsGameEnv, ABC):
     """

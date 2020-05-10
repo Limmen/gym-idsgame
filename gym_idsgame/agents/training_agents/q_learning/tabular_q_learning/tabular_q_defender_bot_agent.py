@@ -33,7 +33,7 @@ class TabularQDefenderBotAgent(BotAgent):
         """
         actions = list(range(self.game_config.num_defense_actions))
         legal_actions = list(filter(lambda action: util.is_defense_id_legal(action,
-                                                                            self.game_config), actions))
+                                                                            self.game_config, game_state), actions))
         s = 0
         max_legal_action_value = float("-inf")
         max_legal_action = float("-inf")

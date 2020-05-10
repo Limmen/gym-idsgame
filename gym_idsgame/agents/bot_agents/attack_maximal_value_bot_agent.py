@@ -31,7 +31,8 @@ class AttackMaximalValueBotAgent(BotAgent):
         """
         actions = list(range(self.game_config.num_attack_actions))
         legal_actions = list(filter(lambda action: idsgame_util.is_attack_id_legal(action, self.game_config,
-                                                                                   game_state.attacker_pos), actions))
+                                                                                   game_state.attacker_pos,
+                                                                                   game_state), actions))
         attacker_row, attacker_col = game_state.attacker_pos
         max_node_value = float("-inf")
         max_action_id = -1

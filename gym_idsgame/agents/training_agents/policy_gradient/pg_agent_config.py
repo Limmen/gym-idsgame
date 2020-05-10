@@ -208,6 +208,10 @@ class PolicyGradientAgentConfig:
                 writer.writerow(["pool_maxsize", str(self.opponent_pool_config.pool_maxsize)])
                 writer.writerow(["pool_increment_period", str(self.opponent_pool_config.pool_increment_period)])
                 writer.writerow(["head_to_head_period", str(self.opponent_pool_config.head_to_head_period)])
+                writer.writerow(["quality_scores", str(self.opponent_pool_config.quality_scores)])
+                writer.writerow(["quality_score_eta", str(self.opponent_pool_config.quality_score_eta)])
+                writer.writerow(["pool_prob", str(self.opponent_pool_config.pool_prob)])
+                writer.writerow(["initial_quality", str(self.opponent_pool_config.initial_quality)])
 
 
     def hparams_dict(self):
@@ -248,4 +252,8 @@ class PolicyGradientAgentConfig:
             hparams["pool_maxsize"] = self.opponent_pool_config.pool_maxsize
             hparams["pool_increment_period"] = self.opponent_pool_config.pool_increment_period
             hparams["head_to_head_period"] = self.opponent_pool_config.head_to_head_period
+            hparams["quality_scores"] = self.opponent_pool_config.quality_scores
+            hparams["quality_score_eta"] = self.opponent_pool_config.quality_score_eta
+            hparams["pool_prob"] = self.opponent_pool_config.pool_prob
+            hparams["initial_quality"] = self.opponent_pool_config.initial_quality
         return hparams

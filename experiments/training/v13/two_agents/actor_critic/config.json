@@ -46,9 +46,13 @@
         "opponent_pool": true,
         "opponent_pool_config": {
             "head_to_head_period": 1,
+            "initial_quality": 1,
             "pool_increment_period": 500,
             "pool_maxsize": 10,
-            "py/object": "gym_idsgame.agents.training_agents.common.opponent_pool_config.OpponentPoolConfig"
+            "pool_prob": 0.2,
+            "py/object": "gym_idsgame.agents.training_agents.common.opponent_pool_config.OpponentPoolConfig",
+            "quality_score_eta": 0.01,
+            "quality_scores": true
         },
         "optimizer": "Adam",
         "output_dim_attacker": 4,

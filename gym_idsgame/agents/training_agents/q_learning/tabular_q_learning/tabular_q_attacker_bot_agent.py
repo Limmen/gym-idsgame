@@ -33,7 +33,7 @@ class TabularQAttackerBotAgent(BotAgent):
         """
         actions = list(range(self.game_config.num_attack_actions))
         legal_actions = list(filter(lambda action: util.is_attack_id_legal(
-            action, self.game_config, game_state.attacker_pos), actions))
+            action, self.game_config, game_state.attacker_pos, game_state), actions))
         s = self.game_config.network_config.get_node_id(game_state.attacker_pos)
         max_legal_action_value = float("-inf")
         max_legal_action = float("-inf")
