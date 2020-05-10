@@ -223,11 +223,13 @@ class ActorCriticAgent(PolicyGradientAgent):
                 # negative log probsince we are doing gradient descent (not ascent)
                 policy_loss.append(-log_prob * advantage)
 
+                R_tensor = torch.tensor([R])
+
                 # Move to GPU if using GPU
                 if torch.cuda.is_available() and self.config.gpu:
                     device = torch.device("cuda:0")
                     state_value = state_value.to(device)
-                    R_tensor = torch.tensor([R]).to(device)
+                    R_tensor = R_tensor.to(device)
 
 
                 # calculate critic loss using Huber loss
