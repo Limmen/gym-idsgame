@@ -334,8 +334,8 @@ class ActorCriticAgent(PolicyGradientAgent):
         obs = self.env.reset(update_stats=False)
         attacker_obs, defender_obs = obs
 
-        attacker_state = self.update_state(attacker_obs, defender_obs, [])
-        defender_state = self.update_state(defender_obs, attacker_obs, [])
+        attacker_state = self.update_state(attacker_obs=attacker_obs, defender_obs=defender_obs, state=[], attacker=True)
+        defender_state = self.update_state(defender_obs=defender_obs, attacker_obs=attacker_obs, state=[], attacker=False)
 
         # Tracking metrics
         episode_attacker_rewards = []
@@ -462,8 +462,8 @@ class ActorCriticAgent(PolicyGradientAgent):
                 obs = obs_prime
                 attacker_obs = obs_prime_attacker
                 defender_obs = obs_prime_defender
-                attacker_state = self.update_state(attacker_obs, defender_obs, attacker_state)
-                defender_state = self.update_state(defender_obs, attacker_obs, defender_state)
+                attacker_state = self.update_state(attacker_obs=attacker_obs, defender_obs=defender_obs, state=attacker_state, attacker=True)
+                defender_state = self.update_state(defender_obs=defender_obs, attacker_obs=attacker_obs, state=defender_state, attacker=False)
 
             # Render final frame
             if self.config.render:
@@ -519,14 +519,6 @@ class ActorCriticAgent(PolicyGradientAgent):
                 num_batch_episode = 0
                 total_num_batches += 1
                 num_alt_iterations += 1
-                if self.config.alternating_optimization and self.config.opponent_pool:
-                    if train_attacker:
-                        num_attacker_pool_iterations += 1
-                        num_defender_opponent_iterations += 1
-
-                    if train_defender:
-                        num_defender_pool_iterations += 1
-                        num_attacker_opponent_iterations += 1
 
                 if episode_step > 0:
                     if self.config.attacker:
@@ -551,6 +543,16 @@ class ActorCriticAgent(PolicyGradientAgent):
             if self.env.state.hacked:
                 self.num_train_hacks += 1
                 self.num_train_hacks_total += 1
+
+            if self.config.alternating_optimization and self.config.opponent_pool:
+                if train_attacker:
+                    num_attacker_pool_iterations += 1
+                    num_defender_opponent_iterations += 1
+
+                if train_defender:
+                    num_defender_pool_iterations += 1
+                    num_attacker_opponent_iterations += 1
+
             episode_attacker_rewards.append(episode_attacker_reward)
             episode_defender_rewards.append(episode_defender_reward)
             episode_steps.append(episode_step)
@@ -613,8 +615,8 @@ class ActorCriticAgent(PolicyGradientAgent):
             # Reset environment for the next episode and update game stats
             done = False
             attacker_obs, defender_obs = self.env.reset(update_stats=True)
-            attacker_state = self.update_state(attacker_obs, defender_obs, [])
-            defender_state = self.update_state(defender_obs, attacker_obs, [])
+            attacker_state = self.update_state(attacker_obs=attacker_obs, defender_obs=defender_obs, state=[], attacker=True)
+            defender_state = self.update_state(defender_obs=defender_obs, attacker_obs=attacker_obs, state=[], attacker=False)
             self.outer_train.update(1)
 
             # If using opponent pool, update the pool
@@ -643,7 +645,6 @@ class ActorCriticAgent(PolicyGradientAgent):
 
                     if num_attacker_opponent_iterations > self.config.opponent_pool_config.head_to_head_period:
                         if np.random.rand() < self.config.opponent_pool_config.pool_prob:
-                            print("sample opponent pool")
                             self.attacker_opponent_idx = self.sample_opponent(attacker=True)
                             if self.config.opponent_pool_config.quality_scores:
                                 self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx][0]
@@ -727,30 +728,42 @@ class ActorCriticAgent(PolicyGradientAgent):
             self.defender_pool[opponent_idx][1] = self.defender_pool[opponent_idx][1] - \
                                                   (self.config.opponent_pool_config.quality_score_eta / (N * p))
 
-    def update_state(self, observation_1: np.ndarray, observation_2: np.ndarray, state: np.ndarray) -> np.ndarray:
+    def update_state(self, attacker_obs: np.ndarray = None, defender_obs: np.ndarray = None,
+                     state: np.ndarray = None, attacker : bool = True) -> np.ndarray:
         """
         Update approximative Markov state
 
-        :param observation_1: latest observation
+        :param attacker_obs: attacker obs
+        :param defender_obs: defender observation
         :param state: current state
+        :param attacker: boolean flag whether it is attacker or not
         :return: new state
         """
         if self.env.fully_observed():
             if self.config.state_length == 1:
-                return np.append(observation_1, observation_2)
+                return defender_obs - attacker_obs
             if len(state) == 0:
-                temp = np.append(observation_1, observation_2)
+                temp = defender_obs - attacker_obs
                 s = np.array([temp] * self.config.state_length)
                 return s
-            temp = np.append(observation_1, observation_2)
+            temp = defender_obs-attacker_obs
             state = np.append(state[1:], np.array([temp]), axis=0)
             return state
         else:
             if self.config.state_length == 1:
-                return np.array(observation_1)
+                if attacker:
+                    return np.array(attacker_obs)
+                else:
+                    return np.array(defender_obs)
             if len(state) == 0:
-                return np.array([observation_1] * self.config.state_length)
-            state = np.append(state[1:], np.array([observation_1]), axis=0)
+                if attacker:
+                    return np.array([attacker_obs] * self.config.state_length)
+                else:
+                    return np.array([defender_obs] * self.config.state_length)
+            if attacker:
+                state = np.append(state[1:], np.array([attacker_obs]), axis=0)
+            else:
+                state = np.append(state[1:], np.array([defender_obs]), axis=0)
             return state
 
     def eval(self, train_episode, log=True) -> ExperimentResult:
@@ -795,8 +808,8 @@ class ActorCriticAgent(PolicyGradientAgent):
 
         # Eval
         attacker_obs, defender_obs = self.env.reset(update_stats=False)
-        attacker_state = self.update_state(attacker_obs, defender_obs, [])
-        defender_state = self.update_state(defender_obs, attacker_obs, [])
+        attacker_state = self.update_state(attacker_obs=attacker_obs, defender_obs=defender_obs, state=[], attacker=True)
+        defender_state = self.update_state(defender_obs=defender_obs, attacker_obs=attacker_obs, state=[], attacker=False)
 
         for episode in range(self.config.eval_episodes):
             episode_attacker_reward = 0
@@ -829,8 +842,8 @@ class ActorCriticAgent(PolicyGradientAgent):
                 episode_step += 1
                 attacker_obs = obs_prime_attacker
                 defender_obs = obs_prime_defender
-                attacker_state = self.update_state(attacker_obs, defender_obs, attacker_state)
-                defender_state = self.update_state(defender_obs, attacker_obs, defender_state)
+                attacker_state = self.update_state(attacker_obs=attacker_obs, defender_obs=defender_obs, state=attacker_state, attacker=True)
+                defender_state = self.update_state(defender_obs=defender_obs, attacker_obs=attacker_obs, state=defender_state, attacker=False)
 
             # Render final frame when game completed
             if self.config.eval_render:
@@ -885,8 +898,8 @@ class ActorCriticAgent(PolicyGradientAgent):
             # Reset for new eval episode
             done = False
             attacker_obs, defender_obs = self.env.reset(update_stats=False)
-            attacker_state = self.update_state(attacker_obs, defender_obs, attacker_state)
-            defender_state = self.update_state(defender_obs, attacker_obs, defender_state)
+            attacker_state = self.update_state(attacker_obs=attacker_obs, defender_obs=defender_obs, state=attacker_state, attacker=True)
+            defender_state = self.update_state(defender_obs=defender_obs, attacker_obs=attacker_obs, state=defender_state, attacker=False)
             self.outer_eval.update(1)
 
         # Log average eval statistics
