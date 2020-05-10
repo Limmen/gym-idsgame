@@ -62,7 +62,7 @@ class PolicyGradientAgent(TrainAgent, ABC):
                     episode_avg_defender_loss: list = None,
                     eval: bool = False,
                     update_stats : bool = True, lr: float = None, train_attacker : bool = False,
-                    train_defender : bool = False, a_pool: int = 0, d_pool : int = 0) -> None:
+                    train_defender : bool = False, a_pool: int = 0, d_pool : int = 0, total_num_batches : int = 0) -> None:
         """
         Logs average metrics for the last <self.config.log_frequency> episodes
 
@@ -80,6 +80,7 @@ class PolicyGradientAgent(TrainAgent, ABC):
         :param train_defender: boolean flag indicating whether the defender is being trained
         :param a_pool: size of the attacker pool (if using opponent pools)
         :param d_pool: size of the defender pool (if using opponent pools)
+        :param total_num_batches: number of training batches
         :return: None
         """
         avg_attacker_episode_rewards = np.mean(attacker_episode_rewards)
@@ -112,11 +113,11 @@ class PolicyGradientAgent(TrainAgent, ABC):
         else:
             log_str = "[Train] episode: {:.2f} epsilon:{:.2f},avg_a_R:{:.2f},avg_d_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
                       "acc_D_R:{:.2f},A_loss:{:.6f},D_loss:{:.6f},lr:{:.2E},c_h:{:.2f},Tr_A:{},Tr_D:{}," \
-                      "a_pool:{},d_pool:{}".format(
+                      "a_pool:{},d_pool:{},batch:{}".format(
                 episode, self.config.epsilon, avg_attacker_episode_rewards, avg_defender_episode_rewards,
                 avg_episode_steps, hack_probability, attacker_cumulative_reward, defender_cumulative_reward,
                 avg_episode_attacker_loss, avg_episode_defender_loss, lr, hack_probability_total, train_attacker,
-                train_defender,a_pool, d_pool)
+                train_defender,a_pool, d_pool, total_num_batches)
             self.outer_train.set_description_str(log_str)
         self.config.logger.info(log_str)
         if update_stats and self.config.tensorboard:
@@ -179,7 +180,7 @@ class PolicyGradientAgent(TrainAgent, ABC):
         self.tensorboard_writer.add_scalar('cumulative_reward/defender/' + train_or_eval,
                                            defender_cumulative_reward, episode)
         self.tensorboard_writer.add_scalar('epsilon', epsilon, episode)
-        if self.config.opponent_pool and a_pool is not None and d_pool is not None:
+        if self.config.opponent_pool and a_pool is not None and d_pool is not None and not eval:
             self.tensorboard_writer.add_scalar('opponent_pool_size/attacker', a_pool, episode)
             self.tensorboard_writer.add_scalar('opponent_pool_size/defender', d_pool, episode)
         if not eval:

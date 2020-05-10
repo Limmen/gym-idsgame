@@ -7,7 +7,6 @@ import time
 import tqdm
 import torch
 import copy
-import random
 from scipy.special import softmax
 from torch.distributions import Categorical
 from torch.utils.tensorboard import SummaryWriter
@@ -178,8 +177,8 @@ class ActorCriticAgent(PolicyGradientAgent):
         """
         return list(map(lambda x: x[1], self.defender_pool))
 
-    def training_step(self, saved_rewards : List[float], saved_log_probs : List[torch.Tensor],
-                      saved_state_values : List[torch.Tensor], attacker=True) -> torch.Tensor:
+    def training_step(self, saved_rewards : List[List[float]], saved_log_probs : List[List[torch.Tensor]],
+                      saved_state_values : List[List[torch.Tensor]], attacker=True) -> torch.Tensor:
         """
         Performs a training step of the Deep-Q-learning algorithm (implemented in PyTorch)
 
@@ -189,48 +188,52 @@ class ActorCriticAgent(PolicyGradientAgent):
         :return: loss
         """
 
-        R = 0
         policy_loss = [] # list to save actor (policy) loss
         value_loss = []  # list to save critic (value) loss
-        returns = [] # list to save the true (observed) values
+        num_batches = len(saved_rewards)
 
-        # Create discounted returns. When episode is finished we can go back and compute the observed cumulative
-        # discounted reward by using the observed rewards
-        for r in saved_rewards[::-1]:
-            R = r + self.config.gamma * R
-            returns.insert(0, R)
-        num_rewards = len(returns)
+        for batch in range(num_batches):
+            R = 0
+            returns = []  # list to save the true (observed) values
+            # Create discounted returns. When episode is finished we can go back and compute the observed cumulative
+            # discounted reward by using the observed rewards
+            for r in saved_rewards[batch][::-1]:
+                R = r + self.config.gamma * R
+                returns.insert(0, R)
+            num_rewards = len(returns)
 
-        # convert list to torch tensor
-        returns = torch.tensor(returns)
+            # convert list to torch tensor
+            returns = torch.tensor(returns)
 
-        # normalize
-        std = returns.std()
-        if num_rewards < 2:
-            std = 0
-        returns = (returns - returns.mean()) / (std + self.machine_eps)
+            # normalize
+            std = returns.std()
+            if num_rewards < 2:
+                std = 0
+            returns = (returns - returns.mean()) / (std + self.machine_eps)
 
-        # Compute PG "loss" which in reality is the expected reward, which we want to maximize with gradient ascent
-        for log_prob, state_value, R in zip(saved_log_probs, saved_state_values, returns):
-            # Compute the advantage which will be used as a baseline in REINFORCE to reduce the gradient variance
-            # Intuitively, the advantage tells us how much better the observed reward was compared to the expected reward
-            # If the advantage of an action is high, it means that the current policy should be modified to reinforce
-            # that action. That is, the advantage tells us for every action much better that action is than
-            # the average action.
-            advantage = R - state_value.item()
+            # Compute PG "loss" which in reality is the expected reward, which we want to maximize with gradient ascent
+            for log_prob, state_value, R in zip(saved_log_probs[batch], saved_state_values[batch], returns):
+                # Compute the advantage which will be used as a baseline in REINFORCE to reduce the gradient variance
+                # Intuitively, the advantage tells us how much better the observed reward was compared to the expected reward
+                # If the advantage of an action is high, it means that the current policy should be modified to reinforce
+                # that action. That is, the advantage tells us for every action much better that action is than
+                # the average action.
+                advantage = R - state_value.item()
 
-            # negative log probsince we are doing gradient descent (not ascent)
-            policy_loss.append(-log_prob * advantage)
+                # negative log probsince we are doing gradient descent (not ascent)
+                policy_loss.append(-log_prob * advantage)
 
-            # calculate critic loss using Huber loss
-            value_loss.append(self.critic_loss_fn(state_value, torch.tensor([R])))
+                # calculate critic loss using Huber loss
+                value_loss.append(self.critic_loss_fn(state_value, torch.tensor([R])))
+
 
         # Compute gradient and update models
         if attacker:
             # reset gradients
             self.attacker_optimizer.zero_grad()
             # sum up all the values of policy losses and value losses
-            loss = torch.stack(policy_loss).sum() + torch.stack(value_loss).sum()
+            total_loss = (torch.stack(policy_loss).sum() + torch.stack(value_loss).sum())
+            loss = total_loss/num_batches
             # perform backprop
             loss.backward()
             # maybe clip gradient
@@ -242,7 +245,8 @@ class ActorCriticAgent(PolicyGradientAgent):
             # reset gradients
             self.defender_optimizer.zero_grad()
             # sum up all the values of policy losses and value losses
-            loss = torch.stack(policy_loss).sum() + torch.stack(value_loss).sum()
+            total_loss = torch.stack(policy_loss).sum() + torch.stack(value_loss).sum()
+            loss = total_loss / num_batches
             # perform backprop
             loss.backward()
             # maybe clip gradient
@@ -294,7 +298,8 @@ class ActorCriticAgent(PolicyGradientAgent):
 
         # Set probability of non-legal actions to 0
         action_probs_1 = action_probs.clone()
-        action_probs_1[non_legal_actions] = 0
+        if len(legal_actions) > 0:
+            action_probs_1[non_legal_actions] = 0
 
         # Use torch.distributions package to create a parameterizable probability distribution of the learned policy
         # PG uses a trick to turn the gradient into a stochastic gradient which we can sample from in order to
@@ -369,14 +374,24 @@ class ActorCriticAgent(PolicyGradientAgent):
                     self.attacker_opponent = self.attacker_policy_network
                     self.attacker_opponent_idx = None
 
-        num_alt_episodes = 0
-        num_attacker_pool_episodes = 0
-        num_defender_pool_episodes = 0
-        num_attacker_opponent_episodes = 0
-        num_defender_opponent_episodes = 0
+        num_alt_iterations = 0
+        num_attacker_pool_iterations = 0
+        num_defender_pool_iterations = 0
+        num_attacker_opponent_iterations = 0
+        num_defender_opponent_iterations = 0
 
         attacker_initial_state_action_dist = np.zeros(self.config.output_dim_attacker)
         defender_initial_state_action_dist = np.zeros(self.config.output_dim_defender)
+
+        num_batch_episode = 0
+        saved_attacker_log_probs_batch = []
+        saved_attacker_rewards_batch = []
+        saved_attacker_state_values_batch = []
+        saved_defender_log_probs_batch = []
+        saved_defender_rewards_batch = []
+        saved_defender_state_values_batch = []
+
+        total_num_batches = 0
 
         # Training
         for episode in range(self.config.num_episodes):
@@ -454,20 +469,75 @@ class ActorCriticAgent(PolicyGradientAgent):
             if self.config.render:
                 self.env.render(mode="human")
 
-            # Perform Policy Gradient updates
-            if self.config.attacker:
-                if not self.config.alternating_optimization or \
-                        (self.config.alternating_optimization and train_attacker):
-                    loss = self.training_step(saved_attacker_rewards, saved_attacker_log_probs,
-                                              saved_attacker_state_values, attacker=True)
-                    episode_attacker_loss += loss.item()
+            saved_attacker_log_probs_batch.append(saved_attacker_log_probs)
+            saved_attacker_rewards_batch.append(saved_attacker_rewards)
+            saved_attacker_state_values_batch.append(saved_attacker_state_values)
+            saved_defender_log_probs_batch.append(saved_defender_log_probs)
+            saved_defender_rewards_batch.append(saved_defender_rewards)
+            saved_defender_state_values_batch.append(saved_defender_state_values)
+            num_batch_episode += 1
 
-            if self.config.defender:
-                if not self.config.alternating_optimization or \
-                        (self.config.alternating_optimization and train_defender):
-                    loss = self.training_step(saved_defender_rewards, saved_defender_log_probs,
-                                              saved_defender_state_values, attacker=False)
-                    episode_defender_loss += loss.item()
+            if num_batch_episode >= self.config.batch_size:
+                # Perform Policy Gradient updates
+                if self.config.attacker:
+                    if not self.config.alternating_optimization or \
+                            (self.config.alternating_optimization and train_attacker):
+                        loss = self.training_step(saved_attacker_rewards_batch, saved_attacker_log_probs_batch,
+                                                  saved_attacker_state_values_batch, attacker=True)
+                        episode_attacker_loss += loss.item()
+
+                if self.config.defender:
+                    if not self.config.alternating_optimization or \
+                            (self.config.alternating_optimization and train_defender):
+                        loss = self.training_step(saved_defender_rewards_batch, saved_defender_log_probs_batch,
+                                                  saved_defender_state_values_batch, attacker=False)
+                        episode_defender_loss += loss.item()
+
+                saved_attacker_log_probs_batch = []
+                saved_attacker_rewards_batch = []
+                saved_attacker_state_values_batch = []
+                saved_defender_log_probs_batch = []
+                saved_defender_rewards_batch = []
+                saved_defender_state_values_batch = []
+
+                # Log values and gradients of the parameters (histogram summary) to tensorboard
+                if self.config.attacker and train_attacker:
+                    for tag, value in self.attacker_policy_network.named_parameters():
+                        tag = tag.replace('.', '/')
+                        self.tensorboard_writer.add_histogram(tag, value.data.cpu().numpy(), episode)
+                        self.tensorboard_writer.add_histogram(tag + '_attacker/grad',
+                                                              value.grad.data.cpu().numpy(),
+                                                              episode)
+
+                if self.config.defender and train_defender:
+                    for tag, value in self.defender_policy_network.named_parameters():
+                        tag = tag.replace('.', '/')
+                        self.tensorboard_writer.add_histogram(tag, value.data.cpu().numpy(), episode)
+                        self.tensorboard_writer.add_histogram(tag + '_defender/grad',
+                                                              value.grad.data.cpu().numpy(),
+                                                              episode)
+                num_batch_episode = 0
+                total_num_batches += 1
+                num_alt_iterations += 1
+                if self.config.alternating_optimization and self.config.opponent_pool:
+                    if train_attacker:
+                        num_attacker_pool_iterations += 1
+                        num_defender_opponent_iterations += 1
+
+                    if train_defender:
+                        num_defender_pool_iterations += 1
+                        num_attacker_opponent_iterations += 1
+
+                if episode_step > 0:
+                    if self.config.attacker:
+                        episode_avg_attacker_loss.append(episode_attacker_loss / episode_step)
+                    if self.config.defender:
+                        episode_avg_defender_loss.append(episode_defender_loss / episode_step)
+                else:
+                    if self.config.attacker:
+                        episode_avg_attacker_loss.append(episode_attacker_loss)
+                    if self.config.defender:
+                        episode_avg_defender_loss.append(episode_defender_loss)
 
             # Decay LR after every episode
             lr = self.config.alpha
@@ -476,7 +546,6 @@ class ActorCriticAgent(PolicyGradientAgent):
                 lr = self.attacker_lr_decay.get_lr()[0]
 
             # Record episode metrics
-            num_alt_episodes += 1
             self.num_train_games += 1
             self.num_train_games_total += 1
             if self.env.state.hacked:
@@ -484,25 +553,6 @@ class ActorCriticAgent(PolicyGradientAgent):
                 self.num_train_hacks_total += 1
             episode_attacker_rewards.append(episode_attacker_reward)
             episode_defender_rewards.append(episode_defender_reward)
-            if episode_step > 0:
-                if self.config.attacker:
-                    episode_avg_attacker_loss.append(episode_attacker_loss/episode_step)
-                if self.config.defender:
-                    episode_avg_defender_loss.append(episode_defender_loss / episode_step)
-            else:
-                if self.config.attacker:
-                    episode_avg_attacker_loss.append(episode_attacker_loss)
-                if self.config.defender:
-                    episode_avg_defender_loss.append(episode_defender_loss)
-
-            if self.config.alternating_optimization and self.config.opponent_pool:
-                if train_attacker:
-                    num_attacker_pool_episodes += 1
-                    num_defender_opponent_episodes += 1
-
-                if train_defender:
-                    num_defender_pool_episodes += 1
-                    num_attacker_opponent_episodes += 1
             episode_steps.append(episode_step)
 
             # Update opponent pool qualities
@@ -530,24 +580,7 @@ class ActorCriticAgent(PolicyGradientAgent):
                                  episode_avg_attacker_loss, episode_avg_defender_loss, lr=lr,
                                  train_attacker = (self.config.attacker and train_attacker),
                                  train_defender = (self.config.defender and train_defender),
-                                 a_pool=a_pool,
-                                 d_pool=d_pool)
-
-                # Log values and gradients of the parameters (histogram summary) to tensorboard
-                if self.config.attacker and train_attacker:
-                    for tag, value in self.attacker_policy_network.named_parameters():
-                        tag = tag.replace('.', '/')
-                        self.tensorboard_writer.add_histogram(tag, value.data.cpu().numpy(), episode)
-                        self.tensorboard_writer.add_histogram(tag + '_attacker/grad', value.grad.data.cpu().numpy(),
-                                                              episode)
-
-                if self.config.defender and train_defender:
-                    for tag, value in self.defender_policy_network.named_parameters():
-                        tag = tag.replace('.', '/')
-                        self.tensorboard_writer.add_histogram(tag, value.data.cpu().numpy(), episode)
-                        self.tensorboard_writer.add_histogram(tag + '_defender/grad', value.grad.data.cpu().numpy(),
-                                                              episode)
-
+                                 a_pool=a_pool, d_pool=d_pool, total_num_batches=total_num_batches)
 
                 episode_attacker_rewards = []
                 episode_defender_rewards = []
@@ -584,20 +617,14 @@ class ActorCriticAgent(PolicyGradientAgent):
             defender_state = self.update_state(defender_obs, attacker_obs, [])
             self.outer_train.update(1)
 
-            # If doing alternating optimization and the alternating period is up, change agent that is optimized
-            if self.config.alternating_optimization and num_alt_episodes > self.config.alternating_period:
-                train_defender = not train_defender
-                train_attacker = not train_attacker
-                num_alt_episodes = 0
-
             # If using opponent pool, update the pool
             if self.config.opponent_pool and self.config.opponent_pool_config is not None:
                 if train_attacker:
-                    if num_attacker_pool_episodes > self.config.opponent_pool_config.pool_increment_period:
+                    if num_attacker_pool_iterations > self.config.opponent_pool_config.pool_increment_period:
                         self.add_model_to_pool(attacker=True)
-                        num_attacker_pool_episodes = 0
+                        num_attacker_pool_iterations = 0
 
-                    if num_defender_opponent_episodes > self.config.opponent_pool_config.head_to_head_period:
+                    if num_defender_opponent_iterations > self.config.opponent_pool_config.head_to_head_period:
                         if np.random.rand() < self.config.opponent_pool_config.pool_prob:
                             self.defender_opponent_idx = self.sample_opponent(attacker=False)
                             if self.config.opponent_pool_config.quality_scores:
@@ -607,15 +634,16 @@ class ActorCriticAgent(PolicyGradientAgent):
                         else:
                             self.defender_opponent = self.defender_policy_network
                             self.defender_opponent_idx = None
-                        num_defender_opponent_episodes = 0
+                        num_defender_opponent_iterations = 0
 
                 if train_defender:
-                    if num_defender_pool_episodes > self.config.opponent_pool_config.pool_increment_period:
+                    if num_defender_pool_iterations > self.config.opponent_pool_config.pool_increment_period:
                         self.add_model_to_pool(attacker=False)
-                        num_defender_pool_episodes = 0
+                        num_defender_pool_iterations = 0
 
-                    if num_attacker_opponent_episodes > self.config.opponent_pool_config.head_to_head_period:
+                    if num_attacker_opponent_iterations > self.config.opponent_pool_config.head_to_head_period:
                         if np.random.rand() < self.config.opponent_pool_config.pool_prob:
+                            print("sample opponent pool")
                             self.attacker_opponent_idx = self.sample_opponent(attacker=True)
                             if self.config.opponent_pool_config.quality_scores:
                                 self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx][0]
@@ -625,7 +653,13 @@ class ActorCriticAgent(PolicyGradientAgent):
                             self.attacker_opponent = self.attacker_policy_network
                             self.attacker_opponent_idx = None
 
-                        num_attacker_opponent_episodes = 0
+                        num_attacker_opponent_iterations = 0
+
+            # If doing alternating optimization and the alternating period is up, change agent that is optimized
+            if self.config.alternating_optimization and num_alt_iterations > self.config.alternating_period:
+                train_defender = not train_defender
+                train_attacker = not train_attacker
+                num_alt_iterations = 0
 
             # Anneal epsilon linearly
             self.anneal_epsilon()

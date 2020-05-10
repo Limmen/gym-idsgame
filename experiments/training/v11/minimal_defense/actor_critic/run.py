@@ -51,22 +51,24 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    pg_agent_config = PolicyGradientAgentConfig(gamma=0.999, alpha=0.00001, epsilon=1, render=False, eval_sleep=0.9,
+    pg_agent_config = PolicyGradientAgentConfig(gamma=0.999, alpha=0.0001, epsilon=1, render=False, eval_sleep=0.9,
                                                 min_epsilon=0.01, eval_episodes=100, train_log_frequency=100,
                                                 epsilon_decay=0.9999, video=True, eval_log_frequency=1,
                                                 video_fps=5, video_dir=default_output_dir() + "/results/videos",
                                                 num_episodes=350001,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
-                                                eval_frequency=10000, attacker=True, defender=False, video_frequency=101,
+                                                eval_frequency=10000, attacker=True, defender=False,
+                                                video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=15000, input_dim=6*2, output_dim_attacker=4,
+                                                checkpoint_freq=5000, input_dim=12, output_dim_attacker=4,
                                                 hidden_dim=64,
-                                                num_hidden_layers=4, batch_size=32,
+                                                num_hidden_layers=1, batch_size=32,
                                                 gpu=False, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
                                                 state_length=1)
+
     env_name = "idsgame-minimal_defense-v11"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.ACTOR_CRITIC_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,

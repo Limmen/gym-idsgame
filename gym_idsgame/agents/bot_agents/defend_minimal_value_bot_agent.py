@@ -49,5 +49,8 @@ class DefendMinimalValueBotAgent(BotAgent):
                         min_node_value = game_state.defense_values[id][min_idx]
                         min_action_id = action_id
         if min_action_id == -1:
-            min_action_id = np.random.choice(legal_actions)
+            if len(legal_actions) == 0:
+                min_action_id = np.random.choice(actions)
+            else:
+                min_action_id = np.random.choice(legal_actions)
         return min_action_id
