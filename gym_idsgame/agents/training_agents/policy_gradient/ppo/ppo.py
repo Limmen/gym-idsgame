@@ -229,7 +229,7 @@ class PPOAgent(PolicyGradientAgent):
             num_rewards = len(returns)
 
             # convert list to torch tensor
-            returns = torch.tensor(returns)
+            returns = torch.tensor(returns).to(device)
 
             # normalize the rewards
             std = returns.std()
