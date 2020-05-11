@@ -71,11 +71,11 @@ class ReinforceAgent(PolicyGradientAgent):
         # Define Optimizer. The call to model.parameters() in the optimizer constructor will contain the learnable
         # parameters of the layers in the model
         if self.config.optimizer == "Adam":
-            self.attacker_optimizer = torch.optim.Adam(self.attacker_policy_network.parameters(), lr=self.config.alpha)
-            self.defender_optimizer = torch.optim.Adam(self.defender_policy_network.parameters(), lr=self.config.alpha)
+            self.attacker_optimizer = torch.optim.Adam(self.attacker_policy_network.parameters(), lr=self.config.alpha_attacker)
+            self.defender_optimizer = torch.optim.Adam(self.defender_policy_network.parameters(), lr=self.config.alpha_defender)
         elif self.config.optimizer == "SGD":
-            self.attacker_optimizer = torch.optim.SGD(self.attacker_policy_network.parameters(), lr=self.config.alpha)
-            self.defender_optimizer = torch.optim.SGD(self.defender_policy_network.parameters(), lr=self.config.alpha)
+            self.attacker_optimizer = torch.optim.SGD(self.attacker_policy_network.parameters(), lr=self.config.alpha_attacker)
+            self.defender_optimizer = torch.optim.SGD(self.defender_policy_network.parameters(), lr=self.config.alpha_defender)
         else:
             raise ValueError("Optimizer not recognized")
 
@@ -286,10 +286,16 @@ class ReinforceAgent(PolicyGradientAgent):
                 episode_defender_loss += loss.item()
 
             # Decay LR after every episode
-            lr = self.config.alpha
+            lr_attacker = self.config.alpha_attacker
             if self.config.lr_exp_decay:
                 self.attacker_lr_decay.step()
-                lr = self.attacker_lr_decay.get_lr()[0]
+                lr_attacker = self.attacker_lr_decay.get_lr()[0]
+
+            # Decay LR after every episode
+            lr_defender = self.config.alpha_defender
+            if self.config.lr_exp_decay:
+                self.defender_lr_decay.step()
+                lr_defender = self.defender_lr_decay.get_lr()[0]
 
             # Record episode metrics
             self.num_train_games += 1
@@ -321,7 +327,8 @@ class ReinforceAgent(PolicyGradientAgent):
                     self.train_hack_probability = 0.0
                     self.train_cumulative_hack_probability = 0.0
                 self.log_metrics(episode, self.train_result, episode_attacker_rewards, episode_defender_rewards, episode_steps,
-                                 episode_avg_attacker_loss, episode_avg_defender_loss, lr=lr)
+                                 episode_avg_attacker_loss, episode_avg_defender_loss, lr_attacker=lr_attacker,
+                                 lr_defender=lr_defender)
 
                 # Log values and gradients of the parameters (histogram summary) to tensorboard
 

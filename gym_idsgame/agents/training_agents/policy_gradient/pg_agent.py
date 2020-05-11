@@ -61,7 +61,8 @@ class PolicyGradientAgent(TrainAgent, ABC):
                     episode_steps: list, episode_avg_attacker_loss: list = None,
                     episode_avg_defender_loss: list = None,
                     eval: bool = False,
-                    update_stats : bool = True, lr: float = None, train_attacker : bool = False,
+                    update_stats : bool = True, lr_attacker: float = None, lr_defender: float = None,
+                    train_attacker : bool = False,
                     train_defender : bool = False, a_pool: int = 0, d_pool : int = 0, total_num_batches : int = 0) -> None:
         """
         Logs average metrics for the last <self.config.log_frequency> episodes
@@ -75,7 +76,8 @@ class PolicyGradientAgent(TrainAgent, ABC):
         :param episode_avg_defender_loss: list of episode defedner loss for the last <self.config.log_frequency> episodes
         :param eval: boolean flag whether the metrics are logged in an evaluation context.
         :param update_stats: boolean flag whether to update stats
-        :param lr: the learning rate
+        :param lr_attacker: the learning rate of the attacker
+        :param lr_defender: the learning rate of the defender
         :param train_attacker: boolean flag indicating whether the attacker is being trained
         :param train_defender: boolean flag indicating whether the defender is being trained
         :param a_pool: size of the attacker pool (if using opponent pools)
@@ -85,8 +87,10 @@ class PolicyGradientAgent(TrainAgent, ABC):
         """
         avg_attacker_episode_rewards = np.mean(attacker_episode_rewards)
         avg_defender_episode_rewards = np.mean(defender_episode_rewards)
-        if lr is None:
-            lr = 0.0
+        if lr_attacker is None:
+            lr_attacker = 0.0
+        if lr_defender is None:
+            lr_defender = 0.0
         if not eval and episode_avg_attacker_loss is not None:
             avg_episode_attacker_loss = np.mean(episode_avg_attacker_loss)
         else:
@@ -105,26 +109,27 @@ class PolicyGradientAgent(TrainAgent, ABC):
             else self.eval_defender_cumulative_reward
         if eval:
             log_str = "[Eval] episode:{},avg_a_R:{:.2f},avg_d_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
-                      "acc_D_R:{:.2f},lr:{:.2E},c_h:{:.2f}".format(
+                      "acc_D_R:{:.2f},lr_a:{:.2E},lr_d:{:.2E},c_h:{:.2f}".format(
                 episode, avg_attacker_episode_rewards, avg_defender_episode_rewards, avg_episode_steps, hack_probability,
-                attacker_cumulative_reward, defender_cumulative_reward, lr,
+                attacker_cumulative_reward, defender_cumulative_reward, lr_attacker, lr_defender,
                 hack_probability_total)
             self.outer_eval.set_description_str(log_str)
         else:
             log_str = "[Train] episode: {:.2f} epsilon:{:.2f},avg_a_R:{:.2f},avg_d_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
-                      "acc_D_R:{:.2f},A_loss:{:.6f},D_loss:{:.6f},lr:{:.2E},c_h:{:.2f},Tr_A:{},Tr_D:{}," \
+                      "acc_D_R:{:.2f},A_loss:{:.6f},D_loss:{:.6f},lr_a:{:.2E},lr_d:{:.2E},c_h:{:.2f},Tr_A:{},Tr_D:{}," \
                       "a_pool:{},d_pool:{},batch:{}".format(
                 episode, self.config.epsilon, avg_attacker_episode_rewards, avg_defender_episode_rewards,
                 avg_episode_steps, hack_probability, attacker_cumulative_reward, defender_cumulative_reward,
-                avg_episode_attacker_loss, avg_episode_defender_loss, lr, hack_probability_total, train_attacker,
+                avg_episode_attacker_loss, avg_episode_defender_loss, lr_attacker, lr_defender, hack_probability_total,
+                train_attacker,
                 train_defender,a_pool, d_pool, total_num_batches)
             self.outer_train.set_description_str(log_str)
         self.config.logger.info(log_str)
         if update_stats and self.config.tensorboard:
             self.log_tensorboard(episode, avg_attacker_episode_rewards, avg_defender_episode_rewards, avg_episode_steps,
                                  avg_episode_attacker_loss, avg_episode_defender_loss, hack_probability,
-                                 attacker_cumulative_reward, defender_cumulative_reward, self.config.epsilon, lr,
-                                 hack_probability_total, a_pool, d_pool, eval=eval)
+                                 attacker_cumulative_reward, defender_cumulative_reward, self.config.epsilon, lr_attacker,
+                                 lr_defender, hack_probability_total, a_pool, d_pool, eval=eval)
         if update_stats:
             result.avg_episode_steps.append(avg_episode_steps)
             result.avg_attacker_episode_rewards.append(avg_attacker_episode_rewards)
@@ -136,13 +141,13 @@ class PolicyGradientAgent(TrainAgent, ABC):
             result.defender_cumulative_reward.append(defender_cumulative_reward)
             result.avg_episode_loss_attacker.append(avg_episode_attacker_loss)
             result.avg_episode_loss_defender.append(avg_episode_defender_loss)
-            result.lr_list.append(lr)
+            result.lr_list.append(lr_attacker)
 
     def log_tensorboard(self, episode: int, avg_attacker_episode_rewards: float, avg_defender_episode_rewards: float,
                         avg_episode_steps: float, episode_avg_loss_attacker: float, episode_avg_loss_defender: float,
                         hack_probability: float, attacker_cumulative_reward: int, defender_cumulative_reward: int,
-                        epsilon: float, lr: float, cumulative_hack_probability : float, a_pool : int, d_pool : int,
-                        eval=False) -> None:
+                        epsilon: float, lr_attacker: float, lr_defender: float, cumulative_hack_probability : float,
+                        a_pool : int, d_pool : int, eval=False) -> None:
         """
         Log metrics to tensorboard
 
@@ -156,7 +161,8 @@ class PolicyGradientAgent(TrainAgent, ABC):
         :param attacker_cumulative_reward: the cumulative attacker reward
         :param defender_cumulative_reward: the cumulative defender reward
         :param epsilon: the exploration rate
-        :param lr: the learning rate
+        :param lr_attacker: the learning rate of the attacker
+        :param lr_defender: the learning rate of the defender
         :param cumulative_hack_probability: the cumulative hack probability
         :param eval: boolean flag whether eval or not
         :param a_pool: size of the attacker opponent pool
@@ -184,7 +190,8 @@ class PolicyGradientAgent(TrainAgent, ABC):
             self.tensorboard_writer.add_scalar('opponent_pool_size/attacker', a_pool, episode)
             self.tensorboard_writer.add_scalar('opponent_pool_size/defender', d_pool, episode)
         if not eval:
-            self.tensorboard_writer.add_scalar('lr', lr, episode)
+            self.tensorboard_writer.add_scalar('lr/attacker', lr_attacker, episode)
+            self.tensorboard_writer.add_scalar('lr/defender', lr_defender, episode)
 
     def anneal_epsilon(self) -> None:
         """

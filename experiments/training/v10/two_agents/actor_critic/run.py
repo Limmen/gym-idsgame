@@ -59,7 +59,7 @@ def default_config() -> ClientConfig:
                                               quality_score_eta=0.01,
                                               initial_quality=1000,
                                               pool_prob=0.5)
-    pg_agent_config = PolicyGradientAgentConfig(gamma=0.999, alpha=0.00001, epsilon=1, render=False, eval_sleep=0.9,
+    pg_agent_config = PolicyGradientAgentConfig(gamma=0.999, alpha_attacker=0.00001, epsilon=1, render=False, eval_sleep=0.9,
                                                 min_epsilon=0.01, eval_episodes=100, train_log_frequency=200,
                                                 epsilon_decay=0.9999, video=True, eval_log_frequency=1,
                                                 video_fps=5, video_dir=default_output_dir() + "/results/videos",

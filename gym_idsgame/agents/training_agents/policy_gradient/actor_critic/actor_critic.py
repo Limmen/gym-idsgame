@@ -67,7 +67,7 @@ class ActorCriticAgent(PolicyGradientAgent):
 
         # Specify device
         if torch.cuda.is_available() and self.config.gpu:
-            device = torch.device("cuda:0")
+            device = torch.device("cuda:" + str(self.config.gpu_id))
             self.config.logger.info("Running on the GPU")
         else:
             device = torch.device("cpu")
@@ -87,11 +87,11 @@ class ActorCriticAgent(PolicyGradientAgent):
         # Define Optimizer. The call to model.parameters() in the optimizer constructor will contain the learnable
         # parameters of the layers in the model
         if self.config.optimizer == "Adam":
-            self.attacker_optimizer = torch.optim.Adam(self.attacker_policy_network.parameters(), lr=self.config.alpha)
-            self.defender_optimizer = torch.optim.Adam(self.defender_policy_network.parameters(), lr=self.config.alpha)
+            self.attacker_optimizer = torch.optim.Adam(self.attacker_policy_network.parameters(), lr=self.config.alpha_attacker)
+            self.defender_optimizer = torch.optim.Adam(self.defender_policy_network.parameters(), lr=self.config.alpha_defender)
         elif self.config.optimizer == "SGD":
-            self.attacker_optimizer = torch.optim.SGD(self.attacker_policy_network.parameters(), lr=self.config.alpha)
-            self.defender_optimizer = torch.optim.SGD(self.defender_policy_network.parameters(), lr=self.config.alpha)
+            self.attacker_optimizer = torch.optim.SGD(self.attacker_policy_network.parameters(), lr=self.config.alpha_attacker)
+            self.defender_optimizer = torch.optim.SGD(self.defender_policy_network.parameters(), lr=self.config.alpha_defender)
         else:
             raise ValueError("Optimizer not recognized")
 
@@ -99,7 +99,7 @@ class ActorCriticAgent(PolicyGradientAgent):
         if self.config.lr_exp_decay:
             self.attacker_lr_decay = torch.optim.lr_scheduler.ExponentialLR(optimizer=self.attacker_optimizer,
                                                                        gamma=self.config.lr_decay_rate)
-            self.defender_lr_decay = torch.optim.lr_scheduler.ExponentialLR(optimizer=self.attacker_optimizer,
+            self.defender_lr_decay = torch.optim.lr_scheduler.ExponentialLR(optimizer=self.defender_optimizer,
                                                                             gamma=self.config.lr_decay_rate)
 
         self.add_model_to_pool(attacker=True)
@@ -227,7 +227,7 @@ class ActorCriticAgent(PolicyGradientAgent):
 
                 # Move to GPU if using GPU
                 if torch.cuda.is_available() and self.config.gpu:
-                    device = torch.device("cuda:0")
+                    device = torch.device("cuda:" + str(self.config.gpu_id))
                     state_value = state_value.to(device)
                     R_tensor = R_tensor.to(device)
 
@@ -280,7 +280,7 @@ class ActorCriticAgent(PolicyGradientAgent):
 
         # Move to GPU if using GPU
         if torch.cuda.is_available() and self.config.gpu:
-            device = torch.device("cuda:0")
+            device = torch.device("cuda:" + str(self.config.gpu_id))
             state = state.to(device)
 
         # Calculate legal actions
@@ -474,6 +474,7 @@ class ActorCriticAgent(PolicyGradientAgent):
                 attacker_state = self.update_state(attacker_obs=attacker_obs, defender_obs=defender_obs, state=attacker_state, attacker=True)
                 defender_state = self.update_state(defender_obs=defender_obs, attacker_obs=attacker_obs, state=defender_state, attacker=False)
 
+
             # Render final frame
             if self.config.render:
                 self.env.render(mode="human")
@@ -541,10 +542,16 @@ class ActorCriticAgent(PolicyGradientAgent):
                         episode_avg_defender_loss.append(episode_defender_loss)
 
             # Decay LR after every episode
-            lr = self.config.alpha
+            lr_attacker = self.config.alpha_attacker
             if self.config.lr_exp_decay:
                 self.attacker_lr_decay.step()
-                lr = self.attacker_lr_decay.get_lr()[0]
+                lr_attacker = self.attacker_lr_decay.get_lr()[0]
+
+            # Decay LR after every episode
+            lr_defender = self.config.alpha_attacker
+            if self.config.lr_exp_decay:
+                self.defender_lr_decay.step()
+                lr_defender = self.defender_lr_decay.get_lr()[0]
 
             # Record episode metrics
             self.num_train_games += 1
@@ -588,7 +595,8 @@ class ActorCriticAgent(PolicyGradientAgent):
                     a_pool = len(self.attacker_pool)
                     d_pool = len(self.defender_pool)
                 self.log_metrics(episode, self.train_result, episode_attacker_rewards, episode_defender_rewards, episode_steps,
-                                 episode_avg_attacker_loss, episode_avg_defender_loss, lr=lr,
+                                 episode_avg_attacker_loss, episode_avg_defender_loss, lr_attacker=lr_attacker,
+                                 lr_defender=lr_defender,
                                  train_attacker = (self.config.attacker and train_attacker),
                                  train_defender = (self.config.defender and train_defender),
                                  a_pool=a_pool, d_pool=d_pool, total_num_batches=total_num_batches)
@@ -708,7 +716,7 @@ class ActorCriticAgent(PolicyGradientAgent):
             tag = "Defender"
             file_suffix = "initial_state_policy_defender"
         title = tag + " Initial State Policy"
-        data = idsgame_util.action_dist_hist(sample, title=title, xlabel="Action", ylabel=r"$\mathbb{P}(s|a)$",
+        data = idsgame_util.action_dist_hist(sample, title=title, xlabel="Action", ylabel=r"$\mathbb{P}(a|s)$",
                                       file_name=self.config.save_dir + "/" + file_suffix + "_" + str(episode))
         self.tensorboard_writer.add_image(str(episode) + "_initial_state_policy/" + tag,
                                           data, global_step=episode, dataformats="HWC")
@@ -749,16 +757,50 @@ class ActorCriticAgent(PolicyGradientAgent):
         :return: new state
         """
         if self.env.fully_observed():
+            a_pos = attacker_obs[:,-1]
+            det_values = defender_obs[:, -1]
+            temp = defender_obs[:,0:-1] - attacker_obs[:,0:-1]
+            if self.config.normalize_features:
+                det_values = det_values / np.linalg.norm(det_values)
+                temp = temp / np.linalg.norm(temp)
+            features = []
+            for idx, row in enumerate(temp):
+                t = row.tolist()
+                t.append(a_pos[idx])
+                t.append(det_values[idx])
+                features.append(t)
+            features = np.array(features)
             if self.config.state_length == 1:
-                return defender_obs - attacker_obs
+                return features
             if len(state) == 0:
-                temp = defender_obs - attacker_obs
-                s = np.array([temp] * self.config.state_length)
+                s = np.array([features] * self.config.state_length)
                 return s
-            temp = defender_obs-attacker_obs
-            state = np.append(state[1:], np.array([temp]), axis=0)
+            state = np.append(state[1:], np.array([features]), axis=0)
             return state
         else:
+            if self.config.normalize_features:
+                attacker_obs_1 = attacker_obs[:,0:-1] / np.linalg.norm(attacker_obs[:,0:-1])
+                normalized_attacker_features = []
+                for idx, row in enumerate(attacker_obs_1):
+                    if np.isnan(attacker_obs_1).any():
+                        t = attacker_obs[idx]
+                    else:
+                        t = attacker_obs_1.tolist()
+                        t.append(attacker_obs[idx][-1])
+                    normalized_attacker_features.append(t)
+
+                defender_obs_1 = defender_obs[:, 0:-1] / np.linalg.norm(defender_obs[:, 0:-1])
+                normalized_defender_features = []
+                for idx, row in enumerate(defender_obs_1):
+                    if np.isnan(defender_obs_1).any():
+                        t= defender_obs[idx]
+                    else:
+                        t = defender_obs_1.tolist()
+                        t.append(defender_obs[idx][-1])
+                    normalized_defender_features.append(t)
+                attacker_obs = np.array(normalized_attacker_features)
+                defender_obs = np.array(normalized_defender_features)
+
             if self.config.state_length == 1:
                 if attacker:
                     return np.array(attacker_obs)

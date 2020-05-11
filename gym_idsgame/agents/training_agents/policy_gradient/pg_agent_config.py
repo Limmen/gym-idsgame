@@ -1,5 +1,5 @@
 """
-Configuration for QAgent
+Configuration for Policy gradient agents
 """
 import csv
 from gym_idsgame.agents.training_agents.common.opponent_pool_config import OpponentPoolConfig
@@ -9,7 +9,8 @@ class PolicyGradientAgentConfig:
     DTO with configuration for PolicyGradientAgent
     """
 
-    def __init__(self, gamma :float = 0.8, alpha:float = 0.1, epsilon :float =0.9, render :bool =False,
+    def __init__(self, gamma :float = 0.8, alpha_attacker:float = 0.1, alpha_defender:float = 0.1,
+                 epsilon :float =0.9, render :bool =False,
                  eval_sleep :float = 0.35,
                  epsilon_decay :float = 0.999, min_epsilon :float = 0.1, eval_episodes :int = 1,
                  train_log_frequency :int =100,
@@ -27,13 +28,15 @@ class PolicyGradientAgentConfig:
                  lr_decay_rate: float = 0.96, hidden_activation: str = "ReLU", clip_gradient = False,
                  max_gradient_norm = 40, critic_loss_fn : str = "MSE", state_length = 1,
                  alternating_optimization : bool = False, alternating_period : int = 15000,
-                 opponent_pool : bool = False, opponent_pool_config : OpponentPoolConfig = None
+                 opponent_pool : bool = False, opponent_pool_config : OpponentPoolConfig = None,
+                 normalize_features : bool = False, gpu_id: int = 0
                  ):
         """
         Initialize environment and hyperparameters
 
         :param gamma: the discount factor
-        :param alpha: the learning rate
+        :param alpha_attacker: the learning rate of the attacker
+        :param alpha_defender: the learning rate of the defender
         :param epsilon: the exploration rate
         :param render: whether to render the environment *during training*
         :param eval_sleep: amount of sleep between time-steps during evaluation and rendering
@@ -80,9 +83,12 @@ class PolicyGradientAgentConfig:
         :param alternating_period: period for alternating between training attacker and defender
         :param opponent_pool: boolean flag whether using opponent pool or not
         :param opponent_pool_config: DTO with config when training against opponent pool
+        :param normalize_features: boolean flag that indicates whether features should be normalized or not
+        :param gpu_id: id of the GPU to use
         """
         self.gamma = gamma
-        self.alpha = alpha
+        self.alpha_attacker = alpha_attacker
+        self.alpha_defender = alpha_defender
         self.epsilon = epsilon
         self.render = render
         self.eval_sleep = eval_sleep
@@ -130,26 +136,29 @@ class PolicyGradientAgentConfig:
         self.alternating_period = alternating_period
         self.opponent_pool = opponent_pool
         self.opponent_pool_config = opponent_pool_config
+        self.normalize_features = normalize_features
+        self.gpu_id = gpu_id
 
 
     def to_str(self) -> str:
         """
         :return: a string with information about all of the parameters
         """
-        return "Hyperparameters: gamma:{0},alpha:{1},epsilon:{2},render:{3},eval_sleep:{4}," \
+        return "Hyperparameters: gamma:{0},alpha_attacker:{1},epsilon:{2},render:{3},eval_sleep:{4}," \
                "epsilon_decay:{5},min_epsilon:{6},eval_episodes:{7},train_log_frequency:{8}," \
                "eval_log_frequency:{9},video:{10},video_fps:{11}," \
                "video_dir:{12},num_episodes:{13},eval_render:{14},gifs:{15}," \
                "gifdir:{16},eval_frequency:{17},video_frequency:{18},attacker{19},defender:{20}," \
                "checkpoint_freq:{21},random_seed:{22},eval_epsilon:{23},clip_gradient:{24},max_gradient_norm:{25}," \
                "output_dim_defender:{26},critic_loss_fn:{27},state_length:{28},alternating_optimization:{29}," \
-               "alternating_period:{30}".format(
-            self.gamma, self.alpha, self.epsilon, self.render, self.eval_sleep, self.epsilon_decay,
+               "alternating_period:{30},normalize_features:{31},alpha_defender:{32},gpu_id:{33}".format(
+            self.gamma, self.alpha_attacker, self.epsilon, self.render, self.eval_sleep, self.epsilon_decay,
             self.min_epsilon, self.eval_episodes, self.train_log_frequency, self.eval_log_frequency, self.video,
             self.video_fps, self.video_dir, self.num_episodes, self.eval_render, self.gifs, self.gif_dir,
             self.eval_frequency, self.video_frequency, self.attacker, self.defender, self.checkpoint_freq,
             self.random_seed, self.eval_epsilon, self.clip_gradient, self.max_gradient_norm, self.output_dim_defender,
-            self.critic_loss_fn, self.state_length, self.alternating_optimization, self.alternating_period)
+            self.critic_loss_fn, self.state_length, self.alternating_optimization, self.alternating_period,
+            self.normalize_features, self.alpha_defender, self.gpu_id)
 
     def to_csv(self, file_path: str) -> None:
         """
@@ -162,7 +171,7 @@ class PolicyGradientAgentConfig:
             writer = csv.writer(f)
             writer.writerow(["parameter", "value"])
             writer.writerow(["gamma", str(self.gamma)])
-            writer.writerow(["alpha", str(self.alpha)])
+            writer.writerow(["alpha_attacker", str(self.alpha_attacker)])
             writer.writerow(["epsilon", str(self.epsilon)])
             writer.writerow(["render", str(self.render)])
             writer.writerow(["eval_sleep", str(self.eval_sleep)])
@@ -204,6 +213,9 @@ class PolicyGradientAgentConfig:
             writer.writerow(["state_length", str(self.state_length)])
             writer.writerow(["alternating_optimization", str(self.alternating_optimization)])
             writer.writerow(["alternating_period", str(self.alternating_period)])
+            writer.writerow(["normalize_features", str(self.normalize_features)])
+            writer.writerow(["alpha_defender", str(self.normalize_features)])
+            writer.writerow(["gpu_id", str(self.gpu_id)])
             if self.opponent_pool and self.opponent_pool_config is not None:
                 writer.writerow(["pool_maxsize", str(self.opponent_pool_config.pool_maxsize)])
                 writer.writerow(["pool_increment_period", str(self.opponent_pool_config.pool_increment_period)])
@@ -217,7 +229,7 @@ class PolicyGradientAgentConfig:
     def hparams_dict(self):
         hparams = {}
         hparams["gamma"] = self.gamma
-        hparams["alpha"] = self.alpha
+        hparams["alpha_attacker"] = self.alpha_attacker
         hparams["epsilon"] = self.epsilon
         hparams["epsilon_decay"] = self.epsilon_decay
         hparams["min_epsilon"] = self.min_epsilon
@@ -248,6 +260,9 @@ class PolicyGradientAgentConfig:
         hparams["state_length"] = self.state_length
         hparams["alternating_optimization"] = self.alternating_optimization
         hparams["alternating_period"] = self.alternating_period
+        hparams["normalize_features"] = self.normalize_features
+        hparams["alpha_defender"] = self.alpha_defender
+        hparams["gpu_id"] = self.gpu_id
         if self.opponent_pool and self.opponent_pool_config is not None:
             hparams["pool_maxsize"] = self.opponent_pool_config.pool_maxsize
             hparams["pool_increment_period"] = self.opponent_pool_config.pool_increment_period
