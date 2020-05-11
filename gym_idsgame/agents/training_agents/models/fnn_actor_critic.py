@@ -4,7 +4,7 @@ A FNN model with Softmax output defined in PyTorch
 import torch
 
 
-class ActorCriticNN(torch.nn.Module):
+class FFNActorCritic(torch.nn.Module):
     """
     Implements a FNN with two heads, one for the critic (predict values) and one for the actor (predict p(a|s)
     """
@@ -20,7 +20,7 @@ class ActorCriticNN(torch.nn.Module):
         :param num_hidden_layers: the number of hidden layers
         :param hidden_activation: hidden activation type
         """
-        super(ActorCriticNN, self).__init__()
+        super(FFNActorCritic, self).__init__()
 
         self.input_dim = input_dim
         self.output_dim = output_dim
@@ -104,7 +104,7 @@ def test() -> None:
     batch_size = 64
 
     # Create model
-    model = ActorCriticNN(input_dim, output_dim, hidden_dim, num_hidden_layers=2)
+    model = FFNActorCritic(input_dim, output_dim, hidden_dim, num_hidden_layers=2)
 
     # Create random Tensors to hold inputs and outputs
     x = torch.randn(batch_size, input_dim)

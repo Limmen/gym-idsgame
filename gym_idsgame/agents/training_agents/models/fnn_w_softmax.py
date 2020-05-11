@@ -4,7 +4,7 @@ A FNN model with Softmax output defined in PyTorch
 import torch
 
 
-class FeedForwardNNWithSoftmax(torch.nn.Module):
+class FNNwithSoftmax(torch.nn.Module):
     """
     Implements a FNN with parameterizable number of layers, dimensions, and hidden activations.
 
@@ -22,7 +22,7 @@ class FeedForwardNNWithSoftmax(torch.nn.Module):
         :param num_hidden_layers: the number of hidden layers
         :param hidden_activation: hidden activation type
         """
-        super(FeedForwardNNWithSoftmax, self).__init__()
+        super(FNNwithSoftmax, self).__init__()
 
         self.input_dim = input_dim
         self.output_dim = output_dim
@@ -96,7 +96,7 @@ def test() -> None:
     batch_size = 64
 
     # Create model
-    model = FeedForwardNNWithSoftmax(input_dim, output_dim, hidden_dim, num_hidden_layers=2)
+    model = FNNwithSoftmax(input_dim, output_dim, hidden_dim, num_hidden_layers=2)
 
     # Create random Tensors to hold inputs and outputs
     x = torch.randn(batch_size, input_dim)

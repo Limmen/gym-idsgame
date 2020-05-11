@@ -60,18 +60,19 @@ def default_config() -> ClientConfig:
                                                 gif_dir=default_output_dir() + "/results/gifs",
                                                 eval_frequency=10000, attacker=True, defender=False, video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=15000, input_dim=36, output_dim_attacker=30,
+                                                checkpoint_freq=15000, input_dim=(4+1)*3*2, output_dim_attacker=4*3,
                                                 hidden_dim=36,
                                                 num_hidden_layers=1, batch_size=1,
                                                 gpu=False, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
-                                                state_length=1, normalize_features=True)
-    env_name = "idsgame-minimal_defense-v10"
-    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.ACTOR_CRITIC_AGENT.value,
+                                                state_length=1, normalize_features=False, merged_ad_features=False,
+                                                optimization_iterations=8)
+    env_name = "idsgame-minimal_defense-v14"
+    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.PPO_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),
-                                 title="Actor-Critic vs DefendMinimalDefender",
+                                 title="PPO vs DefendMinimalDefender",
                                  run_many=False, random_seeds=[0, 999, 299, 399, 499])
     #client_config = hp_tuning_config(client_config)
     return client_config
@@ -138,7 +139,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir, random_seed)
-    logger = util.setup_logger("actor_critic_vs_minimal_defense-v10", config.output_dir + "/results/logs/" +
+    logger = util.setup_logger("ppo_vs_minimal_defense-v14", config.output_dir + "/results/logs/" +
                                str(random_seed) + "/",
                                time_str=time_str)
     config.pg_agent_config.save_dir = default_output_dir() + "/results/data/" + str(random_seed) + "/"
@@ -169,7 +170,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
 # Program entrypoint
 if __name__ == '__main__':
     args = util.parse_args(default_config_path())
-    experiment_title = "Actor-Critic vs minimal defense"
+    experiment_title = "PPO vs minimal defense"
     if args.configpath is not None and not args.noconfig:
         if not os.path.exists(args.configpath):
             write_default_config()

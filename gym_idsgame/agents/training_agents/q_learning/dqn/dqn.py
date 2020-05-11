@@ -12,7 +12,7 @@ from gym_idsgame.agents.training_agents.q_learning.q_agent_config import QAgentC
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
 from gym_idsgame.envs.constants import constants
-from gym_idsgame.agents.training_agents.q_learning.dqn.model import FeedForwardNN
+from gym_idsgame.agents.training_agents.models.fnn_w_linear import FNNwithLinear
 from gym_idsgame.agents.training_agents.q_learning.experience_replay.replay_buffer import ReplayBuffer
 from gym_idsgame.agents.training_agents.q_learning.q_agent import QAgent
 
@@ -129,19 +129,19 @@ class DQNAgent(QAgent):
         """
 
         # Initialize models
-        self.attacker_q_network = FeedForwardNN(self.config.dqn_config.input_dim, self.config.dqn_config.attacker_output_dim,
+        self.attacker_q_network = FNNwithLinear(self.config.dqn_config.input_dim, self.config.dqn_config.attacker_output_dim,
                                                 self.config.dqn_config.hidden_dim,
                                                 num_hidden_layers=self.config.dqn_config.num_hidden_layers,
                                                 hidden_activation=self.config.dqn_config.hidden_activation)
-        self.attacker_target_network = FeedForwardNN(self.config.dqn_config.input_dim, self.config.dqn_config.attacker_output_dim,
+        self.attacker_target_network = FNNwithLinear(self.config.dqn_config.input_dim, self.config.dqn_config.attacker_output_dim,
                                                      self.config.dqn_config.hidden_dim,
                                                      num_hidden_layers=self.config.dqn_config.num_hidden_layers,
                                                      hidden_activation=self.config.dqn_config.hidden_activation)
-        self.defender_q_network = FeedForwardNN(self.config.dqn_config.input_dim, self.config.dqn_config.defender_output_dim,
+        self.defender_q_network = FNNwithLinear(self.config.dqn_config.input_dim, self.config.dqn_config.defender_output_dim,
                                                 self.config.dqn_config.hidden_dim,
                                                 num_hidden_layers=self.config.dqn_config.num_hidden_layers,
                                                 hidden_activation=self.config.dqn_config.hidden_activation)
-        self.defender_target_network = FeedForwardNN(self.config.dqn_config.input_dim, self.config.dqn_config.defender_output_dim,
+        self.defender_target_network = FNNwithLinear(self.config.dqn_config.input_dim, self.config.dqn_config.defender_output_dim,
                                                      self.config.dqn_config.hidden_dim,
                                                      num_hidden_layers=self.config.dqn_config.num_hidden_layers,
                                                      hidden_activation=self.config.dqn_config.hidden_activation)

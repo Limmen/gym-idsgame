@@ -18,6 +18,7 @@ from gym_idsgame.agents.training_agents.q_learning.tabular_q_learning.tabular_q_
 from gym_idsgame.agents.training_agents.q_learning.dqn.dqn import DQNAgent
 from gym_idsgame.agents.training_agents.policy_gradient.reinforce.reinforce import ReinforceAgent
 from gym_idsgame.agents.training_agents.policy_gradient.actor_critic.actor_critic import ActorCriticAgent
+from gym_idsgame.agents.training_agents.policy_gradient.ppo.ppo import PPOAgent
 from gym_idsgame.agents.training_agents.train_agent import TrainAgent
 from gym_idsgame.agents.bot_agents.bot_agent import BotAgent
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
@@ -81,6 +82,8 @@ class Runner:
             attacker = ReinforceAgent(env, config.pg_agent_config)
         elif config.attacker_type == AgentType.ACTOR_CRITIC_AGENT.value:
             attacker = ActorCriticAgent(env, config.pg_agent_config)
+        elif config.attacker_type == AgentType.PPO_AGENT.value:
+            attacker = PPOAgent(env, config.pg_agent_config)
         else:
             raise AssertionError("Attacker train agent type not recognized: {}".format(config.attacker_type))
         attacker.train()
@@ -110,6 +113,8 @@ class Runner:
             defender = ReinforceAgent(env, config.pg_agent_config)
         elif config.defender_type == AgentType.ACTOR_CRITIC_AGENT.value:
             defender = ActorCriticAgent(env, config.pg_agent_config)
+        elif config.defender_type == AgentType.PPO_AGENT.value:
+            defender =  PPOAgent(env, config.pg_agent_config)
         else:
             raise AssertionError("Defender train agent type not recognized: {}".format(config.defender_type))
         defender.train()
@@ -141,6 +146,8 @@ class Runner:
             agent = ReinforceAgent(env, config.pg_agent_config)
         elif config.attacker_type == AgentType.ACTOR_CRITIC_AGENT.value:
             agent = ActorCriticAgent(env, config.pg_agent_config)
+        elif config.attacker_type == AgentType.PPO_AGENT.value:
+            agent = PPOAgent(env, config.pg_agent_config)
         else:
             raise AssertionError("Train agent type not recognized: {}".format(config.attacker_type))
         agent.train()

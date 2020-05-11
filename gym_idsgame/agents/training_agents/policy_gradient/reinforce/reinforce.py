@@ -12,7 +12,7 @@ from gym_idsgame.envs.rendering.video.idsgame_monitor import IdsGameMonitor
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
 from gym_idsgame.envs.constants import constants
-from gym_idsgame.agents.training_agents.policy_gradient.reinforce.model import FeedForwardNNWithSoftmax
+from gym_idsgame.agents.training_agents.models.fnn_w_softmax import FNNwithSoftmax
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent import PolicyGradientAgent
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
 
@@ -48,14 +48,14 @@ class ReinforceAgent(PolicyGradientAgent):
         """
 
         # Initialize models
-        self.attacker_policy_network = FeedForwardNNWithSoftmax(self.config.input_dim, self.config.output_dim_attacker,
-                                                     self.config.hidden_dim,
-                                                     num_hidden_layers=self.config.num_hidden_layers,
-                                                     hidden_activation=self.config.hidden_activation)
-        self.defender_policy_network = FeedForwardNNWithSoftmax(self.config.input_dim, self.config.output_dim_defender,
-                                                     self.config.hidden_dim,
-                                                     num_hidden_layers=self.config.num_hidden_layers,
-                                                     hidden_activation=self.config.hidden_activation)
+        self.attacker_policy_network = FNNwithSoftmax(self.config.input_dim, self.config.output_dim_attacker,
+                                                      self.config.hidden_dim,
+                                                      num_hidden_layers=self.config.num_hidden_layers,
+                                                      hidden_activation=self.config.hidden_activation)
+        self.defender_policy_network = FNNwithSoftmax(self.config.input_dim, self.config.output_dim_defender,
+                                                      self.config.hidden_dim,
+                                                      num_hidden_layers=self.config.num_hidden_layers,
+                                                      hidden_activation=self.config.hidden_activation)
 
         # Specify device
         if torch.cuda.is_available() and self.config.gpu:

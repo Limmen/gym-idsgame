@@ -3,7 +3,7 @@ A FNN model defined in PyTorch
 """
 import torch
 
-class FeedForwardNN(torch.nn.Module):
+class FNNwithLinear(torch.nn.Module):
     """
     Implements a FNN with parameterizable number of layers, dimensions, and hidden activations.
 
@@ -20,7 +20,7 @@ class FeedForwardNN(torch.nn.Module):
         :param num_hidden_layers: the number of hidden layers
         :param hidden_activation: hidden activation type
         """
-        super(FeedForwardNN, self).__init__()
+        super(FNNwithLinear, self).__init__()
 
         self.input_dim = input_dim
         self.output_dim = output_dim
@@ -94,7 +94,7 @@ def test() -> None:
     batch_size = 64
 
     # Create model
-    model = FeedForwardNN(input_dim, output_dim, hidden_dim, num_hidden_layers=2)
+    model = FNNwithLinear(input_dim, output_dim, hidden_dim, num_hidden_layers=2)
 
     # Create random Tensors to hold inputs and outputs
     x = torch.randn(batch_size, input_dim)
