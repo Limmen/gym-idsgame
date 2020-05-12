@@ -59,7 +59,7 @@ class ReinforceAgent(PolicyGradientAgent):
 
         # Specify device
         if torch.cuda.is_available() and self.config.gpu:
-            device = torch.device("cuda:0")
+            device = torch.device("cuda:" + str(self.config.gpu_id))
             self.config.logger.info("Running on the GPU")
         else:
             device = torch.device("cpu")
@@ -169,7 +169,7 @@ class ReinforceAgent(PolicyGradientAgent):
 
         # Move to GPU if using GPU
         if torch.cuda.is_available() and self.config.gpu:
-            device = torch.device("cuda:0")
+            device = torch.device("cuda:" + str(self.config.gpu_id))
             state = state.to(device)
 
         # Calculate legal actions
@@ -190,7 +190,8 @@ class ReinforceAgent(PolicyGradientAgent):
 
         # Set probability of non-legal actions to 0
         action_probs_1 = action_probs.clone()
-        action_probs_1[non_legal_actions] = 0
+        if len(legal_actions) > 0:
+            action_probs_1[non_legal_actions] = 0
 
         # Use torch.distributions package to create a parameterizable probability distribution of the learned policy
         # PG uses a trick to turn the gradient into a stochastic gradient which we can sample from in order to
@@ -322,18 +323,15 @@ class ReinforceAgent(PolicyGradientAgent):
                     self.num_train_hacks_total += 1
                 episode_attacker_rewards.append(episode_attacker_reward)
                 episode_defender_rewards.append(episode_defender_reward)
-                if episode_step > 0:
-                    if self.config.attacker:
-                        episode_avg_attacker_loss.append(episode_attacker_loss / episode_step)
-                    if self.config.defender:
-                        episode_avg_defender_loss.append(episode_defender_loss / episode_step)
-                else:
-                    if self.config.attacker:
-                        episode_avg_attacker_loss.append(episode_attacker_loss)
-                    if self.config.defender:
-                        episode_avg_defender_loss.append(episode_defender_loss)
-
                 episode_steps.append(episode_step)
+
+                # Reset environment for the next episode and update game stats
+                done = False
+                attacker_obs, defender_obs = self.env.reset(update_stats=True)
+                attacker_state = self.update_state(attacker_obs=attacker_obs, defender_obs=defender_obs, state=[],
+                                                   attacker=True)
+                defender_state = self.update_state(defender_obs=defender_obs, attacker_obs=attacker_obs, state=[],
+                                                   attacker=False)
 
             # Perform Batch Policy Gradient updates
             if self.config.attacker:
@@ -343,6 +341,17 @@ class ReinforceAgent(PolicyGradientAgent):
             if self.config.defender:
                 loss = self.training_step(saved_defender_rewards_batch, saved_defender_log_probs_batch, attacker=False)
                 episode_defender_loss += loss.item()
+
+            if iter > 0:
+                if self.config.attacker:
+                    episode_avg_attacker_loss.append(episode_attacker_loss / iter)
+                if self.config.defender:
+                    episode_avg_defender_loss.append(episode_defender_loss / iter)
+            else:
+                if self.config.attacker:
+                    episode_avg_attacker_loss.append(episode_attacker_loss)
+                if self.config.defender:
+                    episode_avg_defender_loss.append(episode_defender_loss)
 
             # Reset batch
             saved_attacker_log_probs_batch = []
@@ -371,9 +380,10 @@ class ReinforceAgent(PolicyGradientAgent):
                 else:
                     self.train_hack_probability = 0.0
                     self.train_cumulative_hack_probability = 0.0
-                self.log_metrics(iter, self.train_result, episode_attacker_rewards, episode_defender_rewards, episode_steps,
-                                 episode_avg_attacker_loss, episode_avg_defender_loss, lr_attacker=lr_attacker,
-                                 lr_defender=lr_defender)
+                self.log_metrics(episode=iter, result=self.train_result, attacker_episode_rewards=episode_attacker_rewards,
+                                 defender_episode_rewards=episode_defender_rewards, episode_steps=episode_steps,
+                                 episode_avg_attacker_loss=episode_avg_attacker_loss, episode_avg_defender_loss=episode_avg_defender_loss,
+                                 eval=False, update_stats=True, lr_attacker=lr_attacker, lr_defender=lr_defender)
 
                 # Log values and gradients of the parameters (histogram summary) to tensorboard
                 if self.config.attacker:
@@ -410,13 +420,6 @@ class ReinforceAgent(PolicyGradientAgent):
                     self.train_result.to_csv(self.config.save_dir + "/" + time_str + "_train_results_checkpoint.csv")
                     self.eval_result.to_csv(self.config.save_dir + "/" + time_str + "_eval_results_checkpoint.csv")
 
-            # Reset environment for the next episode and update game stats
-            done = False
-            attacker_obs, defender_obs = self.env.reset(update_stats=True)
-            attacker_state = self.update_state(attacker_obs=attacker_obs, defender_obs=defender_obs, state=[],
-                                               attacker=True)
-            defender_state = self.update_state(defender_obs=defender_obs, attacker_obs=attacker_obs, state=[],
-                                               attacker=False)
             self.outer_train.update(1)
 
             # Anneal epsilon linearly

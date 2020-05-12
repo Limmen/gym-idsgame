@@ -213,14 +213,70 @@ class PolicyGradientAgent(TrainAgent, ABC):
         :param attacker: boolean flag whether it is attacker or not
         :return: new state
         """
+        if self.config.zero_mean_features:
+            attacker_obs_1 = attacker_obs[:, 0:-1]
+            zero_mean_attacker_features = []
+            for idx, row in enumerate(attacker_obs_1):
+                mean = np.mean(row)
+                if mean != 0:
+                    t = row - mean
+                else:
+                    t = row
+                if np.isnan(t).any():
+                    t = attacker_obs[idx]
+                else:
+                    t = row.tolist()
+                    t.append(attacker_obs[idx][-1])
+                zero_mean_attacker_features.append(t)
+
+            defender_obs_1 = attacker_obs[:, 0:-1]
+            zero_mean_defender_features = []
+            for idx, row in enumerate(defender_obs_1):
+                mean = np.mean(row)
+                if mean != 0:
+                    t = row - mean
+                else:
+                    t = row
+                if np.isnan(row).any():
+                    t = defender_obs[idx]
+                else:
+                    t = row.tolist()
+                    t.append(defender_obs[idx][-1])
+                zero_mean_attacker_features.append(t)
+
+            attacker_obs = np.array(zero_mean_attacker_features)
+            defender_obs = np.array(zero_mean_defender_features)
+
+        # Normalize
+        if self.config.normalize_features:
+            attacker_obs_1 = attacker_obs[:, 0:-1] / np.linalg.norm(attacker_obs[:, 0:-1])
+            normalized_attacker_features = []
+            for idx, row in enumerate(attacker_obs_1):
+                if np.isnan(attacker_obs_1).any():
+                    t = attacker_obs[idx]
+                else:
+                    t = attacker_obs_1.tolist()
+                    t.append(attacker_obs[idx][-1])
+                normalized_attacker_features.append(t)
+
+            defender_obs_1 = defender_obs[:, 0:-1] / np.linalg.norm(defender_obs[:, 0:-1])
+            normalized_defender_features = []
+            for idx, row in enumerate(defender_obs_1):
+                if np.isnan(defender_obs_1).any():
+                    t = defender_obs[idx]
+                else:
+                    t = defender_obs_1.tolist()
+                    t.append(defender_obs[idx][-1])
+                normalized_defender_features.append(t)
+
+            attacker_obs = np.array(normalized_attacker_features)
+            defender_obs = np.array(normalized_defender_features)
+
         if self.env.fully_observed():
             if self.config.merged_ad_features:
                 a_pos = attacker_obs[:, -1]
                 det_values = defender_obs[:, -1]
                 temp = defender_obs[:, 0:-1] - attacker_obs[:, 0:-1]
-                if self.config.normalize_features:
-                    det_values = det_values / np.linalg.norm(det_values)
-                    temp = temp / np.linalg.norm(temp)
                 features = []
                 for idx, row in enumerate(temp):
                     t = row.tolist()
@@ -245,29 +301,6 @@ class PolicyGradientAgent(TrainAgent, ABC):
                 state = np.append(state[1:], np.array([temp]), axis=0)
             return state
         else:
-            if self.config.normalize_features:
-                attacker_obs_1 = attacker_obs[:, 0:-1] / np.linalg.norm(attacker_obs[:, 0:-1])
-                normalized_attacker_features = []
-                for idx, row in enumerate(attacker_obs_1):
-                    if np.isnan(attacker_obs_1).any():
-                        t = attacker_obs[idx]
-                    else:
-                        t = attacker_obs_1.tolist()
-                        t.append(attacker_obs[idx][-1])
-                    normalized_attacker_features.append(t)
-
-                defender_obs_1 = defender_obs[:, 0:-1] / np.linalg.norm(defender_obs[:, 0:-1])
-                normalized_defender_features = []
-                for idx, row in enumerate(defender_obs_1):
-                    if np.isnan(defender_obs_1).any():
-                        t = defender_obs[idx]
-                    else:
-                        t = defender_obs_1.tolist()
-                        t.append(defender_obs[idx][-1])
-                    normalized_defender_features.append(t)
-                attacker_obs = np.array(normalized_attacker_features)
-                defender_obs = np.array(normalized_defender_features)
-
             if self.config.state_length == 1:
                 if attacker:
                     return np.array(attacker_obs)

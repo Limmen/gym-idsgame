@@ -30,7 +30,7 @@ class PolicyGradientAgentConfig:
                  alternating_optimization : bool = False, alternating_period : int = 15000,
                  opponent_pool : bool = False, opponent_pool_config : OpponentPoolConfig = None,
                  normalize_features : bool = False, gpu_id: int = 0, merged_ad_features : bool = False,
-                 optimization_iterations : int = 28, eps_clip : float = 0.2
+                 optimization_iterations : int = 28, eps_clip : float = 0.2, zero_mean_features : bool = False
                  ):
         """
         Initialize environment and hyperparameters
@@ -90,6 +90,7 @@ class PolicyGradientAgentConfig:
                                    should pre preprocessed by subtracting defense values with attack values
         :param optimization_iterations: number of optimization iterations, this correspond to "K" in PPO
         :param eps_clip: clip parameter for PPO
+        :param zero_mean_features: boolean flag whether to zero mean the features
         """
         self.gamma = gamma
         self.alpha_attacker = alpha_attacker
@@ -146,6 +147,7 @@ class PolicyGradientAgentConfig:
         self.merged_ad_features = merged_ad_features
         self.optimization_iterations = optimization_iterations
         self.eps_clip = eps_clip
+        self.zero_mean_features = zero_mean_features
 
 
     def to_str(self) -> str:
@@ -160,7 +162,7 @@ class PolicyGradientAgentConfig:
                "checkpoint_freq:{21},random_seed:{22},eval_epsilon:{23},clip_gradient:{24},max_gradient_norm:{25}," \
                "output_dim_defender:{26},critic_loss_fn:{27},state_length:{28},alternating_optimization:{29}," \
                "alternating_period:{30},normalize_features:{31},alpha_defender:{32},gpu_id:{33}," \
-               "merged_ad_features:{34},optimization_iterations{35},eps_clip:{36}".format(
+               "merged_ad_features:{34},optimization_iterations{35},eps_clip:{36},zero_mean_features:{37}".format(
             self.gamma, self.alpha_attacker, self.epsilon, self.render, self.eval_sleep, self.epsilon_decay,
             self.min_epsilon, self.eval_episodes, self.train_log_frequency, self.eval_log_frequency, self.video,
             self.video_fps, self.video_dir, self.num_episodes, self.eval_render, self.gifs, self.gif_dir,
@@ -168,7 +170,7 @@ class PolicyGradientAgentConfig:
             self.random_seed, self.eval_epsilon, self.clip_gradient, self.max_gradient_norm, self.output_dim_defender,
             self.critic_loss_fn, self.state_length, self.alternating_optimization, self.alternating_period,
             self.normalize_features, self.alpha_defender, self.gpu_id, self.merged_ad_features,
-            self.optimization_iterations, self.eps_clip)
+            self.optimization_iterations, self.eps_clip, self.zero_mean_features)
 
     def to_csv(self, file_path: str) -> None:
         """
@@ -229,6 +231,7 @@ class PolicyGradientAgentConfig:
             writer.writerow(["merged_ad_features", str(self.merged_ad_features)])
             writer.writerow(["optimization_iterations", str(self.optimization_iterations)])
             writer.writerow(["eps_clip", str(self.eps_clip)])
+            writer.writerow(["zero_mean_features", str(self.zero_mean_features)])
             if self.opponent_pool and self.opponent_pool_config is not None:
                 writer.writerow(["pool_maxsize", str(self.opponent_pool_config.pool_maxsize)])
                 writer.writerow(["pool_increment_period", str(self.opponent_pool_config.pool_increment_period)])
@@ -280,6 +283,7 @@ class PolicyGradientAgentConfig:
         hparams["merged_ad_features"] = self.merged_ad_features
         hparams["optimization_iterations"] = self.optimization_iterations
         hparams["eps_clip"] = self.eps_clip
+        hparams["zero_mean_features"] = self.zero_mean_features
         if self.opponent_pool and self.opponent_pool_config is not None:
             hparams["pool_maxsize"] = self.opponent_pool_config.pool_maxsize
             hparams["pool_increment_period"] = self.opponent_pool_config.pool_increment_period
