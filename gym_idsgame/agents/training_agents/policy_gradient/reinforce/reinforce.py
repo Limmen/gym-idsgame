@@ -204,7 +204,17 @@ class ReinforceAgent(PolicyGradientAgent):
         policy_dist = Categorical(action_probs_1)
 
         # Sample an action from the probability distribution
-        action = policy_dist.sample()
+        try:
+            action = policy_dist.sample()
+        except Exception as e:
+            print("Nan values in distribution, consider using a lower learnign rate or gradient clipping")
+            print("legal actions: {}".format(legal_actions))
+            print("non_legal actions: {}".format(non_legal_actions))
+            print("action_probs: {}".format(action_probs))
+            print("action_probs_1: {}".format(action_probs_1))
+            print("state: {}".format(state))
+            print("policy_dist: {}".format(policy_dist))
+            action = 0
 
         # log_prob returns the log of the probability density/mass function evaluated at value.
         # save the log_prob as it will use later on for computing the policy gradient

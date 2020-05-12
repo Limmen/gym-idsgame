@@ -51,7 +51,7 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    pg_agent_config = PolicyGradientAgentConfig(gamma=0.999, alpha_attacker=0.001, alpha_defender=0.001,
+    pg_agent_config = PolicyGradientAgentConfig(gamma=0.999, alpha_attacker=0.0001, alpha_defender=0.0001,
                                                 epsilon=1, render=False, eval_sleep=0.9,
                                                 min_epsilon=0.01, eval_episodes=100, train_log_frequency=100,
                                                 epsilon_decay=0.9999, video=True, eval_log_frequency=1,
@@ -78,7 +78,7 @@ def default_config() -> ClientConfig:
                                  defender_type=AgentType.REINFORCE_AGENT.value,
                                  mode=RunnerMode.TRAIN_DEFENDER_AND_ATTACKER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),
-                                 title="TrainingREINFORCEAgent vs TrainingREINFORCEAgent",
+                                 title="REINFORCE vs REINFORCE",
                                  run_many=False, random_seeds=[0, 999, 299, 399, 499])
     #client_config = hp_tuning_config(client_config)
     return client_config

@@ -58,9 +58,10 @@ def default_config() -> ClientConfig:
                                                 num_episodes=2200001,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
-                                                eval_frequency=500, attacker=True, defender=False, video_frequency=101,
+                                                eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=5000, input_dim_attacker=(4 + 2) * 3, output_dim_attacker=4 * 3,
+                                                checkpoint_freq=5000, input_dim_attacker=(4 + 3) * 2,
+                                                output_dim_attacker=4 * 2,
                                                 hidden_dim=32,
                                                 num_hidden_layers=1, batch_size=8,
                                                 gpu=True, tensorboard=True,
@@ -72,7 +73,7 @@ def default_config() -> ClientConfig:
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.REINFORCE_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),
-                                 title="TrainingREINFORCEAgent vs DefendMinimalDefender",
+                                 title="REINFORCE vs DefendMinimalDefender",
                                  run_many=False, random_seeds=[0, 999, 299, 399, 499])
     client_config = hp_tuning_config(client_config)
     return client_config
