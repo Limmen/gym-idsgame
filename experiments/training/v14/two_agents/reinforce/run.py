@@ -59,7 +59,7 @@ def default_config() -> ClientConfig:
                                                 num_episodes=450001,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
-                                                eval_frequency=500, attacker=True, defender=True, video_frequency=101,
+                                                eval_frequency=1000, attacker=True, defender=True, video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
                                                 checkpoint_freq=5000, input_dim_attacker=(4 + 3) * 2,
                                                 input_dim_defender=(4+2)*3,
