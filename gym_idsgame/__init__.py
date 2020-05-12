@@ -888,7 +888,8 @@ register(
 # [Rewards] Dense
 # [Version] 14
 # [Observations] fully observed
-# [Environment] Deterministic
+# [Environment] Random
+# [Local View] Yes
 register(
     id='idsgame-random_defense-v14',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV14Env',
@@ -900,7 +901,8 @@ register(
 # [Rewards] Dense
 # [Version] 14
 # [Observations] fully observed
-# [Environment] Deterministic
+# [Environment] Random
+# [Local View] Yes
 register(
     id='idsgame-minimal_defense-v14',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV14Env',
@@ -912,7 +914,8 @@ register(
 # [Rewards] Dense
 # [Version] 14
 # [Observations] fully observed
-# [Environment] Deterministic
+# [Environment] Random
+# [Local View] Yes
 register(
     id='idsgame-random_attack-v14',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV14Env',
@@ -924,7 +927,8 @@ register(
 # [Rewards] Dense
 # [Version] 14
 # [Observations] fully observed
-# [Environment] Deterministic
+# [Environment] Random
+# [Local View] Yes
 register(
     id='idsgame-maximal_attack-v14',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV14Env',
@@ -936,9 +940,77 @@ register(
 # [Rewards] Dense
 # [Version] 14
 # [Observations] fully observed
-# [Environment] Deterministic
+# [Environment] Random
+# [Local View] Yes
 register(
     id='idsgame-v14',
     entry_point='gym_idsgame.envs:IdsGameV14Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# -------- Version 15 ------------
+
+# [AttackEnv] 1 layer, 1 server per layer, 4 attack-defense-values
+# [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 15
+# [Observations] fully observed
+# [Environment] Random
+# [Local View] Yes
+register(
+    id='idsgame-random_defense-v15',
+    entry_point='gym_idsgame.envs:IdsGameRandomDefenseV15Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [AttackEnv] 1 layer, 1 server per layer, 4 attack-defense-values
+# [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 15
+# [Observations] fully observed
+# [Environment] Random
+# [Local View] Yes
+register(
+    id='idsgame-minimal_defense-v15',
+    entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV15Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [DefenseEnv] 1 layer, 1 server per layer, 4 attack-defense-values
+# [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 15
+# [Observations] fully observed
+# [Environment] Random
+# [Local View] Yes
+register(
+    id='idsgame-random_attack-v15',
+    entry_point='gym_idsgame.envs:IdsGameRandomAttackV15Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [DefenseEnv] 1 layer, 1 server per layer, 4 attack-defense-values
+# [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 15
+# [Observations] fully observed
+# [Environment] Random
+# [Local View] Yes
+register(
+    id='idsgame-maximal_attack-v15',
+    entry_point='gym_idsgame.envs:IdsGameMaximalAttackV15Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [AttackDefenseEnv] 1 layer, 1 server per layer, 4 attack-defense-values
+# [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 15
+# [Observations] fully observed
+# [Environment] Random
+# [Local View] Yes
+register(
+    id='idsgame-v15',
+    entry_point='gym_idsgame.envs:IdsGameV15Env',
     kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
 )

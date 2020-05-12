@@ -60,8 +60,8 @@ def default_config() -> ClientConfig:
                                                 gif_dir=default_output_dir() + "/results/gifs",
                                                 eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=5000, input_dim_attacker=(4 + 3) * 2,
-                                                output_dim_attacker=4 * 2,
+                                                checkpoint_freq=5000, input_dim_attacker=(10 + 3) * 2,
+                                                output_dim_attacker=10 * 2,
                                                 hidden_dim=32,
                                                 num_hidden_layers=1, batch_size=8,
                                                 gpu=True, tensorboard=True,
@@ -69,7 +69,7 @@ def default_config() -> ClientConfig:
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
                                                 state_length=1, normalize_features=False, merged_ad_features=True,
                                                 zero_mean_features=False, gpu_id=0)
-    env_name = "idsgame-minimal_defense-v14"
+    env_name = "idsgame-minimal_defense-v15"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.REINFORCE_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),
@@ -140,7 +140,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir, random_seed)
-    logger = util.setup_logger("reinforce_vs_minimal_defense-v14", config.output_dir + "/results/logs/" +
+    logger = util.setup_logger("reinforce_vs_minimal_defense-v15", config.output_dir + "/results/logs/" +
                                str(random_seed) + "/",
                                time_str=time_str)
     config.pg_agent_config.save_dir = default_output_dir() + "/results/data/" + str(random_seed) + "/"
