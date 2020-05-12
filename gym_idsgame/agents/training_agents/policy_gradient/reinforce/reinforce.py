@@ -157,7 +157,8 @@ class ReinforceAgent(PolicyGradientAgent):
         return policy_loss
 
 
-    def get_action(self, state: np.ndarray, attacker : bool = True) -> Union[int, torch.Tensor]:
+    def get_action(self, state: np.ndarray, attacker : bool = True, legal_actions : List = None,
+                   non_legal_actions : List = None) -> Union[int, torch.Tensor]:
         """
         Samples an action from the policy network
 
@@ -175,8 +176,9 @@ class ReinforceAgent(PolicyGradientAgent):
         # Calculate legal actions
         if attacker:
             actions = list(range(self.env.num_attack_actions))
-            legal_actions = list(filter(lambda action: self.env.is_attack_legal(action), actions))
-            non_legal_actions = list(filter(lambda action: not self.env.is_attack_legal(action), actions))
+            if not self.env.local_view_features():
+                legal_actions = list(filter(lambda action: self.env.is_attack_legal(action), actions))
+                non_legal_actions = list(filter(lambda action: not self.env.is_attack_legal(action), actions))
         else:
             actions = list(range(self.env.num_defense_actions))
             legal_actions = list(filter(lambda action: self.env.is_defense_legal(action), actions))
@@ -225,7 +227,6 @@ class ReinforceAgent(PolicyGradientAgent):
         done = False
         obs = self.env.reset(update_stats=False)
         attacker_obs, defender_obs = obs
-
         attacker_state = self.update_state(attacker_obs=attacker_obs, defender_obs=defender_obs, state=[],
                                            attacker=True)
         defender_state = self.update_state(defender_obs=defender_obs, attacker_obs=attacker_obs, state=[],
@@ -275,7 +276,16 @@ class ReinforceAgent(PolicyGradientAgent):
 
                     # Get attacker and defender actions
                     if self.config.attacker:
-                        attacker_action, attacker_log_prob = self.get_action(attacker_state, attacker=True)
+                        #print("attacker state:{}".format(attacker_state))
+                        legal_actions = None
+                        illegal_actions = None
+                        if self.env.local_view_features():
+                            legal_actions, illegal_actions = self.get_legal_attacker_actions(attacker_obs)
+                        attacker_action, attacker_log_prob = self.get_action(attacker_state, attacker=True,
+                                                                             legal_actions=legal_actions,
+                                                                             non_legal_actions=illegal_actions)
+                        if self.env.local_view_features():
+                            attacker_action = self.convert_local_attacker_action_to_global(attacker_action, attacker_obs)
                         saved_attacker_log_probs.append(attacker_log_prob)
                     if self.config.defender:
                         defender_action, defender_log_prob= self.get_action(defender_state, attacker=False)
@@ -505,7 +515,14 @@ class ReinforceAgent(PolicyGradientAgent):
 
                 # Get attacker and defender actions
                 if self.config.attacker:
-                    attacker_action, _ = self.get_action(attacker_state, attacker=True)
+                    legal_actions = None
+                    illegal_actions = None
+                    if self.env.local_view_features():
+                        legal_actions, illegal_actions = self.get_legal_attacker_actions(attacker_obs)
+                    attacker_action, _ = self.get_action(attacker_state, attacker=True,
+                                                         legal_actions=legal_actions, non_legal_actions=illegal_actions)
+                    if self.env.local_view_features():
+                        attacker_action = self.convert_local_attacker_action_to_global(attacker_action, attacker_obs)
                 if self.config.defender:
                     defender_action, _ = self.get_action(defender_state, attacker=False)
                 action = (attacker_action, defender_action)

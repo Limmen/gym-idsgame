@@ -213,8 +213,13 @@ class PolicyGradientAgent(TrainAgent, ABC):
         :param attacker: boolean flag whether it is attacker or not
         :return: new state
         """
+
+        # Zero mean
         if self.config.zero_mean_features:
-            attacker_obs_1 = attacker_obs[:, 0:-1]
+            if not self.env.local_view_features():
+                attacker_obs_1 = attacker_obs[:, 0:-1]
+            else:
+                attacker_obs_1 = attacker_obs[:, 0:-2]
             zero_mean_attacker_features = []
             for idx, row in enumerate(attacker_obs_1):
                 mean = np.mean(row)
@@ -225,11 +230,15 @@ class PolicyGradientAgent(TrainAgent, ABC):
                 if np.isnan(t).any():
                     t = attacker_obs[idx]
                 else:
-                    t = row.tolist()
-                    t.append(attacker_obs[idx][-1])
+                    t = t.tolist()
+                    if not self.env.local_view_features():
+                        t.append(attacker_obs[idx][-1])
+                    else:
+                        t.append(attacker_obs[idx][-2])
+                        t.append(attacker_obs[idx][-1])
                 zero_mean_attacker_features.append(t)
 
-            defender_obs_1 = attacker_obs[:, 0:-1]
+            defender_obs_1 = defender_obs[:, 0:-1]
             zero_mean_defender_features = []
             for idx, row in enumerate(defender_obs_1):
                 mean = np.mean(row)
@@ -237,26 +246,33 @@ class PolicyGradientAgent(TrainAgent, ABC):
                     t = row - mean
                 else:
                     t = row
-                if np.isnan(row).any():
+                if np.isnan(t).any():
                     t = defender_obs[idx]
                 else:
-                    t = row.tolist()
+                    t = t.tolist()
                     t.append(defender_obs[idx][-1])
-                zero_mean_attacker_features.append(t)
+                zero_mean_defender_features.append(t)
 
             attacker_obs = np.array(zero_mean_attacker_features)
             defender_obs = np.array(zero_mean_defender_features)
 
         # Normalize
         if self.config.normalize_features:
-            attacker_obs_1 = attacker_obs[:, 0:-1] / np.linalg.norm(attacker_obs[:, 0:-1])
+            if not self.env.local_view_features():
+                attacker_obs_1 = attacker_obs[:, 0:-1] / np.linalg.norm(attacker_obs[:, 0:-1])
+            else:
+                attacker_obs_1 = attacker_obs[:, 0:-2] / np.linalg.norm(attacker_obs[:, 0:-2])
             normalized_attacker_features = []
             for idx, row in enumerate(attacker_obs_1):
                 if np.isnan(attacker_obs_1).any():
                     t = attacker_obs[idx]
                 else:
                     t = attacker_obs_1.tolist()
-                    t.append(attacker_obs[idx][-1])
+                    if not self.env.local_view_features():
+                        t.append(attacker_obs[idx][-1])
+                    else:
+                        t.append(attacker_obs[idx][-2])
+                        t.append(attacker_obs[idx][-1])
                 normalized_attacker_features.append(t)
 
             defender_obs_1 = defender_obs[:, 0:-1] / np.linalg.norm(defender_obs[:, 0:-1])
@@ -267,22 +283,43 @@ class PolicyGradientAgent(TrainAgent, ABC):
                 else:
                     t = defender_obs_1.tolist()
                     t.append(defender_obs[idx][-1])
+
                 normalized_defender_features.append(t)
 
             attacker_obs = np.array(normalized_attacker_features)
             defender_obs = np.array(normalized_defender_features)
 
+        if self.env.local_view_features():
+            neighbor_defense_attributes = np.zeros((attacker_obs.shape[0], defender_obs.shape[1]))
+            for node in range(attacker_obs.shape[0]):
+                if int(attacker_obs[node][-1]) == 1:
+                    id = int(attacker_obs[node][-2])
+                    neighbor_defense_attributes[node] = defender_obs[id]
+
         if self.env.fully_observed():
             if self.config.merged_ad_features:
-                a_pos = attacker_obs[:, -1]
-                det_values = defender_obs[:, -1]
-                temp = defender_obs[:, 0:-1] - attacker_obs[:, 0:-1]
-                features = []
-                for idx, row in enumerate(temp):
-                    t = row.tolist()
-                    t.append(a_pos[idx])
-                    t.append(det_values[idx])
-                    features.append(t)
+                if not self.env.local_view_features():
+                    a_pos = attacker_obs[:, -1]
+                    det_values = defender_obs[:, -1]
+                    temp = defender_obs[:, 0:-1] - attacker_obs[:, 0:-1]
+                    features = []
+                    for idx, row in enumerate(temp):
+                        t = row.tolist()
+                        t.append(a_pos[idx])
+                        t.append(det_values[idx])
+                        features.append(t)
+                else:
+                    node_ids = attacker_obs[:, -2]
+                    node_reachable = attacker_obs[:, -1]
+                    det_values = neighbor_defense_attributes[:, -1]
+                    temp = neighbor_defense_attributes[:, 0:-1] - attacker_obs[:, 2:]
+                    features = []
+                    for idx, row in enumerate(temp):
+                        t = row.tolist()
+                        t.append(node_ids[idx])
+                        t.append(node_reachable[idx])
+                        t.append(det_values[idx])
+                        features.append(t)
                 features = np.array(features)
                 if self.config.state_length == 1:
                     return features
@@ -292,12 +329,21 @@ class PolicyGradientAgent(TrainAgent, ABC):
                 state = np.append(state[1:], np.array([features]), axis=0)
             else:
                 if self.config.state_length == 1:
-                    return np.append(attacker_obs, defender_obs)
+                    if not self.env.local_view_features():
+                        return np.append(attacker_obs, defender_obs)
+                    else:
+                        return np.append(attacker_obs, neighbor_defense_attributes)
                 if len(state) == 0:
-                    temp = np.append(attacker_obs, defender_obs)
+                    if not self.env.local_view_features():
+                        temp = np.append(attacker_obs, defender_obs)
+                    else:
+                        temp = np.append(attacker_obs, neighbor_defense_attributes)
                     s = np.array([temp] * self.config.state_length)
                     return s
-                temp = np.append(attacker_obs, defender_obs)
+                if not self.env.local_view_features():
+                    temp = np.append(attacker_obs, defender_obs)
+                else:
+                    temp = np.append(attacker_obs, neighbor_defense_attributes)
                 state = np.append(state[1:], np.array([temp]), axis=0)
             return state
         else:
@@ -316,6 +362,27 @@ class PolicyGradientAgent(TrainAgent, ABC):
             else:
                 state = np.append(state[1:], np.array([defender_obs]), axis=0)
             return state
+
+    def get_legal_attacker_actions(self, attacker_obs):
+        legal_actions = []
+        illegal_actions = []
+        num_attack_types = attacker_obs[:,0:-2].shape[1]
+        for i in range(len(attacker_obs)):
+            if int(attacker_obs[i][-1]) == 1:
+                for ac in range(num_attack_types):
+                    legal_actions.append(i*num_attack_types + ac)
+            else:
+                for ac in range(num_attack_types):
+                    illegal_actions.append(i * num_attack_types + ac)
+        return legal_actions, illegal_actions
+
+    def convert_local_attacker_action_to_global(self, action_id, attacker_obs):
+        num_attack_types = attacker_obs[:, 0:-2].shape[1]
+        neighbor = action_id // num_attack_types
+        attack_type = action_id % num_attack_types
+        target_id = int(attacker_obs[neighbor][-2])
+        attacker_action = target_id * num_attack_types + attack_type
+        return attacker_action
 
     @abstractmethod
     def get_action(self, s, eval=False, attacker=True) -> int:

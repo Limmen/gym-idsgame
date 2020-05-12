@@ -399,7 +399,8 @@ class IdsGameEnv(gym.Env, ABC):
 
         :return: (attacker_obs, defender_obs)
         """
-        attacker_obs = self.state.get_attacker_observation(self.idsgame_config.game_config.network_config)
+        attacker_obs = self.state.get_attacker_observation(self.idsgame_config.game_config.network_config,
+                                                           local_view=self.idsgame_config.local_view_observations)
         defender_obs = self.state.get_defender_observation(self.idsgame_config.game_config.network_config)
         return attacker_obs, defender_obs
 
@@ -410,6 +411,14 @@ class IdsGameEnv(gym.Env, ABC):
         :return: True if the environment is fully observed, otherwise false
         """
         return self.idsgame_config.game_config.network_config.fully_observed
+
+    def local_view_features(self) -> bool:
+        """
+        Boolean function to check whether the environment uses local view observations of the attacker
+
+        :return: True if the environment uses local view observations
+        """
+        return self.idsgame_config.local_view_observations
 
     @abstractmethod
     def get_attacker_action(self, action) -> Union[int, Union[int, int], int]:
@@ -2739,11 +2748,13 @@ class IdsGameMinimalDefenseV14Env(AttackerEnv):
                                           vulnerability_val=0, num_vulnerabilities_per_layer=1)
             game_config.dense_rewards = True
             game_config.network_config.fully_observed = True
+            game_config.network_config.relative_neighbor_positions = [(-1, 0), (1, 0)]
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             defender_agent = DefendMinimalValueBotAgent(game_config)
             idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
             idsgame_config.render_config.caption = "idsgame-minimal_defense-v14"
+            idsgame_config.local_view_observations=True
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
 
 

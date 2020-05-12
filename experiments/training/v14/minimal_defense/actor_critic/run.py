@@ -8,6 +8,7 @@ from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.config.hp_tuning_config import HpTuningConfig
 from gym_idsgame.runnner import Runner
+from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from experiments.util import plotting_util, util, hp_tuning
 
 
@@ -60,7 +61,7 @@ def default_config() -> ClientConfig:
                                                 gif_dir=default_output_dir() + "/results/gifs",
                                                 eval_frequency=10000, attacker=True, defender=False, video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=15000, input_dim=(4+1)*3*2, output_dim_attacker=4*3,
+                                                checkpoint_freq=15000, input_dim=(4+1)*2*2, output_dim_attacker=4*3,
                                                 hidden_dim=36,
                                                 num_hidden_layers=1, batch_size=16,
                                                 gpu=False, tensorboard=True,

@@ -276,12 +276,13 @@ class GameState():
         """
         return np.random.rand() < self.defense_det[node_id] / 10
 
-    def get_attacker_observation(self, network_config: NetworkConfig) -> np.ndarray:
+    def get_attacker_observation(self, network_config: NetworkConfig, local_view=False) -> np.ndarray:
         """
         Converts the state of the dynamical system into an observation for the attacker. As the environment
         is a partially observed markov decision process, the attacker observation is only a subset of the game state
 
         :param network_config: the network configuration of the game
+        :param local_view: boolean flag indicating whether observations are provided in a local view or not
         :return: An observation of the environment
         """
         # +1 to have an extra feature that indicates if this is the node that the attacker is currently in
@@ -291,16 +292,42 @@ class GameState():
         current_row, current_col = current_pos
         current_adjacency_matrix_id = network_config.get_adjacency_matrix_id(current_row, current_col)
 
+        if local_view:
+            neighbors = []
+
         for node_id in range(len(network_config.node_list)):
             pos = network_config.get_node_pos(node_id)
             node_row, node_col = pos
             node_adjacency_matrix_id = network_config.get_adjacency_matrix_id(node_row, node_col)
-            if node_id == current_node_id:
-                attack_observation[node_id] = np.append(self.attack_values[node_id], 1)
-            elif network_config.fully_observed:
-                attack_observation[node_id] = np.append(self.attack_values[node_id], 0)
-            elif network_config.adjacency_matrix[current_adjacency_matrix_id][node_adjacency_matrix_id]:
-                attack_observation[node_id] = np.append(self.attack_values[node_id], 0)
+            if local_view:
+                if network_config.adjacency_matrix[current_adjacency_matrix_id][node_adjacency_matrix_id] \
+                        and node_id != current_node_id:
+                    neighbor_data = np.append(self.attack_values[node_id], node_id)
+                    neighbor_row, neighbor_col = network_config.get_node_pos(node_id)
+                    neighbors.append((neighbor_row, neighbor_col, neighbor_data))
+            else:
+                if node_id == current_node_id:
+                    attack_observation[node_id] = np.append(self.attack_values[node_id], 1)
+                elif network_config.fully_observed:
+                    attack_observation[node_id] = np.append(self.attack_values[node_id], 0)
+                elif network_config.adjacency_matrix[current_adjacency_matrix_id][node_adjacency_matrix_id]:
+                    attack_observation[node_id] = np.append(self.attack_values[node_id], 0)
+
+        if local_view:
+            # sort by row then col
+            sorted_neighbors = sorted(neighbors, key=lambda x: (x[0], x[1]))
+            neighbor_data = np.array(list(map(lambda x: x[2], sorted_neighbors)))
+            neighbor_ids = neighbor_data[:,-1]
+            local_view_obs = np.zeros((network_config.max_neighbors, self.attack_values.shape[1] + 2))
+            for n in range(network_config.max_neighbors):
+                rel_neighbor_pos = network_config.relative_neighbor_positions[n]
+                neighbor_pos = (current_row + rel_neighbor_pos[0], current_col + rel_neighbor_pos[1])
+                for i in range(len(neighbor_ids)):
+                    node_id = neighbor_ids[i]
+                    node_pos = network_config.get_node_pos(node_id)
+                    if node_pos == neighbor_pos and node_pos[0] <= current_row:
+                        local_view_obs[n] = np.append(neighbor_data[i], 1)
+            attack_observation = np.array(local_view_obs)
         return attack_observation
 
     def get_attacker_node_from_observation(self, observation: np.ndarray) -> int:

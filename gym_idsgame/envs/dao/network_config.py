@@ -9,7 +9,8 @@ class NetworkConfig:
     """
     DTO with configuration of the network for the game, i.e. the servers and their connectivity
     """
-    def __init__(self, num_rows: int, num_cols: int, connected_layers : bool = False, fully_observed = False):
+    def __init__(self, num_rows: int, num_cols: int, connected_layers : bool = False, fully_observed = False,
+                 relative_neighbor_positions : List = None):
         """
         Constructor
 
@@ -18,6 +19,7 @@ class NetworkConfig:
         :param connected_layers: whether layers are connected with horizontal links or not
         :param fully_observed: boolean flag that indicates whether the environment
                               is fully observed or not (by default the environment is partially observed)
+        :param relative_neighbor_positions: max num neighbors and their positions
         """
         self.num_rows = num_rows
         self.num_cols = num_cols
@@ -25,6 +27,15 @@ class NetworkConfig:
         self.graph_layout = self.__default_graph_layout()
         self.adjacency_matrix = self.__default_adjacency_matrix()
         self.fully_observed = fully_observed
+        self.max_neighbors = self.__max_num_neighbors()
+        self.relative_neighbor_positions = relative_neighbor_positions
+
+    def __max_num_neighbors(self):
+        max_neighbors = 0
+        for node in range(len(self.node_list)):
+            num_neighbors = self.adjacency_matrix[node].sum()
+            max_neighbors = max(max_neighbors, num_neighbors)
+        return max_neighbors
 
     def __default_graph_layout(self) -> np.ndarray:
         """
