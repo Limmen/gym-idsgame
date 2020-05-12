@@ -60,7 +60,7 @@ def default_config() -> ClientConfig:
                                                 gif_dir=default_output_dir() + "/results/gifs",
                                                 eval_frequency=10000, attacker=True, defender=False, video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=15000, input_dim=(4+1)*3*2, output_dim_attacker=4*3,
+                                                checkpoint_freq=15000, input_dim_attacker=(4 + 1) * 3 * 2, output_dim_attacker=4 * 3,
                                                 hidden_dim=36,
                                                 num_hidden_layers=1, batch_size=1,
                                                 gpu=False, tensorboard=True,

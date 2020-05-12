@@ -56,11 +56,11 @@ class ActorCriticAgent(PolicyGradientAgent):
         """
 
         # Initialize models
-        self.attacker_policy_network = FFNActorCritic(self.config.input_dim, self.config.output_dim_attacker,
+        self.attacker_policy_network = FFNActorCritic(self.config.input_dim_attacker, self.config.output_dim_attacker,
                                                       self.config.hidden_dim,
                                                       num_hidden_layers=self.config.num_hidden_layers,
                                                       hidden_activation=self.config.hidden_activation)
-        self.defender_policy_network = FFNActorCritic(self.config.input_dim, self.config.output_dim_defender,
+        self.defender_policy_network = FFNActorCritic(self.config.input_dim_defender, self.config.output_dim_defender,
                                                       self.config.hidden_dim,
                                                       num_hidden_layers=self.config.num_hidden_layers,
                                                       hidden_activation=self.config.hidden_activation)
@@ -267,13 +267,16 @@ class ActorCriticAgent(PolicyGradientAgent):
         return loss
 
 
-    def get_action(self, state: np.ndarray, attacker : bool = True, opponent_pool = False) -> Union[int, torch.Tensor, torch.Tensor, np.ndarray]:
+    def get_action(self, state: np.ndarray, attacker : bool = True, opponent_pool = False,
+                   legal_actions: List = None, non_legal_actions: List = None) -> Union[int, torch.Tensor, torch.Tensor, np.ndarray]:
         """
         Samples an action from the policy network
 
         :param state: the state to sample an action for
         :param attacker: boolean flag whether running in attacker mode (if false assume defender)
         :param opponent_pool: boolean flag, if true get model from opponent pool
+        :param legal_actions: list of allowed actions
+        :param non_legal_actions: list of disallowed actions
         :return: The sampled action id, log probability of action id, state value, action distribution
         """
         state = torch.from_numpy(state.flatten()).float()
@@ -286,8 +289,9 @@ class ActorCriticAgent(PolicyGradientAgent):
         # Calculate legal actions
         if attacker:
             actions = list(range(self.env.num_attack_actions))
-            legal_actions = list(filter(lambda action: self.env.is_attack_legal(action), actions))
-            non_legal_actions = list(filter(lambda action: not self.env.is_attack_legal(action), actions))
+            if not self.env.local_view_features() or (legal_actions is None or non_legal_actions is None):
+                legal_actions = list(filter(lambda action: self.env.is_attack_legal(action), actions))
+                non_legal_actions = list(filter(lambda action: not self.env.is_attack_legal(action), actions))
         else:
             actions = list(range(self.env.num_defense_actions))
             legal_actions = list(filter(lambda action: self.env.is_defense_legal(action), actions))
@@ -392,7 +396,6 @@ class ActorCriticAgent(PolicyGradientAgent):
         attacker_initial_state_action_dist = np.zeros(self.config.output_dim_attacker)
         defender_initial_state_action_dist = np.zeros(self.config.output_dim_defender)
 
-        num_batch_episode = 0
         saved_attacker_log_probs_batch = []
         saved_attacker_rewards_batch = []
         saved_attacker_state_values_batch = []
@@ -400,165 +403,226 @@ class ActorCriticAgent(PolicyGradientAgent):
         saved_defender_rewards_batch = []
         saved_defender_state_values_batch = []
 
-        total_num_batches = 0
+        total_num_episodes = 0
 
         # Training
-        for episode in range(self.config.num_episodes):
-            episode_attacker_reward = 0
-            episode_defender_reward = 0
-            episode_step = 0
-            episode_attacker_loss = 0.0
-            episode_defender_loss = 0.0
-            saved_attacker_log_probs = []
-            saved_attacker_rewards = []
-            saved_attacker_state_values = []
-            saved_defender_log_probs = []
-            saved_defender_rewards = []
-            saved_defender_state_values = []
-            while not done:
+        for iter in range(self.config.num_episodes):
+
+            # Batch
+            for episode in range(self.config.batch_size):
+                episode_attacker_reward = 0
+                episode_defender_reward = 0
+                episode_step = 0
+                episode_attacker_loss = 0.0
+                episode_defender_loss = 0.0
+                saved_attacker_log_probs = []
+                saved_attacker_rewards = []
+                saved_attacker_state_values = []
+                saved_defender_log_probs = []
+                saved_defender_rewards = []
+                saved_defender_state_values = []
+                while not done:
+                    if self.config.render:
+                        self.env.render(mode="human")
+
+                    if not self.config.attacker and not self.config.defender:
+                        raise AssertionError("Must specify whether training an attacker agent or defender agent")
+
+                    # Default initialization
+                    attacker_action = 0
+                    defender_action = 0
+
+                    # Get attacker and defender actions
+                    if self.config.attacker:
+                        legal_actions = None
+                        illegal_actions = None
+                        if self.env.local_view_features():
+                            legal_actions, illegal_actions = self.get_legal_attacker_actions(attacker_obs)
+                        if self.config.alternating_optimization and not train_attacker \
+                                and self.config.opponent_pool and self.config.opponent_pool_config is not None:
+                            attacker_action, attacker_log_prob, attacker_state_value, attacker_action_dist = self.get_action(
+                                attacker_state, attacker=True, opponent_pool=True, legal_actions=legal_actions,
+                                non_legal_actions=illegal_actions)
+                        else:
+                            attacker_action, attacker_log_prob, attacker_state_value, attacker_action_dist = \
+                                self.get_action(attacker_state, attacker=True, opponent_pool=False,
+                                                legal_actions=legal_actions, non_legal_actions=illegal_actions)
+                        if self.env.local_view_features():
+                            attacker_action = self.convert_local_attacker_action_to_global(attacker_action, attacker_obs)
+                        saved_attacker_log_probs.append(attacker_log_prob)
+                        saved_attacker_state_values.append(attacker_state_value)
+                        if episode_step == 0:
+                            attacker_initial_state_action_dist = attacker_action_dist
+
+                    if self.config.defender:
+                        if self.config.alternating_optimization and not train_defender \
+                                and self.config.opponent_pool and self.config.opponent_pool_config is not None:
+                            defender_action, defender_log_prob, defender_state_value, defender_action_dist = self.get_action(
+                                defender_state, attacker=False, opponent_pool=True)
+                        else:
+                            defender_action, defender_log_prob, defender_state_value, defender_action_dist = \
+                                self.get_action(defender_state, attacker=False, opponent_pool=False)
+                        saved_defender_log_probs.append(defender_log_prob)
+                        saved_defender_state_values.append(defender_state_value)
+                        if episode_step == 0:
+                            defender_initial_state_action_dist = defender_action_dist
+
+                    action = (attacker_action, defender_action)
+
+                    # Take a step in the environment
+                    obs_prime, reward, done, _ = self.env.step(action)
+
+                    # Update metrics
+                    attacker_reward, defender_reward = reward
+                    obs_prime_attacker, obs_prime_defender = obs_prime
+                    episode_attacker_reward += attacker_reward
+                    saved_attacker_rewards.append(attacker_reward)
+                    episode_defender_reward += defender_reward
+                    saved_defender_rewards.append(defender_reward)
+                    episode_step += 1
+
+                    # Move to the next state
+                    obs = obs_prime
+                    attacker_obs = obs_prime_attacker
+                    defender_obs = obs_prime_defender
+                    attacker_state = self.update_state(attacker_obs=attacker_obs, defender_obs=defender_obs, state=attacker_state, attacker=True)
+                    defender_state = self.update_state(defender_obs=defender_obs, attacker_obs=attacker_obs, state=defender_state, attacker=False)
+
+
+                # Render final frame
                 if self.config.render:
                     self.env.render(mode="human")
 
-                if not self.config.attacker and not self.config.defender:
-                    raise AssertionError("Must specify whether training an attacker agent or defender agent")
+                # Accumulate batch
+                saved_attacker_log_probs_batch.append(saved_attacker_log_probs)
+                saved_attacker_rewards_batch.append(saved_attacker_rewards)
+                saved_attacker_state_values_batch.append(saved_attacker_state_values)
+                saved_defender_log_probs_batch.append(saved_defender_log_probs)
+                saved_defender_rewards_batch.append(saved_defender_rewards)
+                saved_defender_state_values_batch.append(saved_defender_state_values)
 
-                # Default initialization
-                attacker_action = 0
-                defender_action = 0
+                # Record episode metrics
+                self.num_train_games += 1
+                self.num_train_games_total += 1
+                if self.env.state.hacked:
+                    self.num_train_hacks += 1
+                    self.num_train_hacks_total += 1
 
-                # Get attacker and defender actions
+                episode_attacker_rewards.append(episode_attacker_reward)
+                episode_defender_rewards.append(episode_defender_reward)
+                episode_steps.append(episode_step)
+
+                # Reset environment for the next episode and update game stats
+                done = False
+                attacker_obs, defender_obs = self.env.reset(update_stats=True)
+                attacker_state = self.update_state(attacker_obs=attacker_obs, defender_obs=defender_obs, state=[],
+                                                   attacker=True)
+                defender_state = self.update_state(defender_obs=defender_obs, attacker_obs=attacker_obs, state=[],
+                                                   attacker=False)
+
+                # If using opponent pool, update the pool
+                if self.config.opponent_pool and self.config.opponent_pool_config is not None:
+                    if train_attacker:
+                        if num_attacker_pool_iterations > self.config.opponent_pool_config.pool_increment_period:
+                            self.add_model_to_pool(attacker=True)
+                            num_attacker_pool_iterations = 0
+
+                        if num_defender_opponent_iterations > self.config.opponent_pool_config.head_to_head_period:
+                            if np.random.rand() < self.config.opponent_pool_config.pool_prob:
+                                self.defender_opponent_idx = self.sample_opponent(attacker=False)
+                                if self.config.opponent_pool_config.quality_scores:
+                                    self.defender_opponent = self.defender_pool[self.defender_opponent_idx][0]
+                                else:
+                                    self.defender_opponent = self.defender_pool[self.defender_opponent_idx]
+                            else:
+                                self.defender_opponent = self.defender_policy_network
+                                self.defender_opponent_idx = None
+                            num_defender_opponent_iterations = 0
+
+                    if train_defender:
+                        if num_defender_pool_iterations > self.config.opponent_pool_config.pool_increment_period:
+                            self.add_model_to_pool(attacker=False)
+                            num_defender_pool_iterations = 0
+
+                        if num_attacker_opponent_iterations > self.config.opponent_pool_config.head_to_head_period:
+                            if np.random.rand() < self.config.opponent_pool_config.pool_prob:
+                                self.attacker_opponent_idx = self.sample_opponent(attacker=True)
+                                if self.config.opponent_pool_config.quality_scores:
+                                    self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx][0]
+                                else:
+                                    self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx]
+                            else:
+                                self.attacker_opponent = self.attacker_policy_network
+                                self.attacker_opponent_idx = None
+
+                            num_attacker_opponent_iterations = 0
+                            total_num_episodes += 1
+
+            # End Batch
+
+            # Perform Policy Gradient updates
+            if self.config.attacker:
+                if not self.config.alternating_optimization or \
+                        (self.config.alternating_optimization and train_attacker):
+                    loss = self.training_step(saved_attacker_rewards_batch, saved_attacker_log_probs_batch,
+                                              saved_attacker_state_values_batch, attacker=True)
+                    episode_attacker_loss += loss.item()
+
+            if self.config.defender:
+                if not self.config.alternating_optimization or \
+                        (self.config.alternating_optimization and train_defender):
+                    loss = self.training_step(saved_defender_rewards_batch, saved_defender_log_probs_batch,
+                                              saved_defender_state_values_batch, attacker=False)
+                    episode_defender_loss += loss.item()
+
+            # Reset batch
+            saved_attacker_log_probs_batch = []
+            saved_attacker_rewards_batch = []
+            saved_attacker_state_values_batch = []
+            saved_defender_log_probs_batch = []
+            saved_defender_rewards_batch = []
+            saved_defender_state_values_batch = []
+
+            # Log values and gradients of the parameters (histogram summary) to tensorboard
+            if self.config.attacker and train_attacker:
+                for tag, value in self.attacker_policy_network.named_parameters():
+                    tag = tag.replace('.', '/')
+                    self.tensorboard_writer.add_histogram(tag, value.data.cpu().numpy(), iter)
+                    self.tensorboard_writer.add_histogram(tag + '_attacker/grad',
+                                                          value.grad.data.cpu().numpy(),
+                                                          iter)
+
+            if self.config.defender and train_defender:
+                for tag, value in self.defender_policy_network.named_parameters():
+                    tag = tag.replace('.', '/')
+                    self.tensorboard_writer.add_histogram(tag, value.data.cpu().numpy(), iter)
+                    self.tensorboard_writer.add_histogram(tag + '_defender/grad',
+                                                          value.grad.data.cpu().numpy(),
+                                                          iter)
+            num_alt_iterations += 1
+
+            if self.config.batch_size > 0:
                 if self.config.attacker:
-                    if self.config.alternating_optimization and not train_attacker \
-                            and self.config.opponent_pool and self.config.opponent_pool_config is not None:
-                        attacker_action, attacker_log_prob, attacker_state_value, attacker_action_dist = self.get_action(
-                            attacker_state, attacker=True, opponent_pool=True)
-                    else:
-                        attacker_action, attacker_log_prob, attacker_state_value, attacker_action_dist = \
-                            self.get_action(attacker_state, attacker=True, opponent_pool=False)
-                    saved_attacker_log_probs.append(attacker_log_prob)
-                    saved_attacker_state_values.append(attacker_state_value)
-                    if episode_step == 0:
-                        attacker_initial_state_action_dist = attacker_action_dist
-
+                    episode_avg_attacker_loss.append(episode_attacker_loss / self.config.batch_size)
                 if self.config.defender:
-                    if self.config.alternating_optimization and not train_defender \
-                            and self.config.opponent_pool and self.config.opponent_pool_config is not None:
-                        defender_action, defender_log_prob, defender_state_value, defender_action_dist = self.get_action(
-                            defender_state, attacker=False, opponent_pool=True)
-                    else:
-                        defender_action, defender_log_prob, defender_state_value, defender_action_dist = \
-                            self.get_action(defender_state, attacker=False, opponent_pool=False)
-                    saved_defender_log_probs.append(defender_log_prob)
-                    saved_defender_state_values.append(defender_state_value)
-                    if episode_step == 0:
-                        defender_initial_state_action_dist = defender_action_dist
-
-                action = (attacker_action, defender_action)
-
-                # Take a step in the environment
-                obs_prime, reward, done, _ = self.env.step(action)
-
-                # Update metrics
-                attacker_reward, defender_reward = reward
-                obs_prime_attacker, obs_prime_defender = obs_prime
-                episode_attacker_reward += attacker_reward
-                saved_attacker_rewards.append(attacker_reward)
-                episode_defender_reward += defender_reward
-                saved_defender_rewards.append(defender_reward)
-                episode_step += 1
-
-                # Move to the next state
-                obs = obs_prime
-                attacker_obs = obs_prime_attacker
-                defender_obs = obs_prime_defender
-                attacker_state = self.update_state(attacker_obs=attacker_obs, defender_obs=defender_obs, state=attacker_state, attacker=True)
-                defender_state = self.update_state(defender_obs=defender_obs, attacker_obs=attacker_obs, state=defender_state, attacker=False)
-
-
-            # Render final frame
-            if self.config.render:
-                self.env.render(mode="human")
-
-            saved_attacker_log_probs_batch.append(saved_attacker_log_probs)
-            saved_attacker_rewards_batch.append(saved_attacker_rewards)
-            saved_attacker_state_values_batch.append(saved_attacker_state_values)
-            saved_defender_log_probs_batch.append(saved_defender_log_probs)
-            saved_defender_rewards_batch.append(saved_defender_rewards)
-            saved_defender_state_values_batch.append(saved_defender_state_values)
-            num_batch_episode += 1
-
-            if num_batch_episode >= self.config.batch_size:
-                # Perform Policy Gradient updates
+                    episode_avg_defender_loss.append(episode_defender_loss / self.config.batch_size)
+            else:
                 if self.config.attacker:
-                    if not self.config.alternating_optimization or \
-                            (self.config.alternating_optimization and train_attacker):
-                        loss = self.training_step(saved_attacker_rewards_batch, saved_attacker_log_probs_batch,
-                                                  saved_attacker_state_values_batch, attacker=True)
-                        episode_attacker_loss += loss.item()
-
+                    episode_avg_attacker_loss.append(episode_attacker_loss)
                 if self.config.defender:
-                    if not self.config.alternating_optimization or \
-                            (self.config.alternating_optimization and train_defender):
-                        loss = self.training_step(saved_defender_rewards_batch, saved_defender_log_probs_batch,
-                                                  saved_defender_state_values_batch, attacker=False)
-                        episode_defender_loss += loss.item()
+                    episode_avg_defender_loss.append(episode_defender_loss)
 
-                saved_attacker_log_probs_batch = []
-                saved_attacker_rewards_batch = []
-                saved_attacker_state_values_batch = []
-                saved_defender_log_probs_batch = []
-                saved_defender_rewards_batch = []
-                saved_defender_state_values_batch = []
-
-                # Log values and gradients of the parameters (histogram summary) to tensorboard
-                if self.config.attacker and train_attacker:
-                    for tag, value in self.attacker_policy_network.named_parameters():
-                        tag = tag.replace('.', '/')
-                        self.tensorboard_writer.add_histogram(tag, value.data.cpu().numpy(), episode)
-                        self.tensorboard_writer.add_histogram(tag + '_attacker/grad',
-                                                              value.grad.data.cpu().numpy(),
-                                                              episode)
-
-                if self.config.defender and train_defender:
-                    for tag, value in self.defender_policy_network.named_parameters():
-                        tag = tag.replace('.', '/')
-                        self.tensorboard_writer.add_histogram(tag, value.data.cpu().numpy(), episode)
-                        self.tensorboard_writer.add_histogram(tag + '_defender/grad',
-                                                              value.grad.data.cpu().numpy(),
-                                                              episode)
-                num_batch_episode = 0
-                total_num_batches += 1
-                num_alt_iterations += 1
-
-                if episode_step > 0:
-                    if self.config.attacker:
-                        episode_avg_attacker_loss.append(episode_attacker_loss / episode_step)
-                    if self.config.defender:
-                        episode_avg_defender_loss.append(episode_defender_loss / episode_step)
-                else:
-                    if self.config.attacker:
-                        episode_avg_attacker_loss.append(episode_attacker_loss)
-                    if self.config.defender:
-                        episode_avg_defender_loss.append(episode_defender_loss)
-
-            # Decay LR after every episode
+            # Decay LR after every iteration
             lr_attacker = self.config.alpha_attacker
             if self.config.lr_exp_decay:
                 self.attacker_lr_decay.step()
                 lr_attacker = self.attacker_lr_decay.get_lr()[0]
 
-            # Decay LR after every episode
+            # Decay LR after every iter
             lr_defender = self.config.alpha_attacker
             if self.config.lr_exp_decay:
                 self.defender_lr_decay.step()
                 lr_defender = self.defender_lr_decay.get_lr()[0]
-
-            # Record episode metrics
-            self.num_train_games += 1
-            self.num_train_games_total += 1
-            if self.env.state.hacked:
-                self.num_train_hacks += 1
-                self.num_train_hacks_total += 1
 
             if self.config.alternating_optimization and self.config.opponent_pool:
                 if train_attacker:
@@ -569,9 +633,6 @@ class ActorCriticAgent(PolicyGradientAgent):
                     num_defender_pool_iterations += 1
                     num_attacker_opponent_iterations += 1
 
-            episode_attacker_rewards.append(episode_attacker_reward)
-            episode_defender_rewards.append(episode_defender_reward)
-            episode_steps.append(episode_step)
 
             # Update opponent pool qualities
             if self.config.opponent_pool and self.config.opponent_pool_config is not None \
@@ -581,8 +642,8 @@ class ActorCriticAgent(PolicyGradientAgent):
                 if train_defender and self.attacker_opponent_idx is not None and not self.env.state.hacked:
                     self.update_quality_score(self.attacker_opponent_idx, attacker=True)
 
-            # Log average metrics every <self.config.train_log_frequency> episodes
-            if episode % self.config.train_log_frequency == 0:
+            # Log average metrics every <self.config.train_log_frequency> iterations
+            if iter % self.config.train_log_frequency == 0:
                 if self.num_train_games > 0 and self.num_train_games_total > 0:
                     self.train_hack_probability = self.num_train_hacks / self.num_train_games
                     self.train_cumulative_hack_probability = self.num_train_hacks_total / self.num_train_games_total
@@ -594,12 +655,12 @@ class ActorCriticAgent(PolicyGradientAgent):
                 if self.config.opponent_pool and self.config.opponent_pool_config is not None:
                     a_pool = len(self.attacker_pool)
                     d_pool = len(self.defender_pool)
-                self.log_metrics(episode, self.train_result, episode_attacker_rewards, episode_defender_rewards, episode_steps,
+                self.log_metrics(iter, self.train_result, episode_attacker_rewards, episode_defender_rewards, episode_steps,
                                  episode_avg_attacker_loss, episode_avg_defender_loss, lr_attacker=lr_attacker,
                                  lr_defender=lr_defender,
                                  train_attacker = (self.config.attacker and train_attacker),
                                  train_defender = (self.config.defender and train_defender),
-                                 a_pool=a_pool, d_pool=d_pool, total_num_batches=total_num_batches)
+                                 a_pool=a_pool, d_pool=d_pool, total_num_episodes=total_num_episodes)
 
                 episode_attacker_rewards = []
                 episode_defender_rewards = []
@@ -607,15 +668,15 @@ class ActorCriticAgent(PolicyGradientAgent):
                 self.num_train_games = 0
                 self.num_train_hacks = 0
 
-            # Run evaluation every <self.config.eval_frequency> episodes
-            if episode % self.config.eval_frequency == 0:
-                self.eval(episode)
+            # Run evaluation every <self.config.eval_frequency> iterations
+            if iter % self.config.eval_frequency == 0:
+                self.eval(iter)
                 if self.config.opponent_pool and self.config.opponent_pool_config is not None:
                     self.log_action_dist(attacker_initial_state_action_dist, attacker=True)
                     self.log_action_dist(defender_initial_state_action_dist, attacker=False)
 
-            # Save models and other state every <self.config.checkpoint_frequency> episodes
-            if episode % self.config.checkpoint_freq == 0:
+            # Save models and other state every <self.config.checkpoint_frequency> iterations
+            if iter % self.config.checkpoint_freq == 0:
                 self.save_model()
                 self.env.save_trajectories()
                 self.env.save_attack_data(checkpoint=True)
@@ -624,54 +685,10 @@ class ActorCriticAgent(PolicyGradientAgent):
                     self.train_result.to_csv(self.config.save_dir + "/" + time_str + "_train_results_checkpoint.csv")
                     self.eval_result.to_csv(self.config.save_dir + "/" + time_str + "_eval_results_checkpoint.csv")
                 if self.config.opponent_pool and self.config.opponent_pool_config is not None:
-                    self.create_policy_plot(attacker_initial_state_action_dist.data.cpu().numpy(), episode,
+                    self.create_policy_plot(attacker_initial_state_action_dist.data.cpu().numpy(), iter,
                                             attacker=True)
-                    self.create_policy_plot(defender_initial_state_action_dist.data.cpu().numpy(), episode,
+                    self.create_policy_plot(defender_initial_state_action_dist.data.cpu().numpy(), iter,
                                             attacker=False)
-
-            # Reset environment for the next episode and update game stats
-            done = False
-            attacker_obs, defender_obs = self.env.reset(update_stats=True)
-            attacker_state = self.update_state(attacker_obs=attacker_obs, defender_obs=defender_obs, state=[], attacker=True)
-            defender_state = self.update_state(defender_obs=defender_obs, attacker_obs=attacker_obs, state=[], attacker=False)
-            self.outer_train.update(1)
-
-            # If using opponent pool, update the pool
-            if self.config.opponent_pool and self.config.opponent_pool_config is not None:
-                if train_attacker:
-                    if num_attacker_pool_iterations > self.config.opponent_pool_config.pool_increment_period:
-                        self.add_model_to_pool(attacker=True)
-                        num_attacker_pool_iterations = 0
-
-                    if num_defender_opponent_iterations > self.config.opponent_pool_config.head_to_head_period:
-                        if np.random.rand() < self.config.opponent_pool_config.pool_prob:
-                            self.defender_opponent_idx = self.sample_opponent(attacker=False)
-                            if self.config.opponent_pool_config.quality_scores:
-                                self.defender_opponent = self.defender_pool[self.defender_opponent_idx][0]
-                            else:
-                                self.defender_opponent = self.defender_pool[self.defender_opponent_idx]
-                        else:
-                            self.defender_opponent = self.defender_policy_network
-                            self.defender_opponent_idx = None
-                        num_defender_opponent_iterations = 0
-
-                if train_defender:
-                    if num_defender_pool_iterations > self.config.opponent_pool_config.pool_increment_period:
-                        self.add_model_to_pool(attacker=False)
-                        num_defender_pool_iterations = 0
-
-                    if num_attacker_opponent_iterations > self.config.opponent_pool_config.head_to_head_period:
-                        if np.random.rand() < self.config.opponent_pool_config.pool_prob:
-                            self.attacker_opponent_idx = self.sample_opponent(attacker=True)
-                            if self.config.opponent_pool_config.quality_scores:
-                                self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx][0]
-                            else:
-                                self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx]
-                        else:
-                            self.attacker_opponent = self.attacker_policy_network
-                            self.attacker_opponent_idx = None
-
-                        num_attacker_opponent_iterations = 0
 
             # If doing alternating optimization and the alternating period is up, change agent that is optimized
             if self.config.alternating_optimization and num_alt_iterations > self.config.alternating_period:
@@ -681,6 +698,8 @@ class ActorCriticAgent(PolicyGradientAgent):
 
             # Anneal epsilon linearly
             self.anneal_epsilon()
+
+            self.outer_train.update(1)
 
         self.config.logger.info("Training Complete")
 
@@ -806,7 +825,15 @@ class ActorCriticAgent(PolicyGradientAgent):
 
                 # Get attacker and defender actions
                 if self.config.attacker:
-                    attacker_action, _, _, _ = self.get_action(attacker_state, attacker=True)
+                    legal_actions = None
+                    illegal_actions = None
+                    if self.env.local_view_features():
+                        legal_actions, illegal_actions = self.get_legal_attacker_actions(attacker_obs)
+                    attacker_action, _, _, _ = self.get_action(attacker_state, attacker=True,
+                                                               legal_actions=legal_actions,
+                                                               non_legal_actions=illegal_actions)
+                    if self.env.local_view_features():
+                        attacker_action = self.convert_local_attacker_action_to_global(attacker_action, attacker_obs)
                 if self.config.defender:
                     defender_action, _, _, _ = self.get_action(defender_state, attacker=False)
                 action = (attacker_action, defender_action)

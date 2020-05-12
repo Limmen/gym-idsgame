@@ -48,11 +48,11 @@ class ReinforceAgent(PolicyGradientAgent):
         """
 
         # Initialize models
-        self.attacker_policy_network = FNNwithSoftmax(self.config.input_dim, self.config.output_dim_attacker,
+        self.attacker_policy_network = FNNwithSoftmax(self.config.input_dim_attacker, self.config.output_dim_attacker,
                                                       self.config.hidden_dim,
                                                       num_hidden_layers=self.config.num_hidden_layers,
                                                       hidden_activation=self.config.hidden_activation)
-        self.defender_policy_network = FNNwithSoftmax(self.config.input_dim, self.config.output_dim_defender,
+        self.defender_policy_network = FNNwithSoftmax(self.config.input_dim_defender, self.config.output_dim_defender,
                                                       self.config.hidden_dim,
                                                       num_hidden_layers=self.config.num_hidden_layers,
                                                       hidden_activation=self.config.hidden_activation)
@@ -164,6 +164,8 @@ class ReinforceAgent(PolicyGradientAgent):
 
         :param state: the state to sample an action for
         :param attacker: boolean flag whether running in attacker mode (if false assume defender)
+        :param legal_actions: list of allowed actions
+        :param non_legal_actions: list of disallowed actions
         :return: The sampled action id
         """
         state = torch.from_numpy(state.flatten()).float()
@@ -176,7 +178,7 @@ class ReinforceAgent(PolicyGradientAgent):
         # Calculate legal actions
         if attacker:
             actions = list(range(self.env.num_attack_actions))
-            if not self.env.local_view_features():
+            if not self.env.local_view_features() or (legal_actions is None or non_legal_actions is None):
                 legal_actions = list(filter(lambda action: self.env.is_attack_legal(action), actions))
                 non_legal_actions = list(filter(lambda action: not self.env.is_attack_legal(action), actions))
         else:
@@ -276,7 +278,6 @@ class ReinforceAgent(PolicyGradientAgent):
 
                     # Get attacker and defender actions
                     if self.config.attacker:
-                        #print("attacker state:{}".format(attacker_state))
                         legal_actions = None
                         illegal_actions = None
                         if self.env.local_view_features():
@@ -325,7 +326,6 @@ class ReinforceAgent(PolicyGradientAgent):
                 saved_defender_rewards_batch.append(saved_defender_rewards)
 
                 # Record episode metrics
-
                 self.num_train_games += 1
                 self.num_train_games_total += 1
                 if self.env.state.hacked:
@@ -352,11 +352,11 @@ class ReinforceAgent(PolicyGradientAgent):
                 loss = self.training_step(saved_defender_rewards_batch, saved_defender_log_probs_batch, attacker=False)
                 episode_defender_loss += loss.item()
 
-            if iter > 0:
+            if self.config.batch_size > 0:
                 if self.config.attacker:
-                    episode_avg_attacker_loss.append(episode_attacker_loss / iter)
+                    episode_avg_attacker_loss.append(episode_attacker_loss / self.config.batch_size)
                 if self.config.defender:
-                    episode_avg_defender_loss.append(episode_defender_loss / iter)
+                    episode_avg_defender_loss.append(episode_defender_loss / self.config.batch_size)
             else:
                 if self.config.attacker:
                     episode_avg_attacker_loss.append(episode_attacker_loss)
@@ -390,7 +390,7 @@ class ReinforceAgent(PolicyGradientAgent):
                 else:
                     self.train_hack_probability = 0.0
                     self.train_cumulative_hack_probability = 0.0
-                self.log_metrics(episode=iter, result=self.train_result, attacker_episode_rewards=episode_attacker_rewards,
+                self.log_metrics(iteration=iter, result=self.train_result, attacker_episode_rewards=episode_attacker_rewards,
                                  defender_episode_rewards=episode_defender_rewards, episode_steps=episode_steps,
                                  episode_avg_attacker_loss=episode_avg_attacker_loss, episode_avg_defender_loss=episode_avg_defender_loss,
                                  eval=False, update_stats=True, lr_attacker=lr_attacker, lr_defender=lr_defender)

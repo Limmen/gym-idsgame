@@ -31,5 +31,8 @@ class RandomDefenseBotAgent(BotAgent):
         actions = list(range(self.game_config.num_defense_actions))
         legal_actions = list(filter(lambda action: idsgame_util.is_defense_id_legal(action, self.game_config,
                                                                                     game_state), actions))
-        action_id = np.random.choice(legal_actions)
+        if len(legal_actions) > 0:
+            action_id = np.random.choice(legal_actions)
+        else:
+            action_id = np.random.choice(actions)
         return action_id

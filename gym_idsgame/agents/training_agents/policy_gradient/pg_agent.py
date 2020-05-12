@@ -56,18 +56,18 @@ class PolicyGradientAgent(TrainAgent, ABC):
         log_str = log_str + dist_str + "]"
         self.config.logger.info(log_str)
 
-    def log_metrics(self, episode: int, result: ExperimentResult, attacker_episode_rewards: list,
+    def log_metrics(self, iteration: int, result: ExperimentResult, attacker_episode_rewards: list,
                     defender_episode_rewards: list,
                     episode_steps: list, episode_avg_attacker_loss: list = None,
                     episode_avg_defender_loss: list = None,
                     eval: bool = False,
                     update_stats : bool = True, lr_attacker: float = None, lr_defender: float = None,
                     train_attacker : bool = False,
-                    train_defender : bool = False, a_pool: int = 0, d_pool : int = 0, total_num_batches : int = 0) -> None:
+                    train_defender : bool = False, a_pool: int = 0, d_pool : int = 0, total_num_episodes : int = 0) -> None:
         """
         Logs average metrics for the last <self.config.log_frequency> episodes
 
-        :param episode: the episode
+        :param iteration: the training iteration (equivalent to episode if batching is not used)
         :param result: the result object to add the results to
         :param attacker_episode_rewards: list of attacker episode rewards for the last <self.config.log_frequency> episodes
         :param defender_episode_rewards: list of defender episode rewards for the last <self.config.log_frequency> episodes
@@ -82,7 +82,7 @@ class PolicyGradientAgent(TrainAgent, ABC):
         :param train_defender: boolean flag indicating whether the defender is being trained
         :param a_pool: size of the attacker pool (if using opponent pools)
         :param d_pool: size of the defender pool (if using opponent pools)
-        :param total_num_batches: number of training batches
+        :param total_num_episodes: number of training episodes
         :return: None
         """
         avg_attacker_episode_rewards = np.mean(attacker_episode_rewards)
@@ -108,25 +108,25 @@ class PolicyGradientAgent(TrainAgent, ABC):
         defender_cumulative_reward = self.env.state.defender_cumulative_reward if not eval \
             else self.eval_defender_cumulative_reward
         if eval:
-            log_str = "[Eval] episode:{},avg_a_R:{:.2f},avg_d_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
+            log_str = "[Eval] iter:{},avg_a_R:{:.2f},avg_d_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
                       "acc_D_R:{:.2f},lr_a:{:.2E},lr_d:{:.2E},c_h:{:.2f}".format(
-                episode, avg_attacker_episode_rewards, avg_defender_episode_rewards, avg_episode_steps, hack_probability,
+                iteration, avg_attacker_episode_rewards, avg_defender_episode_rewards, avg_episode_steps, hack_probability,
                 attacker_cumulative_reward, defender_cumulative_reward, lr_attacker, lr_defender,
                 hack_probability_total)
             self.outer_eval.set_description_str(log_str)
         else:
-            log_str = "[Train] episode: {:.2f} epsilon:{:.2f},avg_a_R:{:.2f},avg_d_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
+            log_str = "[Train] iter: {:.2f} epsilon:{:.2f},avg_a_R:{:.2f},avg_d_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
                       "acc_D_R:{:.2f},A_loss:{:.6f},D_loss:{:.6f},lr_a:{:.2E},lr_d:{:.2E},c_h:{:.2f},Tr_A:{},Tr_D:{}," \
-                      "a_pool:{},d_pool:{},batch:{}".format(
-                episode, self.config.epsilon, avg_attacker_episode_rewards, avg_defender_episode_rewards,
+                      "a_pool:{},d_pool:{},episode:{}".format(
+                iteration, self.config.epsilon, avg_attacker_episode_rewards, avg_defender_episode_rewards,
                 avg_episode_steps, hack_probability, attacker_cumulative_reward, defender_cumulative_reward,
                 avg_episode_attacker_loss, avg_episode_defender_loss, lr_attacker, lr_defender, hack_probability_total,
                 train_attacker,
-                train_defender,a_pool, d_pool, total_num_batches)
+                train_defender,a_pool, d_pool, total_num_episodes)
             self.outer_train.set_description_str(log_str)
         self.config.logger.info(log_str)
         if update_stats and self.config.tensorboard:
-            self.log_tensorboard(episode, avg_attacker_episode_rewards, avg_defender_episode_rewards, avg_episode_steps,
+            self.log_tensorboard(iteration, avg_attacker_episode_rewards, avg_defender_episode_rewards, avg_episode_steps,
                                  avg_episode_attacker_loss, avg_episode_defender_loss, hack_probability,
                                  attacker_cumulative_reward, defender_cumulative_reward, self.config.epsilon, lr_attacker,
                                  lr_defender, hack_probability_total, a_pool, d_pool, eval=eval)
@@ -213,10 +213,13 @@ class PolicyGradientAgent(TrainAgent, ABC):
         :param attacker: boolean flag whether it is attacker or not
         :return: new state
         """
+        if not attacker and self.env.local_view_features():
+            attacker_obs = self.env.state.get_attacker_observation(self.env.idsgame_config.game_config.network_config,
+                                                local_view=False)
 
         # Zero mean
         if self.config.zero_mean_features:
-            if not self.env.local_view_features():
+            if not self.env.local_view_features() or not attacker:
                 attacker_obs_1 = attacker_obs[:, 0:-1]
             else:
                 attacker_obs_1 = attacker_obs[:, 0:-2]
@@ -231,7 +234,7 @@ class PolicyGradientAgent(TrainAgent, ABC):
                     t = attacker_obs[idx]
                 else:
                     t = t.tolist()
-                    if not self.env.local_view_features():
+                    if not self.env.local_view_features() or not attacker:
                         t.append(attacker_obs[idx][-1])
                     else:
                         t.append(attacker_obs[idx][-2])
@@ -258,7 +261,7 @@ class PolicyGradientAgent(TrainAgent, ABC):
 
         # Normalize
         if self.config.normalize_features:
-            if not self.env.local_view_features():
+            if not self.env.local_view_features() or not attacker:
                 attacker_obs_1 = attacker_obs[:, 0:-1] / np.linalg.norm(attacker_obs[:, 0:-1])
             else:
                 attacker_obs_1 = attacker_obs[:, 0:-2] / np.linalg.norm(attacker_obs[:, 0:-2])
@@ -268,7 +271,7 @@ class PolicyGradientAgent(TrainAgent, ABC):
                     t = attacker_obs[idx]
                 else:
                     t = attacker_obs_1.tolist()
-                    if not self.env.local_view_features():
+                    if not self.env.local_view_features() or not attacker:
                         t.append(attacker_obs[idx][-1])
                     else:
                         t.append(attacker_obs[idx][-2])
@@ -289,7 +292,7 @@ class PolicyGradientAgent(TrainAgent, ABC):
             attacker_obs = np.array(normalized_attacker_features)
             defender_obs = np.array(normalized_defender_features)
 
-        if self.env.local_view_features():
+        if self.env.local_view_features() and attacker:
             neighbor_defense_attributes = np.zeros((attacker_obs.shape[0], defender_obs.shape[1]))
             for node in range(attacker_obs.shape[0]):
                 if int(attacker_obs[node][-1]) == 1:
@@ -298,7 +301,7 @@ class PolicyGradientAgent(TrainAgent, ABC):
 
         if self.env.fully_observed():
             if self.config.merged_ad_features:
-                if not self.env.local_view_features():
+                if not self.env.local_view_features() or not attacker:
                     a_pos = attacker_obs[:, -1]
                     det_values = defender_obs[:, -1]
                     temp = defender_obs[:, 0:-1] - attacker_obs[:, 0:-1]
@@ -312,7 +315,7 @@ class PolicyGradientAgent(TrainAgent, ABC):
                     node_ids = attacker_obs[:, -2]
                     node_reachable = attacker_obs[:, -1]
                     det_values = neighbor_defense_attributes[:, -1]
-                    temp = neighbor_defense_attributes[:, 0:-1] - attacker_obs[:, 2:]
+                    temp = neighbor_defense_attributes[:, 0:-1] - attacker_obs[:, 0:-2]
                     features = []
                     for idx, row in enumerate(temp):
                         t = row.tolist()
@@ -329,18 +332,18 @@ class PolicyGradientAgent(TrainAgent, ABC):
                 state = np.append(state[1:], np.array([features]), axis=0)
             else:
                 if self.config.state_length == 1:
-                    if not self.env.local_view_features():
+                    if not self.env.local_view_features() or not attacker:
                         return np.append(attacker_obs, defender_obs)
                     else:
                         return np.append(attacker_obs, neighbor_defense_attributes)
                 if len(state) == 0:
-                    if not self.env.local_view_features():
+                    if not self.env.local_view_features() or not attacker:
                         temp = np.append(attacker_obs, defender_obs)
                     else:
                         temp = np.append(attacker_obs, neighbor_defense_attributes)
                     s = np.array([temp] * self.config.state_length)
                     return s
-                if not self.env.local_view_features():
+                if not self.env.local_view_features() or not attacker:
                     temp = np.append(attacker_obs, defender_obs)
                 else:
                     temp = np.append(attacker_obs, neighbor_defense_attributes)

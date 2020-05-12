@@ -60,7 +60,7 @@ def default_config() -> ClientConfig:
                                                 gif_dir=default_output_dir() + "/results/gifs",
                                                 eval_frequency=10000, attacker=True, defender=False, video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=5000, input_dim=33, output_dim_attacker=30, hidden_dim=64,
+                                                checkpoint_freq=5000, input_dim_attacker=33, output_dim_attacker=30, hidden_dim=64,
                                                 num_hidden_layers=1, batch_size=32,
                                                 gpu=False, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",

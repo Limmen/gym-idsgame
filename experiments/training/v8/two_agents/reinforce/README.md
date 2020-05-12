@@ -1,12 +1,11 @@
-# Experiment `minimal_defense-v8`_`reinforce`
+# Experiment `reinforce`_vs_`reinforce`
 
-This is an experiment in the `minimal_defense-v8` environment. 
-An environment where the defender is following the `defend_minimal` defense policy. 
-The `defend_minimal` policy entails that the defender will always 
-defend the attribute with the minimal value out of all of its neighbors.
+This is an experiment in the `idsgame-v8` environment. 
+An environment where neither the attacker nor defender is part of the environment, i.e.
+it is intended for 2-agent simulations or RL training.
  
-This experiment trains an attacker agent using REINFORCE to act optimally in the given
-environment and defeat the defender.
+This experiment trains the attacker and defender using REINFORCE to act optimally in the given
+environment.
 
 The network configuration of the environment is as follows:
 
@@ -33,7 +32,7 @@ The environment has dense rewards (+1,-1 given whenever the attacker reaches a n
 
 ## Environment 
 
-- Env: `minimal_defense-v8`
+- Env: `v8`
 
 ## Algorithm
 

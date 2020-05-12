@@ -693,7 +693,7 @@ class PPOAgent(PolicyGradientAgent):
                                  lr_defender=lr_defender,
                                  train_attacker = (self.config.attacker and train_attacker),
                                  train_defender = (self.config.defender and train_defender),
-                                 a_pool=a_pool, d_pool=d_pool, total_num_batches=total_num_batches)
+                                 a_pool=a_pool, d_pool=d_pool, total_num_episodes=total_num_batches)
 
                 episode_attacker_rewards = []
                 episode_defender_rewards = []

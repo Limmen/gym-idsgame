@@ -32,7 +32,7 @@ The environment has dense rewards (+1,-1 given whenever the attacker reaches a n
 
 ## Environment 
 
-- Env: `random_attack-v8`
+- Env: `v8`
 
 ## Algorithm
 

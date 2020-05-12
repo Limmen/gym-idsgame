@@ -20,7 +20,8 @@ class PolicyGradientAgentConfig:
                  video_frequency :int = 101, attacker :bool = True, defender :bool = False,
                  save_dir :str = None, attacker_load_path : str = None, defender_load_path : str = None,
                  checkpoint_freq : int = 100000, random_seed: int = 0, eval_epsilon : float = 0.0,
-                 input_dim: int = 30, output_dim_attacker: int = 30, output_dim_defender: int = 33,
+                 input_dim_attacker: int = 30, output_dim_attacker: int = 30, output_dim_defender: int = 33,
+                 input_dim_defender: int = 30,
                  hidden_dim: int = 64,
                  batch_size: int = 64, num_hidden_layers=2,
                  gpu: bool = False, tensorboard: bool = False, tensorboard_dir: str = "",
@@ -63,7 +64,8 @@ class PolicyGradientAgentConfig:
         :param checkpoint_freq: frequency of checkpointing the model (episodes)
         :param random_seed: the random seed for reproducibility
         :param eval_epsilon: evaluation epsilon for implementing a "soft policy" rather than a "greedy policy"
-        :param input_dim: input dimension of the policy network
+        :param input_dim_attacker: input dimension of the policy network for the attacker
+        :param input_dim_defender: input dimension of the policy network for the defender
         :param output_dim_attacker: output dimensions of the policy network of the attacker
         :param output_dim_defender: output dimensions of the policy network of the defender
         :param hidden_dim: hidden dimension of the policy network
@@ -121,7 +123,8 @@ class PolicyGradientAgentConfig:
         self.checkpoint_freq = checkpoint_freq
         self.random_seed = random_seed
         self.eval_epsilon = eval_epsilon
-        self.input_dim = input_dim
+        self.input_dim_attacker = input_dim_attacker
+        self.input_dim_defender = input_dim_defender
         self.output_dim_attacker = output_dim_attacker
         self.output_dim_defender = output_dim_defender
         self.hidden_dim = hidden_dim
@@ -162,7 +165,8 @@ class PolicyGradientAgentConfig:
                "checkpoint_freq:{21},random_seed:{22},eval_epsilon:{23},clip_gradient:{24},max_gradient_norm:{25}," \
                "output_dim_defender:{26},critic_loss_fn:{27},state_length:{28},alternating_optimization:{29}," \
                "alternating_period:{30},normalize_features:{31},alpha_defender:{32},gpu_id:{33}," \
-               "merged_ad_features:{34},optimization_iterations{35},eps_clip:{36},zero_mean_features:{37}".format(
+               "merged_ad_features:{34},optimization_iterations{35},eps_clip:{36},zero_mean_features:{37}," \
+               "input_dim_defender:{38},input_dim_attacker:{39}".format(
             self.gamma, self.alpha_attacker, self.epsilon, self.render, self.eval_sleep, self.epsilon_decay,
             self.min_epsilon, self.eval_episodes, self.train_log_frequency, self.eval_log_frequency, self.video,
             self.video_fps, self.video_dir, self.num_episodes, self.eval_render, self.gifs, self.gif_dir,
@@ -170,7 +174,8 @@ class PolicyGradientAgentConfig:
             self.random_seed, self.eval_epsilon, self.clip_gradient, self.max_gradient_norm, self.output_dim_defender,
             self.critic_loss_fn, self.state_length, self.alternating_optimization, self.alternating_period,
             self.normalize_features, self.alpha_defender, self.gpu_id, self.merged_ad_features,
-            self.optimization_iterations, self.eps_clip, self.zero_mean_features)
+            self.optimization_iterations, self.eps_clip, self.zero_mean_features, self.input_dim_defender,
+            self.input_dim_attacker)
 
     def to_csv(self, file_path: str) -> None:
         """
@@ -206,7 +211,7 @@ class PolicyGradientAgentConfig:
             writer.writerow(["checkpoint_freq", str(self.checkpoint_freq)])
             writer.writerow(["random_seed", str(self.random_seed)])
             writer.writerow(["eval_epsilon", str(self.eval_epsilon)])
-            writer.writerow(["input_dim", str(self.input_dim)])
+            writer.writerow(["input_dim_attacker", str(self.input_dim_attacker)])
             writer.writerow(["output_dim_attacker", str(self.output_dim_attacker)])
             writer.writerow(["hidden_dim", str(self.hidden_dim)])
             writer.writerow(["batch_size", str(self.batch_size)])
@@ -232,6 +237,7 @@ class PolicyGradientAgentConfig:
             writer.writerow(["optimization_iterations", str(self.optimization_iterations)])
             writer.writerow(["eps_clip", str(self.eps_clip)])
             writer.writerow(["zero_mean_features", str(self.zero_mean_features)])
+            writer.writerow(["input_dim_defender", str(self.input_dim_defender)])
             if self.opponent_pool and self.opponent_pool_config is not None:
                 writer.writerow(["pool_maxsize", str(self.opponent_pool_config.pool_maxsize)])
                 writer.writerow(["pool_increment_period", str(self.opponent_pool_config.pool_increment_period)])
@@ -260,7 +266,7 @@ class PolicyGradientAgentConfig:
         hparams["checkpoint_freq"] = self.checkpoint_freq
         hparams["random_seed"] = self.random_seed
         hparams["eval_epsilon"] = self.eval_epsilon
-        hparams["input_dim"] = self.input_dim
+        hparams["input_dim_attacker"] = self.input_dim_attacker
         hparams["output_dim_attacker"] = self.output_dim_attacker
         hparams["hidden_dim"] = self.hidden_dim
         hparams["batch_size"] = self.batch_size
@@ -284,6 +290,7 @@ class PolicyGradientAgentConfig:
         hparams["optimization_iterations"] = self.optimization_iterations
         hparams["eps_clip"] = self.eps_clip
         hparams["zero_mean_features"] = self.zero_mean_features
+        hparams["input_dim_defender"] = self.input_dim_defender
         if self.opponent_pool and self.opponent_pool_config is not None:
             hparams["pool_maxsize"] = self.opponent_pool_config.pool_maxsize
             hparams["pool_increment_period"] = self.opponent_pool_config.pool_increment_period

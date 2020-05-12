@@ -13,7 +13,8 @@ class GameConfig():
     def __init__(self, network_config: NetworkConfig = None, manual_attacker: bool = True, num_layers: int = 1,
                  num_servers_per_layer: int = 2, num_attack_types: int = 10, max_value: int = 9,
                  initial_state: GameState = None, manual_defender: bool = False, initial_state_path :str = None,
-                 dense_rewards = False):
+                 dense_rewards = False, min_random_a_val :int = 0, min_random_d_val :int = 0,
+                 min_random_det_val :int = 0):
         """
         Class constructor, initializes the DTO
 
@@ -27,6 +28,9 @@ class GameConfig():
         :param initial_state: the initial state
         :param initial_state_path: path to the initial state saved on disk
         :param dense_rewards: if true, give hacker dense rewards (reward for each intermediate server hacked)
+        :param min_random_a_val: minimum attack value when randomizing the state
+        :param min_random_d_val: minimum defense value when randomizing the state
+        :param min_random_det_val: minimum detection value when randomizing the state
         """
         self.manual_attacker = manual_attacker
         self.manual_defender = manual_defender
@@ -34,6 +38,9 @@ class GameConfig():
         self.num_servers_per_layer = num_servers_per_layer
         self.num_attack_types = num_attack_types
         self.max_value = max_value
+        self.min_random_a_val = min_random_a_val
+        self.min_random_d_val = min_random_d_val
+        self.min_random_det_val = min_random_det_val
         self.num_rows = self.num_layers + 2
         self.num_nodes = self.num_layers * self.num_servers_per_layer + 2  # +2 for Start and Data Nodes
         self.num_cols = self.num_servers_per_layer
@@ -54,7 +61,8 @@ class GameConfig():
         if self.initial_state is None and self.initial_state_path is not None:
             self.initial_state = GameState.load(self.initial_state)
         if self.initial_state is None and self.initial_state_path is None:
-            self.initial_state = GameState()
+            self.initial_state = GameState(min_random_a_val=min_random_a_val, min_random_det_val=min_random_det_val,
+                                           min_random_d_val=min_random_d_val)
             self.initial_state.default_state(self.network_config.node_list, self.network_config.start_pos,
                                              self.num_attack_types, network_config=self.network_config)
         self.dense_rewards = dense_rewards
@@ -80,6 +88,7 @@ class GameConfig():
         :param det_val: detection value per node
         :param vulnerability_val: defense value for defense types that are vulnerable
         :param num_vulnerabilities_per_layer: number of vulnerabilities per layer
+        :param min_random_val: minimum val when randomizing the state
         :return:
         """
         if num_vulnerabilities_per_layer is None:

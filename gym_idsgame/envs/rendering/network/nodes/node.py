@@ -24,7 +24,7 @@ class Node(ABC):
         return (self.row, self.col)
 
     @abstractmethod
-    def manual_blink_defense(self, i):
+    def manual_blink_defense(self, i, detect :bool = False):
         pass
 
     @abstractmethod

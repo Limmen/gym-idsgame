@@ -58,16 +58,16 @@ def default_config() -> ClientConfig:
                                                 num_episodes=2200001,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
-                                                eval_frequency=100, attacker=True, defender=False, video_frequency=101,
+                                                eval_frequency=500, attacker=True, defender=False, video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=5000, input_dim=((4+2)*2 + (4+1)*2), output_dim_attacker=4*2,
+                                                checkpoint_freq=5000, input_dim_attacker=(4 + 2) * 3, output_dim_attacker=4 * 3,
                                                 hidden_dim=32,
                                                 num_hidden_layers=1, batch_size=8,
                                                 gpu=True, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
-                                                state_length=1, normalize_features=False, merged_ad_features=False,
-                                                zero_mean_features=True, gpu_id=0)
+                                                state_length=1, normalize_features=False, merged_ad_features=True,
+                                                zero_mean_features=False, gpu_id=0)
     env_name = "idsgame-minimal_defense-v14"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.REINFORCE_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,

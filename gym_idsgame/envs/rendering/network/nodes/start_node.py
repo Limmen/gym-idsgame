@@ -84,7 +84,7 @@ class StartNode(Node):
     # --- Inherited methods----
     # the start node cannot be attacked or defended so simply do nothing when they are called
 
-    def manual_blink_defense(self, i):
+    def manual_blink_defense(self, i, detect :bool = False):
         pass
 
     def manual_blink_attack(self, i, attacker_pos: Union[int, int], edges=None):
