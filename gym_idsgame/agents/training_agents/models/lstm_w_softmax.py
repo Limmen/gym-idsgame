@@ -1,46 +1,59 @@
 """
-A FNN model with Softmax output defined in PyTorch
+A LSTM model with Softmax output defined in PyTorch
 """
 import torch
 
 
-class FNNwithSoftmax(torch.nn.Module):
+class LSTMwithSoftmax(torch.nn.Module):
     """
-    Implements a FNN with parameterizable number of layers, dimensions, and hidden activations.
+    Implements a LSTM with parameterizable number of layers, dimensions, and hidden activations.
 
     Sub-classing the torch.nn.Module to be able to use high-level API for creating the custom network
     """
 
-    def __init__(self, input_dim: int, output_dim: int, hidden_dim: int, num_hidden_layers: int = 2,
-                 hidden_activation: str = "ReLU"):
+    def __init__(self, input_dim: int, output_dim: int, hidden_dim: int, num_lstm_layers: int = 2,
+                 num_hidden_linear_layers: int = 2,
+                 hidden_activation: str = "ReLU", seq_length : int = 4):
         """
         Builds the model
 
         :param input_dim: the input dimension
         :param output_dim: the output dimension
         :param hidden_dim: the hidden dimension
-        :param num_hidden_layers: the number of hidden layers
+        :param num_lstm_layers: the number of hidden layers
+        :param num_hidden_linear_layers: the number of linear layers
         :param hidden_activation: hidden activation type
+        :param seq_length: length of the sequence
         """
-        super(FNNwithSoftmax, self).__init__()
+        super(LSTMwithSoftmax, self).__init__()
 
         self.input_dim = input_dim
         self.output_dim = output_dim
         self.hidden_dim = hidden_dim
-        self.num_hidden_layers = num_hidden_layers
-        self.num_layers = num_hidden_layers + 2
+        self.num_hidden_layers = num_lstm_layers
+        self.num_lstm_layers = num_lstm_layers
+        self.num_hidden_linear_layers = num_hidden_linear_layers
+        self.num_layers = self.num_lstm_layers + self.num_hidden_linear_layers + 1
         self.hidden_activation = hidden_activation
 
         # Define layers of FNN
         self.layers = torch.nn.ModuleList()
 
         # Input layer
-        self.layers.append(torch.nn.Linear(input_dim, hidden_dim))
-        self.layers.append(self.get_hidden_activation())
+        self.layers.append(torch.nn.LSTM(input_size=input_dim, hidden_size=hidden_dim,
+                                         num_layers=num_lstm_layers,
+                                         batch_first=True))
+
+        # self.layers.append(torch.nn.Linear(input_dim, hidden_dim))
+        # self.layers.append(self.get_hidden_activation())
 
         # Hidden Layers
-        for i in range(self.num_hidden_layers):
-            self.layers.append(torch.nn.Linear(hidden_dim, hidden_dim))
+        for i in range(self.num_hidden_linear_layers):
+            if i == 0:
+                #self.layers.append(torch.nn.Linear(hidden_dim, hidden_dim))
+                self.layers.append(torch.nn.Linear(hidden_dim*seq_length, hidden_dim))
+            else:
+                self.layers.append(torch.nn.Linear(hidden_dim, hidden_dim))
             self.layers.append(self.get_hidden_activation())
 
         # Output layer
@@ -78,7 +91,11 @@ class FNNwithSoftmax(torch.nn.Module):
         :return: Output prediction
         """
         y = x
-        for i in range(len(self.layers)):
+        hidden_vec, last_hidden = self.layers[0](y)
+        y = hidden_vec
+        # flatten
+        y = torch.reshape(y, (y.shape[0], y.shape[1]*y.shape[2]))
+        for i in range(1, len(self.layers)):
             y = self.layers[i](y)
         return y
 
@@ -90,16 +107,16 @@ def test() -> None:
     :return: None
     """
     # Constants
+    batch_size = 64
     input_dim = 44
     output_dim = 44
     hidden_dim = 64
-    batch_size = 64
 
     # Create model
-    model = FNNwithSoftmax(input_dim, output_dim, hidden_dim, num_hidden_layers=2)
+    model = LSTMwithSoftmax(input_dim, output_dim, hidden_dim, num_lstm_layers=2)
 
     # Create random Tensors to hold inputs and outputs
-    x = torch.randn(batch_size, input_dim)
+    x = torch.randn(batch_size, 4, input_dim)
     y = torch.empty(batch_size, dtype=torch.long).random_(output_dim)
 
     # Construct our loss function and an Optimizer. The call to model.parameters()
