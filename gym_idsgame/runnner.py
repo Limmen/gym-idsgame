@@ -17,6 +17,7 @@ from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.agents.training_agents.q_learning.tabular_q_learning.tabular_q_agent import TabularQAgent
 from gym_idsgame.agents.training_agents.q_learning.dqn.dqn import DQNAgent
 from gym_idsgame.agents.training_agents.policy_gradient.reinforce.reinforce import ReinforceAgent
+from gym_idsgame.agents.training_agents.policy_gradient.reinforce.reinforce_attacker_bot_agent import ReinforceAttackerBotAgent
 from gym_idsgame.agents.training_agents.policy_gradient.actor_critic.actor_critic import ActorCriticAgent
 from gym_idsgame.agents.training_agents.policy_gradient.ppo.ppo import PPOAgent
 from gym_idsgame.agents.training_agents.train_agent import TrainAgent
@@ -234,8 +235,30 @@ class Runner:
                                    initial_state_path = config.initial_state_path)
         if config.title is not None:
             env.idsgame_config.render_config.title = config.title
-        if not issubclass(type(env), DefenderEnv):
-            raise AssertionError("Manual defender play is only supported for defender-envs")
+        if not config.bot_attacker:
+            if not issubclass(type(env), DefenderEnv):
+                raise AssertionError("Manual defender play is only supported for defender-envs")
         env.idsgame_config.game_config.manual_defender = True
+        if config.bot_attacker:
+            attacker: BotAgent = None
+            if config.attacker_type == AgentType.TABULAR_Q_AGENT.value:
+                if config.q_agent_config is None or config.q_agent_config.attacker_load_path is None:
+                    raise ValueError("To run a simulation with a tabular Q-agent, the path to the saved "
+                                     "Q-table must be specified")
+                attacker = TabularQAttackerBotAgent(env.idsgame_config.game_config,
+                                                    config.q_agent_config.attacker_load_path)
+            elif config.attacker_type == AgentType.RANDOM.value:
+                attacker = RandomAttackBotAgent(env.idsgame_config.game_config)
+            elif config.attacker_type == AgentType.ATTACK_MAXIMAL_VALUE.value:
+                attacker = AttackMaximalValueBotAgent(env.idsgame_config.game_config)
+            elif config.attacker_type == AgentType.REINFORCE_AGENT.value:
+                if config.pg_agent_config is None or config.pg_agent_config.attacker_load_path is None:
+                    raise ValueError("To run a simulation with a pretrained REINFORCE agent, the path to the saved "
+                                     "model must be specified")
+                attacker = ReinforceAttackerBotAgent(config.pg_agent_config, env.idsgame_config.game_config,
+                                                    config.pg_agent_config.attacker_load_path)
+            else:
+                raise AssertionError("Attacker type not recognized: {}".format(config.attacker_type))
+            env.idsgame_config.attacker_agent = attacker
         ManualDefenseAgent(env.idsgame_config)
         return env

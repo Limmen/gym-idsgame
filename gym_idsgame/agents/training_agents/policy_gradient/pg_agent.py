@@ -366,6 +366,7 @@ class PolicyGradientAgent(TrainAgent, ABC):
                 state = np.append(state[1:], np.array([defender_obs]), axis=0)
             return state
 
+
     def get_legal_attacker_actions(self, attacker_obs):
         legal_actions = []
         illegal_actions = []
@@ -379,13 +380,14 @@ class PolicyGradientAgent(TrainAgent, ABC):
                     illegal_actions.append(i * num_attack_types + ac)
         legal_actions_2 = []
         for action in legal_actions:
-            global_action = self.convert_local_attacker_action_to_global(action, attacker_obs)
+            global_action = PolicyGradientAgent.convert_local_attacker_action_to_global(action, attacker_obs)
             if self.env.is_attack_legal(global_action):
                 legal_actions_2.append(global_action)
             else:
                 illegal_actions.append(action)
         return legal_actions_2, illegal_actions
 
+    @abstractmethod
     def convert_local_attacker_action_to_global(self, action_id, attacker_obs):
         num_attack_types = attacker_obs[:, 0:-2].shape[1]
         neighbor = action_id // num_attack_types

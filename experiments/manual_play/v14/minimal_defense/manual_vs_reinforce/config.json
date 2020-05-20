@@ -1,40 +1,22 @@
 {
     "attacker_type": 7,
+    "bot_attacker": true,
     "defender_type": 1,
-    "env_name": "idsgame-minimal_defense-v14",
-    "hp_tuning": true,
-    "hp_tuning_config": {
-        "alpha": [
-            1e-06,
-            1e-05,
-            0.0001,
-            0.001,
-            0.01
-        ],
-        "epsilon_decay": null,
-        "num_hidden_layers": [
-            1,
-            2,
-            4,
-            8,
-            16
-        ],
-        "param_1": "alpha",
-        "param_2": "num_hidden_layers",
-        "py/object": "gym_idsgame.config.hp_tuning_config.HpTuningConfig"
-    },
+    "env_name": "idsgame-v14",
+    "hp_tuning": false,
+    "hp_tuning_config": null,
     "idsgame_config": null,
     "initial_state_path": null,
     "logger": null,
-    "mode": 0,
-    "output_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v14/minimal_defense/reinforce",
+    "mode": 4,
+    "output_dir": "",
     "pg_agent_config": {
         "alpha_attacker": 0.001,
         "alpha_defender": 0.1,
         "alternating_optimization": false,
         "alternating_period": 15000,
         "attacker": true,
-        "attacker_load_path": null,
+        "attacker_load_path": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v14/minimal_defense/reinforce/results/data/0/1589370657.761538_attacker_policy_network.pt",
         "batch_size": 8,
         "checkpoint_freq": 1000,
         "clip_gradient": false,
@@ -51,7 +33,7 @@
         "eval_render": false,
         "eval_sleep": 0.9,
         "gamma": 0.999,
-        "gif_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v14/minimal_defense/reinforce/results/gifs",
+        "gif_dir": "/results/gifs",
         "gifs": true,
         "gpu": true,
         "gpu_id": 0,
@@ -77,13 +59,13 @@
         "py/object": "gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config.PolicyGradientAgentConfig",
         "random_seed": 0,
         "render": false,
-        "save_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v14/minimal_defense/reinforce/results/data",
+        "save_dir": "/results/data",
         "state_length": 1,
         "tensorboard": true,
-        "tensorboard_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v14/minimal_defense/reinforce/results/tensorboard",
+        "tensorboard_dir": "/results/tensorboard",
         "train_log_frequency": 100,
         "video": true,
-        "video_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v14/minimal_defense/reinforce/results/videos",
+        "video_dir": "/results/videos",
         "video_fps": 5,
         "video_frequency": 101,
         "zero_mean_features": false
@@ -91,14 +73,8 @@
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": null,
     "random_seed": 0,
-    "random_seeds": [
-        0,
-        999,
-        299,
-        399,
-        499
-    ],
+    "random_seeds": null,
     "run_many": false,
     "simulation_config": null,
-    "title": "REINFORCE vs DefendMinimalDefender"
+    "title": "REINFORCE vs ManualDefender"
 }

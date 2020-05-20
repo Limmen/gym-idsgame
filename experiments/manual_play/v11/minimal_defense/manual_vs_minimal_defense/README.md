@@ -58,7 +58,7 @@ Example configuration in `config.json`:
     "initial_state_path": null,
     "logger": null,
     "mode": 3,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v11/minimal_defense/manual_vs_minimal_defense",
+    "output_dir": manual_vs_reinforce,
     "pg_agent_config": null,
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": null,

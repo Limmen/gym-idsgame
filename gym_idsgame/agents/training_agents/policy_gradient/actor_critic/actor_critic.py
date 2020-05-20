@@ -448,7 +448,7 @@ class ActorCriticAgent(PolicyGradientAgent):
                                 self.get_action(attacker_state, attacker=True, opponent_pool=False,
                                                 legal_actions=legal_actions, non_legal_actions=illegal_actions)
                         if self.env.local_view_features():
-                            attacker_action = self.convert_local_attacker_action_to_global(attacker_action, attacker_obs)
+                            attacker_action = PolicyGradientAgent.convert_local_attacker_action_to_global(attacker_action, attacker_obs)
                         saved_attacker_log_probs.append(attacker_log_prob)
                         saved_attacker_state_values.append(attacker_state_value)
                         if episode_step == 0:
@@ -833,7 +833,7 @@ class ActorCriticAgent(PolicyGradientAgent):
                                                                legal_actions=legal_actions,
                                                                non_legal_actions=illegal_actions)
                     if self.env.local_view_features():
-                        attacker_action = self.convert_local_attacker_action_to_global(attacker_action, attacker_obs)
+                        attacker_action = PolicyGradientAgent.convert_local_attacker_action_to_global(attacker_action, attacker_obs)
                 if self.config.defender:
                     defender_action, _, _, _ = self.get_action(defender_state, attacker=False)
                 action = (attacker_action, defender_action)
