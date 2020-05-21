@@ -387,8 +387,8 @@ class PolicyGradientAgent(TrainAgent, ABC):
                 illegal_actions.append(action)
         return legal_actions_2, illegal_actions
 
-    @abstractmethod
-    def convert_local_attacker_action_to_global(self, action_id, attacker_obs):
+    @staticmethod
+    def convert_local_attacker_action_to_global(action_id, attacker_obs):
         num_attack_types = attacker_obs[:, 0:-2].shape[1]
         neighbor = action_id // num_attack_types
         attack_type = action_id % num_attack_types

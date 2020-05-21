@@ -31,7 +31,8 @@ class PolicyGradientAgentConfig:
                  alternating_optimization : bool = False, alternating_period : int = 15000,
                  opponent_pool : bool = False, opponent_pool_config : OpponentPoolConfig = None,
                  normalize_features : bool = False, gpu_id: int = 0, merged_ad_features : bool = False,
-                 optimization_iterations : int = 28, eps_clip : float = 0.2, zero_mean_features : bool = False
+                 optimization_iterations : int = 28, eps_clip : float = 0.2, zero_mean_features : bool = False,
+                 lstm_network : bool = False, lstm_seq_length : int = 4, num_lstm_layers : int = 4
                  ):
         """
         Initialize environment and hyperparameters
@@ -93,6 +94,9 @@ class PolicyGradientAgentConfig:
         :param optimization_iterations: number of optimization iterations, this correspond to "K" in PPO
         :param eps_clip: clip parameter for PPO
         :param zero_mean_features: boolean flag whether to zero mean the features
+        :param lstm_network: boolean flag whether to use the LSTM network
+        :param lstm_seq_length: sequence length for LSTM
+        :param num_lstm_layers: number of LSTM layers (for stacked LSTM)
         """
         self.gamma = gamma
         self.alpha_attacker = alpha_attacker
@@ -151,6 +155,9 @@ class PolicyGradientAgentConfig:
         self.optimization_iterations = optimization_iterations
         self.eps_clip = eps_clip
         self.zero_mean_features = zero_mean_features
+        self.lstm_network = lstm_network
+        self.lstm_seq_length = lstm_seq_length
+        self.num_lstm_layers = num_lstm_layers
 
 
     def to_str(self) -> str:
@@ -166,7 +173,8 @@ class PolicyGradientAgentConfig:
                "output_dim_defender:{26},critic_loss_fn:{27},state_length:{28},alternating_optimization:{29}," \
                "alternating_period:{30},normalize_features:{31},alpha_defender:{32},gpu_id:{33}," \
                "merged_ad_features:{34},optimization_iterations{35},eps_clip:{36},zero_mean_features:{37}," \
-               "input_dim_defender:{38},input_dim_attacker:{39}".format(
+               "input_dim_defender:{38},input_dim_attacker:{39},lstm_network:{40},num_hidden_layers:{41}," \
+               "lstm_seq_length:{41},num_lstm_layers:{42}".format(
             self.gamma, self.alpha_attacker, self.epsilon, self.render, self.eval_sleep, self.epsilon_decay,
             self.min_epsilon, self.eval_episodes, self.train_log_frequency, self.eval_log_frequency, self.video,
             self.video_fps, self.video_dir, self.num_episodes, self.eval_render, self.gifs, self.gif_dir,
@@ -175,7 +183,8 @@ class PolicyGradientAgentConfig:
             self.critic_loss_fn, self.state_length, self.alternating_optimization, self.alternating_period,
             self.normalize_features, self.alpha_defender, self.gpu_id, self.merged_ad_features,
             self.optimization_iterations, self.eps_clip, self.zero_mean_features, self.input_dim_defender,
-            self.input_dim_attacker)
+            self.input_dim_attacker, self.lstm_network, self.num_hidden_layers, self.lstm_seq_length,
+            self.num_lstm_layers)
 
     def to_csv(self, file_path: str) -> None:
         """
@@ -238,6 +247,9 @@ class PolicyGradientAgentConfig:
             writer.writerow(["eps_clip", str(self.eps_clip)])
             writer.writerow(["zero_mean_features", str(self.zero_mean_features)])
             writer.writerow(["input_dim_defender", str(self.input_dim_defender)])
+            writer.writerow(["lstm_network", str(self.lstm_network)])
+            writer.writerow(["lstm_seq_length", str(self.lstm_seq_length)])
+            writer.writerow(["num_lstm_layers", str(self.num_lstm_layers)])
             if self.opponent_pool and self.opponent_pool_config is not None:
                 writer.writerow(["pool_maxsize", str(self.opponent_pool_config.pool_maxsize)])
                 writer.writerow(["pool_increment_period", str(self.opponent_pool_config.pool_increment_period)])
@@ -291,6 +303,9 @@ class PolicyGradientAgentConfig:
         hparams["eps_clip"] = self.eps_clip
         hparams["zero_mean_features"] = self.zero_mean_features
         hparams["input_dim_defender"] = self.input_dim_defender
+        hparams["lstm_network"] = self.lstm_network
+        hparams["lstm_seq_length"] = self.lstm_seq_length
+        hparams["num_lstm_layers"] = self.num_lstm_layers
         if self.opponent_pool and self.opponent_pool_config is not None:
             hparams["pool_maxsize"] = self.opponent_pool_config.pool_maxsize
             hparams["pool_increment_period"] = self.opponent_pool_config.pool_increment_period

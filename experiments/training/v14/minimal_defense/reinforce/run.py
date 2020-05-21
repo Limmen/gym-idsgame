@@ -67,15 +67,16 @@ def default_config() -> ClientConfig:
                                                 gpu=True, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
-                                                state_length=1, normalize_features=False, merged_ad_features=True,
-                                                zero_mean_features=False, gpu_id=0)
+                                                state_length=4, normalize_features=False, merged_ad_features=True,
+                                                zero_mean_features=False, gpu_id=0, lstm_network=True,
+                                                lstm_seq_length=4, num_lstm_layers=2)
     env_name = "idsgame-minimal_defense-v14"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.REINFORCE_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),
                                  title="REINFORCE vs DefendMinimalDefender",
                                  run_many=False, random_seeds=[0, 999, 299, 399, 499])
-    client_config = hp_tuning_config(client_config)
+    #client_config = hp_tuning_config(client_config)
     return client_config
 
 def write_default_config(path:str = None) -> None:

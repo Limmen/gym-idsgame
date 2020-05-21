@@ -13,6 +13,7 @@ from gym_idsgame.envs.idsgame_env import IdsGameEnv
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
 from gym_idsgame.envs.constants import constants
 from gym_idsgame.agents.training_agents.models.fnn_w_softmax import FNNwithSoftmax
+from gym_idsgame.agents.training_agents.models.lstm_w_softmax import LSTMwithSoftmax
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent import PolicyGradientAgent
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
 
@@ -48,14 +49,32 @@ class ReinforceAgent(PolicyGradientAgent):
         """
 
         # Initialize models
-        self.attacker_policy_network = FNNwithSoftmax(self.config.input_dim_attacker, self.config.output_dim_attacker,
-                                                      self.config.hidden_dim,
-                                                      num_hidden_layers=self.config.num_hidden_layers,
-                                                      hidden_activation=self.config.hidden_activation)
-        self.defender_policy_network = FNNwithSoftmax(self.config.input_dim_defender, self.config.output_dim_defender,
-                                                      self.config.hidden_dim,
-                                                      num_hidden_layers=self.config.num_hidden_layers,
-                                                      hidden_activation=self.config.hidden_activation)
+        if self.config.lstm_network:
+            self.attacker_policy_network = LSTMwithSoftmax(input_dim=self.config.input_dim_attacker,
+                                                           output_dim=self.config.output_dim_attacker,
+                                                           hidden_dim=self.config.hidden_dim,
+                                                           num_lstm_layers=self.config.num_lstm_layers,
+                                                           num_hidden_linear_layers=self.config.num_hidden_layers,
+                                                           hidden_activation="ReLU",
+                                                           seq_length=self.config.lstm_seq_length)
+            self.defender_policy_network = LSTMwithSoftmax(input_dim=self.config.input_dim_defender,
+                                                           output_dim=self.config.output_dim_defender,
+                                                           hidden_dim=self.config.hidden_dim,
+                                                           num_lstm_layers=self.config.num_lstm_layers,
+                                                           num_hidden_linear_layers=self.config.num_hidden_layers,
+                                                           hidden_activation="ReLU",
+                                                           seq_length=self.config.lstm_seq_length)
+        else:
+            self.attacker_policy_network = FNNwithSoftmax(input_dim=self.config.input_dim_attacker,
+                                                          output_dim=self.config.output_dim_attacker,
+                                                          hidden_dim=self.config.hidden_dim,
+                                                          num_hidden_layers=self.config.num_hidden_layers,
+                                                          hidden_activation=self.config.hidden_activation)
+            self.defender_policy_network = FNNwithSoftmax(input_dim=self.config.input_dim_defender,
+                                                          output_dim=self.config.output_dim_defender,
+                                                          hidden_dim=self.config.hidden_dim,
+                                                          num_hidden_layers=self.config.num_hidden_layers,
+                                                          hidden_activation=self.config.hidden_activation)
 
         # Specify device
         if torch.cuda.is_available() and self.config.gpu:
@@ -168,7 +187,10 @@ class ReinforceAgent(PolicyGradientAgent):
         :param non_legal_actions: list of disallowed actions
         :return: The sampled action id
         """
-        state = torch.from_numpy(state.flatten()).float()
+        if self.config.lstm_network:
+            state = torch.from_numpy(state.reshape(1, state.shape[0], state.shape[1]*state.shape[2])).float()
+        else:
+            state = torch.from_numpy(state.flatten()).float()
 
         # Move to GPU if using GPU
         if torch.cuda.is_available() and self.config.gpu:
