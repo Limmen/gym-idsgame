@@ -128,6 +128,7 @@ def test() -> None:
         y_pred = model(x)
 
         # Compute and print loss
+        print("y_pred shape:{}".format(y_pred.shape))
         loss = criterion(y_pred, y.squeeze())
         if t % 100 == 99:
             print("step: {}, loss:{}".format(t, loss.item()))

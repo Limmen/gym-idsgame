@@ -210,13 +210,13 @@ class ReinforceAgent(PolicyGradientAgent):
 
         # Forward pass using the current policy network to predict P(a|s)
         if attacker:
-            action_probs = self.attacker_policy_network(state)
+            action_probs = self.attacker_policy_network(state).squeeze()
         else:
-            action_probs = self.defender_policy_network(state)
+            action_probs = self.defender_policy_network(state).squeeze()
 
         # Set probability of non-legal actions to 0
         action_probs_1 = action_probs.clone()
-        if len(legal_actions) > 0 and len(non_legal_actions) < len(action_probs_1):
+        if len(legal_actions) > 0 and len(non_legal_actions) < self.env.num_attack_actions:
             action_probs_1[non_legal_actions] = 0
 
         # Use torch.distributions package to create a parameterizable probability distribution of the learned policy

@@ -382,7 +382,7 @@ class PolicyGradientAgent(TrainAgent, ABC):
         for action in legal_actions:
             global_action = PolicyGradientAgent.convert_local_attacker_action_to_global(action, attacker_obs)
             if self.env.is_attack_legal(global_action):
-                legal_actions_2.append(global_action)
+                legal_actions_2.append(action)
             else:
                 illegal_actions.append(action)
         return legal_actions_2, illegal_actions
