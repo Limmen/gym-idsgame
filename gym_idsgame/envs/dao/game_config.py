@@ -62,7 +62,7 @@ class GameConfig():
             self.initial_state = GameState.load(self.initial_state)
         if self.initial_state is None and self.initial_state_path is None:
             self.initial_state = GameState(min_random_a_val=min_random_a_val, min_random_det_val=min_random_det_val,
-                                           min_random_d_val=min_random_d_val)
+                                           min_random_d_val=min_random_d_val, max_value=self.max_value)
             self.initial_state.default_state(self.network_config.node_list, self.network_config.start_pos,
                                              self.num_attack_types, network_config=self.network_config)
         self.dense_rewards = dense_rewards

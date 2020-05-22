@@ -13,7 +13,7 @@ MANIFEST_PREFIX = FILE_PREFIX + '.manifest'
 
 class IdsGameMonitor(Wrapper):
     def __init__(self, env, directory, video_callable=None, force=False, resume=False,
-                 write_upon_reset=False, uid=None, mode=None, video_frequency = 1):
+                 write_upon_reset=False, uid=None, mode=None, video_frequency = 1, openai_baseline = False):
         super(IdsGameMonitor, self).__init__(env)
 
         self.videos = []
@@ -28,6 +28,7 @@ class IdsGameMonitor(Wrapper):
                             write_upon_reset, uid, mode)
         self.episode_frames = []
         self.video_frequency = video_frequency
+        self.openai_baseline = openai_baseline
 
     def step(self, action):
         self._before_step(action)
@@ -39,6 +40,8 @@ class IdsGameMonitor(Wrapper):
         return observation, reward, done, info
 
     def reset(self, **kwargs):
+        if self.openai_baseline and len(self.episode_frames) > 0:
+            return
         self._before_reset()
         observation = self.env.reset(**kwargs)
         self._after_reset(observation)
@@ -186,6 +189,8 @@ class IdsGameMonitor(Wrapper):
         if (self.episode_frames is not None and len(self.episode_frames) > 0
                 and (self.episode_id-1) % (self.video_frequency) == 0):
             imageio.mimsave(path, self.episode_frames, fps=fps)
+            if self.openai_baseline:
+                self.episode_frames = []
 
     def _before_reset(self):
         if not self.enabled: return

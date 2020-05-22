@@ -55,28 +55,27 @@ def default_config() -> ClientConfig:
                                                 min_epsilon=0.01, eval_episodes=100, train_log_frequency=100,
                                                 epsilon_decay=0.9999, video=True, eval_log_frequency=1,
                                                 video_fps=5, video_dir=default_output_dir() + "/results/videos",
-                                                num_episodes=10000,
+                                                num_episodes=2200001,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
                                                 eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=1000, input_dim_attacker=(4 + 3) * 2,
-                                                output_dim_attacker=4 * 2,
+                                                checkpoint_freq=5000, input_dim_attacker=(4 + 2) * 3 * 1, output_dim_attacker=4 * 3,
                                                 hidden_dim=32,
                                                 num_hidden_layers=1, batch_size=8,
                                                 gpu=True, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
                                                 state_length=1, normalize_features=False, merged_ad_features=True,
-                                                zero_mean_features=False, gpu_id=0, lstm_network=False,
-                                                lstm_seq_length=4, num_lstm_layers=2)
-    env_name = "idsgame-minimal_defense-v14"
+                                                zero_mean_features=False, gpu_id=0)
+    #input_dim = (4 + 3) * 2, output_dim_attacker = 4 * 2,
+    env_name = "idsgame-random_defense-v14"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.REINFORCE_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),
-                                 title="REINFORCE vs DefendMinimalDefender",
+                                 title="TrainingREINFORCEAgent vs RandomDefender",
                                  run_many=False, random_seeds=[0, 999, 299, 399, 499])
-    #client_config = hp_tuning_config(client_config)
+    client_config = hp_tuning_config(client_config)
     return client_config
 
 def write_default_config(path:str = None) -> None:
@@ -141,7 +140,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir, random_seed)
-    logger = util.setup_logger("reinforce_vs_minimal_defense-v14", config.output_dir + "/results/logs/" +
+    logger = util.setup_logger("reinforce_vs_random_defense-v14", config.output_dir + "/results/logs/" +
                                str(random_seed) + "/",
                                time_str=time_str)
     config.pg_agent_config.save_dir = default_output_dir() + "/results/data/" + str(random_seed) + "/"
@@ -172,7 +171,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
 # Program entrypoint
 if __name__ == '__main__':
     args = util.parse_args(default_config_path())
-    experiment_title = "REINFORCE vs minimal defense"
+    experiment_title = "REINFORCE vs random defense"
     if args.configpath is not None and not args.noconfig:
         if not os.path.exists(args.configpath):
             write_default_config()

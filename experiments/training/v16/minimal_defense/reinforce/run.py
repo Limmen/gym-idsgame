@@ -60,8 +60,8 @@ def default_config() -> ClientConfig:
                                                 gif_dir=default_output_dir() + "/results/gifs",
                                                 eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=1000, input_dim_attacker=(4 + 3) * 2,
-                                                output_dim_attacker=4 * 2,
+                                                checkpoint_freq=1000, input_dim_attacker=(4 + 2) * 3,
+                                                output_dim_attacker=4 * 3,
                                                 hidden_dim=32,
                                                 num_hidden_layers=1, batch_size=8,
                                                 gpu=True, tensorboard=True,
@@ -70,7 +70,7 @@ def default_config() -> ClientConfig:
                                                 state_length=1, normalize_features=False, merged_ad_features=True,
                                                 zero_mean_features=False, gpu_id=0, lstm_network=False,
                                                 lstm_seq_length=4, num_lstm_layers=2)
-    env_name = "idsgame-minimal_defense-v14"
+    env_name = "idsgame-minimal_defense-v16"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.REINFORCE_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),

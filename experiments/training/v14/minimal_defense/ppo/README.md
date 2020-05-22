@@ -13,7 +13,7 @@ The network configuration of the environment is as follows:
 - `num_layers=1` (number of layers between the start and end nodes)
 - `num_servers_per_layer=1`
 - `num_attack_types=4`
-- `max_value=9`  
+- `max_value=4`  
 
 <p align="center">
 <img src="docs/env.png" width="600">
@@ -21,7 +21,7 @@ The network configuration of the environment is as follows:
 
 The starting state for each node in the environment is initialized as follows (with some randomness for where the vulnerabilities are placed).
 
-- `defense_val=2`
+- `defense_val=(3-4)`
 - `attack_val=0`
 - `num_vulnerabilities_per_node=1` (which type of defense at the node that is vulnerable is selected randomly when the environment is initialized)
 - `det_val=1`
@@ -31,6 +31,8 @@ The starting state for each node in the environment is initialized as follows (w
 The environment has dense rewards (+1,-1 given whenever the attacker reaches a new level in the network)
 
 The environment is fully observed for both the attacker and defender.
+
+The state of the environment is randomized on upon every `reset()`
 
 ## Environment 
 
@@ -50,26 +52,30 @@ Example configuration in `config.json`:
 
 ```json
 {
-    "attacker_type": 8,
+    "attacker_type": 9,
     "defender_type": 1,
-    "env_name": "idsgame-minimal_defense-v10",
+    "env_name": "idsgame-minimal_defense-v14",
     "hp_tuning": false,
     "hp_tuning_config": null,
     "idsgame_config": null,
     "initial_state_path": null,
     "logger": null,
     "mode": 0,
-    "output_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v10/minimal_defense/actor_critic",
+    "output_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v14/minimal_defense/ppo",
     "pg_agent_config": {
-        "alpha": 1e-05,
+        "alpha_attacker": 0.001,
+        "alpha_defender": 0.1,
+        "alternating_optimization": false,
+        "alternating_period": 15000,
         "attacker": true,
         "attacker_load_path": null,
-        "batch_size": 32,
+        "batch_size": 1,
         "checkpoint_freq": 15000,
         "clip_gradient": false,
         "critic_loss_fn": "MSE",
         "defender": false,
         "defender_load_path": null,
+        "eps_clip": 0.2,
         "epsilon": 1,
         "epsilon_decay": 0.9999,
         "eval_episodes": 100,
@@ -79,32 +85,38 @@ Example configuration in `config.json`:
         "eval_render": false,
         "eval_sleep": 0.9,
         "gamma": 0.999,
-        "gif_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v10/minimal_defense/actor_critic/results/gifs",
+        "gif_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v14/minimal_defense/ppo/results/gifs",
         "gifs": true,
         "gpu": false,
+        "gpu_id": 0,
         "hidden_activation": "ReLU",
-        "hidden_dim": 64,
-        "input_dim": 264,
+        "hidden_dim": 36,
+        "input_dim": 30,
         "logger": null,
         "lr_decay_rate": 0.999,
         "lr_exp_decay": false,
         "max_gradient_norm": 40,
+        "merged_ad_features": false,
         "min_epsilon": 0.01,
+        "normalize_features": false,
         "num_episodes": 350001,
-        "num_hidden_layers": 4,
+        "num_hidden_layers": 1,
+        "opponent_pool": false,
+        "opponent_pool_config": null,
+        "optimization_iterations": 8,
         "optimizer": "Adam",
-        "output_dim_attacker": 30,
+        "output_dim_attacker": 12,
         "output_dim_defender": 33,
         "py/object": "gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config.PolicyGradientAgentConfig",
         "random_seed": 0,
         "render": false,
-        "save_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v10/minimal_defense/actor_critic/results/data",
-        "state_length": 4,
+        "save_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v14/minimal_defense/ppo/results/data",
+        "state_length": 1,
         "tensorboard": true,
-        "tensorboard_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v10/minimal_defense/actor_critic/results/tensorboard",
+        "tensorboard_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v14/minimal_defense/ppo/results/tensorboard",
         "train_log_frequency": 100,
         "video": true,
-        "video_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v10/minimal_defense/actor_critic/results/videos",
+        "video_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v14/minimal_defense/ppo/results/videos",
         "video_fps": 5,
         "video_frequency": 101
     },
@@ -120,7 +132,7 @@ Example configuration in `config.json`:
     ],
     "run_many": false,
     "simulation_config": null,
-    "title": "Actor-Critic vs DefendMinimalDefender"
+    "title": "PPO vs DefendMinimalDefender"
 }
 ```
 
@@ -136,7 +148,7 @@ pg_agent_config = PolicyGradientAgentConfig(gamma=0.999, alpha_attacker=0.001, e
                                                 gif_dir=default_output_dir() + "/results/gifs",
                                                 eval_frequency=10000, attacker=True, defender=False, video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=15000, input_dim=(4+1)*3*2, output_dim_attacker=4*3,
+                                                checkpoint_freq=15000, input_dim_attacker=(4 + 1) * 3 * 2, output_dim_attacker=4 * 3,
                                                 hidden_dim=36,
                                                 num_hidden_layers=1, batch_size=1,
                                                 gpu=False, tensorboard=True,

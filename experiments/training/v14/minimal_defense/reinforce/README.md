@@ -1,6 +1,6 @@
-# Experiment `minimal_defense-v8`_`reinforce`
+# Experiment `minimal_defense-v14`_`reinforce`
 
-This is an experiment in the `minimal_defense-v8` environment. 
+This is an experiment in the `minimal_defense-v14` environment. 
 An environment where the defender is following the `defend_minimal` defense policy. 
 The `defend_minimal` policy entails that the defender will always 
 defend the attribute with the minimal value out of all of its neighbors.
@@ -13,7 +13,7 @@ The network configuration of the environment is as follows:
 - `num_layers=1` (number of layers between the start and end nodes)
 - `num_servers_per_layer=1`
 - `num_attack_types=4`
-- `max_value=9`  
+- `max_value=4`  
 
 <p align="center">
 <img src="docs/env.png" width="600">
@@ -21,7 +21,7 @@ The network configuration of the environment is as follows:
 
 The starting state for each node in the environment is initialized as follows (with some randomness for where the vulnerabilities are placed).
 
-- `defense_val=2`
+- `defense_val=3-4 (random)`
 - `attack_val=0`
 - `num_vulnerabilities_per_node=1` (which type of defense at the node that is vulnerable is selected randomly when the environment is initialized)
 - `det_val=1`
@@ -32,13 +32,15 @@ The environment has dense rewards (+1,-1 given whenever the attacker reaches a n
 
 The environment is fully observed for both the attacker and defender.
 
+The state of the environment is randomized on upon every `reset()`
+
 ## Environment 
 
 - Env: `minimal_defense-v14`
 
 ## Algorithm
 
-- REINFORCE with linear exploration annealing  
+- REINFORCE  
  
 ## Instructions 
 
@@ -51,78 +53,78 @@ Example configuration in `config.json`:
 ```json
 {
     "attacker_type": 7,
+    "bot_attacker": false,
     "defender_type": 1,
-    "env_name": "idsgame-minimal_defense-v8",
-    "hp_tuning": true,
-    "hp_tuning_config": {
-        "alpha": [
-            1e-06,
-            1e-05,
-            0.0001,
-            0.001,
-            0.01
-        ],
-        "epsilon_decay": null,
-        "num_hidden_layers": [
-            1,
-            2,
-            4,
-            8,
-            16
-        ],
-        "param_1": "alpha",
-        "param_2": "num_hidden_layers",
-        "py/object": "gym_idsgame.config.hp_tuning_config.HpTuningConfig"
-    },
+    "env_name": "idsgame-minimal_defense-v14",
+    "hp_tuning": false,
+    "hp_tuning_config": null,
     "idsgame_config": null,
     "initial_state_path": null,
     "logger": null,
     "mode": 0,
-    "output_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v8/minimal_defense/reinforce",
+    "output_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v14/minimal_defense/reinforce",
     "pg_agent_config": {
-        "alpha": 1e-05,
+        "alpha_attacker": 0.001,
+        "alpha_defender": 0.1,
+        "alternating_optimization": false,
+        "alternating_period": 15000,
         "attacker": true,
         "attacker_load_path": null,
-        "batch_size": 32,
-        "checkpoint_freq": 5000,
+        "batch_size": 8,
+        "checkpoint_freq": 1000,
         "clip_gradient": false,
+        "critic_loss_fn": "MSE",
         "defender": false,
         "defender_load_path": null,
+        "eps_clip": 0.2,
         "epsilon": 1,
         "epsilon_decay": 0.9999,
         "eval_episodes": 100,
         "eval_epsilon": 0.0,
-        "eval_frequency": 10000,
+        "eval_frequency": 1000,
         "eval_log_frequency": 1,
         "eval_render": false,
         "eval_sleep": 0.9,
         "gamma": 0.999,
-        "gif_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v8/minimal_defense/reinforce/results/gifs",
+        "gif_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v14/minimal_defense/reinforce/results/gifs",
         "gifs": true,
-        "gpu": false,
+        "gpu": true,
+        "gpu_id": 0,
         "hidden_activation": "ReLU",
-        "hidden_dim": 64,
-        "input_dim": 33,
+        "hidden_dim": 32,
+        "input_dim_attacker": 14,
+        "input_dim_defender": 30,
         "logger": null,
         "lr_decay_rate": 0.999,
         "lr_exp_decay": false,
+        "lstm_network": false,
+        "lstm_seq_length": 4,
         "max_gradient_norm": 40,
+        "merged_ad_features": true,
         "min_epsilon": 0.01,
-        "num_episodes": 200001,
+        "normalize_features": false,
+        "num_episodes": 10000,
         "num_hidden_layers": 1,
+        "num_lstm_layers": 2,
+        "opponent_pool": false,
+        "opponent_pool_config": null,
+        "optimization_iterations": 28,
         "optimizer": "Adam",
-        "output_dim": 30,
+        "output_dim_attacker": 8,
+        "output_dim_defender": 33,
         "py/object": "gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config.PolicyGradientAgentConfig",
         "random_seed": 0,
         "render": false,
-        "save_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v8/minimal_defense/reinforce/results/data",
+        "save_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v14/minimal_defense/reinforce/results/data",
+        "state_length": 1,
         "tensorboard": true,
-        "tensorboard_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v8/minimal_defense/reinforce/results/tensorboard",
+        "tensorboard_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v14/minimal_defense/reinforce/results/tensorboard",
         "train_log_frequency": 100,
         "video": true,
-        "video_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v8/minimal_defense/reinforce/results/videos",
+        "video_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v14/minimal_defense/reinforce/results/videos",
         "video_fps": 5,
-        "video_frequency": 101
+        "video_frequency": 101,
+        "zero_mean_features": false
     },
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": null,
@@ -136,34 +138,39 @@ Example configuration in `config.json`:
     ],
     "run_many": false,
     "simulation_config": null,
-    "title": "TrainingREINFORCEAgent vs DefendMinimalDefender"
+    "title": "REINFORCE vs DefendMinimalDefender"
 }
 ```
 
 Example configuration in `run.py`:
 
 ```python
-pg_agent_config = PolicyGradientAgentConfig(gamma=0.999, alpha=0.00001, epsilon=1, render=False, eval_sleep=0.9,
+pg_agent_config = PolicyGradientAgentConfig(gamma=0.999, alpha_attacker=0.001, epsilon=1, render=False, eval_sleep=0.9,
                                                 min_epsilon=0.01, eval_episodes=100, train_log_frequency=100,
                                                 epsilon_decay=0.9999, video=True, eval_log_frequency=1,
                                                 video_fps=5, video_dir=default_output_dir() + "/results/videos",
-                                                num_episodes=200001,
+                                                num_episodes=10000,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
-                                                eval_frequency=10000, attacker=True, defender=False, video_frequency=101,
+                                                eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=5000, input_dim=33, output_dim_attacker=30, hidden_dim=64,
-                                                num_hidden_layers=1, batch_size=32,
-                                                gpu=False, tensorboard=True,
+                                                checkpoint_freq=1000, input_dim_attacker=(4 + 3) * 2,
+                                                output_dim_attacker=4 * 2,
+                                                hidden_dim=32,
+                                                num_hidden_layers=1, batch_size=8,
+                                                gpu=True, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
-                                                optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999)
-env_name = "idsgame-minimal_defense-v8"
+                                                optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
+                                                state_length=1, normalize_features=False, merged_ad_features=True,
+                                                zero_mean_features=False, gpu_id=0, lstm_network=False,
+                                                lstm_seq_length=4, num_lstm_layers=2)
+env_name = "idsgame-minimal_defense-v14"
 client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.REINFORCE_AGENT.value,
                              mode=RunnerMode.TRAIN_ATTACKER.value,
                              pg_agent_config=pg_agent_config, output_dir=default_output_dir(),
-                             title="TrainingREINFORCEAgent vs DefendMinimalDefender",
+                             title="REINFORCE vs DefendMinimalDefender",
                              run_many=False, random_seeds=[0, 999, 299, 399, 499])
-client_config = hp_tuning_config(client_config)
+#client_config = hp_tuning_config(client_config)
 return client_config
 ```
 
