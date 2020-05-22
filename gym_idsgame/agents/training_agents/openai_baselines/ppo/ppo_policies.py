@@ -221,15 +221,9 @@ class PPOPolicy(BasePolicy):
                                                          non_legal_actions=non_legal_actions, device=device)
 
         actions = distribution.get_actions(deterministic=deterministic)
-        log_prob = distribution.log_prob(actions)
-        #print("got actions:{}".format(actions))
-        # print("legal? action:{}".format(actions))
-        # print(env.is_attack_legal(actions))
-        #print("obs shape:{}".format(obs.shape))
-        # for a in actions.numpy():
-        #     print(a)
         actions = th.tensor(np.array([actions]))
-        actions.to(self.device)
+        actions = actions.to(self.device)
+        log_prob = distribution.log_prob(actions)
         return actions, values, log_prob
 
     def _get_latent(self, obs: th.Tensor) -> Tuple[th.Tensor, th.Tensor, th.Tensor]:

@@ -32,7 +32,8 @@ class PolicyGradientAgentConfig:
                  opponent_pool : bool = False, opponent_pool_config : OpponentPoolConfig = None,
                  normalize_features : bool = False, gpu_id: int = 0, merged_ad_features : bool = False,
                  optimization_iterations : int = 28, eps_clip : float = 0.2, zero_mean_features : bool = False,
-                 lstm_network : bool = False, lstm_seq_length : int = 4, num_lstm_layers : int = 4
+                 lstm_network : bool = False, lstm_seq_length : int = 4, num_lstm_layers : int = 4,
+                 gae_lambda : float = 0.95
                  ):
         """
         Initialize environment and hyperparameters
@@ -97,6 +98,7 @@ class PolicyGradientAgentConfig:
         :param lstm_network: boolean flag whether to use the LSTM network
         :param lstm_seq_length: sequence length for LSTM
         :param num_lstm_layers: number of LSTM layers (for stacked LSTM)
+        :param gae_lambda: gae_lambda parameter of PPO
         """
         self.gamma = gamma
         self.alpha_attacker = alpha_attacker
@@ -158,6 +160,7 @@ class PolicyGradientAgentConfig:
         self.lstm_network = lstm_network
         self.lstm_seq_length = lstm_seq_length
         self.num_lstm_layers = num_lstm_layers
+        self.gae_lambda = gae_lambda
 
 
     def to_str(self) -> str:
@@ -174,7 +177,7 @@ class PolicyGradientAgentConfig:
                "alternating_period:{30},normalize_features:{31},alpha_defender:{32},gpu_id:{33}," \
                "merged_ad_features:{34},optimization_iterations{35},eps_clip:{36},zero_mean_features:{37}," \
                "input_dim_defender:{38},input_dim_attacker:{39},lstm_network:{40},num_hidden_layers:{41}," \
-               "lstm_seq_length:{41},num_lstm_layers:{42}".format(
+               "lstm_seq_length:{41},num_lstm_layers:{42},gae_lambda:{43}".format(
             self.gamma, self.alpha_attacker, self.epsilon, self.render, self.eval_sleep, self.epsilon_decay,
             self.min_epsilon, self.eval_episodes, self.train_log_frequency, self.eval_log_frequency, self.video,
             self.video_fps, self.video_dir, self.num_episodes, self.eval_render, self.gifs, self.gif_dir,
@@ -184,7 +187,7 @@ class PolicyGradientAgentConfig:
             self.normalize_features, self.alpha_defender, self.gpu_id, self.merged_ad_features,
             self.optimization_iterations, self.eps_clip, self.zero_mean_features, self.input_dim_defender,
             self.input_dim_attacker, self.lstm_network, self.num_hidden_layers, self.lstm_seq_length,
-            self.num_lstm_layers)
+            self.num_lstm_layers, self.gae_lambda)
 
     def to_csv(self, file_path: str) -> None:
         """
@@ -250,6 +253,7 @@ class PolicyGradientAgentConfig:
             writer.writerow(["lstm_network", str(self.lstm_network)])
             writer.writerow(["lstm_seq_length", str(self.lstm_seq_length)])
             writer.writerow(["num_lstm_layers", str(self.num_lstm_layers)])
+            writer.writerow(["gae_lambda", str(self.gae_lambda)])
             if self.opponent_pool and self.opponent_pool_config is not None:
                 writer.writerow(["pool_maxsize", str(self.opponent_pool_config.pool_maxsize)])
                 writer.writerow(["pool_increment_period", str(self.opponent_pool_config.pool_increment_period)])
@@ -306,6 +310,7 @@ class PolicyGradientAgentConfig:
         hparams["lstm_network"] = self.lstm_network
         hparams["lstm_seq_length"] = self.lstm_seq_length
         hparams["num_lstm_layers"] = self.num_lstm_layers
+        hparams["gae_lambda"] = self.gae_lambda
         if self.opponent_pool and self.opponent_pool_config is not None:
             hparams["pool_maxsize"] = self.opponent_pool_config.pool_maxsize
             hparams["pool_increment_period"] = self.opponent_pool_config.pool_increment_period

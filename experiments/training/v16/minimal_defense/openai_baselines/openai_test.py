@@ -28,7 +28,7 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    pg_agent_config = PolicyGradientAgentConfig(gamma=0.999, alpha_attacker=0.001, epsilon=1, render=False,
+    pg_agent_config = PolicyGradientAgentConfig(gamma=0.999, alpha_attacker=0.0001, epsilon=1, render=False,
                                                 eval_sleep=0.9,
                                                 min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
                                                 epsilon_decay=0.9999, video=True, eval_log_frequency=1,
@@ -41,13 +41,14 @@ def default_config() -> ClientConfig:
                                                 checkpoint_freq=5000, input_dim_attacker=(4 + 2) * 3,
                                                 output_dim_attacker=4 * 3,
                                                 hidden_dim=32,
-                                                num_hidden_layers=1, batch_size=8,
+                                                num_hidden_layers=1, batch_size=2000,
                                                 gpu=True, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
                                                 state_length=1, normalize_features=False, merged_ad_features=True,
                                                 zero_mean_features=False, gpu_id=0, lstm_network=False,
-                                                lstm_seq_length=4, num_lstm_layers=2)
+                                                lstm_seq_length=4, num_lstm_layers=2, optimization_iterations=10,
+                                                eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95)
     env_name = "idsgame-minimal_defense-v16"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.REINFORCE_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
@@ -78,9 +79,6 @@ def test():
         config.output_dir + "/results/hyperparameters/" + str(random_seed) + "/" + time_str + ".csv")
     train_csv_path = ""
     eval_csv_path = ""
-    # env = gym.make(config.env_name, idsgame_config=config.idsgame_config,
-    #                save_dir=config.output_dir + "/results/data/" + str(config.random_seed),
-    #                initial_state_path=config.initial_state_path)
     wrapper_env = BaselineEnvWrapper(config.env_name, idsgame_config=config.idsgame_config,
                    save_dir=config.output_dir + "/results/data/" + str(config.random_seed),
                    initial_state_path=config.initial_state_path)
@@ -89,18 +87,19 @@ def test():
     policy_kwargs = dict(activation_fn=torch.nn.ReLU, net_arch=[32, 32])
 
     #check_env(wrapper_env)
+    device = "cpu" if not config.pg_agent_config.gpu else "cuda:" + str(config.pg_agent_config.gpu_id)
     model = PPO("MlpPolicy", wrapper_env,
-                learning_rate=0.0001,
-                n_steps=2000, # batch size is n_steps * n_env
-                n_epochs=10, # Number of epoch when optimizing the surrogate loss
-                gamma = 0.999,
-                gae_lambda=0.95,
-                clip_range=0.2,
-                max_grad_norm = 0.5,
+                learning_rate=config.pg_agent_config.alpha_attacker,
+                n_steps=config.pg_agent_config.batch_size,
+                n_epochs=config.pg_agent_config.optimization_iterations,
+                gamma = config.pg_agent_config.gamma,
+                gae_lambda=config.pg_agent_config.gae_lambda,
+                clip_range=config.pg_agent_config.eps_clip,
+                max_grad_norm = config.pg_agent_config.max_gradient_norm,
                 verbose=1, tensorboard_log=config.pg_agent_config.tensorboard_dir,
                 seed=config.random_seed,
                 policy_kwargs=policy_kwargs,
-                device="cpu",
+                device=device,
                 pg_agent_config = config.pg_agent_config)
 
     # Video config
@@ -117,15 +116,6 @@ def test():
                 eval_freq=config.pg_agent_config.eval_frequency,
                 n_eval_episodes=config.pg_agent_config.eval_episodes,
                 eval_env=eval_env)
-    # obs = wrapper_env.reset()
-    # for i in range(10000000):
-    #     obs = torch.tensor(obs)
-    #     res = model.predict(obs)
-    #     action = res.numpy()
-    #     obs, rewards, dones, info = wrapper_env.step(action)
-    #     wrapper_env.render()
-    #     if dones:
-    #         obs = wrapper_env.reset()
 
 
 if __name__ == '__main__':
