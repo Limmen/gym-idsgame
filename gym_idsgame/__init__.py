@@ -1082,3 +1082,70 @@ register(
     entry_point='gym_idsgame.envs:IdsGameV16Env',
     kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
 )
+
+# -------- Version 17 ------------
+
+# [AttackerEnv] 1 layer, 1 server per layer, 4 attack-defense-values, random defender
+# [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 16
+# [Observations] partially observed
+# [Environment] Random
+# [Local View] No
+register(
+    id='idsgame-random_defense-v17',
+    entry_point='gym_idsgame.envs:IdsGameRandomDefenseV17Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [AttackerEnv] 1 layer, 1 server per layer, 4 attack-defense-values, defender following the "defend minimal strategy"
+# [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 17
+# [Observations] partially observed
+# [Environment] Random
+# [Local View] No
+register(
+    id='idsgame-minimal_defense-v17',
+    entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV17Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [DefenseEnv] 1 layer, 1 server per layer, 4 attack-defense-values, random attacker
+# [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 17
+# [Observations] fully observed
+# [Environment] Random
+# [Local View] No
+register(
+    id='idsgame-random_attack-v17',
+    entry_point='gym_idsgame.envs:IdsGameRandomAttackV17Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [DefenseEnv] 1 layer, 1 server per layer, 4 attack-defense-values, attacker following the "attack maximal strategy"
+# [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 17
+# [Observations] partially observed
+# [Environment] Random
+# [Local View] No
+register(
+    id='idsgame-maximal_attack-v17',
+    entry_point='gym_idsgame.envs:IdsGameMaximalAttackV17Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [AttackDefenseEnv] 1 layer, 1 server per layer, 4 attack-defense-values
+# [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 0
+# [Rewards] Dense
+# [Version] 17
+# [Observations] partially observed
+# [Environment] Random
+# [Local View] No
+register(
+    id='idsgame-v17',
+    entry_point='gym_idsgame.envs:IdsGameV17Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)

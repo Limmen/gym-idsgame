@@ -92,6 +92,8 @@ class Runner:
                                              save_dir=config.output_dir + "/results/data/" + str(config.random_seed),
                                              initial_state_path=config.initial_state_path,
                                              pg_agent_config=config.pg_agent_config)
+            if config.title is not None:
+                wrapper_env.idsgame_env.idsgame_config.render_config.title = config.title
             attacker = OpenAiPPOAgent(wrapper_env, config.pg_agent_config)
         else:
             raise AssertionError("Attacker train agent type not recognized: {}".format(config.attacker_type))
@@ -129,6 +131,8 @@ class Runner:
                                              save_dir=config.output_dir + "/results/data/" + str(config.random_seed),
                                              initial_state_path=config.initial_state_path,
                                              pg_agent_config=config.pg_agent_config)
+            if config.title is not None:
+                wrapper_env.idsgame_env.idsgame_config.render_config.title = config.title
             defender = OpenAiPPOAgent(wrapper_env, config.pg_agent_config)
         else:
             raise AssertionError("Defender train agent type not recognized: {}".format(config.defender_type))
@@ -168,6 +172,8 @@ class Runner:
                                              save_dir=config.output_dir + "/results/data/" + str(config.random_seed),
                                              initial_state_path=config.initial_state_path,
                                              pg_agent_config=config.pg_agent_config)
+            if config.title is not None:
+                wrapper_env.idsgame_env.idsgame_config.render_config.title = config.title
             agent = OpenAiPPOAgent(wrapper_env, config.pg_agent_config)
         else:
             raise AssertionError("Train agent type not recognized: {}".format(config.attacker_type))

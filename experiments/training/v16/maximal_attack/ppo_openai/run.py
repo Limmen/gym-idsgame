@@ -52,6 +52,7 @@ def default_config() -> ClientConfig:
     :return: Default configuration for the experiment
     """
     pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.0001, epsilon=1, render=False,
+                                                alpha_defender=0.0001,
                                                 eval_sleep=0.9,
                                                 min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
                                                 epsilon_decay=0.9999, video=True, eval_log_frequency=1,
@@ -178,7 +179,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
 # Program entrypoint
 if __name__ == '__main__':
     args = util.parse_args(default_config_path())
-    experiment_title = "REINFORCE vs minimal defense"
+    experiment_title = "OpenAI-PPO vs minimal defense"
     if args.configpath is not None and not args.noconfig:
         if not os.path.exists(args.configpath):
             write_default_config()
