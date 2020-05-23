@@ -824,5 +824,15 @@ clean:
 	cd ./training/v16/maximal_attack/ppo_openai/ && $(MAKE) clean
 	cd ./training/v16/maximal_attack/reinforce/ && $(MAKE) clean
 
+	# V17
+	cd ./training/v17/minimal_defense/ppo_openai/ && $(MAKE) clean
+	cd ./training/v17/minimal_defense/reinforce/ && $(MAKE) clean
+	cd ./training/v17/minimal_defense/reinforce/ && $(MAKE) clean
+	cd ./training/v17/random_defense/reinforce/ && $(MAKE) clean
+	cd ./training/v17/two_agents/reinforce/ && $(MAKE) clean
+	cd ./training/v17/two_agents/ppo_openai/ && $(MAKE) clean
+	cd ./training/v17/maximal_attack/ppo_openai/ && $(MAKE) clean
+	cd ./training/v17/maximal_attack/reinforce/ && $(MAKE) clean
+
 	# Tests
 	cd ./it_tests/ && $(MAKE) clean

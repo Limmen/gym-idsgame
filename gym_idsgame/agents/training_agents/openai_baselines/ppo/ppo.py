@@ -4,11 +4,11 @@ An agent for the IDSGameEnv that uses the PPO Policy Gradient algorithm from Ope
 import time
 import torch
 from gym_idsgame.envs.rendering.video.idsgame_monitor import IdsGameMonitor
-from gym_idsgame.agents.training_agents.openai_baselines.lib.baseline_env_wrapper import BaselineEnvWrapper
+from gym_idsgame.agents.training_agents.openai_baselines.common.baseline_env_wrapper import BaselineEnvWrapper
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent import PolicyGradientAgent
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
-from gym_idsgame.agents.training_agents.openai_baselines.lib.ppo.ppo import PPO
+from gym_idsgame.agents.training_agents.openai_baselines.common.ppo.ppo import PPO
 
 class OpenAiPPOAgent(PolicyGradientAgent):
     """

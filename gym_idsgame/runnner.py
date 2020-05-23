@@ -32,7 +32,7 @@ from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendM
 from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
 from gym_idsgame.agents.training_agents.q_learning.tabular_q_learning.tabular_q_attacker_bot_agent import TabularQAttackerBotAgent
 from gym_idsgame.agents.training_agents.q_learning.tabular_q_learning.tabular_q_defender_bot_agent import TabularQDefenderBotAgent
-from gym_idsgame.agents.training_agents.openai_baselines.lib.baseline_env_wrapper import BaselineEnvWrapper
+from gym_idsgame.agents.training_agents.openai_baselines.common.baseline_env_wrapper import BaselineEnvWrapper
 
 class Runner:
     """
