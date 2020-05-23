@@ -20,6 +20,7 @@ from gym_idsgame.agents.training_agents.policy_gradient.reinforce.reinforce impo
 from gym_idsgame.agents.training_agents.policy_gradient.reinforce.reinforce_attacker_bot_agent import ReinforceAttackerBotAgent
 from gym_idsgame.agents.training_agents.policy_gradient.actor_critic.actor_critic import ActorCriticAgent
 from gym_idsgame.agents.training_agents.policy_gradient.ppo.ppo import PPOAgent
+from gym_idsgame.agents.training_agents.openai_baselines.ppo.ppo import OpenAiPPOAgent
 from gym_idsgame.agents.training_agents.train_agent import TrainAgent
 from gym_idsgame.agents.bot_agents.bot_agent import BotAgent
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
@@ -31,6 +32,7 @@ from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendM
 from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
 from gym_idsgame.agents.training_agents.q_learning.tabular_q_learning.tabular_q_attacker_bot_agent import TabularQAttackerBotAgent
 from gym_idsgame.agents.training_agents.q_learning.tabular_q_learning.tabular_q_defender_bot_agent import TabularQDefenderBotAgent
+from gym_idsgame.agents.training_agents.openai_baselines.lib.baseline_env_wrapper import BaselineEnvWrapper
 
 class Runner:
     """
@@ -85,6 +87,12 @@ class Runner:
             attacker = ActorCriticAgent(env, config.pg_agent_config)
         elif config.attacker_type == AgentType.PPO_AGENT.value:
             attacker = PPOAgent(env, config.pg_agent_config)
+        elif config.attacker_type == AgentType.PPO_OPENAI_AGENT.value:
+            wrapper_env = BaselineEnvWrapper(config.env_name, idsgame_config=config.idsgame_config,
+                                             save_dir=config.output_dir + "/results/data/" + str(config.random_seed),
+                                             initial_state_path=config.initial_state_path,
+                                             pg_agent_config=config.pg_agent_config)
+            attacker = OpenAiPPOAgent(wrapper_env, config.pg_agent_config)
         else:
             raise AssertionError("Attacker train agent type not recognized: {}".format(config.attacker_type))
         attacker.train()
@@ -116,6 +124,12 @@ class Runner:
             defender = ActorCriticAgent(env, config.pg_agent_config)
         elif config.defender_type == AgentType.PPO_AGENT.value:
             defender =  PPOAgent(env, config.pg_agent_config)
+        elif config.attacker_type == AgentType.PPO_OPENAI_AGENT.value:
+            wrapper_env = BaselineEnvWrapper(config.env_name, idsgame_config=config.idsgame_config,
+                                             save_dir=config.output_dir + "/results/data/" + str(config.random_seed),
+                                             initial_state_path=config.initial_state_path,
+                                             pg_agent_config=config.pg_agent_config)
+            defender = OpenAiPPOAgent(wrapper_env, config.pg_agent_config)
         else:
             raise AssertionError("Defender train agent type not recognized: {}".format(config.defender_type))
         defender.train()
@@ -149,6 +163,12 @@ class Runner:
             agent = ActorCriticAgent(env, config.pg_agent_config)
         elif config.attacker_type == AgentType.PPO_AGENT.value:
             agent = PPOAgent(env, config.pg_agent_config)
+        elif config.attacker_type == AgentType.PPO_OPENAI_AGENT.value:
+            wrapper_env = BaselineEnvWrapper(config.env_name, idsgame_config=config.idsgame_config,
+                                             save_dir=config.output_dir + "/results/data/" + str(config.random_seed),
+                                             initial_state_path=config.initial_state_path,
+                                             pg_agent_config=config.pg_agent_config)
+            agent = OpenAiPPOAgent(wrapper_env, config.pg_agent_config)
         else:
             raise AssertionError("Train agent type not recognized: {}".format(config.attacker_type))
         agent.train()

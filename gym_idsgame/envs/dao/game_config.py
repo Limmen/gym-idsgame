@@ -14,7 +14,7 @@ class GameConfig():
                  num_servers_per_layer: int = 2, num_attack_types: int = 10, max_value: int = 9,
                  initial_state: GameState = None, manual_defender: bool = False, initial_state_path :str = None,
                  dense_rewards = False, min_random_a_val :int = 0, min_random_d_val :int = 0,
-                 min_random_det_val :int = 0):
+                 min_random_det_val :int = 0, dense_rewards_v2 = False):
         """
         Class constructor, initializes the DTO
 
@@ -28,6 +28,7 @@ class GameConfig():
         :param initial_state: the initial state
         :param initial_state_path: path to the initial state saved on disk
         :param dense_rewards: if true, give hacker dense rewards (reward for each intermediate server hacked)
+        :param dense_rewards_v2: if true, give defender reward only when blocking
         :param min_random_a_val: minimum attack value when randomizing the state
         :param min_random_d_val: minimum defense value when randomizing the state
         :param min_random_det_val: minimum detection value when randomizing the state
@@ -53,6 +54,7 @@ class GameConfig():
         self.attack_val = 0
         self.num_vulnerabilities_per_node = 1
         self.det_val = 2
+        self.dense_rewards_v2 = dense_rewards_v2
         self.vulnerabilitiy_val = 0
         self.num_vulnerabilities_per_layer = None
         if network_config is None:

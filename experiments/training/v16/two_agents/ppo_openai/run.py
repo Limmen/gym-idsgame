@@ -51,36 +51,38 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    pg_agent_config = PolicyGradientAgentConfig(gamma=0.999, alpha_attacker=0.0001, alpha_defender=0.0001,
-                                                epsilon=1, render=False, eval_sleep=0.9,
-                                                min_epsilon=0.01, eval_episodes=100, train_log_frequency=100,
+    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.0001, epsilon=1, render=False,
+                                                eval_sleep=0.9,
+                                                min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
                                                 epsilon_decay=0.9999, video=True, eval_log_frequency=1,
                                                 video_fps=5, video_dir=default_output_dir() + "/results/videos",
-                                                num_episodes=450001,
+                                                num_episodes=100000000,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
-                                                eval_frequency=1000, attacker=True, defender=True, video_frequency=101,
+                                                eval_frequency=250000, attacker=True, defender=True,
+                                                video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=5000, input_dim_attacker=(4 + 3) * 2,
-                                                input_dim_defender=(4+2)*3,
-                                                output_dim_attacker=4 * 2,
-                                                output_dim_defender=(4+1)*3,
+                                                checkpoint_freq=5000, input_dim_attacker=(4 + 2) * 3,
+                                                output_dim_attacker=4 * 3,
+                                                input_dim_defender=(4 + 2) * 3,
+                                                output_dim_defender=5 * 3,
                                                 hidden_dim=32,
-                                                num_hidden_layers=1, batch_size=16,
-                                                gpu=False, tensorboard=True,
+                                                num_hidden_layers=2, batch_size=2000,
+                                                gpu=True, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
-                                                normalize_features=False, merged_ad_features=True,
-                                                zero_mean_features=False, gpu_id=0
-                                                )
+                                                state_length=1, normalize_features=False, merged_ad_features=True,
+                                                zero_mean_features=False, gpu_id=0, lstm_network=False,
+                                                lstm_seq_length=4, num_lstm_layers=2, optimization_iterations=10,
+                                                eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95)
     env_name = "idsgame-v16"
-    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.REINFORCE_AGENT.value,
-                                 defender_type=AgentType.REINFORCE_AGENT.value,
+    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.PPO_OPENAI_AGENT.value,
+                                 defender_type=AgentType.PPO_OPENAI_AGENT.value,
                                  mode=RunnerMode.TRAIN_DEFENDER_AND_ATTACKER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),
-                                 title="REINFORCE vs REINFORCE",
+                                 title="OpenAI-PPO vs OpenAI-PPO",
                                  run_many=False, random_seeds=[0, 999, 299, 399, 499])
-    #client_config = hp_tuning_config(client_config)
+    # client_config = hp_tuning_config(client_config)
     return client_config
 
 def write_default_config(path:str = None) -> None:
@@ -145,7 +147,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir, random_seed)
-    logger = util.setup_logger("reinforce_vs_reinforce-v16", config.output_dir + "/results/logs/" +
+    logger = util.setup_logger("openai-ppo_vs_openai-ppo-v16", config.output_dir + "/results/logs/" +
                                str(random_seed) + "/",
                                time_str=time_str)
     config.pg_agent_config.save_dir = default_output_dir() + "/results/data/" + str(random_seed) + "/"
@@ -176,7 +178,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
 # Program entrypoint
 if __name__ == '__main__':
     args = util.parse_args(default_config_path())
-    experiment_title = "REINFORCE vs REINFORCE"
+    experiment_title = "REINFORCE vs minimal defense"
     if args.configpath is not None and not args.noconfig:
         if not os.path.exists(args.configpath):
             write_default_config()

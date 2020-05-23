@@ -11,3 +11,4 @@ class AgentType(Enum):
     REINFORCE_AGENT = 7
     ACTOR_CRITIC_AGENT = 8
     PPO_AGENT = 9
+    PPO_OPENAI_AGENT = 10

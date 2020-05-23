@@ -87,6 +87,8 @@ class IdsGameEnv(gym.Env, ABC):
         self.game_trajectory = []
         self.attack_detections = []
         self.total_attacks = []
+        self.defenses = []
+        self.attacks = []
 
     # -------- API ------------
     def step(self, action: int) -> Union[np.ndarray, int, bool, dict]:
@@ -126,8 +128,10 @@ class IdsGameEnv(gym.Env, ABC):
 
         # 3. Defend
         detect = defense_type == self.idsgame_config.game_config.num_attack_types
-        self.state.defend(defense_node_id, defense_type, self.idsgame_config.game_config.max_value,
+        defense_successful = self.state.defend(defense_node_id, defense_type, self.idsgame_config.game_config.max_value,
                           self.idsgame_config.game_config.network_config, detect=detect)
+        if defense_successful:
+            self.defenses.append((defense_node_id, defense_type, detect, self.state.game_step))
         self.state.add_defense_event(defense_pos, defense_type)
 
         if util.is_attack_legal(target_pos, attacker_pos, self.idsgame_config.game_config.network_config,
@@ -137,6 +141,7 @@ class IdsGameEnv(gym.Env, ABC):
             self.state.attack(target_node_id, attack_type, self.idsgame_config.game_config.max_value,
                               self.idsgame_config.game_config.network_config)
             self.state.add_attack_event(target_pos, attack_type, self.state.attacker_pos)
+            self.attacks.append((target_node_id, attack_type, self.state.game_step))
 
             # 5. Simulate attack outcome
             attack_successful = self.state.simulate_attack(target_node_id, attack_type,
@@ -160,7 +165,9 @@ class IdsGameEnv(gym.Env, ABC):
                 if detected:
                     self.state.done = True
                     self.state.detected = True
-                    reward = self.get_detect_reward()
+                    reward = self.get_detect_reward(target_node_id,  attack_type, self.state.defense_det[target_node_id])
+                else:
+                    reward = self.get_blocked_attack_reward(target_node_id, attack_type)
                 if self.idsgame_config.save_attack_stats:
                     self.attack_detections.append([target_node_id, detected, self.state.defense_det[target_node_id]])
         #else:
@@ -215,6 +222,8 @@ class IdsGameEnv(gym.Env, ABC):
             self.viewer.gameframe.reset()
         observation = self.get_observation()
         self.past_positions.append(self.state.attacker_pos)
+        self.defenses = []
+        self.attacks = []
         return observation
 
     def restart(self) -> np.ndarray:
@@ -359,21 +368,55 @@ class IdsGameEnv(gym.Env, ABC):
 
         :return: (attacker_reward, defender_reward)
         """
-        if not self.idsgame_config.game_config.dense_rewards:
+        if not self.idsgame_config.game_config.dense_rewards and not self.idsgame_config.game_config.dense_rewards_v2:
             return constants.GAME_CONFIG.POSITIVE_REWARD, -constants.GAME_CONFIG.POSITIVE_REWARD
-        else:
+        elif self.idsgame_config.game_config.dense_rewards and not self.idsgame_config.game_config.dense_rewards_v2:
             return 100*constants.GAME_CONFIG.POSITIVE_REWARD, -100*constants.GAME_CONFIG.POSITIVE_REWARD
+        else:
+            # detection_actions = 0
+            # for defense in self.defenses:
+            #     if defense[2]:
+            #         detection_actions += 1
+            # unblocked_attacks = 0
+            # for defense in self.defenses:
+            #     blocked = False
+            #     for attack in self.attacks:
+            #         if defense[0] == attack[0] and defense[1] == attack[1] and defense[3] < attack[2]:
+            #             blocked = True
+            #     if not blocked:
+            #         unblocked_attacks += 1
+            # norm_factor = self.state.game_step if self.state.game_step > 0 else 1
+            # reward = -((unblocked_attacks)/norm_factor)
+            # #print("reward:{}".format(reward))
+            return 1 * constants.GAME_CONFIG.POSITIVE_REWARD, 0
 
-    def get_detect_reward(self) -> Union[int, int]:
+    def get_detect_reward(self, target_node_id : int, attack_type : int, detection_value) -> Union[int, int]:
         """
         Returns the attacker and defender reward in the case when the attacker was detected.
 
         :return: (attacker_reward, defender_reward)
         """
-        if not self.idsgame_config.game_config.dense_rewards:
+        if not self.idsgame_config.game_config.dense_rewards and not self.idsgame_config.game_config.dense_rewards_v2:
             return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
-        else:
+        elif self.idsgame_config.game_config.dense_rewards and not self.idsgame_config.game_config.dense_rewards_v2:
             return -100*constants.GAME_CONFIG.POSITIVE_REWARD, 100*constants.GAME_CONFIG.POSITIVE_REWARD
+        else:
+            added_detection = 0
+            for defense in self.defenses:
+                if defense[2] and defense[0] == target_node_id:
+                    added_detection += 1
+            # detection_ratio = added_detection/((detection_value+1))
+            # blocked_attacks = 0
+            # for defense in self.defenses:
+            #     blocked = False
+            #     for attack in self.attacks:
+            #         if defense[0] == attack[0] and defense[1] == attack[1] and defense[3] < attack[2]:
+            #             blocked = True
+            #     if blocked:
+            #         blocked_attacks += 1
+            # norm_factor = self.state.game_step if self.state.game_step > 0 else 1
+            # reward = (blocked_attacks)/norm_factor
+            return -constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
 
     def get_successful_attack_reward(self) -> Union[int, int]:
         """
@@ -382,9 +425,9 @@ class IdsGameEnv(gym.Env, ABC):
 
         :return:(attacker_reward, defender_reward)
         """
-        if not self.idsgame_config.game_config.dense_rewards:
+        if not self.idsgame_config.game_config.dense_rewards and not self.idsgame_config.game_config.dense_rewards_v2:
             return 0, 0
-        else:
+        elif self.idsgame_config.game_config.dense_rewards and not self.idsgame_config.game_config.dense_rewards_v2:
             attack_row, attack_col = self.state.attacker_pos
             if attack_row < self.furthest_hack:
                 self.furthest_hack = attack_row
@@ -392,6 +435,39 @@ class IdsGameEnv(gym.Env, ABC):
             elif attack_row > self.furthest_hack:
                 return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
             return 0,0
+        else:
+            attack_row, attack_col = self.state.attacker_pos
+            if attack_row < self.furthest_hack:
+                self.furthest_hack = attack_row
+                return constants.GAME_CONFIG.POSITIVE_REWARD, 0
+            elif attack_row > self.furthest_hack:
+                return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
+            return 0, 0
+
+    def get_blocked_attack_reward(self, target_node_id : int, attack_type : int) -> Union[int, int]:
+        """
+        Returns the reward for the attacker and defender after a blocked attack on some server in
+        the network
+
+        :return:(attacker_reward, defender_reward)
+        """
+        if not self.idsgame_config.game_config.dense_rewards and not self.idsgame_config.game_config.dense_rewards_v2:
+            return 0, 0
+        elif self.idsgame_config.game_config.dense_rewards and not self.idsgame_config.game_config.dense_rewards_v2:
+            return 0, 0
+        else:
+            upd_defenses = []
+            match = False
+            for defense in self.defenses:
+                if ((defense[0] == target_node_id and defense[1] == attack_type)) \
+                        and not match:
+                   match = True
+                else:
+                    upd_defenses.append(defense)
+            self.defenses = upd_defenses
+            if match:
+                return 0, constants.GAME_CONFIG.POSITIVE_REWARD
+            return 0, 0
 
     def get_observation(self) -> Union[np.ndarray, np.ndarray]:
         """
@@ -3081,7 +3157,7 @@ class IdsGameRandomDefenseV16Env(AttackerEnv):
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
             game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
                                           vulnerability_val=0, num_vulnerabilities_per_layer=1)
-            game_config.dense_rewards = True
+            game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = True
             game_config.network_config.relative_neighbor_positions = [(-1, 0), (1, 0)]
             if initial_state_path is not None:
@@ -3117,7 +3193,7 @@ class IdsGameMinimalDefenseV16Env(AttackerEnv):
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
             game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
                                           vulnerability_val=0, num_vulnerabilities_per_layer=1)
-            game_config.dense_rewards = True
+            game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = True
             game_config.network_config.relative_neighbor_positions = [(-1, 0), (1, 0)]
             if initial_state_path is not None:
@@ -3153,7 +3229,7 @@ class IdsGameRandomAttackV16Env(DefenderEnv):
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
             game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
                                           vulnerability_val=0, num_vulnerabilities_per_layer=1)
-            game_config.dense_rewards = True
+            game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = True
             game_config.network_config.relative_neighbor_positions = [(-1, 0), (1, 0)]
             if initial_state_path is not None:
@@ -3186,10 +3262,10 @@ class IdsGameMaximalAttackV16Env(DefenderEnv):
         """
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
-                                     min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
-            game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
+                                     min_random_a_val=0, min_random_d_val=1, min_random_det_val=1)
+            game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=1, det_val=4,
                                           vulnerability_val=0, num_vulnerabilities_per_layer=1)
-            game_config.dense_rewards = True
+            game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = True
             game_config.network_config.relative_neighbor_positions = [(-1, 0), (1, 0)]
             if initial_state_path is not None:
@@ -3225,7 +3301,7 @@ class IdsGameV16Env(AttackDefenseEnv):
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
             game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
                                           vulnerability_val=0, num_vulnerabilities_per_layer=1)
-            game_config.dense_rewards = True
+            game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = True
             game_config.network_config.relative_neighbor_positions = [(-1, 0), (1, 0)]
             if initial_state_path is not None:

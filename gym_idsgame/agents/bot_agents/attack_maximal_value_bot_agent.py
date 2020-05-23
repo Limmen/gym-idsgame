@@ -46,5 +46,8 @@ class AttackMaximalValueBotAgent(BotAgent):
                     max_node_value = game_state.attack_values[id][max_idx]
                     max_action_id = action_id
         if max_action_id == -1:
-            max_action_id = np.random.choice(legal_actions)
+            if len(legal_actions) > 0:
+                max_action_id = np.random.choice(legal_actions)
+            else:
+                max_action_id = np.random.choice(actions)
         return max_action_id

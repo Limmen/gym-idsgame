@@ -115,7 +115,7 @@ class ReinforceAgent(PolicyGradientAgent):
         :param saved_log_probs list of log-action probabilities (log p(a|s)) encountered in the latest episode trajectory
         :return: loss
         """
-
+        #print("saved rewards: {}".format(sum(sum(x) for x in saved_rewards)))
         policy_loss = []
 
         num_batches = len(saved_rewards)
@@ -211,13 +211,18 @@ class ReinforceAgent(PolicyGradientAgent):
         # Forward pass using the current policy network to predict P(a|s)
         if attacker:
             action_probs = self.attacker_policy_network(state).squeeze()
+            # Set probability of non-legal actions to 0
+            action_probs_1 = action_probs.clone()
+            if len(legal_actions) > 0 and len(non_legal_actions) < self.env.num_attack_actions:
+                action_probs_1[non_legal_actions] = 0
         else:
             action_probs = self.defender_policy_network(state).squeeze()
-
-        # Set probability of non-legal actions to 0
-        action_probs_1 = action_probs.clone()
-        if len(legal_actions) > 0 and len(non_legal_actions) < self.env.num_attack_actions:
-            action_probs_1[non_legal_actions] = 0
+            # Set probability of non-legal actions to 0
+            action_probs_1 = action_probs.clone()
+            # print("state shape:{}".format(state.shape))
+            # print("action shape:{}".format(action_probs_1.shape))
+            if len(legal_actions) > 0 and len(non_legal_actions) < self.env.num_defense_actions:
+                action_probs_1[non_legal_actions] = 0
 
         # Use torch.distributions package to create a parameterizable probability distribution of the learned policy
         # PG uses a trick to turn the gradient into a stochastic gradient which we can sample from in order to
@@ -236,7 +241,7 @@ class ReinforceAgent(PolicyGradientAgent):
             print("action_probs_1: {}".format(action_probs_1))
             print("state: {}".format(state))
             print("policy_dist: {}".format(policy_dist))
-            action = 0
+            action = torch.tensor(0).type(torch.LongTensor)
 
         # log_prob returns the log of the probability density/mass function evaluated at value.
         # save the log_prob as it will use later on for computing the policy gradient
