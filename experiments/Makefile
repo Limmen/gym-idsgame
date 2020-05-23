@@ -530,7 +530,92 @@ tabular_q_learning_vs_minimal_defense-v13: training/v13/minimal_defense/tabular_
 actor_critic_vs_actor_critic-v13: training/v13/two_agents/actor_critic/run.py training/v13/two_agents/actor_critic/run.sh
 	cd training/v13/two_agents/actor_critic/ && $(MAKE) run
 
+maximal_attack_vs_tabular_q_learning-v13: training/v13/maximal_attack/tabular_q_learning/run.py training/v13/maximal_attack/tabular_q_learning/run.sh
+	cd training/v13/maximal_attack/tabular_q_learnig/ && $(MAKE) run
+
 v13: actor_critic_vs_minimal_defense-v13 actor_critic_vs_actor_critic-v13 tabular_q_learning_vs_minimal_defense-v13
+v13: maximal_attack_vs_tabular_q_learning-v13
+
+# v14 Experiments
+
+actor_critic_vs_minimal_defense-v14: training/v14/minimal_defense/actor_critic/run.py training/v14/minimal_defense/actor_critic/run.sh
+	cd training/v14/minimal_defense/actor_critic/ && $(MAKE) run
+
+ppo_vs_minimal_defense-v14: training/v14/minimal_defense/ppo/run.py training/v14/minimal_defense/ppo/run.sh
+	cd training/v14/minimal_defense/ppo/ && $(MAKE) run
+
+reinforce_vs_minimal_defense-v14: training/v14/minimal_defense/reinforce/run.py training/v14/minimal_defense/reinforce/run.sh
+	cd training/v14/minimal_defense/reinforce/ && $(MAKE) run
+
+reinforce_vs_random_defense-v14: training/v14/random_defense/actor_critic/run.py training/v14/random_defense/actor_critic/run.sh
+	cd training/v14/random_defense/actor_critic/ && $(MAKE) run
+
+reinforce_vs_reinforce-v14: training/v14/two_agents/reinforce/run.py training/v14/two_agents/reinforce/run.sh
+	cd training/v14/two_agents/reinforce/ && $(MAKE) run
+
+v14: reinforce_vs_reinforce-v14 reinforce_vs_random_defense-v14 reinforce_vs_minimal_defense-v14
+v14: ppo_vs_minimal_defense-v14 actor_critic_vs_minimal_defense-v14
+
+# v15 Experiments
+
+reinforce_vs_minimal_defense-v15: training/v15/minimal_defense/reinforce/run.py training/v15/minimal_defense/reinforce/run.sh
+	cd training/v15/minimal_defense/reinforce/ && $(MAKE) run
+
+v15: reinforce_vs_minimal_defense-v15
+
+# v16 Experiments
+
+ppo_openai_vs_minimal_defense-v16: training/v16/minimal_defense/ppo_openai/run.py training/v16/minimal_defense/ppo_openai/run.sh
+	cd training/v16/minimal_defense/ppo_openai/ && $(MAKE) run
+
+reinforce_vs_minimal_defense-v16: training/v16/minimal_defense/reinforce/run.py training/v16/minimal_defense/reinforce/run.sh
+	cd training/v16/minimal_defense/reinforce/ && $(MAKE) run
+
+reinforce_vs_random_defense-v16: training/v16/random_defense/reinforce/run.py training/v16/random_defense/reinforce/run.sh
+	cd training/v16/random_defense/reinforce/ && $(MAKE) run
+
+reinforce_vs_reinforce-v16: training/v16/two_agents/reinforce/run.py training/v16/two_agents/reinforce/run.sh
+	cd training/v16/two_agents/reinforce/ && $(MAKE) run
+
+ppo_openai_vs_ppo_openai-v16: training/v16/two_agents/ppo_openai/run.py training/v16/two_agents/ppo_openai/run.sh
+	cd training/v16/two_agents/ppo_openai/ && $(MAKE) run
+
+maximal_attack_vs_ppo_openai-v16: training/v16/maximal_attack/ppo_openai/run.py training/v16/maximal_attack/ppo_openai/run.sh
+	cd training/v16/maximal_attack/ppo_openai/ && $(MAKE) run
+
+maximal_attack_vs_reinforce-v16: training/v16/maximal_attack/reinforce/run.py training/v16/maximal_attack/reinforce/run.sh
+	cd training/v16/maximal_attack/reinforce/ && $(MAKE) run
+
+v16: ppo_openai_vs_minimal_defense-v16 reinforce_vs_minimal_defense-v16 reinforce_vs_random_defense-v16
+v16: reinforce_vs_reinforce-v16 maximal_attack_vs_ppo_openai-v16 maximal_attack_vs_reinforce-v16
+v16: ppo_openai_vs_ppo_openai-v16
+
+# v17 Experiments
+
+ppo_openai_vs_minimal_defense-v17: training/v17/minimal_defense/ppo_openai/run.py training/v17/minimal_defense/ppo_openai/run.sh
+	cd training/v17/minimal_defense/ppo_openai/ && $(MAKE) run
+
+reinforce_vs_minimal_defense-v17: training/v17/minimal_defense/reinforce/run.py training/v17/minimal_defense/reinforce/run.sh
+	cd training/v17/minimal_defense/reinforce/ && $(MAKE) run
+
+reinforce_vs_random_defense-v17: training/v17/random_defense/reinforce/run.py training/v17/random_defense/reinforce/run.sh
+	cd training/v17/random_defense/reinforce/ && $(MAKE) run
+
+reinforce_vs_reinforce-v17: training/v17/two_agents/reinforce/run.py training/v17/two_agents/reinforce/run.sh
+	cd training/v17/two_agents/reinforce/ && $(MAKE) run
+
+ppo_openai_vs_ppo_openai-v17: training/v17/two_agents/ppo_openai/run.py training/v17/two_agents/ppo_openai/run.sh
+	cd training/v17/two_agents/ppo_openai/ && $(MAKE) run
+
+maximal_attack_vs_ppo_openai-v17: training/v17/maximal_attack/ppo_openai/run.py training/v17/maximal_attack/ppo_openai/run.sh
+	cd training/v17/maximal_attack/ppo_openai/ && $(MAKE) run
+
+maximal_attack_vs_reinforce-v17: training/v17/maximal_attack/reinforce/run.py training/v17/maximal_attack/reinforce/run.sh
+	cd training/v17/maximal_attack/reinforce/ && $(MAKE) run
+
+v17: ppo_openai_vs_minimal_defense-v17 reinforce_vs_minimal_defense-v17 reinforce_vs_random_defense-v17
+v17: reinforce_vs_reinforce-v17 maximal_attack_vs_ppo_openai-v17 maximal_attack_vs_reinforce-v17
+v17: ppo_openai_vs_ppo_openai-v17
 
 # Tests
 
@@ -539,7 +624,7 @@ tests: it_tests/run.py it_tests/run.sh
 
 # All
 
-all: v0 v1 v2 v3 v4 v5 v6 v7 v8 v9 v10 v11 v12 v13 tests
+all: v0 v1 v2 v3 v4 v5 v6 v7 v8 v9 v10 v11 v12 v13 v14 v15 v16 v17 tests
 
 # Clean
 
@@ -717,6 +802,27 @@ clean:
 	cd ./training/v13/minimal_defense/tabular_q_learning/ && $(MAKE) clean
 	cd ./training/v13/minimal_defense/actor_critic/ && $(MAKE) clean
 	cd ./training/v13/two_agents/actor_critic/ && $(MAKE) clean
+	cd ./training/v13/maximal_attack/tabular_q_learning/ && $(MAKE) clean
+
+	# V14
+	cd ./training/v14/minimal_defense/reinforce/ && $(MAKE) clean
+	cd ./training/v14/minimal_defense/actor_critic/ && $(MAKE) clean
+	cd ./training/v14/minimal_defense/ppo/ && $(MAKE) clean
+	cd ./training/v14/random_defense/reinforce/ && $(MAKE) clean
+	cd ./training/v14/two_agents/reinforce/ && $(MAKE) clean
+
+	# V15
+	cd ./training/v15/minimal_defense/reinforce/ && $(MAKE) clean
+
+	# V16
+	cd ./training/v16/minimal_defense/ppo_openai/ && $(MAKE) clean
+	cd ./training/v16/minimal_defense/reinforce/ && $(MAKE) clean
+	cd ./training/v16/minimal_defense/reinforce/ && $(MAKE) clean
+	cd ./training/v16/random_defense/reinforce/ && $(MAKE) clean
+	cd ./training/v16/two_agents/reinforce/ && $(MAKE) clean
+	cd ./training/v16/two_agents/ppo_openai/ && $(MAKE) clean
+	cd ./training/v16/maximal_attack/ppo_openai/ && $(MAKE) clean
+	cd ./training/v16/maximal_attack/reinforce/ && $(MAKE) clean
 
 	# Tests
 	cd ./it_tests/ && $(MAKE) clean
