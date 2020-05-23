@@ -36,11 +36,11 @@ def default_config() -> ClientConfig:
                                                 num_episodes=100000000,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
-                                                eval_frequency=100, attacker=True, defender=False, video_frequency=101,
+                                                eval_frequency=100000, attacker=True, defender=True, video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
                                                 checkpoint_freq=5000, input_dim_attacker=(4 + 2) * 3,
-                                                output_dim_attacker=4 * 3,
                                                 input_dim_defender=(4 + 2) * 3,
+                                                output_dim_attacker=4 * 3,
                                                 output_dim_defender=4 * 3,
                                                 hidden_dim=32,
                                                 num_hidden_layers=1, batch_size=2000,
@@ -51,9 +51,10 @@ def default_config() -> ClientConfig:
                                                 zero_mean_features=False, gpu_id=0, lstm_network=False,
                                                 lstm_seq_length=4, num_lstm_layers=2, optimization_iterations=10,
                                                 eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95)
-    env_name = "idsgame-minimal_defense-v16"
+    #env_name = "idsgame-minimal_defense-v16"
+    env_name = "idsgame-v16"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.REINFORCE_AGENT.value,
-                                 mode=RunnerMode.TRAIN_ATTACKER.value,
+                                 mode=RunnerMode.TRAIN_DEFENDER_AND_ATTACKER,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),
                                  title="REINFORCE vs DefendMinimalDefender",
                                  run_many=False, random_seeds=[0, 999, 299, 399, 499])

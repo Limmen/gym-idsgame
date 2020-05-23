@@ -7,10 +7,10 @@ from typing import Union, List, Dict, Any, Optional
 import gym
 import numpy as np
 
-from stable_baselines3.common.vec_env import DummyVecEnv, VecEnv, sync_envs_normalization
 from gym_idsgame.agents.training_agents.openai_baselines.evaluation import evaluate_policy
 from stable_baselines3.common.logger import Logger
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
+from gym_idsgame.agents.training_agents.openai_baselines.vec_env import DummyVecEnv, VecEnv, sync_envs_normalization
 
 if typing.TYPE_CHECKING:
     from stable_baselines3.common.base_class import BaseRLModel  # pytype: disable=pyi-error

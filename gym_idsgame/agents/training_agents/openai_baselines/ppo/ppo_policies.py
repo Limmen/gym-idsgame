@@ -14,7 +14,7 @@ from gym_idsgame.agents.training_agents.openai_baselines.distributions import (m
                                                                                StateDependentNoiseDistribution)
 
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
-
+from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
 
 class PPOPolicy(BasePolicy):
     """
@@ -68,7 +68,8 @@ class PPOPolicy(BasePolicy):
                  features_extractor_kwargs: Optional[Dict[str, Any]] = None,
                  normalize_images: bool = True,
                  optimizer_class: Type[th.optim.Optimizer] = th.optim.Adam,
-                 optimizer_kwargs: Optional[Dict[str, Any]] = None):
+                 optimizer_kwargs: Optional[Dict[str, Any]] = None,
+                 pg_agent_config : PolicyGradientAgentConfig = None):
 
         if optimizer_kwargs is None:
             optimizer_kwargs = {}
@@ -76,7 +77,7 @@ class PPOPolicy(BasePolicy):
             if optimizer_class == th.optim.Adam:
                 optimizer_kwargs['eps'] = 1e-5
 
-        super(PPOPolicy, self).__init__(observation_space, action_space,
+        super(PPOPolicy, self).__init__(pg_agent_config, observation_space, action_space,
                                         device,
                                         features_extractor_class,
                                         features_extractor_kwargs,
@@ -94,8 +95,9 @@ class PPOPolicy(BasePolicy):
         self.net_arch = net_arch
         self.activation_fn = activation_fn
         self.ortho_init = ortho_init
+        self.pg_agent_config = pg_agent_config
 
-        self.features_extractor = features_extractor_class(self.observation_space,
+        self.features_extractor = features_extractor_class(self.pg_agent_config, self.observation_space,
                                                            **self.features_extractor_kwargs)
         self.features_dim = self.features_extractor.features_dim
 

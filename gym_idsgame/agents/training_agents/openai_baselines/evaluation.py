@@ -2,7 +2,7 @@
 import numpy as np
 import torch as th
 import time
-from stable_baselines3.common.vec_env import VecEnv
+from gym_idsgame.agents.training_agents.openai_baselines.vec_env import VecEnv
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
 from gym_idsgame.envs.constants import constants
 
@@ -55,24 +55,38 @@ def evaluate_policy(model, env, n_eval_episodes=10, deterministic=True,
 
     for episode in range(n_eval_episodes):
         obs = env.reset()
+        a_obs = obs[0]
+        d_obs = obs[1]
         done = False
-        episode_reward = 0.0
+        episode_attacker_reward = 0.0
+        episode_defender_reward = 0.0
         episode_length = 0
         while not done:
             if pg_agent_config.eval_render:
                 env.render()
                 time.sleep(pg_agent_config.eval_sleep)
 
+            attacker_action = np.array([0])
+            defender_action = np.array([0])
+
             # Get attacker and defender actions
-            obs = th.tensor(obs)
-            res = model.predict(obs, deterministic=False)
-            action = res.numpy()
+            if pg_agent_config.attacker:
+                a_obs = th.tensor(a_obs).to(device=model.device)
+                res = model.predict(a_obs, deterministic=False)
+                attacker_action = np.array([res.cpu().numpy()])
+
+            if pg_agent_config.defender:
+                d_obs = th.tensor(d_obs).to(device=model.device)
+                res = model.predict(d_obs, deterministic=False)
+                defender_action = np.array([res.cpu().numpy()])
 
             # Take a step in the environment
-            obs, reward, done, _info = env.step(np.array([action]))
+            joint_action = np.array([[attacker_action, defender_action]])
+            a_obs, d_obs, a_reward, d_reward, done, _info = env.step(joint_action)
 
             # Update state information and metrics
-            episode_reward += reward
+            episode_attacker_reward += a_reward
+            episode_defender_reward += d_reward
             if callback is not None:
                 callback(locals(), globals())
             episode_length += 1
@@ -83,7 +97,8 @@ def evaluate_policy(model, env, n_eval_episodes=10, deterministic=True,
         pg_agent_config.logger.info("Eval episode: {}, Game ended after {} steps".format(episode, episode_length))
 
         # Record episode metrics
-        episode_attacker_rewards.append(episode_reward)
+        episode_attacker_rewards.append(episode_attacker_reward)
+        episode_defender_rewards.append(episode_defender_reward)
         episode_steps.append(episode_length)
 
         # Update eval stats
@@ -123,6 +138,8 @@ def evaluate_policy(model, env, n_eval_episodes=10, deterministic=True,
         # Reset for new eval episode
         done = False
         obs = env.reset()
+        obs_a = obs[0]
+        obs_d = obs[1]
 
     # Log average eval statistics
     if model.num_eval_hacks > 0:

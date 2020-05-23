@@ -19,7 +19,7 @@ from gym_idsgame.agents.training_agents.openai_baselines.base_class import BaseR
 from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback
 from stable_baselines3.common.buffers import RolloutBuffer
 from stable_baselines3.common.utils import explained_variance, get_schedule_fn
-from stable_baselines3.common.vec_env import VecEnv
+from gym_idsgame.agents.training_agents.openai_baselines.vec_env import VecEnv
 from gym_idsgame.agents.training_agents.openai_baselines.callbacks import BaseCallback
 from gym_idsgame.agents.training_agents.openai_baselines.ppo.ppo_policies import PPOPolicy
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
@@ -115,7 +115,7 @@ class PPO(BaseRLModel):
         self.ent_coef = ent_coef
         self.vf_coef = vf_coef
         self.max_grad_norm = max_grad_norm
-        self.rollout_buffer = None
+        self.attacker_rollout_buffer = None
         self.target_kl = target_kl
         self.tensorboard_log = tensorboard_log
         self.tb_writer = None
@@ -131,15 +131,23 @@ class PPO(BaseRLModel):
         self._setup_lr_schedule()
         self.set_random_seed(self.seed)
 
-        self.rollout_buffer = RolloutBuffer(self.n_steps, self.observation_space,
-                                            self.action_space, self.device,
-                                            gamma=self.gamma, gae_lambda=self.gae_lambda,
-                                            n_envs=self.n_envs)
-        #self.policy_class = "experiments.training.v16.minimal_defense.openai_baselines.ppo_policies.PPOPolicy"
-        self.policy = PPOPolicy(self.observation_space, self.action_space,
-                                        self.lr_schedule, use_sde=self.use_sde, device=self.device,
-                                        **self.policy_kwargs)
-        self.policy = self.policy.to(self.device)
+        self.attacker_rollout_buffer = RolloutBuffer(self.n_steps, self.attacker_observation_space,
+                                                     self.attacker_action_space, self.device,
+                                                     gamma=self.gamma, gae_lambda=self.gae_lambda,
+                                                     n_envs=self.n_envs)
+        self.defender_rollout_buffer = RolloutBuffer(self.n_steps, self.defender_observation_space,
+                                                     self.defender_action_space, self.device,
+                                                     gamma=self.gamma, gae_lambda=self.gae_lambda,
+                                                     n_envs=self.n_envs)
+        self.attacker_policy = PPOPolicy(self.attacker_observation_space, self.attacker_action_space,
+                                         self.lr_schedule_a, use_sde=self.use_sde, device=self.device,
+                                         pg_agent_config=self.pg_agent_config, **self.policy_kwargs)
+        self.attacker_policy = self.attacker_policy.to(self.device)
+
+        self.defender_policy = PPOPolicy(self.defender_observation_space, self.defender_action_space,
+                                         self.lr_schedule_a, use_sde=self.use_sde, device=self.device,
+                                         pg_agent_config=self.pg_agent_config, **self.policy_kwargs)
+        self.defender_policy = self.defender_policy.to(self.device)
 
         self.clip_range = get_schedule_fn(self.clip_range)
         if self.clip_range_vf is not None:
@@ -152,7 +160,7 @@ class PPO(BaseRLModel):
     def predict(self, observation: np.ndarray,
                 state: Optional[np.ndarray] = None,
                 mask: Optional[np.ndarray] = None,
-                deterministic: bool = False) -> Tuple[np.ndarray, Optional[np.ndarray]]:
+                deterministic: bool = False, attacker = True) -> Tuple[np.ndarray, Optional[np.ndarray]]:
         """
         Get the model's action(s) from an observation
 
@@ -163,20 +171,32 @@ class PPO(BaseRLModel):
         :return: (Tuple[np.ndarray, Optional[np.ndarray]]) the model's action and the next state
             (used in recurrent policies)
         """
-        return self.policy._predict(observation, self.env.envs[0], deterministic, device=self.device)
+        if attacker:
+            return self.attacker_policy._predict(observation, self.env.envs[0], deterministic, device=self.device)
+        else:
+            return self.defender_policy._predict(observation, self.env.envs[0], deterministic, device=self.device)
 
     def collect_rollouts(self,
                          env: VecEnv,
                          callback: BaseCallback,
-                         rollout_buffer: RolloutBuffer,
+                         attacker_rollout_buffer: RolloutBuffer,
+                         defender_rollout_buffer: RolloutBuffer,
                          n_rollout_steps: int = 256) -> Union[bool, List, List, List]:
 
-        assert self._last_obs is not None, "No previous observation was provided"
+        assert self._last_obs_a is not None, "No previous attacker observation was provided"
+        assert self._last_obs_d is not None, "No previous defender observation was provided"
         n_steps = 0
-        rollout_buffer.reset()
+        if self.pg_agent_config.attacker:
+            attacker_rollout_buffer.reset()
+        if self.pg_agent_config.defender:
+            defender_rollout_buffer.reset()
+
         # Sample new weights for the state dependent exploration
         if self.use_sde:
-            self.policy.reset_noise(env.num_envs)
+            if self.pg_agent_config.attacker:
+                self.attacker_policy.reset_noise(env.num_envs)
+            if self.pg_agent_config.defender:
+                self.defender_policy.reset_noise(env.num_envs)
 
         # Avg metrics
         episode_attacker_rewards = []
@@ -192,21 +212,40 @@ class PPO(BaseRLModel):
         while n_steps < n_rollout_steps:
             if self.use_sde and self.sde_sample_freq > 0 and n_steps % self.sde_sample_freq == 0:
                 # Sample a new noise matrix
-                self.policy.reset_noise(env.num_envs)
+                if self.pg_agent_config.attacker:
+                    self.attacker_policy.reset_noise(env.num_envs)
+                if self.pg_agent_config.defender:
+                    self.defender_policy.reset_noise(env.num_envs)
 
             with th.no_grad():
+
+                # Default actions
+                attacker_actions = [0]
+                defender_actions = [0]
+
                 # Convert to pytorch tensor
-                obs_tensor = th.as_tensor(self._last_obs).to(self.device)
-                actions, values, log_probs = self.policy.forward(obs_tensor, self.env.envs[0], device=self.device)
-            actions = actions.cpu().numpy()
+                obs_tensor_a = th.as_tensor(self._last_obs_a).to(self.device)
+                obs_tensor_d = th.as_tensor(self._last_obs_d).to(self.device)
+                if self.pg_agent_config.attacker:
+                    attacker_actions, attacker_values, attacker_log_probs = self.attacker_policy.forward(obs_tensor_a, self.env.envs[0], device=self.device)
+                    attacker_actions = attacker_actions.cpu().numpy()
+                if self.pg_agent_config.defender:
+                    defender_actions, defender_values, defender_log_probs = self.defender_policy.forward(obs_tensor_d, self.env.envs[0],
+                                                                              device=self.device)
+                    defender_actions = defender_actions.cpu().numpy()
 
             # Rescale and perform action
-            clipped_actions = actions
-            # Clip the actions to avoid out of bound error
-            if isinstance(self.action_space, gym.spaces.Box):
-                clipped_actions = np.clip(actions, self.action_space.low, self.action_space.high)
+            clipped_attacker_actions = attacker_actions
+            clipped_defender_actions = defender_actions
+            # Clip the attacker_actions to avoid out of bound error
+            if isinstance(self.attacker_action_space, gym.spaces.Box):
+                clipped_attacker_actions = np.clip(attacker_actions, self.attacker_action_space.low, self.attacker_action_space.high)
+                clipped_defender_actions = np.clip(defender_actions, self.attacker_action_space.low, self.attacker_action_space.high)
 
-            new_obs, rewards, dones, infos = env.step(clipped_actions)
+            joint_actions = np.array([[clipped_attacker_actions, clipped_defender_actions]])
+            new_a_obs, new_d_obs, a_rewards, d_rewards, dones, infos = env.step(joint_actions, update_stats=True)
+            #print("a_reward:{}, d_reward:{}".format(a_rewards, d_rewards))
+            #print("a_rewards:{}".format(a_rewards))
 
             if callback.on_step() is False:
                 return False
@@ -216,7 +255,8 @@ class PPO(BaseRLModel):
             self._update_info_buffer(infos)
             n_steps += 1
             self.num_timesteps += env.num_envs
-            episode_attacker_reward += rewards
+            episode_attacker_reward += a_rewards
+            episode_defender_reward += d_rewards
             episode_step +=1
             # Record episode metrics
             self.num_train_games += 1
@@ -225,11 +265,20 @@ class PPO(BaseRLModel):
                 self.num_train_hacks += 1
                 self.num_train_hacks_total += 1
 
-            if isinstance(self.action_space, gym.spaces.Discrete):
+            if isinstance(self.attacker_action_space, gym.spaces.Discrete):
                 # Reshape in case of discrete action
-                actions = actions.reshape(-1, 1)
-            rollout_buffer.add(self._last_obs, actions, rewards, dones, values, log_probs)
-            self._last_obs = new_obs
+                if self.pg_agent_config.attacker:
+                    attacker_actions = attacker_actions.reshape(-1, 1)
+                if self.pg_agent_config.defender:
+                    defender_actions = defender_actions.reshape(-1, 1)
+
+            if self.pg_agent_config.attacker:
+                attacker_rollout_buffer.add(self._last_obs_a, attacker_actions, a_rewards, dones, attacker_values, attacker_log_probs)
+            if self.pg_agent_config.defender:
+                defender_rollout_buffer.add(self._last_obs_d, defender_actions, d_rewards, dones, defender_values,
+                                            defender_log_probs)
+            self._last_obs_a = new_a_obs
+            self._last_obs_d = new_d_obs
 
             if dones:
                 episode_attacker_rewards.append(episode_attacker_reward)
@@ -239,16 +288,20 @@ class PPO(BaseRLModel):
                 episode_defender_reward = 0
                 episode_step = 0
 
-        rollout_buffer.compute_returns_and_advantage(values, dones=dones)
+        attacker_rollout_buffer.compute_returns_and_advantage(attacker_values, dones=dones)
 
         callback.on_rollout_end()
 
         return True, episode_attacker_rewards, episode_defender_rewards, episode_steps
 
-    def train(self, n_epochs: int, batch_size: int = 64) -> None:
+    def train(self, n_epochs: int, batch_size: int = 64, attacker=True) -> None:
         # Update optimizer learning rate
-        self._update_learning_rate(self.policy.optimizer)
-        lr = self.policy.optimizer.param_groups[0]["lr"]
+        if attacker:
+            self._update_learning_rate(self.attacker_policy.optimizer, attacker=True)
+            lr = self.attacker_policy.optimizer.param_groups[0]["lr"]
+        else:
+            self._update_learning_rate(self.defender_policy.optimizer, attacker=False)
+            lr = self.defender_policy.optimizer.param_groups[0]["lr"]
         # Compute current clip range
         clip_range = self.clip_range(self._current_progress)
         # Optional: clip range for the value function
@@ -263,9 +316,13 @@ class PPO(BaseRLModel):
         for epoch in range(n_epochs):
             approx_kl_divs = []
             # Do a complete pass on the rollout buffer
-            for rollout_data in self.rollout_buffer.get(batch_size):
+            if attacker:
+                rollout_buffer = self.attacker_rollout_buffer
+            else:
+                rollout_buffer = self.defender_rollout_buffer
+            for rollout_data in rollout_buffer.get(batch_size):
                 actions = rollout_data.actions
-                if isinstance(self.action_space, spaces.Discrete):
+                if isinstance(self.attacker_action_space, spaces.Discrete):
                     # Convert discrete action from float to long
                     actions = rollout_data.actions.long().flatten()
 
@@ -273,9 +330,16 @@ class PPO(BaseRLModel):
                 # TODO: investigate why there is no issue with the gradient
                 # if that line is commented (as in SAC)
                 if self.use_sde:
-                    self.policy.reset_noise(batch_size)
+                    if attacker:
+                        self.attacker_policy.reset_noise(batch_size)
+                    else:
+                        self.defender_policy.reset_noise(batch_size)
 
-                values, log_prob, entropy = self.policy.evaluate_actions(rollout_data.observations, actions)
+                if attacker:
+                    values, log_prob, entropy = self.attacker_policy.evaluate_actions(rollout_data.observations, actions)
+                else:
+                    values, log_prob, entropy = self.defender_policy.evaluate_actions(rollout_data.observations,
+                                                                                      actions)
                 values = values.flatten()
                 # Normalize advantage
                 advantages = rollout_data.advantages
@@ -317,11 +381,18 @@ class PPO(BaseRLModel):
                 loss = policy_loss + self.ent_coef * entropy_loss + self.vf_coef * value_loss
 
                 # Optimization step
-                self.policy.optimizer.zero_grad()
+                if attacker:
+                    self.attacker_policy.optimizer.zero_grad()
+                else:
+                    self.defender_policy.optimizer.zero_grad()
                 loss.backward()
                 # Clip grad norm
-                th.nn.utils.clip_grad_norm_(self.policy.parameters(), self.max_grad_norm)
-                self.policy.optimizer.step()
+                if attacker:
+                    th.nn.utils.clip_grad_norm_(self.attacker_policy.parameters(), self.max_grad_norm)
+                    self.attacker_policy.optimizer.step()
+                else:
+                    th.nn.utils.clip_grad_norm_(self.defender_policy.parameters(), self.max_grad_norm)
+                    self.defender_policy.optimizer.step()
                 approx_kl_divs.append(th.mean(rollout_data.old_log_prob - log_prob).detach().cpu().numpy())
 
             all_kl_divs.append(np.mean(approx_kl_divs))
@@ -331,8 +402,9 @@ class PPO(BaseRLModel):
                 break
 
         self._n_updates += n_epochs
-        explained_var = explained_variance(self.rollout_buffer.returns.flatten(),
-                                           self.rollout_buffer.values.flatten())
+
+        # explained_var = explained_variance(self.attacker_rollout_buffer.returns.flatten(),
+        #                                    self.attacker_rollout_buffer.values.flatten())
 
         # logger.logkv("n_updates", self._n_updates)
         # logger.logkv("clip_fraction", np.mean(clip_fraction))
@@ -347,7 +419,6 @@ class PPO(BaseRLModel):
         # logger.logkv("value_loss", np.mean(value_losses))
         # if hasattr(self.policy, 'log_std'):
         #     logger.logkv("std", th.exp(self.policy.log_std).mean().item())
-
         return np.mean(entropy_losses), np.mean(pg_losses), np.mean(value_losses), lr
 
     def learn(self,
@@ -388,7 +459,8 @@ class PPO(BaseRLModel):
 
         while self.num_timesteps < total_timesteps:
             continue_training, rollouts_attacker_rewards, rollouts_defender_rewards, rollouts_steps = \
-                self.collect_rollouts(self.env, callback, self.rollout_buffer, n_rollout_steps=self.n_steps)
+                self.collect_rollouts(self.env, callback, self.attacker_rollout_buffer, self.defender_rollout_buffer,
+                                      n_rollout_steps=self.n_steps)
             episode_attacker_rewards.extend(rollouts_attacker_rewards)
             episode_defender_rewards.extend(rollouts_defender_rewards)
             episode_steps.extend(rollouts_defender_rewards)
@@ -412,7 +484,7 @@ class PPO(BaseRLModel):
                                  defender_episode_rewards=episode_defender_rewards, episode_steps=episode_steps,
                                  episode_avg_attacker_loss=episode_avg_attacker_loss,
                                  episode_avg_defender_loss=episode_avg_defender_loss,
-                                 eval=False, update_stats=True, lr_attacker=attacker_lr, lr_defender=None,
+                                 eval=False, update_stats=True, lr_attacker=attacker_lr, lr_defender=defender_lr,
                                  total_num_episodes=self.num_train_games_total)
                 episode_attacker_rewards = []
                 episode_defender_rewards = []
@@ -431,14 +503,12 @@ class PPO(BaseRLModel):
                         self.pg_agent_config.save_dir + "/" + time_str + "_train_results_checkpoint.csv")
                     self.eval_result.to_csv(self.pg_agent_config.save_dir + "/" + time_str + "_eval_results_checkpoint.csv")
 
-            entropy_loss, pg_loss, value_loss, attacker_lr = self.train(self.n_epochs, batch_size=self.batch_size)
-            episode_avg_attacker_loss.append(entropy_loss + pg_loss + value_loss)
-
-
-
-            # For tensorboard integration
-            # if self.tb_writer is not None:
-            #     self.tb_writer.add_scalar('Eval/reward', mean_reward, self.num_timesteps)
+            if self.pg_agent_config.attacker:
+                entropy_loss, pg_loss, value_loss, attacker_lr = self.train(self.n_epochs, batch_size=self.batch_size, attacker=True)
+                episode_avg_attacker_loss.append(entropy_loss + pg_loss + value_loss)
+            if self.pg_agent_config.defender:
+                entropy_loss, pg_loss, value_loss, defender_lr = self.train(self.n_epochs, batch_size=self.batch_size, attacker=False)
+                episode_avg_defender_loss.append(entropy_loss + pg_loss + value_loss)
 
         callback.on_training_end()
 
@@ -465,10 +535,175 @@ class PPO(BaseRLModel):
                 self.pg_agent_config.logger.info("Saving policy-network to: {}".format(path))
                 print("Saving policy-network to: {}".format(path))
                 self.save(path)
-            # if self.config.defender:
-            #     path = self.config.save_dir + "/" + time_str + "_defender_policy_network.pt"
-            #     self.config.logger.info("Saving policy-network to: {}".format(path))
-            #     torch.save(self.defender_policy_network.state_dict(), path)
+            if self.config.defender:
+                path = self.pg_agent_config.save_dir + "/" + time_str + "_defender_policy_network.zip"
+                self.pg_agent_config.logger.info("Saving policy-network to: {}".format(path))
+                print("Saving policy-network to: {}".format(path))
+                self.save(path)
         else:
             self.config.logger.warning("Save path not defined, not saving policy-networks to disk")
             print("Save path not defined, not saving policy-networks to disk")
+
+    def update_state(self, attacker_obs: np.ndarray = None, defender_obs: np.ndarray = None,
+                     state: np.ndarray = None, attacker: bool = True) -> np.ndarray:
+        """
+        Update approximative Markov state
+
+        :param attacker_obs: attacker obs
+        :param defender_obs: defender observation
+        :param state: current state
+        :param attacker: boolean flag whether it is attacker or not
+        :return: new state
+        """
+        if not attacker and self.env.local_view_features():
+            attacker_obs = self.env.state.get_attacker_observation(self.envs[0].env.idsgame_env.idsgame_config.game_config.network_config,
+                                                                   local_view=False)
+
+        # Zero mean
+        if self.pg_agent_config.zero_mean_features:
+            if not self.env.local_view_features() or not attacker:
+                attacker_obs_1 = attacker_obs[:, 0:-1]
+            else:
+                attacker_obs_1 = attacker_obs[:, 0:-2]
+            zero_mean_attacker_features = []
+            for idx, row in enumerate(attacker_obs_1):
+                mean = np.mean(row)
+                if mean != 0:
+                    t = row - mean
+                else:
+                    t = row
+                if np.isnan(t).any():
+                    t = attacker_obs[idx]
+                else:
+                    t = t.tolist()
+                    if not self.env.local_view_features() or not attacker:
+                        t.append(attacker_obs[idx][-1])
+                    else:
+                        t.append(attacker_obs[idx][-2])
+                        t.append(attacker_obs[idx][-1])
+                zero_mean_attacker_features.append(t)
+
+            defender_obs_1 = defender_obs[:, 0:-1]
+            zero_mean_defender_features = []
+            for idx, row in enumerate(defender_obs_1):
+                mean = np.mean(row)
+                if mean != 0:
+                    t = row - mean
+                else:
+                    t = row
+                if np.isnan(t).any():
+                    t = defender_obs[idx]
+                else:
+                    t = t.tolist()
+                    t.append(defender_obs[idx][-1])
+                zero_mean_defender_features.append(t)
+
+            attacker_obs = np.array(zero_mean_attacker_features)
+            defender_obs = np.array(zero_mean_defender_features)
+
+        # Normalize
+        if self.pg_agent_config.normalize_features:
+            if not self.env.local_view_features() or not attacker:
+                attacker_obs_1 = attacker_obs[:, 0:-1] / np.linalg.norm(attacker_obs[:, 0:-1])
+            else:
+                attacker_obs_1 = attacker_obs[:, 0:-2] / np.linalg.norm(attacker_obs[:, 0:-2])
+            normalized_attacker_features = []
+            for idx, row in enumerate(attacker_obs_1):
+                if np.isnan(attacker_obs_1).any():
+                    t = attacker_obs[idx]
+                else:
+                    t = attacker_obs_1.tolist()
+                    if not self.env.local_view_features() or not attacker:
+                        t.append(attacker_obs[idx][-1])
+                    else:
+                        t.append(attacker_obs[idx][-2])
+                        t.append(attacker_obs[idx][-1])
+                normalized_attacker_features.append(t)
+
+            defender_obs_1 = defender_obs[:, 0:-1] / np.linalg.norm(defender_obs[:, 0:-1])
+            normalized_defender_features = []
+            for idx, row in enumerate(defender_obs_1):
+                if np.isnan(defender_obs_1).any():
+                    t = defender_obs[idx]
+                else:
+                    t = defender_obs_1.tolist()
+                    t.append(defender_obs[idx][-1])
+
+                normalized_defender_features.append(t)
+
+            attacker_obs = np.array(normalized_attacker_features)
+            defender_obs = np.array(normalized_defender_features)
+
+        if self.env.local_view_features() and attacker:
+            neighbor_defense_attributes = np.zeros((attacker_obs.shape[0], defender_obs.shape[1]))
+            for node in range(attacker_obs.shape[0]):
+                if int(attacker_obs[node][-1]) == 1:
+                    id = int(attacker_obs[node][-2])
+                    neighbor_defense_attributes[node] = defender_obs[id]
+
+        if self.env.fully_observed():
+            if self.pg_agent_config.merged_ad_features:
+                if not self.env.local_view_features() or not attacker:
+                    a_pos = attacker_obs[:, -1]
+                    det_values = defender_obs[:, -1]
+                    temp = defender_obs[:, 0:-1] - attacker_obs[:, 0:-1]
+                    features = []
+                    for idx, row in enumerate(temp):
+                        t = row.tolist()
+                        t.append(a_pos[idx])
+                        t.append(det_values[idx])
+                        features.append(t)
+                else:
+                    node_ids = attacker_obs[:, -2]
+                    node_reachable = attacker_obs[:, -1]
+                    det_values = neighbor_defense_attributes[:, -1]
+                    temp = neighbor_defense_attributes[:, 0:-1] - attacker_obs[:, 0:-2]
+                    features = []
+                    for idx, row in enumerate(temp):
+                        t = row.tolist()
+                        t.append(node_ids[idx])
+                        t.append(node_reachable[idx])
+                        t.append(det_values[idx])
+                        features.append(t)
+                features = np.array(features)
+                if self.pg_agent_config.state_length == 1:
+                    return features
+                if len(state) == 0:
+                    s = np.array([features] * self.pg_agent_config.state_length)
+                    return s
+                state = np.append(state[1:], np.array([features]), axis=0)
+            else:
+                if self.pg_agent_config.state_length == 1:
+                    if not self.env.local_view_features() or not attacker:
+                        return np.append(attacker_obs, defender_obs)
+                    else:
+                        return np.append(attacker_obs, neighbor_defense_attributes)
+                if len(state) == 0:
+                    if not self.env.local_view_features() or not attacker:
+                        temp = np.append(attacker_obs, defender_obs)
+                    else:
+                        temp = np.append(attacker_obs, neighbor_defense_attributes)
+                    s = np.array([temp] * self.pg_agent_config.state_length)
+                    return s
+                if not self.env.local_view_features() or not attacker:
+                    temp = np.append(attacker_obs, defender_obs)
+                else:
+                    temp = np.append(attacker_obs, neighbor_defense_attributes)
+                state = np.append(state[1:], np.array([temp]), axis=0)
+            return state
+        else:
+            if self.pg_agent_config.state_length == 1:
+                if attacker:
+                    return np.array(attacker_obs)
+                else:
+                    return np.array(defender_obs)
+            if len(state) == 0:
+                if attacker:
+                    return np.array([attacker_obs] * self.pg_agent_config.state_length)
+                else:
+                    return np.array([defender_obs] * self.pg_agent_config.state_length)
+            if attacker:
+                state = np.append(state[1:], np.array([attacker_obs]), axis=0)
+            else:
+                state = np.append(state[1:], np.array([defender_obs]), axis=0)
+            return state

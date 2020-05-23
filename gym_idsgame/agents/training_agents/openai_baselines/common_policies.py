@@ -9,8 +9,8 @@ import numpy as np
 
 from stable_baselines3.common.preprocessing import preprocess_obs, get_flattened_obs_dim, is_image_space
 from stable_baselines3.common.utils import get_device
-from stable_baselines3.common.vec_env import VecTransposeImage
-
+from gym_idsgame.agents.training_agents.openai_baselines.vec_env import VecTransposeImage
+from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
 
 class BaseFeaturesExtractor(nn.Module):
     """
@@ -20,11 +20,12 @@ class BaseFeaturesExtractor(nn.Module):
     :param features_dim: (int) Number of features extracted.
     """
 
-    def __init__(self, observation_space: gym.Space, features_dim: int = 0):
+    def __init__(self, pg_agent_config : PolicyGradientAgentConfig, observation_space: gym.Space, features_dim: int = 0):
         super(BaseFeaturesExtractor, self).__init__()
         assert features_dim > 0
         self._observation_space = observation_space
         self._features_dim = features_dim
+        self.pg_agent_config = pg_agent_config
 
     @property
     def features_dim(self) -> int:
@@ -42,8 +43,8 @@ class FlattenExtractor(BaseFeaturesExtractor):
     :param observation_space: (gym.Space)
     """
 
-    def __init__(self, observation_space: gym.Space):
-        super(FlattenExtractor, self).__init__(observation_space, get_flattened_obs_dim(observation_space))
+    def __init__(self, pg_agent_config : PolicyGradientAgentConfig, observation_space: gym.Space):
+        super(FlattenExtractor, self).__init__(pg_agent_config, observation_space, get_flattened_obs_dim(observation_space))
         self.flatten = nn.Flatten()
 
     def forward(self, observations: th.Tensor) -> th.Tensor:
@@ -62,9 +63,9 @@ class NatureCNN(BaseFeaturesExtractor):
         This corresponds to the number of unit for the last layer.
     """
 
-    def __init__(self, observation_space: gym.spaces.Box,
+    def __init__(self, pg_agent_config : PolicyGradientAgentConfig, observation_space: gym.spaces.Box,
                  features_dim: int = 512):
-        super(NatureCNN, self).__init__(observation_space, features_dim)
+        super(NatureCNN, self).__init__(pg_agent_config, observation_space, features_dim)
         # We assume CxWxH images (channels first)
         # Re-ordering will be done by pre-preprocessing or wrapper
         assert is_image_space(observation_space), ('You should use NatureCNN '
@@ -111,7 +112,7 @@ class BasePolicy(nn.Module):
         excluding the learning rate, to pass to the optimizer
     """
 
-    def __init__(self, observation_space: gym.spaces.Space,
+    def __init__(self, pg_agent_config : PolicyGradientAgentConfig, observation_space: gym.spaces.Space,
                  action_space: gym.spaces.Space,
                  device: Union[th.device, str] = 'auto',
                  features_extractor_class: Type[BaseFeaturesExtractor] = FlattenExtractor,
@@ -122,13 +123,12 @@ class BasePolicy(nn.Module):
                  optimizer_kwargs: Optional[Dict[str, Any]] = None,
                  squash_output: bool = False):
         super(BasePolicy, self).__init__()
-
         if optimizer_kwargs is None:
             optimizer_kwargs = {}
 
         if features_extractor_kwargs is None:
             features_extractor_kwargs = {}
-
+        self.pg_agent_config = pg_agent_config
         self.observation_space = observation_space
         self.action_space = action_space
         self.device = get_device(device)
@@ -396,7 +396,6 @@ def create_mlp(input_dim: int,
         activation function
     :return: (List[nn.Module])
     """
-
     if len(net_arch) > 0:
         modules = [nn.Linear(input_dim, net_arch[0]), activation_fn()]
     else:

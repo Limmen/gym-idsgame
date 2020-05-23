@@ -56,6 +56,11 @@ class StatsRecorder(object):
             reward_1, reward_2 = reward
             self.rewards_1 += reward_1
             self.rewards_2 += reward_2
+        elif type(reward) == list:
+            reward_1 = reward[0]
+            reward_2 = reward[1]
+            self.rewards_1 += reward_1
+            self.rewards_2 += reward_2
         else:
             self.rewards_1 += reward
         self.done = done

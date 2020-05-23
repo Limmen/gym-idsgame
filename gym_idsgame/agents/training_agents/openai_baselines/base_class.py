@@ -14,7 +14,6 @@ import numpy as np
 from stable_baselines3.common import logger
 from gym_idsgame.agents.training_agents.openai_baselines.ppo.ppo_policies import BasePolicy
 from stable_baselines3.common.utils import set_random_seed, get_schedule_fn, update_learning_rate, get_device
-from stable_baselines3.common.vec_env import DummyVecEnv, VecEnv, unwrap_vec_normalize, VecNormalize, VecTransposeImage
 from stable_baselines3.common.preprocessing import is_image_space
 from stable_baselines3.common.save_util import data_to_json, json_to_data, recursive_getattr, recursive_setattr
 from stable_baselines3.common.type_aliases import GymEnv, TensorDict, RolloutReturn, MaybeCallback
@@ -25,6 +24,7 @@ from stable_baselines3.common.noise import ActionNoise
 from stable_baselines3.common.buffers import ReplayBuffer
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
+from gym_idsgame.agents.training_agents.openai_baselines.vec_env import DummyVecEnv, VecEnv, unwrap_vec_normalize, VecNormalize, VecTransposeImage
 
 class BaseRLModel(ABC):
     """
@@ -84,8 +84,10 @@ class BaseRLModel(ABC):
         self._vec_normalize_env = unwrap_vec_normalize(env)
         self.verbose = verbose
         self.policy_kwargs = {} if policy_kwargs is None else policy_kwargs
-        self.observation_space = None  # type: Optional[gym.spaces.Space]
-        self.action_space = None  # type: Optional[gym.spaces.Space]
+        self.attacker_observation_space = None  # type: Optional[gym.spaces.Space]
+        self.defender_observation_space = None  # type: Optional[gym.spaces.Space]
+        self.attacker_action_space = None  # type: Optional[gym.spaces.Space]
+        self.defender_action_space = None  # type: Optional[gym.spaces.Space]
         self.n_envs = None
         self.num_timesteps = 0
         self.train_result = ExperimentResult()
@@ -94,10 +96,13 @@ class BaseRLModel(ABC):
         self.seed = seed
         self.action_noise = None  # type: Optional[ActionNoise]
         self.start_time = None
-        self.policy = None
+        self.attacker_policy = None
+        self.defender_policy = None
         self.learning_rate = learning_rate
-        self.lr_schedule = None  # type: Optional[Callable]
-        self._last_obs = None  # type: Optional[np.ndarray]
+        self.lr_schedule_a = None  # type: Optional[Callable]
+        self.lr_schedule_d = None  # type: Optional[Callable]
+        self._last_obs_a = None  # type: Optional[np.ndarray]
+        self._last_obs_d = None  # type: Optional[np.ndarray]
         # When using VecNormalize:
         self._last_original_obs = None  # type: Optional[np.ndarray]
         self._episode_num = 0
@@ -145,8 +150,10 @@ class BaseRLModel(ABC):
 
             env = self._wrap_env(env)
 
-            self.observation_space = env.observation_space
-            self.action_space = env.action_space
+            self.attacker_observation_space = env.attacker_observation_space
+            self.defender_observation_space = env.defender_observation_space
+            self.attacker_action_space = env.attacker_action_space
+            self.defender_action_space = env.defender_action_space
             self.n_envs = env.num_envs
             self.env = env
 
@@ -160,10 +167,10 @@ class BaseRLModel(ABC):
                 print("Wrapping the env in a DummyVecEnv.")
             env = DummyVecEnv([lambda: env])
 
-        if is_image_space(env.observation_space) and not isinstance(env, VecTransposeImage):
-            if self.verbose >= 1:
-                print("Wrapping the env in a VecTransposeImage.")
-            env = VecTransposeImage(env)
+        # if is_image_space(env.attacker_observation_space) and not isinstance(env, VecTransposeImage):
+        #     if self.verbose >= 1:
+        #         print("Wrapping the env in a VecTransposeImage.")
+        #     env = VecTransposeImage(env)
         return env
 
     def log_metrics(self, iteration: int, result: ExperimentResult, attacker_episode_rewards: list,
@@ -331,7 +338,8 @@ class BaseRLModel(ABC):
 
     def _setup_lr_schedule(self) -> None:
         """Transform to callable if needed."""
-        self.lr_schedule = get_schedule_fn(self.learning_rate)
+        self.lr_schedule_a = get_schedule_fn(self.pg_agent_config.alpha_attacker)
+        self.lr_schedule_d = get_schedule_fn(self.pg_agent_config.alpha_defender)
 
     def _update_current_progress(self, num_timesteps: int, total_timesteps: int) -> None:
         """
@@ -342,7 +350,7 @@ class BaseRLModel(ABC):
         """
         self._current_progress = 1.0 - float(num_timesteps) / float(total_timesteps)
 
-    def _update_learning_rate(self, optimizers: Union[List[th.optim.Optimizer], th.optim.Optimizer]) -> None:
+    def _update_learning_rate(self, optimizers: Union[List[th.optim.Optimizer], th.optim.Optimizer], attacker=True) -> None:
         """
         Update the optimizers learning rate using the current learning rate schedule
         and the current progress (from 1 to 0).
@@ -351,12 +359,19 @@ class BaseRLModel(ABC):
             An optimizer or a list of optimizers.
         """
         # Log the current learning rate
-        logger.logkv("learning_rate", self.lr_schedule(self._current_progress))
+        if attacker:
+            logger.logkv("learning_rate", self.lr_schedule_a(self._current_progress))
+            if not isinstance(optimizers, list):
+                optimizers = [optimizers]
+            for optimizer in optimizers:
+                update_learning_rate(optimizer, self.lr_schedule_a(self._current_progress))
+        else:
+            logger.logkv("learning_rate", self.lr_schedule_d(self._current_progress))
+            if not isinstance(optimizers, list):
+                optimizers = [optimizers]
+            for optimizer in optimizers:
+                update_learning_rate(optimizer, self.lr_schedule_d(self._current_progress))
 
-        if not isinstance(optimizers, list):
-            optimizers = [optimizers]
-        for optimizer in optimizers:
-            update_learning_rate(optimizer, self.lr_schedule(self._current_progress))
 
     @staticmethod
     def safe_mean(arr: Union[np.ndarray, list, deque]) -> np.ndarray:
@@ -386,7 +401,8 @@ class BaseRLModel(ABC):
         return self._vec_normalize_env
 
     @staticmethod
-    def check_env(env: GymEnv, observation_space: gym.spaces.Space, action_space: gym.spaces.Space):
+    def check_env(env: GymEnv, attacker_observation_space: gym.spaces.Space, attacker_action_space: gym.spaces.Space,
+                  defender_observation_space: gym.spaces.Space, defender_action_space: gym.spaces.Space):
         """
         Checks the validity of the environment to load vs the one used for training.
         Checked parameters:
@@ -394,16 +410,26 @@ class BaseRLModel(ABC):
         - action_space
 
         :param env: (GymEnv)
-        :param observation_space: (gym.spaces.Space)
-        :param action_space: (gym.spaces.Space)
+        :param attacker_observation_space: (gym.spaces.Space)
+        :param attacker_action_space: (gym.spaces.Space)
         """
-        if (observation_space != env.observation_space
+        if (attacker_observation_space != env.attacker_observation_space
             # Special cases for images that need to be transposed
-            and not (is_image_space(env.observation_space)
-                     and observation_space == VecTransposeImage.transpose_space(env.observation_space))):
-            raise ValueError(f'Observation spaces do not match: {observation_space} != {env.observation_space}')
-        if action_space != env.action_space:
-            raise ValueError(f'Action spaces do not match: {action_space} != {env.action_space}')
+            and not (is_image_space(env.attacker_observation_space)
+                     and attacker_observation_space == VecTransposeImage.transpose_space(env.attacker_observation_space))):
+            raise ValueError(f'Observation spaces do not match: {attacker_observation_space} != {env.attacker_observation_space}')
+        if attacker_action_space != env.attacker_action_space:
+            raise ValueError(f'Action spaces do not match: {attacker_action_space} != {env.attacker_action_space}')
+
+        if (defender_observation_space != env.defender_observation_space
+                # Special cases for images that need to be transposed
+                and not (is_image_space(env.defender_observation_space)
+                         and defender_observation_space == VecTransposeImage.transpose_space(
+                            env.defender_observation_space))):
+            raise ValueError(
+                f'Observation spaces do not match: {defender_observation_space} != {env.defender_observation_space}')
+        if defender_action_space != env.defender_action_space:
+            raise ValueError(f'Action spaces do not match: {defender_action_space} != {env.defender_action_space}')
 
     def set_env(self, env: GymEnv) -> None:
         """
@@ -415,7 +441,8 @@ class BaseRLModel(ABC):
 
         :param env: The environment for learning a policy
         """
-        self.check_env(env, self.observation_space, self.action_space)
+        self.check_env(env, self.attacker_observation_space, self.attacker_action_space,
+                       self.defender_observation_space, self.defender_action_space)
         # it must be coherent now
         # if it is not a VecEnv, make it a VecEnv
         env = self._wrap_env(env)
@@ -600,7 +627,7 @@ class BaseRLModel(ABC):
         if seed is None:
             return
         set_random_seed(seed, using_cuda=self.device == th.device('cuda'))
-        self.action_space.seed(seed)
+        self.attacker_action_space.seed(seed)
         if self.env is not None:
             self.env.seed(seed)
         if self.eval_env is not None:
@@ -668,8 +695,12 @@ class BaseRLModel(ABC):
             self._episode_num = 0
 
         # Avoid resetting the environment when calling ``.learn()`` consecutive times
-        if reset_num_timesteps or self._last_obs is None:
-            self._last_obs = self.env.reset()
+        if reset_num_timesteps or self._last_obs_a is None:
+            obs = self.env.reset()
+            a_obs = obs[0]
+            d_obs = obs[1]
+            self._last_obs_a = a_obs
+            self._last_obs_d = d_obs
             # Retrieve unnormalized observation for saving into the buffer
             if self._vec_normalize_env is not None:
                 self._last_original_obs = self._vec_normalize_env.get_original_obs()
@@ -874,10 +905,10 @@ class OffPolicyRLModel(BaseRLModel):
     def _setup_model(self):
         self._setup_lr_schedule()
         self.set_random_seed(self.seed)
-        self.replay_buffer = ReplayBuffer(self.buffer_size, self.observation_space,
-                                          self.action_space, self.device)
-        self.policy = self.policy_class(self.observation_space, self.action_space,
-                                        self.lr_schedule, **self.policy_kwargs)
+        self.replay_buffer = ReplayBuffer(self.buffer_size, self.attacker_observation_space,
+                                          self.attacker_action_space, self.device)
+        self.policy = self.policy_class(self.attacker_observation_space, self.attacker_action_space,
+                                        self.lr_schedule_a, **self.policy_kwargs)
         self.policy = self.policy.to(self.device)
 
     def save_replay_buffer(self, path: str):
@@ -952,14 +983,14 @@ class OffPolicyRLModel(BaseRLModel):
                 # Select action randomly or according to policy
                 if self.num_timesteps < learning_starts and not (self.use_sde and self.use_sde_at_warmup):
                     # Warmup phase
-                    unscaled_action = np.array([self.action_space.sample()])
+                    unscaled_action = np.array([self.attacker_action_space.sample()])
                 else:
                     # Note: we assume that the policy uses tanh to scale the action
                     # We use non-deterministic action in the case of SAC, for TD3, it does not matter
                     unscaled_action, _ = self.predict(self._last_obs, deterministic=False)
 
                 # Rescale the action from [low, high] to [-1, 1]
-                if isinstance(self.action_space, gym.spaces.Box):
+                if isinstance(self.attacker_action_space, gym.spaces.Box):
                     scaled_action = self.policy.scale_action(unscaled_action)
 
                     # Add noise to the action (improve exploration)
