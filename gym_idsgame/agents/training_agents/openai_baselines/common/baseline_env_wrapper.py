@@ -111,7 +111,8 @@ class BaselineEnvWrapper(gym.Env):
         if not attacker and self.idsgame_env.local_view_features():
             attacker_obs = self.idsgame_env.state.get_attacker_observation(
                 self.idsgame_env.idsgame_config.game_config.network_config,
-                local_view=False)
+                local_view=False,
+            reconnaissance=self.idsgame_env.idsgame_config.reconnaissance_actions)
 
         # Zero mean
         if self.pg_agent_config.zero_mean_features:

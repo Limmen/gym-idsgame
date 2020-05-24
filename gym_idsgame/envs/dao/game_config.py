@@ -14,7 +14,7 @@ class GameConfig():
                  num_servers_per_layer: int = 2, num_attack_types: int = 10, max_value: int = 9,
                  initial_state: GameState = None, manual_defender: bool = False, initial_state_path :str = None,
                  dense_rewards = False, min_random_a_val :int = 0, min_random_d_val :int = 0,
-                 min_random_det_val :int = 0, dense_rewards_v2 = False):
+                 min_random_det_val :int = 0, dense_rewards_v2 = False, reconnaissance_actions : bool = False):
         """
         Class constructor, initializes the DTO
 
@@ -32,7 +32,10 @@ class GameConfig():
         :param min_random_a_val: minimum attack value when randomizing the state
         :param min_random_d_val: minimum defense value when randomizing the state
         :param min_random_det_val: minimum detection value when randomizing the state
+        :param reconnaissance_actions: a boolean flag that indicates whether reconnaissance activities are enabled for
+                                       the attacker
         """
+        self.reconnaissance_actions = reconnaissance_actions
         self.manual_attacker = manual_attacker
         self.manual_defender = manual_defender
         self.num_layers = num_layers
@@ -45,7 +48,10 @@ class GameConfig():
         self.num_rows = self.num_layers + 2
         self.num_nodes = self.num_layers * self.num_servers_per_layer + 2  # +2 for Start and Data Nodes
         self.num_cols = self.num_servers_per_layer
-        self.num_attack_actions = self.num_attack_types * self.num_nodes
+        if not self.reconnaissance_actions:
+            self.num_attack_actions = self.num_attack_types * self.num_nodes
+        else:
+            self.num_attack_actions = (self.num_attack_types*2) * self.num_nodes
         self.num_defense_actions = (self.num_attack_types+1) * self.num_nodes
         self.num_states = self.num_nodes
         self.network_config = network_config

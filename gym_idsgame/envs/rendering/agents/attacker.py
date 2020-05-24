@@ -37,6 +37,7 @@ class Attacker(pyglet.sprite.Sprite):
                                          group=idsgame_config.render_config.second_foreground)
         self.cage.scale = self.idsgame_config.render_config.cage_scale
         self.cage.visible = False
+        self.hidden = False
         self.reset()
 
     def __center_avatar(self) -> None:
@@ -97,6 +98,8 @@ class Attacker(pyglet.sprite.Sprite):
         """
         self.col = self.starting_col
         self.row = self.starting_row
+        if self.hidden:
+            self.visible = False
         self.cage.visible = False
         self.__center_avatar()
 
@@ -109,6 +112,7 @@ class Attacker(pyglet.sprite.Sprite):
         self.cage.x = self.x
         self.cage.y = self.y
         self.cage.visible = True
+        self.visible = True
 
     def undetect(self) -> None:
         """
@@ -117,6 +121,17 @@ class Attacker(pyglet.sprite.Sprite):
         :return: None
         """
         self.cage.visible = False
+        if self.hidden:
+            self.visible = False
+
+
+    def hide(self):
+        self.visible = False
+        self.hidden = True
+
+    def show(self):
+        self.visible = True
+        self.hidden = False
 
     @property
     def pos(self):

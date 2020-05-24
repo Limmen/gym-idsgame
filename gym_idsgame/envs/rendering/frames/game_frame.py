@@ -44,6 +44,8 @@ class GameFrame(pyglet.window.Window):
         self.create_batch()
         self.set_state(self.idsgame_config.game_config.initial_state)
         self.switch_to()
+        self.attacker_view = self.idsgame_config.render_config.attacker_view
+        self.defender_view = self.idsgame_config.render_config.defender_view
 
     def create_batch(self) -> None:
         """
@@ -281,6 +283,43 @@ class GameFrame(pyglet.window.Window):
                     self.game_state.attack_defense_type = 0
             elif symbol == pyglet.window.key.SPACE:
                 self.reset(update_stats=True)
+            elif symbol == pyglet.window.key.A:
+                self.toggle_attacker_view()
+            elif symbol == pyglet.window.key.D:
+                self.toggle_defender_view()
+            elif symbol == pyglet.window.key.F:
+                self.toggle_full_view()
+
+    def toggle_attacker_view(self):
+        self.attacker_view = True
+        self.defender_view = False
+        for i in range(self.idsgame_config.game_config.num_rows - 1):
+            for j in range(self.idsgame_config.game_config.num_cols):
+                node = self.resource_network.grid[i][j]
+                if node is not None:
+                    node.toggle_attacker_view()
+        self.attacker_sprite.show()
+
+    def toggle_defender_view(self):
+        self.attacker_view = False
+        self.defender_view = True
+        for i in range(self.idsgame_config.game_config.num_rows - 1):
+            for j in range(self.idsgame_config.game_config.num_cols):
+                node = self.resource_network.grid[i][j]
+                if node is not None:
+                    node.toggle_defender_view()
+        self.attacker_sprite.hide()
+
+    def toggle_full_view(self):
+        self.attacker_view = True
+        self.defender_view = True
+        for i in range(self.idsgame_config.game_config.num_rows - 1):
+            for j in range(self.idsgame_config.game_config.num_cols):
+                node = self.resource_network.grid[i][j]
+                if node is not None:
+                    node.toggle_full_view()
+        self.attacker_sprite.show()
+
 
     def update(self, dt) -> None:
         """

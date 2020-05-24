@@ -63,21 +63,37 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         """
         :return: the attack text of the node
         """
-        return "A=" + ",".join(map(lambda x: str(x), self.attack_values))
+        if self.idsgame_config.render_config.attacker_view or \
+            (not self.idsgame_config.render_config.attacker_view and not self.idsgame_config.render_config.defender_view):
+            return "A=" + ",".join(map(lambda x: str(x), self.attack_values))
+        else:
+            dummy_values = ["x"]*len(self.attack_values)
+            return "A=" + ",".join(dummy_values)
 
     @property
     def defense_text(self) -> str:
         """
         :return: the defense text of the node
         """
-        return "D=" + ",".join(map(lambda x: str(x), self.defense_values))
+        if self.idsgame_config.render_config.defender_view or \
+                (not self.idsgame_config.render_config.attacker_view and
+                 not self.idsgame_config.render_config.defender_view):
+            return "D=" + ",".join(map(lambda x: str(x), self.defense_values))
+        else:
+            dummy_values = ["x"] * len(self.defense_values)
+            return "D=" + ",".join(dummy_values)
 
     @property
     def det_text(self) -> str:
         """
         :return: the detection text of the node
         """
-        return "Det=" + str(self.det)
+        if self.idsgame_config.render_config.defender_view or \
+                (not self.idsgame_config.render_config.attacker_view and
+                 not self.idsgame_config.render_config.defender_view):
+            return "Det=" + str(self.det)
+        else:
+            return "Det=x"
 
     def initialize_state(self) -> None:
         """
@@ -233,6 +249,18 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         self.center_avatar()
         self.initialize_state()
         self.init_labels()
+
+    def toggle_attacker_view(self):
+        self.idsgame_config.render_config.attacker_view = True
+        self.idsgame_config.render_config.defender_view = False
+
+    def toggle_defender_view(self):
+        self.idsgame_config.render_config.attacker_view = False
+        self.idsgame_config.render_config.defender_view = True
+
+    def toggle_full_view(self):
+        self.idsgame_config.render_config.attacker_view = True
+        self.idsgame_config.render_config.defender_view = True
 
 
     # Abstract methods to be implemented by sub-classes

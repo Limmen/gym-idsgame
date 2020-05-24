@@ -23,7 +23,7 @@ class GameState():
                  done: bool = False, detected: bool = False, attack_type: int = 0, num_hacks: int = 0,
                  hacked: bool = False, min_random_a_val :int = 0, min_random_d_val :int = 0,
                  min_random_det_val :int = 0,
-                 max_value : int = 9):
+                 max_value : int = 9, reconnaissace_state : np.ndarray = None):
         """
         Constructor, initializes the DTO
 
@@ -46,11 +46,13 @@ class GameState():
         :param min_random_d_val: minimum defense value when randomizing the state
         :param min_random_det_val: minimum detection value when randomizing the state
         :param max_value: the maximum value of attack/defense attributes
+        :param reconnaissace_state: the state of the reconnaissance activities by the attacker
         """
         self.attack_values = attack_values
         self.defense_values = defense_values
         self.defense_det = defense_det
         self.attacker_pos = attacker_pos
+        self.reconnaissance_state = reconnaissace_state
         self.game_step = game_step
         self.attacker_cumulative_reward = attacker_cumulative_reward
         self.defender_cumulative_reward = defender_cumulative_reward
@@ -125,6 +127,7 @@ class GameState():
         attack_values = np.zeros((num_nodes, num_attack_types))
         defense_values = np.zeros((num_nodes, num_attack_types))
         det_values = np.zeros(num_nodes)
+        reconnaissance_state = np.zeros((num_nodes, num_attack_types))
 
         d_val = defense_val
         a_val = attack_val
@@ -163,6 +166,7 @@ class GameState():
         self.attack_values = attack_values.astype(np.int32)
         self.defense_values = defense_values.astype(np.int32)
         self.defense_det = det_values.astype(np.int32)
+        self.reconnaissance_state = reconnaissance_state.astype(np.int32)
 
 
     def new_game(self, init_state: "GameState", a_reward : int = 0, d_reward : int = 0,
@@ -205,6 +209,7 @@ class GameState():
             self.attack_values = np.copy(init_state.attack_values)
             self.defense_values = np.copy(init_state.defense_values)
             self.defense_det = np.copy(init_state.defense_det)
+            self.reconnaissance_state = np.copy(init_state.reconnaissance_state)
         else:
             self.set_state(network_config.node_list, num_attack_types, network_config=network_config,
                            num_vulnerabilities_per_layer=num_vulnerabilities_per_layer, randomize_state=randomize_state,
@@ -225,6 +230,7 @@ class GameState():
         new_state.attack_values = np.copy(self.attack_values)
         new_state.defense_values = np.copy(self.defense_values)
         new_state.defense_det = np.copy(self.defense_det)
+        new_state.reconnaissance_state = np.copy(self.reconnaissance_state)
         new_state.attacker_pos = self.attacker_pos
         new_state.game_step = self.game_step
         new_state.attacker_cumulative_reward = self.attacker_cumulative_reward
@@ -251,6 +257,18 @@ class GameState():
         """
         if network_config.node_list[node_id] != NodeType.START and self.attack_values[node_id][attack_type] < max_value:
             self.attack_values[node_id][attack_type] += 1
+
+    def reconnaissance(self, node_id: int, attack_type: int) -> None:
+        """
+        Performs a reconnaissance activity for the attacker
+
+        :param node_id: id of the node to defend
+        :param attack_type: the type of attack attribute to increment
+        :param max_value: the maximum defense value
+        :param network_config: NetworkConfig
+        :return: None
+        """
+        self.reconnaissance_state[node_id][attack_type] = self.defense_values[node_id][attack_type]
 
     def defend(self, node_id: int, defense_type: int, max_value: int, network_config: NetworkConfig,
                detect : bool = False) -> bool:
@@ -297,17 +315,23 @@ class GameState():
         """
         return np.random.rand() < self.defense_det[node_id] / 10
 
-    def get_attacker_observation(self, network_config: NetworkConfig, local_view=False) -> np.ndarray:
+    def get_attacker_observation(self, network_config: NetworkConfig, local_view=False, reconnaissance = False) -> np.ndarray:
         """
         Converts the state of the dynamical system into an observation for the attacker. As the environment
         is a partially observed markov decision process, the attacker observation is only a subset of the game state
 
         :param network_config: the network configuration of the game
         :param local_view: boolean flag indicating whether observations are provided in a local view or not
+        :param reconnaissance: boolean flag indicating whether reconnaissance states should be included
         :return: An observation of the environment
         """
-        # +1 to have an extra feature that indicates if this is the node that the attacker is currently in
-        attack_observation = np.zeros((len(network_config.node_list), self.attack_values.shape[1] + 1))
+        if not reconnaissance:
+            # +1 to have an extra feature that indicates if this is the node that the attacker is currently in
+            attack_observation = np.zeros((len(network_config.node_list), self.attack_values.shape[1] + 1))
+        else:
+            # +1 to have an extra feature that indicates if this is the node that the attacker is currently in
+            attack_observation = np.zeros((len(network_config.node_list), (self.attack_values.shape[1]*2 + 1)))
+
         current_pos = self.attacker_pos
         current_node_id = network_config.get_node_id(current_pos)
         current_row, current_col = current_pos
@@ -328,11 +352,19 @@ class GameState():
                     neighbors.append((neighbor_row, neighbor_col, neighbor_data))
             else:
                 if node_id == current_node_id:
-                    attack_observation[node_id] = np.append(self.attack_values[node_id], 1)
+                    if not reconnaissance:
+                        attack_observation[node_id] = np.append(self.attack_values[node_id], 1)
+                    else:
+                        attack_observation[node_id] = np.append(np.append(self.attack_values[node_id], 1),
+                                                                self.reconnaissance_state[node_id])
                 elif network_config.fully_observed:
                     attack_observation[node_id] = np.append(self.attack_values[node_id], 0)
                 elif network_config.adjacency_matrix[current_adjacency_matrix_id][node_adjacency_matrix_id]:
-                    attack_observation[node_id] = np.append(self.attack_values[node_id], 0)
+                    if not reconnaissance:
+                        attack_observation[node_id] = np.append(self.attack_values[node_id], 0)
+                    else:
+                        attack_observation[node_id] = np.append(np.append(self.attack_values[node_id], 0),
+                                                                self.reconnaissance_state[node_id])
 
         if local_view:
             # sort by row then col
@@ -351,28 +383,37 @@ class GameState():
             attack_observation = np.array(local_view_obs)
         return attack_observation
 
-    def get_attacker_node_from_observation(self, observation: np.ndarray) -> int:
+    def get_attacker_node_from_observation(self, observation: np.ndarray, reconnaissance : bool = False) -> int:
         """
         Extracts which node the attacker is currently at from the observation representation
 
         :param observation: the observation representation emitted from the environment
+        :param reconnaissance: boolean flag indicating whether the observation is from an env with reconnaissance state
         :return: the id of the node that the attacker is in
         """
+
         for node_id in range(len(observation)):
-            if observation[node_id][-1] == 1:
-                return node_id
+            if not reconnaissance:
+                if observation[node_id][-1] == 1:
+                    return node_id
+            else:
+                if observation[node_id][self.attack_values.shape[1]] == 1:
+                    return node_id
         raise AssertionError("Could not find the node that the attacker is in")
 
-    def add_attack_event(self, target_pos: Union[int, int], attack_type: int, attacker_pos: Union[int, int]) -> None:
+    def add_attack_event(self, target_pos: Union[int, int], attack_type: int, attacker_pos: Union[int, int],
+                         reconnaissance : bool = False) -> None:
         """
         Adds an attack event to the state
 
         :param target_pos: position in the grid of the target node
         :param attack_type: the type of the attack
         :param attacker_pos: position of the attacker
+        :param reconnaissance: boolean flag indicating whether it is a reconnaissance event
         :return: None
         """
-        attack_event = AttackDefenseEvent(target_pos, attack_type, attacker_pos=attacker_pos)
+        attack_event = AttackDefenseEvent(target_pos, attack_type, attacker_pos=attacker_pos,
+                                          reconnaissance=reconnaissance)
         self.attack_events.append(attack_event)
 
     def add_defense_event(self, target_pos: Union[int, int], defense_type: int) -> None:

@@ -119,7 +119,7 @@ class IdsGameEnv(gym.Env, ABC):
 
         # 1. Interpret attacker action
         attacker_pos = self.state.attacker_pos
-        target_node_id, target_pos, attack_type = self.get_attacker_action(action)
+        target_node_id, target_pos, attack_type, reconnaissance = self.get_attacker_acation(action)
         trajectory.append([target_node_id, target_pos, attack_type])
 
         # 2. Interpret defense action
@@ -137,11 +137,15 @@ class IdsGameEnv(gym.Env, ABC):
         if util.is_attack_legal(target_pos, attacker_pos, self.idsgame_config.game_config.network_config,
                                 past_positions=self.past_positions):
             self.past_moves.append(target_node_id)
-            # 4. Attack
-            self.state.attack(target_node_id, attack_type, self.idsgame_config.game_config.max_value,
-                              self.idsgame_config.game_config.network_config)
-            self.state.add_attack_event(target_pos, attack_type, self.state.attacker_pos)
-            self.attacks.append((target_node_id, attack_type, self.state.game_step))
+            if not reconnaissance:
+                # 4. Attack
+                self.state.attack(target_node_id, attack_type, self.idsgame_config.game_config.max_value,
+                                  self.idsgame_config.game_config.network_config)
+            else:
+                self.state.reconnaissance(target_node_id, attack_type, self.idsgame_config.game_config.max_value,
+                                  self.idsgame_config.game_config.network_config)
+            self.state.add_attack_event(target_pos, attack_type, self.state.attacker_pos, reconnaissance)
+            self.attacks.append((target_node_id, attack_type, self.state.game_step, reconnaissance))
 
             # 5. Simulate attack outcome
             attack_successful = self.state.simulate_attack(target_node_id, attack_type,
@@ -279,7 +283,8 @@ class IdsGameEnv(gym.Env, ABC):
         :param observation: the observation representation emitted from the environment
         :return: the id of the node that the attacker is in
         """
-        return self.state.get_attacker_node_from_observation(observation)
+        return self.state.get_attacker_node_from_observation(
+            observation, reconnaissance=self.idsgame_config.game_config.reconnaissance_actions)
 
     def hack_probability(self) -> float:
         """
@@ -475,8 +480,9 @@ class IdsGameEnv(gym.Env, ABC):
 
         :return: (attacker_obs, defender_obs)
         """
-        attacker_obs = self.state.get_attacker_observation(self.idsgame_config.game_config.network_config,
-                                                           local_view=self.idsgame_config.local_view_observations)
+        attacker_obs = self.state.get_attacker_observation(
+            self.idsgame_config.game_config.network_config, local_view=self.idsgame_config.local_view_observations,
+            reconnaissance=self.idsgame_config.game_config.reconnaissance_actions)
         defender_obs = self.state.get_defender_observation(self.idsgame_config.game_config.network_config)
         return attacker_obs, defender_obs
 
@@ -599,10 +605,10 @@ class DefenderEnv(IdsGameEnv, ABC):
         _, defender_action = action
         return util.interpret_defense_action(defender_action, self.idsgame_config.game_config)
 
-    def get_attacker_action(self, action) -> Union[Union[int, int], int, int]:
+    def get_attacker_action(self, action) -> Union[Union[int, int], int, int, bool]:
         attack_id = self.idsgame_config.attacker_agent.action(self.state)
-        attack_node_id, attack_node_pos, attack_type = util.interpret_attack_action(attack_id, self.idsgame_config.game_config)
-        return attack_node_id, attack_node_pos, attack_type
+        attack_node_id, attack_node_pos, attack_type, reconnaissance = util.interpret_attack_action(attack_id, self.idsgame_config.game_config)
+        return attack_node_id, attack_node_pos, attack_type, reconnaissance
 
 
 class AttackDefenseEnv(IdsGameEnv, ABC):
@@ -643,6 +649,7 @@ class IdsGameRandomDefenseV0Env(AttackerEnv):
     [Version] 0
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -672,6 +679,7 @@ class IdsGameMinimalDefenseV0Env(AttackerEnv):
     [Version] 0
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -701,6 +709,7 @@ class IdsGameRandomAttackV0Env(DefenderEnv):
     [Version] 0
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -730,6 +739,7 @@ class IdsGameMaximalAttackV0Env(DefenderEnv):
     [Version] 0
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -759,6 +769,7 @@ class IdsGameV0Env(AttackDefenseEnv):
     [Version] 0
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -790,6 +801,7 @@ class IdsGameRandomDefenseV1Env(AttackerEnv):
     [Version] 1
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -819,6 +831,7 @@ class IdsGameMinimalDefenseV1Env(AttackerEnv):
     [Version] 1
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -848,6 +861,7 @@ class IdsGameRandomAttackV1Env(DefenderEnv):
     [Version] 1
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -877,6 +891,7 @@ class IdsGameMaximalAttackV1Env(DefenderEnv):
     [Version] 1
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -906,6 +921,7 @@ class IdsGameV1Env(AttackDefenseEnv):
     [Version] 1
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -936,6 +952,7 @@ class IdsGameRandomDefenseV2Env(AttackerEnv):
     [Version] 2
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -965,6 +982,7 @@ class IdsGameMinimalDefenseV2Env(AttackerEnv):
     [Version] 2
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -994,6 +1012,7 @@ class IdsGameRandomAttackV2Env(DefenderEnv):
     [Version] 2
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1023,6 +1042,7 @@ class IdsGameMaximalAttackV2Env(DefenderEnv):
     [Version] 2
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1052,6 +1072,7 @@ class IdsGameV2Env(AttackDefenseEnv):
     [Version] 2
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1082,6 +1103,7 @@ class IdsGameRandomDefenseV3Env(AttackerEnv):
     [Version] 3
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1111,6 +1133,7 @@ class IdsGameMinimalDefenseV3Env(AttackerEnv):
     [Version] 3
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1140,6 +1163,7 @@ class IdsGameRandomAttackV3Env(DefenderEnv):
     [Version] 3
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1169,6 +1193,7 @@ class IdsGameMaximalAttackV3Env(DefenderEnv):
     [Version] 3
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1198,6 +1223,7 @@ class IdsGameV3Env(AttackDefenseEnv):
     [Version] 3
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1228,6 +1254,7 @@ class IdsGameRandomDefenseV4Env(AttackerEnv):
     [Version] 4
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1257,6 +1284,7 @@ class IdsGameMinimalDefenseV4Env(AttackerEnv):
     [Version] 4
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1286,6 +1314,7 @@ class IdsGameRandomAttackV4Env(DefenderEnv):
     [Version] 4
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1315,6 +1344,7 @@ class IdsGameMaximalAttackV4Env(DefenderEnv):
     [Version] 4
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1344,6 +1374,7 @@ class IdsGameV4Env(AttackDefenseEnv):
     [Version] 4
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1373,6 +1404,7 @@ class IdsGameRandomDefenseV5Env(AttackerEnv):
     [Version] 5
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1405,6 +1437,7 @@ class IdsGameMinimalDefenseV5Env(AttackerEnv):
     [Version] 5
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1436,6 +1469,7 @@ class IdsGameRandomAttackV5Env(DefenderEnv):
     [Version] 5
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1468,6 +1502,7 @@ class IdsGameMaximalAttackV5Env(DefenderEnv):
     [Version] 5
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1499,6 +1534,7 @@ class IdsGameV5Env(AttackDefenseEnv):
     [Version] 5
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1530,6 +1566,7 @@ class IdsGameRandomDefenseV6Env(AttackerEnv):
     [Version] 6
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1563,6 +1600,7 @@ class IdsGameMinimalDefenseV6Env(AttackerEnv):
     [Version] 6
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1595,6 +1633,7 @@ class IdsGameRandomAttackV6Env(DefenderEnv):
     [Version] 6
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1628,6 +1667,7 @@ class IdsGameMaximalAttackV6Env(DefenderEnv):
     [Version] 6
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1660,6 +1700,7 @@ class IdsGameV6Env(AttackDefenseEnv):
     [Version] 6
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1693,6 +1734,7 @@ class IdsGameRandomDefenseV7Env(AttackerEnv):
     [Version] 7
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1723,6 +1765,7 @@ class IdsGameMinimalDefenseV7Env(AttackerEnv):
     [Version] 7
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1753,6 +1796,7 @@ class IdsGameRandomAttackV7Env(DefenderEnv):
     [Version] 7
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1783,6 +1827,7 @@ class IdsGameMaximalAttackV7Env(DefenderEnv):
     [Version] 7
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1813,6 +1858,7 @@ class IdsGameV7Env(AttackDefenseEnv):
     [Version] 7
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1844,6 +1890,7 @@ class IdsGameRandomDefenseV8Env(AttackerEnv):
     [Version] 8
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1874,6 +1921,7 @@ class IdsGameMinimalDefenseV8Env(AttackerEnv):
     [Version] 8
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1904,6 +1952,7 @@ class IdsGameRandomAttackV8Env(DefenderEnv):
     [Version] 8
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1934,6 +1983,7 @@ class IdsGameMaximalAttackV8Env(DefenderEnv):
     [Version] 8
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1964,6 +2014,7 @@ class IdsGameV8Env(AttackDefenseEnv):
     [Version] 8
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -1995,6 +2046,7 @@ class IdsGameRandomDefenseV9Env(AttackerEnv):
     [Version] 9
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2025,6 +2077,7 @@ class IdsGameMinimalDefenseV9Env(AttackerEnv):
     [Version] 9
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2055,6 +2108,7 @@ class IdsGameRandomAttackV9Env(DefenderEnv):
     [Version] 9
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2085,6 +2139,7 @@ class IdsGameMaximalAttackV9Env(DefenderEnv):
     [Version] 2
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2115,6 +2170,7 @@ class IdsGameV9Env(AttackDefenseEnv):
     [Version] 9
     [Observations] partially observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2146,6 +2202,7 @@ class IdsGameRandomDefenseV10Env(AttackerEnv):
     [Version] 10
     [Observations] fully observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2177,6 +2234,7 @@ class IdsGameMinimalDefenseV10Env(AttackerEnv):
     [Version] 10
     [Observations] fully observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2208,6 +2266,7 @@ class IdsGameRandomAttackV10Env(DefenderEnv):
     [Version] 10
     [Observations] fully observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2239,6 +2298,7 @@ class IdsGameMaximalAttackV10Env(DefenderEnv):
     [Version] 10
     [Observations] fully observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2270,6 +2330,7 @@ class IdsGameV10Env(AttackDefenseEnv):
     [Version] 10
     [Observations] fully observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2301,6 +2362,7 @@ class IdsGameRandomDefenseV11Env(AttackerEnv):
     [Version] 11
     [Observations] fully observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2332,6 +2394,7 @@ class IdsGameMinimalDefenseV11Env(AttackerEnv):
     [Version] 11
     [Observations] fully observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2363,6 +2426,7 @@ class IdsGameRandomAttackV11Env(DefenderEnv):
     [Version] 11
     [Observations] fully observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2394,6 +2458,7 @@ class IdsGameMaximalAttackV11Env(DefenderEnv):
     [Version] 11
     [Observations] fully observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2425,6 +2490,7 @@ class IdsGameV11Env(AttackDefenseEnv):
     [Version] 11
     [Observations] fully observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2457,6 +2523,7 @@ class IdsGameRandomDefenseV12Env(AttackerEnv):
     [Version] 12
     [Observations] fully observed
     [Environment] Random
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2490,6 +2557,7 @@ class IdsGameMinimalDefenseV12Env(AttackerEnv):
     [Version] 12
     [Observations] fully observed
     [Environment] Random
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2523,6 +2591,7 @@ class IdsGameRandomAttackV12Env(DefenderEnv):
     [Version] 12
     [Observations] fully observed
     [Environment] Random
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2556,6 +2625,7 @@ class IdsGameMaximalAttackV12Env(DefenderEnv):
     [Version] 12
     [Observations] fully observed
     [Environment] Random
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2589,6 +2659,7 @@ class IdsGameV12Env(AttackDefenseEnv):
     [Version] 12
     [Observations] fully observed
     [Environment] Random
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2622,6 +2693,7 @@ class IdsGameRandomDefenseV13Env(AttackerEnv):
     [Version] 13
     [Observations] fully observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2653,6 +2725,7 @@ class IdsGameMinimalDefenseV13Env(AttackerEnv):
     [Version] 13
     [Observations] fully observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2684,6 +2757,7 @@ class IdsGameRandomAttackV13Env(DefenderEnv):
     [Version] 13
     [Observations] fully observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2715,6 +2789,7 @@ class IdsGameMaximalAttackV13Env(DefenderEnv):
     [Version] 13
     [Observations] fully observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2746,6 +2821,7 @@ class IdsGameV13Env(AttackDefenseEnv):
     [Version] 13
     [Observations] fully observed
     [Environment] Deterministic
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2779,6 +2855,7 @@ class IdsGameRandomDefenseV14Env(AttackerEnv):
     [Observations] fully observed
     [Environment] Random
     [Local View] Yes
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2815,6 +2892,7 @@ class IdsGameMinimalDefenseV14Env(AttackerEnv):
     [Observations] fully observed
     [Environment] Random
     [Local View] Yes
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2851,6 +2929,7 @@ class IdsGameRandomAttackV14Env(DefenderEnv):
     [Observations] fully observed
     [Environment] Random
     [Local View] Yes
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2887,6 +2966,7 @@ class IdsGameMaximalAttackV14Env(DefenderEnv):
     [Observations] fully observed
     [Environment] Random
     [Local View] Yes
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2923,6 +3003,7 @@ class IdsGameV14Env(AttackDefenseEnv):
     [Observations] fully observed
     [Environment] Random
     [Local View] Yes
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2961,6 +3042,7 @@ class IdsGameRandomDefenseV15Env(AttackerEnv):
     [Observations] fully observed
     [Environment] Random
     [Local View] Yes
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -2997,6 +3079,7 @@ class IdsGameMinimalDefenseV15Env(AttackerEnv):
     [Observations] fully observed
     [Environment] Random
     [Local View] Yes
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -3033,6 +3116,7 @@ class IdsGameRandomAttackV15Env(DefenderEnv):
     [Observations] fully observed
     [Environment] Random
     [Local View] Yes
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -3069,6 +3153,7 @@ class IdsGameMaximalAttackV15Env(DefenderEnv):
     [Observations] fully observed
     [Environment] Random
     [Local View] Yes
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -3105,6 +3190,7 @@ class IdsGameV15Env(AttackDefenseEnv):
     [Observations] fully observed
     [Environment] Random
     [Local View] Yes
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -3142,6 +3228,7 @@ class IdsGameRandomDefenseV16Env(AttackerEnv):
     [Observations] fully observed
     [Environment] Random
     [Local View] No
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -3178,6 +3265,7 @@ class IdsGameMinimalDefenseV16Env(AttackerEnv):
     [Observations] fully observed
     [Environment] Random
     [Local View] No
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -3214,6 +3302,7 @@ class IdsGameRandomAttackV16Env(DefenderEnv):
     [Observations] fully observed
     [Environment] Random
     [Local View] No
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -3250,6 +3339,7 @@ class IdsGameMaximalAttackV16Env(DefenderEnv):
     [Observations] fully observed
     [Environment] Random
     [Local View] No
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -3286,6 +3376,7 @@ class IdsGameV16Env(AttackDefenseEnv):
     [Observations] fully observed
     [Environment] Random
     [Local View] No
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -3323,6 +3414,7 @@ class IdsGameRandomDefenseV17Env(AttackerEnv):
     [Observations] partially observed
     [Environment] Random
     [Local View] No
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -3358,6 +3450,7 @@ class IdsGameMinimalDefenseV17Env(AttackerEnv):
     [Observations] partially observed
     [Environment] Random
     [Local View] No
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -3393,6 +3486,7 @@ class IdsGameRandomAttackV17Env(DefenderEnv):
     [Observations] partially observed
     [Environment] Random
     [Local View] No
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -3428,6 +3522,7 @@ class IdsGameMaximalAttackV17Env(DefenderEnv):
     [Observations] partially observed
     [Environment] Random
     [Local View] No
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -3463,6 +3558,7 @@ class IdsGameV17Env(AttackDefenseEnv):
     [Observations] partially observed
     [Environment] Random
     [Local View] No
+    [Reconnaissance activities] disabled
     """
     def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
         """
@@ -3485,4 +3581,194 @@ class IdsGameV17Env(AttackDefenseEnv):
             idsgame_config.render_config.caption = "idsgame-v17"
             idsgame_config.randomize_env = True
             idsgame_config.local_view_observations = False
+        super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
+
+# -------- Version 18 ------------
+
+class IdsGameRandomDefenseV18Env(AttackerEnv):
+    """
+    [AttackerEnv] 1 layer, 1 server per layer, 4 attack-defense-values, random defender
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 0
+    [Rewards] Dense
+    [Version] 18
+    [Observations] partially observed
+    [Environment] Random
+    [Local View] No
+    [Reconnaissance activities] enabled
+    """
+    def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
+        """
+        Initialization of the environment
+
+        :param save_dir: directory to save outputs of the env
+        :param initial_state_path: path to the initial state (if none, use default)
+        :param idsgame_config: configuration of the environment (if not specified a default config is used)
+        """
+        if idsgame_config is None:
+            game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
+                                     min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
+            game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=1)
+            game_config.dense_rewards_v2 = True
+            game_config.network_config.fully_observed = False
+            game_config.reconnaissance_actions = True
+            if initial_state_path is not None:
+                game_config.set_load_initial_state(initial_state_path)
+            defender_agent = RandomDefenseBotAgent(game_config)
+            idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
+            idsgame_config.render_config.caption = "idsgame-random_defense-v18"
+            idsgame_config.randomize_env = True
+            idsgame_config.local_view_observations = False
+            idsgame_config.reconnaissance_actions = True
+        super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
+
+
+class IdsGameMinimalDefenseV18Env(AttackerEnv):
+    """
+    [AttackerEnv] 1 layer, 1 server per layer, 4 attack-defense-values, defender following the "defend minimal strategy"
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 0
+    [Rewards] Dense
+    [Version] 18
+    [Observations] partially observed
+    [Environment] Random
+    [Local View] No
+    [Reconnaissance activities] enabled
+    """
+    def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
+        """
+        Initialization of the environment
+
+        :param save_dir: directory to save outputs of the env
+        :param initial_state_path: path to the initial state (if none, use default)
+        :param idsgame_config: configuration of the environment (if not specified a default config is used)
+        """
+        if idsgame_config is None:
+            game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
+                                     min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
+            game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=1)
+            game_config.dense_rewards_v2 = True
+            game_config.network_config.fully_observed = False
+            game_config.reconnaissance_actions = True
+            if initial_state_path is not None:
+                game_config.set_load_initial_state(initial_state_path)
+            defender_agent = DefendMinimalValueBotAgent(game_config)
+            idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
+            idsgame_config.render_config.caption = "idsgame-minimal_defense-v18"
+            idsgame_config.randomize_env = True
+            idsgame_config.local_view_observations = False
+            idsgame_config.reconnaissance_actions = True
+        super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
+
+
+class IdsGameRandomAttackV18Env(DefenderEnv):
+    """
+    [DefenderEnv] 1 layer, 1 server per layer, 4 attack-defense-values, random attacker
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 0
+    [Rewards] Dense
+    [Version] 18
+    [Observations] partially observed
+    [Environment] Random
+    [Local View] No
+    [Reconnaissance activities] enabled
+    """
+    def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
+        """
+        Initialization of the environment
+
+        :param save_dir: directory to save outputs of the env
+        :param initial_state_path: path to the initial state (if none, use default)
+        :param idsgame_config: configuration of the environment (if not specified a default config is used)
+        """
+        if idsgame_config is None:
+            game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
+                                     min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
+            game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=1)
+            game_config.dense_rewards_v2 = True
+            game_config.network_config.fully_observed = False
+            game_config.reconnaissance_actions = True
+            if initial_state_path is not None:
+                game_config.set_load_initial_state(initial_state_path)
+            attacker_agent = RandomAttackBotAgent(game_config)
+            idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
+            idsgame_config.render_config.caption = "idsgame-random_attack-v18"
+            idsgame_config.randomize_env = True
+            idsgame_config.local_view_observations = False
+            idsgame_config.reconnaissance_actions = True
+        super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
+
+
+class IdsGameMaximalAttackV18Env(DefenderEnv):
+    """
+    [DefenderEnv] 1 layer, 1 server per layer, 4 attack-defense-values, attacker following the "attack maximal strategy"
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 0
+    [Rewards] Dense
+    [Version] 18
+    [Observations] partially observed
+    [Environment] Random
+    [Local View] No
+    [Reconnaissance activities] enabled
+    """
+    def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
+        """
+        Initialization of the environment
+
+        :param save_dir: directory to save outputs of the env
+        :param initial_state_path: path to the initial state (if none, use default)
+        :param idsgame_config: configuration of the environment (if not specified a default config is used)
+        """
+        if idsgame_config is None:
+            game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
+                                     min_random_a_val=0, min_random_d_val=1, min_random_det_val=1)
+            game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=1, det_val=4,
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=1)
+            game_config.dense_rewards_v2 = True
+            game_config.network_config.fully_observed = False
+            game_config.reconnaissance_actions = True
+            if initial_state_path is not None:
+                game_config.set_load_initial_state(initial_state_path)
+            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
+            idsgame_config.render_config.caption = "idsgame-maximal_attack-v18"
+            idsgame_config.randomize_env = True
+            idsgame_config.local_view_observations = False
+            idsgame_config.reconnaissance_actions = True
+        super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
+
+
+class IdsGameV18Env(AttackDefenseEnv):
+    """
+    [AttackDefenseEnv] 1 layer, 1 server per layer, 4 attack-defense-values
+    [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 0
+    [Rewards] Dense
+    [Version] 17
+    [Observations] partially observed
+    [Environment] Random
+    [Local View] No
+    [Reconnaissance activities] enabled
+    """
+    def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
+        """
+        Initialization of the environment
+
+        :param save_dir: directory to save outputs of the env
+        :param initial_state_path: path to the initial state (if none, use default)
+        :param idsgame_config: configuration of the environment (if not specified a default config is used)
+        """
+        if idsgame_config is None:
+            game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
+                                     min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
+            game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
+                                          vulnerability_val=0, num_vulnerabilities_per_layer=1)
+            game_config.dense_rewards_v2 = True
+            game_config.network_config.fully_observed = False
+            game_config.reconnaissance_actions = True
+            if initial_state_path is not None:
+                game_config.set_load_initial_state(initial_state_path)
+            idsgame_config = IdsGameConfig(game_config=game_config)
+            idsgame_config.render_config.caption = "idsgame-v18"
+            idsgame_config.randomize_env = True
+            idsgame_config.local_view_observations = False
+            idsgame_config.reconnaissance_actions = True
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)

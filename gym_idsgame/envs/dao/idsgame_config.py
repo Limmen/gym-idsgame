@@ -13,7 +13,8 @@ class IdsGameConfig:
     def __init__(self, render_config: RenderConfig = None, game_config: GameConfig = None,
                  defender_agent: Agent = None, attacker_agent: Agent = None, initial_state_path: str = None,
                  save_trajectories :bool = False, save_attack_stats : bool = False,
-                 randomize_env : bool = False, local_view_observations : bool = False):
+                 randomize_env : bool = False, local_view_observations : bool = False,
+                 reconnaissance_actions : bool = False):
         """
         Constructor, initializes the config
 
@@ -26,6 +27,8 @@ class IdsGameConfig:
         :param save_attack_stats: boolean flag whether to save attack statistics or not
         :param randomize_env: boolean flag whether to randomize the environment creation before each episode
         :param local_view_observations: boolean flag whether features are provided in a "local view" mode
+        :param reconnaissance_actions: a boolean flag that indicates whether reconnaissance activities are enabled for
+                                       the attacker
         """
         self.render_config = render_config
         self.game_config = game_config
@@ -41,3 +44,4 @@ class IdsGameConfig:
         self.save_attack_stats = save_attack_stats
         self.randomize_env = randomize_env
         self.local_view_observations = local_view_observations
+        self.reconnaissance_actions = reconnaissance_actions

@@ -214,8 +214,9 @@ class PolicyGradientAgent(TrainAgent, ABC):
         :return: new state
         """
         if not attacker and self.env.local_view_features():
-            attacker_obs = self.env.state.get_attacker_observation(self.env.idsgame_config.game_config.network_config,
-                                                local_view=False)
+            attacker_obs = self.env.state.get_attacker_observation(
+                self.env.idsgame_config.game_config.network_config, local_view=False,
+                reconnaissance=self.env.idsgame_config.reconnaissance_actions)
 
         # Zero mean
         if self.config.zero_mean_features:

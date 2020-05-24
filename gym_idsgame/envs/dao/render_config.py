@@ -15,13 +15,16 @@ class RenderConfig:
     """
     def __init__(self, resources_dir: str = constants.RENDERING.RESOURCES_DIR,
                  blink_interval: float = constants.RENDERING.AGENT_BLINK_INTERVAL,
-                 num_blinks: int = constants.RENDERING.AGENT_NUM_BLINKS, title="IdsGame"):
+                 num_blinks: int = constants.RENDERING.AGENT_NUM_BLINKS, title="IdsGame",
+                 attacker_view : bool = False, defender_view : bool = False):
         """
         Constructor, initializes the DTO
 
         :param resources_dir: directory with resources for rendering
         :param blink_interval: the interval for blinking when simulating attack/defense operations
         :param num_blinks: the number of blinks when simulating attack/defense operations
+        :param attacker_view: boolean flag whether to show the attacker's view (otherwise fully observed view is shown)
+        :param defender_view: boolean flag whether to show the defender's view (otherwise fully observed view is shown)
         """
         self.rect_size = constants.RENDERING.RECT_SIZE
         self.bg_color = constants.RENDERING.WHITE
@@ -44,6 +47,8 @@ class RenderConfig:
         self.height = constants.RENDERING.DEFAULT_HEIGHT
         self.width = constants.RENDERING.MIN_WIDTH
         self.title=title
+        self.attacker_view = attacker_view
+        self.defender_view = defender_view
 
 
     def new_window(self):

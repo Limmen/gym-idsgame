@@ -64,7 +64,8 @@ class ReinforceAttackerBotAgent(BotAgent):
         """
 
         # Feature engineering
-        attacker_obs = game_state.get_attacker_observation(self.game_config.network_config, local_view=True)
+        attacker_obs = game_state.get_attacker_observation(self.game_config.network_config, local_view=True,
+                                                           reconnaissance=self.game_config.reconnaissance_actions)
         defender_obs = game_state.get_defender_observation(self.game_config.network_config)
         neighbor_defense_attributes = np.zeros((attacker_obs.shape[0], defender_obs.shape[1]))
         for node in range(attacker_obs.shape[0]):

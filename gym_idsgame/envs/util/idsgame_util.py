@@ -97,7 +97,7 @@ def is_attack_id_legal(attack_id: int, game_config: GameConfig, attacker_pos: Un
     return is_attack_legal(server_pos, attacker_pos, game_config.network_config, past_positions)
 
 
-def interpret_attack_action(action: int, game_config: GameConfig) -> Union[int, Union[int, int], int]:
+def interpret_attack_action(action: int, game_config: GameConfig) -> Union[int, Union[int, int], int, bool]:
     """
     Utility method for interpreting the given attack action, converting it into server_id,pos,type
 
@@ -105,10 +105,17 @@ def interpret_attack_action(action: int, game_config: GameConfig) -> Union[int, 
     :param game_config: game configuration
     :return: server-id, server-position, attack-type
     """
-    server_id = action // game_config.num_attack_types
+    if not game_config.reconnaissance_actions:
+        server_id = action // game_config.num_attack_types
+    else:
+        server_id = action // (game_config.num_attack_types*2)
+
     server_pos = game_config.network_config.get_node_pos(server_id)
     attack_type = get_attack_type(action, game_config)
-    return server_id, server_pos, attack_type
+    reconnaissance = attack_type >= game_config.num_attack_types
+    if reconnaissance:
+        attack_type = attack_type - game_config.num_attack_types
+    return server_id, server_pos, attack_type, reconnaissance
 
 def interpret_defense_action(action: int, game_config: GameConfig) -> Union[int, Union[int, int], int]:
     """
@@ -133,7 +140,10 @@ def get_attack_action_id(server_id, attack_type, game_config: GameConfig):
     :param game_config: game config
     :return: attack id
     """
-    action_id = server_id * game_config.num_attack_types + attack_type
+    if not game_config.reconnaissance_actions:
+        action_id = server_id * game_config.num_attack_types + attack_type
+    else:
+        action_id = server_id * (game_config.num_attack_types*2) + attack_type
     return action_id
 
 
@@ -158,7 +168,10 @@ def get_attack_type(action: int, game_config: GameConfig) -> int:
     :param game_config: game configuration
     :return: action type
     """
-    attack_defense_type = action % game_config.num_attack_types
+    if not game_config.reconnaissance_actions:
+        attack_defense_type = action % game_config.num_attack_types
+    else:
+        attack_defense_type = action % (game_config.num_attack_types*2)
     return attack_defense_type
 
 
