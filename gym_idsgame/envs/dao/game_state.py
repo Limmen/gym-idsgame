@@ -258,7 +258,7 @@ class GameState():
         if network_config.node_list[node_id] != NodeType.START and self.attack_values[node_id][attack_type] < max_value:
             self.attack_values[node_id][attack_type] += 1
 
-    def reconnaissance(self, node_id: int, attack_type: int) -> None:
+    def reconnaissance(self, node_id: int, attack_type: int) -> int:
         """
         Performs a reconnaissance activity for the attacker
 
@@ -266,9 +266,13 @@ class GameState():
         :param attack_type: the type of attack attribute to increment
         :param max_value: the maximum defense value
         :param network_config: NetworkConfig
-        :return: None
+        :return: reward
         """
+        reward = -1*constants.GAME_CONFIG.POSITIVE_REWARD \
+            if self.reconnaissance_state[node_id][attack_type] == self.defense_values[node_id][attack_type] \
+            else 0.1*constants.GAME_CONFIG.POSITIVE_REWARD
         self.reconnaissance_state[node_id][attack_type] = self.defense_values[node_id][attack_type]
+        return reward
 
     def defend(self, node_id: int, defense_type: int, max_value: int, network_config: NetworkConfig,
                detect : bool = False) -> bool:
@@ -306,14 +310,19 @@ class GameState():
             return True
         return self.attack_values[attacked_node_id][attack_type] > self.defense_values[attacked_node_id][attack_type]
 
-    def simulate_detection(self, node_id: int) -> bool:
+    def simulate_detection(self, node_id: int, reconnaissance: bool) -> bool:
         """
         Simulates detection for a unsuccessful attack
 
         :param node_id: the id of the node to simulate deteciton of
+        :param reconnaissance: boolean flag, if true simulate detection of reconnaissance activity
         :return: True if the node was detected, otherwise False
         """
-        return np.random.rand() < self.defense_det[node_id] / 10
+        if not reconnaissance:
+            return np.random.rand() < self.defense_det[node_id] / 10
+        else:
+            det_prob = self.defense_det[node_id] / 10
+            return np.random.rand() < det_prob/100
 
     def get_attacker_observation(self, network_config: NetworkConfig, local_view=False, reconnaissance = False) -> np.ndarray:
         """

@@ -60,23 +60,23 @@ def default_config() -> ClientConfig:
                                                 num_episodes=100000000,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
-                                                eval_frequency=25000, attacker=True, defender=False,
+                                                eval_frequency=50000, attacker=True, defender=False,
                                                 video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=5000, input_dim_attacker=((4 + 1) * 3)*4,
-                                                output_dim_attacker=4 * 3,
-                                                input_dim_defender=((4 + 1) * 3)*4,
-                                                output_dim_defender=5 * 3,
-                                                hidden_dim=64,
-                                                num_hidden_layers=4, batch_size=2000,
-                                                gpu=True, tensorboard=True,
+                                                checkpoint_freq=5000, input_dim_attacker=((3*2 + 1) * 3),
+                                                output_dim_attacker=(3*2) * 3,
+                                                input_dim_defender=((3 + 1) * 3),
+                                                output_dim_defender=4 * 3,
+                                                hidden_dim=32,
+                                                num_hidden_layers=2, batch_size=2000,
+                                                gpu=False, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
-                                                state_length=4, normalize_features=False, merged_ad_features=False,
+                                                state_length=1, normalize_features=False, merged_ad_features=False,
                                                 zero_mean_features=False, gpu_id=0, lstm_network=False,
-                                                lstm_seq_length=4, num_lstm_layers=2, optimization_iterations=10,
+                                                lstm_seq_length=4, num_lstm_layers=2, optimization_iterations=100,
                                                 eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95)
-    env_name = "idsgame-minimal_defense-v17"
+    env_name = "idsgame-minimal_defense-v18"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.PPO_OPENAI_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),
@@ -147,7 +147,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir, random_seed)
-    logger = util.setup_logger("openai-ppo_vs_minimal_defense-v17", config.output_dir + "/results/logs/" +
+    logger = util.setup_logger("openai-ppo_vs_minimal_defense-v18", config.output_dir + "/results/logs/" +
                                str(random_seed) + "/",
                                time_str=time_str)
     config.pg_agent_config.save_dir = default_output_dir() + "/results/data/" + str(random_seed) + "/"

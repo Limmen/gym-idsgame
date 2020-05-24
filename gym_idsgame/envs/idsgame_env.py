@@ -114,12 +114,12 @@ class IdsGameEnv(gym.Env, ABC):
         self.state.defense_events = []
 
         if self.state.game_step > constants.GAME_CONFIG.MAX_GAME_STEPS:
-            return self.get_observation(), (constants.GAME_CONFIG.NEGATIVE_REWARD,
-                                            constants.GAME_CONFIG.NEGATIVE_REWARD), True, info
+            return self.get_observation(), (100*constants.GAME_CONFIG.NEGATIVE_REWARD,
+                                            100*constants.GAME_CONFIG.NEGATIVE_REWARD), True, info
 
         # 1. Interpret attacker action
         attacker_pos = self.state.attacker_pos
-        target_node_id, target_pos, attack_type, reconnaissance = self.get_attacker_acation(action)
+        target_node_id, target_pos, attack_type, reconnaissance = self.get_attacker_action(action)
         trajectory.append([target_node_id, target_pos, attack_type, reconnaissance])
 
         # 2. Interpret defense action
@@ -142,35 +142,41 @@ class IdsGameEnv(gym.Env, ABC):
                 self.state.attack(target_node_id, attack_type, self.idsgame_config.game_config.max_value,
                                   self.idsgame_config.game_config.network_config)
             else:
-                self.state.reconnaissance(target_node_id, attack_type)
+                rec_reward = self.state.reconnaissance(target_node_id, attack_type)
+                reward = (rec_reward, 0)
+
             self.state.add_attack_event(target_pos, attack_type, self.state.attacker_pos, reconnaissance)
             self.attacks.append((target_node_id, attack_type, self.state.game_step, reconnaissance))
 
-            # 5. Simulate attack outcome
-            attack_successful = self.state.simulate_attack(target_node_id, attack_type,
-                                                           self.idsgame_config.game_config.network_config)
+            attack_successful = False
+            if not reconnaissance:
+                # 5. Simulate attack outcome
+                attack_successful = self.state.simulate_attack(target_node_id, attack_type,
+                                                               self.idsgame_config.game_config.network_config)
             if self.idsgame_config.save_attack_stats:
-                self.total_attacks.append([target_node_id, attack_successful])
+                self.total_attacks.append([target_node_id, attack_successful, reconnaissance])
 
             # 6. Update state based on attack outcome
             if attack_successful:
-                self.past_positions.append(target_pos)
-                self.state.attacker_pos = target_pos
-                if target_pos == self.idsgame_config.game_config.network_config.data_pos:
-                    self.state.done = True
-                    self.state.hacked = True
-                    reward = self.get_hack_reward()
-                else:
-                    reward = self.get_successful_attack_reward()
+                if not reconnaissance:
+                    self.past_positions.append(target_pos)
+                    self.state.attacker_pos = target_pos
+                    if target_pos == self.idsgame_config.game_config.network_config.data_pos:
+                        self.state.done = True
+                        self.state.hacked = True
+                        reward = self.get_hack_reward()
+                    else:
+                        reward = self.get_successful_attack_reward()
             else:
                 self.past_positions.append(self.state.attacker_pos)
-                detected = self.state.simulate_detection(target_node_id)
+                detected = self.state.simulate_detection(target_node_id, reconnaissance=reconnaissance)
                 if detected:
                     self.state.done = True
                     self.state.detected = True
                     reward = self.get_detect_reward(target_node_id,  attack_type, self.state.defense_det[target_node_id])
                 else:
-                    reward = self.get_blocked_attack_reward(target_node_id, attack_type)
+                    if not reconnaissance:
+                        reward = self.get_blocked_attack_reward(target_node_id, attack_type)
                 if self.idsgame_config.save_attack_stats:
                     self.attack_detections.append([target_node_id, detected, self.state.defense_det[target_node_id]])
         #else:
@@ -420,7 +426,7 @@ class IdsGameEnv(gym.Env, ABC):
             #         blocked_attacks += 1
             # norm_factor = self.state.game_step if self.state.game_step > 0 else 1
             # reward = (blocked_attacks)/norm_factor
-            return -constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
+            return -1*constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
 
     def get_successful_attack_reward(self) -> Union[int, int]:
         """
@@ -3643,9 +3649,9 @@ class IdsGameMinimalDefenseV18Env(AttackerEnv):
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
         if idsgame_config is None:
-            game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
-                                     min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
-            game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
+            game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=3, max_value=9,
+                                     min_random_a_val=0, min_random_d_val=9, min_random_det_val=1)
+            game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
                                           vulnerability_val=0, num_vulnerabilities_per_layer=1)
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False

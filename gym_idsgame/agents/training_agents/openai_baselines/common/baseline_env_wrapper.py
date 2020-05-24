@@ -13,7 +13,7 @@ class BaselineEnvWrapper(gym.Env):
         self.idsgame_env = gym.make(env_name, idsgame_config=idsgame_config,
                                     save_dir=save_dir,
                                     initial_state_path=initial_state_path)
-        self.idsgame_env.idsgame_config.game_config.dense_rewards = False
+        self.idsgame_env.idsgame_config.render_config.attacker_view = True
         self.pg_agent_config = pg_agent_config
         self.attacker_action_space = self.idsgame_env.attacker_action_space
         self.defender_action_space = self.idsgame_env.defender_action_space
@@ -56,6 +56,10 @@ class BaselineEnvWrapper(gym.Env):
                                            attacker=True)
         defender_state = self.update_state(defender_obs=obs_defender, attacker_obs=obs_attacker, state=[],
                                            attacker=False)
+        # print("attacker state:{}".format(attacker_state))
+        # print("attacker state shape:{}".format(attacker_state.shape))
+        # print("defender state shape:{}".format(defender_state.shape))
+        # print("defender state:{}".format(defender_state))
         return [attacker_state.flatten(), defender_state.flatten()]
 
     def render(self, mode='human'):
@@ -108,6 +112,11 @@ class BaselineEnvWrapper(gym.Env):
         :param attacker: boolean flag whether it is attacker or not
         :return: new state
         """
+        if attacker and self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+            a_obs_len = self.idsgame_env.idsgame_config.game_config.num_attack_types + 1
+            defender_obs = attacker_obs[:, a_obs_len:]
+            attacker_obs = attacker_obs[:, 0:a_obs_len]
+
         if not attacker and self.idsgame_env.local_view_features():
             attacker_obs = self.idsgame_env.state.get_attacker_observation(
                 self.idsgame_env.idsgame_config.game_config.network_config,
@@ -196,29 +205,36 @@ class BaselineEnvWrapper(gym.Env):
                     id = int(attacker_obs[node][-2])
                     neighbor_defense_attributes[node] = defender_obs[id]
 
-        if self.idsgame_env.fully_observed():
+        if self.idsgame_env.fully_observed() or \
+                (self.idsgame_env.idsgame_config.game_config.reconnaissance_actions and attacker):
             if self.pg_agent_config.merged_ad_features:
                 if not self.idsgame_env.local_view_features() or not attacker:
                     a_pos = attacker_obs[:, -1]
-                    det_values = defender_obs[:, -1]
-                    temp = defender_obs[:, 0:-1] - attacker_obs[:, 0:-1]
+                    if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                        det_values = defender_obs[:, -1]
+                        temp = defender_obs[:, 0:-1] - attacker_obs[:, 0:-1]
+                    else:
+                        temp = defender_obs[:, 0:] - attacker_obs[:, 0:-1]
                     features = []
                     for idx, row in enumerate(temp):
                         t = row.tolist()
                         t.append(a_pos[idx])
-                        t.append(det_values[idx])
+                        if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                            t.append(det_values[idx])
                         features.append(t)
                 else:
                     node_ids = attacker_obs[:, -2]
                     node_reachable = attacker_obs[:, -1]
-                    det_values = neighbor_defense_attributes[:, -1]
+                    if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                        det_values = neighbor_defense_attributes[:, -1]
                     temp = neighbor_defense_attributes[:, 0:-1] - attacker_obs[:, 0:-2]
                     features = []
                     for idx, row in enumerate(temp):
                         t = row.tolist()
                         t.append(node_ids[idx])
                         t.append(node_reachable[idx])
-                        t.append(det_values[idx])
+                        if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                            t.append(det_values[idx])
                         features.append(t)
                 features = np.array(features)
                 if self.pg_agent_config.state_length == 1:

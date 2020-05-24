@@ -46,6 +46,12 @@ class GameFrame(pyglet.window.Window):
         self.switch_to()
         self.attacker_view = self.idsgame_config.render_config.attacker_view
         self.defender_view = self.idsgame_config.render_config.defender_view
+        if self.attacker_view and not self.defender_view:
+            self.toggle_attacker_view()
+        elif not self.attacker_view and self.defender_view:
+            self.toggle_defender_view()
+        else:
+            self.toggle_full_view()
 
     def create_batch(self) -> None:
         """
@@ -193,7 +199,7 @@ class GameFrame(pyglet.window.Window):
                                     self.game_state.hacked = True
                             else:
                                 detected = self.game_state.simulate_detection(
-                                    self.resource_network.grid[attack_row][attack_col].id)
+                                    self.resource_network.grid[attack_row][attack_col].id, reconnaissance=reconnaissance)
                                 if detected:
                                     self.game_state.done = True
                                     self.game_state.detected = True
@@ -258,7 +264,7 @@ class GameFrame(pyglet.window.Window):
                                         self.game_state.done = True
                                         self.game_state.hacked = True
                                 else:
-                                    detected = self.game_state.simulate_detection(node.id)
+                                    detected = self.game_state.simulate_detection(node.id, reconnaissance=reconnaissance)
                                     if detected:
                                         self.game_state.done = True
                                         self.game_state.detected = True

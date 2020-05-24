@@ -112,6 +112,7 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         """
         self.attack_values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         self.defense_values = [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+        self.reconnaissance_state = [constants.GAME_CONFIG.INITIAL_RECONNAISSANCE_STATE]*10
         self.det = 2
 
     def blink_green_defense(self, dt, detect :bool = False) -> None:

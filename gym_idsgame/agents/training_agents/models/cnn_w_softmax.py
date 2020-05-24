@@ -16,7 +16,7 @@ class CNNwithSoftmax(torch.nn.Module):
                  hidden_activation: str = "ReLU", conv_kernels : List[int] = None, conv_strides : List[int] = None,
                  conv_out_channels : List[int] = None,
                  pool_kernels : List[int] = None, pool_strides : List[int] = None, pool : List[bool] = None,
-                 flat_dim : int = 256):
+                 flat_dim : int = 256, conv_2d :bool = True, conv_1d : bool = False):
         """
         Builds the model
 
@@ -32,6 +32,8 @@ class CNNwithSoftmax(torch.nn.Module):
         :param pool_strides: size of the pool strides
         :param pool: boolean vector whether to add a pooling layer after each conv layer
         :param flat_dim: dimension of the flatten layer at the end
+        :param conv_1d: boolean flag, whether to use 1D convs
+        :param conv_2d: boolean flag, whether to use 2D convs
         """
         super(CNNwithSoftmax, self).__init__()
 
@@ -48,28 +50,46 @@ class CNNwithSoftmax(torch.nn.Module):
         self.conv_out_channels = conv_out_channels
         self.pool = pool
         self.flat_dim = flat_dim
+        self.conv_1d = conv_1d
+        self.conv_2d = conv_2d
 
         # Define layers of CNN
         self.layers = torch.nn.ModuleList()
 
         # Input layer
-        self.layers.append(torch.nn.Conv2d(in_channels=1, out_channels=self.conv_out_channels[0],
-                                           kernel_size=self.conv_kernels[0], stride=self.conv_strides[0], padding=0))
+        if self.conv_2d:
+            self.layers.append(torch.nn.Conv2d(in_channels=input_dim[0], out_channels=self.conv_out_channels[0],
+                                               kernel_size=self.conv_kernels[0], stride=self.conv_strides[0], padding=0))
+        elif self.conv_1d:
+            self.layers.append(torch.nn.Conv1d(in_channels=input_dim[0], out_channels=self.conv_out_channels[0],
+                                               kernel_size=self.conv_kernels[0], stride=self.conv_strides[0],
+                                               padding=0))
         if pool[0]:
             self.layers.append(torch.nn.MaxPool2d(kernel_size=self.pool_kernels[0], stride=self.pool_strides[0], padding=0))
 
         # Hidden Layers
         for i in range(self.num_hidden_layers):
-            self.layers.append(torch.nn.Conv2d(in_channels=self.conv_out_channels[i-1], out_channels=self.conv_out_channels[i+1],
-                                               kernel_size=self.conv_kernels[i+1], stride=self.conv_strides[i+1],
-                                               padding=0))
+            if self.conv_2d:
+                self.layers.append(torch.nn.Conv2d(in_channels=self.conv_out_channels[i-1], out_channels=self.conv_out_channels[i+1],
+                                                   kernel_size=self.conv_kernels[i+1], stride=self.conv_strides[i+1],
+                                                   padding=0))
+            elif self.conv_1d:
+                self.layers.append(torch.nn.Conv1d(in_channels=self.conv_out_channels[i - 1],
+                                                   out_channels=self.conv_out_channels[i + 1],
+                                                   kernel_size=self.conv_kernels[i + 1],
+                                                   stride=self.conv_strides[i + 1],
+                                                   padding=0))
             if pool[i+1]:
                 self.layers.append(
                     torch.nn.MaxPool2d(kernel_size=self.pool_kernels[i+1], stride=self.pool_strides[i+1], padding=0))
-
-        self.layers.append(
-            torch.nn.Conv2d(in_channels=self.conv_out_channels[-2], out_channels=self.conv_out_channels[-1],
-                            kernel_size=self.conv_kernels[-1], stride=self.conv_strides[-1], padding=0))
+        if self.conv_2d:
+            self.layers.append(
+                torch.nn.Conv2d(in_channels=self.conv_out_channels[-2], out_channels=self.conv_out_channels[-1],
+                                kernel_size=self.conv_kernels[-1], stride=self.conv_strides[-1], padding=0))
+        elif self.conv_1d:
+            self.layers.append(
+                torch.nn.Conv1d(in_channels=self.conv_out_channels[-2], out_channels=self.conv_out_channels[-1],
+                                kernel_size=self.conv_kernels[-1], stride=self.conv_strides[-1], padding=0))
         # Output layer
         self.layers.append(torch.nn.Linear(self.flat_dim, self.output_dim))
         self.layers.append(torch.nn.Softmax())
@@ -121,16 +141,16 @@ def test() -> None:
     :return: None
     """
     # Constants
-    input_dim = (1, 10, 11)
+    input_dim = (3, 8, 60)
     output_dim = 44
     hidden_dim = 64
     batch_size = 64
 
     # Create model
     model = CNNwithSoftmax(input_dim, output_dim, hidden_dim, num_hidden_layers=4, conv_kernels=[2,2,2,2,2,2],
-                           conv_strides=[1,1,1,1,1,1], conv_out_channels=[1,1,1,1,1,1], pool_kernels=[2,2,2,2,2],
+                           conv_strides=[1,1,1,1,1,1], conv_out_channels=[3,3,3,3,3,3], pool_kernels=[2,2,2,2,2],
                            pool_strides=[None, None, None, None, None], pool=[False, False, False, False, False, False],
-                           flat_dim=5)
+                           flat_dim=54, conv_1d=False, conv_2d=True)
 
     # Create random Tensors to hold inputs and outputs
     x = torch.randn(batch_size, input_dim[0], input_dim[1], input_dim[2])

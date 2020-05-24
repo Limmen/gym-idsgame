@@ -71,9 +71,9 @@ def is_attack_legal(target_pos: Union[int, int], attacker_pos: Union[int, int], 
     attacker_row, attacker_col = attacker_pos
     if target_row > attacker_row:
         return False
-    if past_positions is not None and len(past_positions) >=2:
-        if target_pos in past_positions[-3:]:
-            return False
+    # if past_positions is not None and len(past_positions) >=2:
+    #     if target_pos in past_positions[-3:]:
+    #         return False
     attacker_adjacency_matrix_id = attacker_row * network_config.num_cols + attacker_col
     target_adjacency_matrix_id = target_row * network_config.num_cols + target_col
     return network_config.adjacency_matrix[attacker_adjacency_matrix_id][target_adjacency_matrix_id] == int(1)
