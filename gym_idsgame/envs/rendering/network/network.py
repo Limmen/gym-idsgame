@@ -132,7 +132,7 @@ class Network:
                 node = self.grid[i][j]
                 if node.node_type != NodeType.EMPTY:
                     node.set_state(game_state.attack_values[node.id], game_state.defense_values[node.id],
-                                              game_state.defense_det[node.id])
+                                              game_state.defense_det[node.id], game_state.reconnaissance_state[node.id])
 
     def __create_node(self, row: int, col: int) -> Node:
         """

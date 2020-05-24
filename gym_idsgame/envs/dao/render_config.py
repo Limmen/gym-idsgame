@@ -33,6 +33,7 @@ class RenderConfig:
         self.server_filename = constants.RENDERING.SERVER_AVATAR_FILENAME
         self.data_filename = constants.RENDERING.DATA_AVATAR_FILENAME
         self.cage_filename = constants.RENDERING.CAGE_AVATAR_FILENAME
+        self.glass_filename = constants.RENDERING.GLASS_AVATAR_FILENAME
         self.minimum_width = constants.RENDERING.MIN_WIDTH
         self.attacker_scale = constants.RENDERING.ATTACKER_AVATAR_SCALE
         self.server_scale = constants.RENDERING.SERVER_AVATAR_SCALE

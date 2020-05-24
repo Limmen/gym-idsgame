@@ -91,9 +91,10 @@ def is_attack_id_legal(attack_id: int, game_config: GameConfig, attacker_pos: Un
     :param past_positions: if not None, used to check whether the agent is in a periodic policy, e.g. a circle.
     :return: True if legal otherwise False
     """
-    server_id, server_pos, attack_type = interpret_attack_action(attack_id, game_config)
-    if game_state.attack_values[server_id][attack_type] >= game_config.max_value:
-        return False
+    server_id, server_pos, attack_type, reconnaissance = interpret_attack_action(attack_id, game_config)
+    if not reconnaissance:
+        if game_state.attack_values[server_id][attack_type] >= game_config.max_value:
+            return False
     return is_attack_legal(server_pos, attacker_pos, game_config.network_config, past_positions)
 
 

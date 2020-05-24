@@ -120,7 +120,7 @@ class IdsGameEnv(gym.Env, ABC):
         # 1. Interpret attacker action
         attacker_pos = self.state.attacker_pos
         target_node_id, target_pos, attack_type, reconnaissance = self.get_attacker_acation(action)
-        trajectory.append([target_node_id, target_pos, attack_type])
+        trajectory.append([target_node_id, target_pos, attack_type, reconnaissance])
 
         # 2. Interpret defense action
         defense_node_id, defense_pos, defense_type,  = self.get_defender_action(action)
@@ -142,8 +142,7 @@ class IdsGameEnv(gym.Env, ABC):
                 self.state.attack(target_node_id, attack_type, self.idsgame_config.game_config.max_value,
                                   self.idsgame_config.game_config.network_config)
             else:
-                self.state.reconnaissance(target_node_id, attack_type, self.idsgame_config.game_config.max_value,
-                                  self.idsgame_config.game_config.network_config)
+                self.state.reconnaissance(target_node_id, attack_type)
             self.state.add_attack_event(target_pos, attack_type, self.state.attacker_pos, reconnaissance)
             self.attacks.append((target_node_id, attack_type, self.state.game_step, reconnaissance))
 
@@ -3612,6 +3611,7 @@ class IdsGameRandomDefenseV18Env(AttackerEnv):
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
+            game_config.set_attack_actions()
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             defender_agent = RandomDefenseBotAgent(game_config)
@@ -3650,6 +3650,7 @@ class IdsGameMinimalDefenseV18Env(AttackerEnv):
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
+            game_config.set_attack_actions()
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             defender_agent = DefendMinimalValueBotAgent(game_config)
@@ -3688,6 +3689,7 @@ class IdsGameRandomAttackV18Env(DefenderEnv):
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
+            game_config.set_attack_actions()
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             attacker_agent = RandomAttackBotAgent(game_config)
@@ -3726,6 +3728,7 @@ class IdsGameMaximalAttackV18Env(DefenderEnv):
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
+            game_config.set_attack_actions()
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             attacker_agent = AttackMaximalValueBotAgent(game_config)
@@ -3764,6 +3767,7 @@ class IdsGameV18Env(AttackDefenseEnv):
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
+            game_config.set_attack_actions()
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             idsgame_config = IdsGameConfig(game_config=game_config)

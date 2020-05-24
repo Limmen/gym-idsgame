@@ -49,7 +49,10 @@ class EmptyNode(Node):
     def manual_blink_attack(self, i, attacker_pos: Union[int, int], edges=None):
         pass
 
-    def set_state(self, attack_values, defense_values, det_value):
+    def manual_reconnaissance(self, i):
+        pass
+
+    def set_state(self, attack_values, defense_values, det_value, reconnaissance_states):
         pass
 
     def visualize_defense(self, detect):

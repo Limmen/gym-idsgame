@@ -20,3 +20,4 @@ class AttackDefenseEvent:
         self.target_row, self.target_col = target_pos
         self.attack_defense_type = attack_defense_type
         self.attacker_pos = attacker_pos
+        self.reconnaissance = reconnaissance

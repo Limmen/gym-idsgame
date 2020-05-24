@@ -48,10 +48,7 @@ class GameConfig():
         self.num_rows = self.num_layers + 2
         self.num_nodes = self.num_layers * self.num_servers_per_layer + 2  # +2 for Start and Data Nodes
         self.num_cols = self.num_servers_per_layer
-        if not self.reconnaissance_actions:
-            self.num_attack_actions = self.num_attack_types * self.num_nodes
-        else:
-            self.num_attack_actions = (self.num_attack_types*2) * self.num_nodes
+        self.set_attack_actions()
         self.num_defense_actions = (self.num_attack_types+1) * self.num_nodes
         self.num_states = self.num_nodes
         self.network_config = network_config
@@ -74,6 +71,12 @@ class GameConfig():
             self.initial_state.default_state(self.network_config.node_list, self.network_config.start_pos,
                                              self.num_attack_types, network_config=self.network_config)
         self.dense_rewards = dense_rewards
+
+    def set_attack_actions(self):
+        if not self.reconnaissance_actions:
+            self.num_attack_actions = self.num_attack_types * self.num_nodes
+        else:
+            self.num_attack_actions = (self.num_attack_types * 2) * self.num_nodes
 
     def set_load_initial_state(self, initial_state_path: str) -> None:
         """

@@ -127,7 +127,7 @@ class GameState():
         attack_values = np.zeros((num_nodes, num_attack_types))
         defense_values = np.zeros((num_nodes, num_attack_types))
         det_values = np.zeros(num_nodes)
-        reconnaissance_state = np.zeros((num_nodes, num_attack_types))
+        reconnaissance_state = np.full((num_nodes, num_attack_types), constants.GAME_CONFIG.INITIAL_RECONNAISSANCE_STATE)
 
         d_val = defense_val
         a_val = attack_val

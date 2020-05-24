@@ -31,6 +31,11 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         self.outgoing_edges = []
         self.incoming_edges = []
         self.horizontal_edges = []
+        self.glass_avatar = pyglet.resource.image(self.idsgame_config.render_config.glass_filename)
+        self.glass = pyglet.sprite.Sprite(self.glass_avatar, x=self.x, y=self.y, batch=idsgame_config.render_config.batch,
+                                          group=idsgame_config.render_config.second_foreground)
+        self.glass.scale = self.idsgame_config.render_config.cage_scale
+        self.glass.visible = False
         self.initialize_state()
 
     def visualize_defense(self, detect: bool = False) -> None:
@@ -81,6 +86,11 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
             return "D=" + ",".join(map(lambda x: str(x), self.defense_values))
         else:
             dummy_values = ["x"] * len(self.defense_values)
+            if self.idsgame_config.reconnaissance_actions:
+                constants.GAME_CONFIG.INITIAL_RECONNAISSANCE_STATE
+                for idx, rec in enumerate(self.reconnaissance_state):
+                    if rec != constants.GAME_CONFIG.INITIAL_RECONNAISSANCE_STATE:
+                        dummy_values[idx] = str(rec)
             return "D=" + ",".join(dummy_values)
 
     @property
@@ -142,18 +152,20 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         clock.unschedule(self.blink_green_defense)
         clock.unschedule(self.blink_red_attack)
 
-    def set_state(self, attack_values, defense_values, det_value) -> None:
+    def set_state(self, attack_values, defense_values, det_value, reconnaissance_state) -> None:
         """
         Sets the state of the node
 
         :param attack_values: attack values
         :param defense_values: defense values
         :param det_value: detection probabilities
+        :param reconnaissance_state: reconnaissance_state values
         :return: None
         """
         self.attack_values = attack_values
         self.defense_values = defense_values
         self.det = det_value
+        self.reconnaissance_state = reconnaissance_state
         self.set_labels()
 
     def manual_blink_defense(self, i: int, detect :bool = False) -> None:
@@ -262,6 +274,33 @@ class ResourceNode(pyglet.sprite.Sprite, Node, ABC):
         self.idsgame_config.render_config.attacker_view = True
         self.idsgame_config.render_config.defender_view = True
 
+    def visualize_reconnaissance(self):
+        for i in range(0, self.idsgame_config.render_config.num_blinks):
+            if i % 2 == 0:
+                clock.schedule_once(self.show_glass, self.idsgame_config.render_config.blink_interval * i)
+            else:
+                clock.schedule_once(self.hide_glass, self.idsgame_config.render_config.blink_interval * i)
+
+    def manual_reconnaissance(self, i: int) -> None:
+        """
+        Manual attack blink, when not using the clock to schedule blinks but rather ticking the clock manually.
+        Used when the agent plays the game and not a human.
+
+        :param i: the blink number
+        :return: None
+       """
+        if i % 2 == 0:
+            self.show_glass(0)
+        else:
+            self.hide_glass(1)
+
+    def show_glass(self, dt):
+        self.glass.x = self.x + 20
+        self.glass.y = self.y
+        self.glass.visible = True
+
+    def hide_glass(self, dt):
+        self.glass.visible = False
 
     # Abstract methods to be implemented by sub-classes
     @abstractmethod

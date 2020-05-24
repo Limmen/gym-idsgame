@@ -32,7 +32,11 @@ class Node(ABC):
         pass
 
     @abstractmethod
-    def set_state(self, attack_values, defense_values, det_value):
+    def manual_reconnaissance(self, i):
+        pass
+
+    @abstractmethod
+    def set_state(self, attack_values, defense_values, det_value, reconnaissance_states):
         pass
 
     @abstractmethod

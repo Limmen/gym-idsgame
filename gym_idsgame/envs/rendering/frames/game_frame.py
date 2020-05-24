@@ -152,28 +152,37 @@ class GameFrame(pyglet.window.Window):
 
                             # 3. Update attack state
                             attack_id = self.attacker_agent.action(self.game_state)
-                            attack_node_id, attack_node_pos, attack_type = util.interpret_attack_action(
+                            attack_node_id, attack_node_pos, attack_type, reconnaissance = util.interpret_attack_action(
                                 attack_id, self.idsgame_config.game_config)
                             attack_row, attack_col = attack_node_pos
 
-                            self.game_state.attack(attack_node_id, attack_type,
-                                                   self.idsgame_config.game_config.max_value,
-                                                   self.idsgame_config.game_config.network_config)
+                            if not reconnaissance:
+                                self.game_state.attack(attack_node_id, attack_type,
+                                                       self.idsgame_config.game_config.max_value,
+                                                       self.idsgame_config.game_config.network_config)
+                            else:
+                                self.game_state.reconnaissance(attack_node_id, attack_type)
 
                             # 4. Visualize defense
                             self.resource_network.grid[node.row][node.col].visualize_defense(detect=detect)
 
-                            # 6. Visualize attack
-                            edges = []
-                            if self.resource_network.grid[attack_row][attack_col].node_type == NodeType.DATA:
-                                edges = self.resource_network.get(self.attacker_sprite.pos).outgoing_edges
+                            attack_successful = False
 
-                            self.resource_network.grid[attack_row][attack_col].visualize_attack(
-                                attack_type, self.game_state.attacker_pos, edges)
+                            if not reconnaissance:
+                                # 6. Visualize attack
+                                edges = []
+                                if self.resource_network.grid[attack_row][attack_col].node_type == NodeType.DATA:
+                                    edges = self.resource_network.get(self.attacker_sprite.pos).outgoing_edges
 
-                            # 7. Simulate attack outcome
-                            attack_successful = self.game_state.simulate_attack(
-                                attack_node_id, attack_type, self.idsgame_config.game_config.network_config)
+                                self.resource_network.grid[attack_row][attack_col].visualize_attack(
+                                    attack_type, self.game_state.attacker_pos, edges)
+
+                                # 7. Simulate attack outcome
+                                attack_successful = self.game_state.simulate_attack(
+                                    attack_node_id, attack_type, self.idsgame_config.game_config.network_config)
+                            else:
+                                # 6. Visualize reconnaissance
+                                node.visualize_reconnaissance()
 
                             # 8. Update game state based on the outcome of the attack
                             self.game_state.game_step += 1
@@ -209,24 +218,37 @@ class GameFrame(pyglet.window.Window):
                                                        self.idsgame_config.game_config.network_config, detect=detect)
 
                                 # 4. Update attack state
-                                self.game_state.attack(node.id, self.game_state.attack_defense_type,
-                                                       self.idsgame_config.game_config.max_value,
-                                                       self.idsgame_config.game_config.network_config)
+                                reconnaissance = self.game_state.attack_defense_type >= \
+                                                 self.idsgame_config.game_config.num_attack_types
+                                if not reconnaissance:
+                                    self.game_state.attack(node.id, self.game_state.attack_defense_type,
+                                                           self.idsgame_config.game_config.max_value,
+                                                           self.idsgame_config.game_config.network_config)
+                                else:
+                                    attack_type = self.game_state.attack_defense_type - \
+                                                  self.idsgame_config.game_config.num_attack_types
+                                    self.game_state.reconnaissance(node.id, attack_type)
 
                                 # 5. Visualize defense
                                 self.resource_network.grid[defense_row][defense_col].visualize_defense(detect)
 
-                                # 6. Visualize attack
-                                edges = []
-                                if node.node_type == NodeType.DATA:
-                                    edges = self.resource_network.get(self.attacker_sprite.pos).outgoing_edges
-                                node.visualize_attack(self.game_state.attack_defense_type, self.game_state.attacker_pos,
-                                                      edges)
+                                attack_successful = False
 
-                                # 7. Simulate attack outcome
-                                attack_successful = self.game_state.simulate_attack(
-                                    node.id, self.game_state.attack_defense_type,
-                                    self.idsgame_config.game_config.network_config)
+                                if not reconnaissance:
+                                    # 6. Visualize attack
+                                    edges = []
+                                    if node.node_type == NodeType.DATA:
+                                        edges = self.resource_network.get(self.attacker_sprite.pos).outgoing_edges
+                                    node.visualize_attack(self.game_state.attack_defense_type, self.game_state.attacker_pos,
+                                                          edges)
+
+                                    # 7. Simulate attack outcome
+                                    attack_successful = self.game_state.simulate_attack(
+                                        node.id, self.game_state.attack_defense_type,
+                                        self.idsgame_config.game_config.network_config)
+                                else:
+                                    # 6. Visualize reconnaissance activity
+                                    node.visualize_reconnaissance()
 
                                 # 8. Update game state based on the outcome of the attack
                                 self.game_state.game_step += 1
@@ -252,35 +274,75 @@ class GameFrame(pyglet.window.Window):
         """
         if self.idsgame_config.game_config.manual_attacker or self.idsgame_config.game_config.manual_defender:
             if symbol == pyglet.window.key._1:
-                if self.idsgame_config.game_config.num_attack_types > 1:
-                    self.game_state.attack_defense_type = 1
+                if self.idsgame_config.game_config.manual_attacker:
+                    if self.idsgame_config.game_config.num_attack_actions//self.idsgame_config.game_config.num_nodes > 1:
+                        self.game_state.attack_defense_type = 1
+                elif self.idsgame_config.game_config.manual_defender:
+                    if self.idsgame_config.game_config.num_attack_types > 1:
+                        self.game_state.attack_defense_type = 1
             elif symbol == pyglet.window.key._2:
-                if self.idsgame_config.game_config.num_attack_types > 2:
-                    self.game_state.attack_defense_type = 2
+                if self.idsgame_config.game_config.manual_attacker:
+                    if self.idsgame_config.game_config.num_attack_actions//self.idsgame_config.game_config.num_nodes > 2:
+                        self.game_state.attack_defense_type = 2
+                elif self.idsgame_config.game_config.manual_defender:
+                    if self.idsgame_config.game_config.num_attack_types > 2:
+                        self.game_state.attack_defense_type = 2
             elif symbol == pyglet.window.key._3:
-                if self.idsgame_config.game_config.num_attack_types > 3:
-                    self.game_state.attack_defense_type = 3
+                if self.idsgame_config.game_config.manual_attacker:
+                    if self.idsgame_config.game_config.num_attack_actions//self.idsgame_config.game_config.num_nodes > 3:
+                        self.game_state.attack_defense_type = 3
+                elif self.idsgame_config.game_config.manual_defender:
+                    if self.idsgame_config.game_config.num_attack_types > 3:
+                        self.game_state.attack_defense_type = 3
             elif symbol == pyglet.window.key._4:
-                if self.idsgame_config.game_config.num_attack_types > 4:
-                    self.game_state.attack_defense_type = 4
+                if self.idsgame_config.game_config.manual_attacker:
+                    if self.idsgame_config.game_config.num_attack_actions//self.idsgame_config.game_config.num_nodes > 4:
+                        self.game_state.attack_defense_type = 4
+                elif self.idsgame_config.game_config.manual_defender:
+                    if self.idsgame_config.game_config.num_attack_types > 4:
+                        self.game_state.attack_defense_type = 4
             elif symbol == pyglet.window.key._5:
-                if self.idsgame_config.game_config.num_attack_types > 5:
-                    self.game_state.attack_defense_type = 5
+                if self.idsgame_config.game_config.manual_attacker:
+                    if self.idsgame_config.game_config.num_attack_actions//self.idsgame_config.game_config.num_nodes > 5:
+                        self.game_state.attack_defense_type = 5
+                elif self.idsgame_config.game_config.manual_defender:
+                    if self.idsgame_config.game_config.num_attack_types > 5:
+                        self.game_state.attack_defense_type = 5
             elif symbol == pyglet.window.key._6:
-                if self.idsgame_config.game_config.num_attack_types > 6:
-                    self.game_state.attack_defense_type = 6
+                if self.idsgame_config.game_config.manual_attacker:
+                    if self.idsgame_config.game_config.num_attack_actions//self.idsgame_config.game_config.num_nodes > 6:
+                        self.game_state.attack_defense_type = 6
+                elif self.idsgame_config.game_config.manual_defender:
+                    if self.idsgame_config.game_config.num_attack_types > 6:
+                        self.game_state.attack_defense_type = 6
             elif symbol == pyglet.window.key._7:
-                if self.idsgame_config.game_config.num_attack_types > 7:
-                    self.game_state.attack_defense_type = 7
+                if self.idsgame_config.game_config.manual_attacker:
+                    if self.idsgame_config.game_config.num_attack_actions//self.idsgame_config.game_config.num_nodes > 7:
+                        self.game_state.attack_defense_type = 7
+                elif self.idsgame_config.game_config.manual_defender:
+                    if self.idsgame_config.game_config.num_attack_types > 7:
+                        self.game_state.attack_defense_type = 7
             elif symbol == pyglet.window.key._8:
-                if self.idsgame_config.game_config.num_attack_types > 8:
-                    self.game_state.attack_defense_type = 8
+                if self.idsgame_config.game_config.manual_attacker:
+                    if self.idsgame_config.game_config.num_attack_actions//self.idsgame_config.game_config.num_nodes > 8:
+                        self.game_state.attack_defense_type = 8
+                elif self.idsgame_config.game_config.manual_defender:
+                    if self.idsgame_config.game_config.num_attack_types > 8:
+                        self.game_state.attack_defense_type = 8
             elif symbol == pyglet.window.key._9:
-                if self.idsgame_config.game_config.num_attack_types > 9:
-                    self.game_state.attack_defense_type = 9
+                if self.idsgame_config.game_config.manual_attacker:
+                    if self.idsgame_config.game_config.num_attack_actions//self.idsgame_config.game_config.num_nodes > 9:
+                        self.game_state.attack_defense_type = 9
+                elif self.idsgame_config.game_config.manual_defender:
+                    if self.idsgame_config.game_config.num_attack_types > 9:
+                        self.game_state.attack_defense_type = 9
             elif symbol == pyglet.window.key._0:
-                if self.idsgame_config.game_config.num_attack_types > 0:
-                    self.game_state.attack_defense_type = 0
+                if self.idsgame_config.game_config.manual_attacker:
+                    if self.idsgame_config.game_config.num_attack_actions//self.idsgame_config.game_config.num_nodes > 0:
+                        self.game_state.attack_defense_type = 0
+                elif self.idsgame_config.game_config.manual_defender:
+                    if self.idsgame_config.game_config.num_attack_types > 0:
+                        self.game_state.attack_defense_type = 0
             elif symbol == pyglet.window.key.SPACE:
                 self.reset(update_stats=True)
             elif symbol == pyglet.window.key.A:
@@ -291,6 +353,11 @@ class GameFrame(pyglet.window.Window):
                 self.toggle_full_view()
 
     def toggle_attacker_view(self):
+        """
+        Toggle attacker's view, hide defender details (partially observed)
+
+        :return: None
+        """
         self.attacker_view = True
         self.defender_view = False
         for i in range(self.idsgame_config.game_config.num_rows - 1):
@@ -301,6 +368,11 @@ class GameFrame(pyglet.window.Window):
         self.attacker_sprite.show()
 
     def toggle_defender_view(self):
+        """
+        Toggle defender's view, hide attacker details (partially observed)
+
+        :return: None
+        """
         self.attacker_view = False
         self.defender_view = True
         for i in range(self.idsgame_config.game_config.num_rows - 1):
@@ -311,6 +383,11 @@ class GameFrame(pyglet.window.Window):
         self.attacker_sprite.hide()
 
     def toggle_full_view(self):
+        """
+        Toggle fully observed view
+
+        :return: None
+        """
         self.attacker_view = True
         self.defender_view = True
         for i in range(self.idsgame_config.game_config.num_rows - 1):
@@ -379,14 +456,17 @@ class GameFrame(pyglet.window.Window):
             target_node: Node = self.resource_network.grid[attack.target_row][attack.target_col]
             attack_row, attack_col = attack.attacker_pos
             edges = []
-            if target_node.node_type == NodeType.DATA:
-                edges = self.resource_network.get(attack.attacker_pos).outgoing_edges
-            if target_node.node_type == NodeType.START:
-                self.resource_network.grid[attack_row][attack_col].manual_blink_attack(
-                    i, target_node.pos, edges)
-                return
-            self.resource_network.grid[attack.target_row][attack.target_col].manual_blink_attack(
-                i, attack.attacker_pos, edges)
+            if not attack.reconnaissance:
+                if target_node.node_type == NodeType.DATA:
+                    edges = self.resource_network.get(attack.attacker_pos).outgoing_edges
+                if target_node.node_type == NodeType.START:
+                    self.resource_network.grid[attack_row][attack_col].manual_blink_attack(
+                        i, target_node.pos, edges)
+                    return
+                self.resource_network.grid[attack.target_row][attack.target_col].manual_blink_attack(
+                    i, attack.attacker_pos, edges)
+            else:
+                self.resource_network.grid[attack.target_row][attack.target_col].manual_reconnaissance(i)
 
     def simulate_defense_events(self, defense_events: List[AttackDefenseEvent], i:int) -> None:
         """
