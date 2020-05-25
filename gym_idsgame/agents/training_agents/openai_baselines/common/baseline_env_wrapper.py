@@ -1,5 +1,6 @@
 import gym
 import numpy as np
+from sklearn import preprocessing
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
 
@@ -318,15 +319,17 @@ class BaselineEnvWrapper(gym.Env):
 
         attack_plane = attacker_obs
         if self.pg_agent_config.normalize_features:
-            attack_plane_row_sums = attack_plane.sum(axis=1)
-            normalized_attack_plane = attack_plane / attack_plane_row_sums[:, np.newaxis]
-            normalized_attack_plane = np.nan_to_num(normalized_attack_plane, nan=0.0)
+            normalized_attack_plane = preprocessing.normalize(attack_plane)
+            # attack_plane_row_sums = attack_plane.sum(axis=1)
+            # normalized_attack_plane = attack_plane / attack_plane_row_sums[:, np.newaxis]
+            # normalized_attack_plane = np.nan_to_num(normalized_attack_plane, nan=0.0)
 
         defense_plane = defender_obs
         if self.pg_agent_config.normalize_features:
-            defense_plane_row_sums = defense_plane.sum(axis=1)
-            normalized_defense_plane = defense_plane / defense_plane_row_sums[:, np.newaxis]
-            normalized_defense_plane = np.nan_to_num(normalized_defense_plane, nan=0.0)
+            normalized_defense_plane = preprocessing.normalize(defense_plane)
+            # defense_plane_row_sums = defense_plane.sum(axis=1)
+            # normalized_defense_plane = defense_plane / defense_plane_row_sums[:, np.newaxis]
+            # normalized_defense_plane = np.nan_to_num(normalized_defense_plane, nan=0.0)
 
         position_plane = np.zeros(attack_plane.shape)
         for idx, present in enumerate(attacker_position):
@@ -352,11 +355,15 @@ class BaselineEnvWrapper(gym.Env):
             row_difference = attacker_row-node_row
             row_difference_plane[node_id] = np.full(row_difference_plane.shape[1], row_difference)
 
+        if self.pg_agent_config.normalize_features:
+            normalized_row_difference_plance = preprocessing.normalize(row_difference_plane)
+
         attack_defense_difference_plane = attacker_obs - defender_obs
         if self.pg_agent_config.normalize_features:
-            attack_defense_difference_plane_row_sums = attack_defense_difference_plane.sum(axis=1)
-            normalized_attack_defense_difference_plane = attack_defense_difference_plane / attack_defense_difference_plane_row_sums[:, np.newaxis]
-            normalized_attack_defense_difference_plane = np.nan_to_num(normalized_attack_defense_difference_plane, nan=0.0)
+            normalized_attack_defense_difference_plane = preprocessing.normalize(attack_defense_difference_plane)
+            # attack_defense_difference_plane_row_sums = attack_defense_difference_plane.sum(axis=1)
+            # normalized_attack_defense_difference_plane = attack_defense_difference_plane / attack_defense_difference_plane_row_sums[:, np.newaxis]
+            # normalized_attack_defense_difference_plane = np.nan_to_num(normalized_attack_defense_difference_plane, nan=0.0)
 
         # print("attack plane:")
         # print(attack_plane)
@@ -365,7 +372,8 @@ class BaselineEnvWrapper(gym.Env):
         # print("position plane:")
         # print(position_plane)
         if self.pg_agent_config.normalize_features:
-            feature_frames = np.stack([normalized_attack_plane, normalized_defense_plane, position_plane, reachable_plane, row_difference_plane,
+            feature_frames = np.stack([normalized_attack_plane, normalized_defense_plane, position_plane, reachable_plane,
+                                       normalized_row_difference_plance,
                                        normalized_attack_defense_difference_plane],
                                   axis=0)
         else:
@@ -374,9 +382,9 @@ class BaselineEnvWrapper(gym.Env):
                  row_difference_plane,
                  attack_defense_difference_plane],
                 axis=0)
-        print("feature_frames:")
-        print(feature_frames)
-        raise AssertionError("test")
+        # print("feature_frames:")
+        # print(feature_frames)
+        # raise AssertionError("test")
         return feature_frames
 
 
