@@ -11,7 +11,7 @@
     "mode": 0,
     "output_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v18/minimal_defense/ppo_openai",
     "pg_agent_config": {
-        "alpha_attacker": 0.001,
+        "alpha_attacker": 0.0001,
         "alpha_defender": 0.0001,
         "alternating_optimization": false,
         "alternating_period": 15000,
@@ -20,6 +20,7 @@
         "batch_size": 2000,
         "checkpoint_freq": 5000,
         "clip_gradient": false,
+        "cnn_feature_extractor": true,
         "critic_loss_fn": "MSE",
         "defender": false,
         "defender_load_path": null,
@@ -28,7 +29,7 @@
         "epsilon_decay": 0.9999,
         "eval_episodes": 100,
         "eval_epsilon": 0.0,
-        "eval_frequency": 50000,
+        "eval_frequency": 100000,
         "eval_log_frequency": 1,
         "eval_render": false,
         "eval_sleep": 0.9,
@@ -40,8 +41,20 @@
         "gpu_id": 0,
         "hidden_activation": "ReLU",
         "hidden_dim": 32,
-        "input_dim_attacker": 21,
-        "input_dim_defender": 12,
+        "input_dim_attacker": {
+            "py/tuple": [
+                3,
+                3,
+                5
+            ]
+        },
+        "input_dim_defender": {
+            "py/tuple": [
+                3,
+                3,
+                5
+            ]
+        },
         "logger": null,
         "lr_decay_rate": 0.999,
         "lr_exp_decay": false,
@@ -58,8 +71,8 @@
         "opponent_pool_config": null,
         "optimization_iterations": 10,
         "optimizer": "Adam",
-        "output_dim_attacker": 18,
-        "output_dim_defender": 12,
+        "output_dim_attacker": 30,
+        "output_dim_defender": 18,
         "py/object": "gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config.PolicyGradientAgentConfig",
         "random_seed": 0,
         "render": false,

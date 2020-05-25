@@ -13,18 +13,17 @@ class BaselineEnvWrapper(gym.Env):
         self.idsgame_env = gym.make(env_name, idsgame_config=idsgame_config,
                                     save_dir=save_dir,
                                     initial_state_path=initial_state_path)
-        self.idsgame_env.idsgame_config.render_config.attacker_view = True
+        #self.idsgame_env.idsgame_config.render_config.attacker_view = True
         self.pg_agent_config = pg_agent_config
         self.attacker_action_space = self.idsgame_env.attacker_action_space
         self.defender_action_space = self.idsgame_env.defender_action_space
-
         self.attacker_observation_space = gym.spaces.Box(low=0,
                                                          high=self.idsgame_env.idsgame_config.game_config.max_value,
-                                                         shape=(self.pg_agent_config.input_dim_attacker,),
+                                                         shape=self.pg_agent_config.input_dim_attacker,
                                                          dtype=np.float32)
         self.defender_observation_space = gym.spaces.Box(low=0,
                                                          high=self.idsgame_env.idsgame_config.game_config.max_value,
-                                                         shape=(self.pg_agent_config.input_dim_defender,),
+                                                         shape=self.pg_agent_config.input_dim_defender,
                                                          dtype=np.float32)
         self.prev_episode_hacked = False
         self.prev_episode_detected = False
@@ -41,26 +40,37 @@ class BaselineEnvWrapper(gym.Env):
         obs_prime, reward, done, info = self.idsgame_env.step(joint_action)
         attacker_reward, defender_reward = reward
         obs_prime_attacker, obs_prime_defender = obs_prime
-        attacker_state = self.update_state(attacker_obs=obs_prime_attacker, defender_obs=obs_prime_defender, state=[],
-                                           attacker=True)
-        defender_state = self.update_state(defender_obs=obs_prime_defender, attacker_obs=obs_prime_attacker, state=[],
-                                           attacker=False)
-        return [attacker_state.flatten(), defender_state.flatten()], [attacker_reward, defender_reward], done, info
+        if self.pg_agent_config.cnn_feature_extractor:
+            attacker_state = self.grid_obs(obs_prime_attacker, obs_prime_defender, attacker=True)
+            defender_state = self.grid_obs(obs_prime_attacker, obs_prime_defender, attacker=True)
+            return [attacker_state, defender_state], [attacker_reward, defender_reward], done, info
+        else:
+            attacker_state = self.update_state(attacker_obs=obs_prime_attacker, defender_obs=obs_prime_defender, state=[],
+                                               attacker=True)
+            defender_state = self.update_state(defender_obs=obs_prime_defender, attacker_obs=obs_prime_attacker, state=[],
+                                               attacker=False)
+            return [attacker_state.flatten(), defender_state.flatten()], [attacker_reward, defender_reward], done, info
 
     def reset(self, update_stats: False):
         self.prev_episode_hacked = self.idsgame_env.state.hacked
         self.prev_episode_detected = self.idsgame_env.state.detected
         obs = self.idsgame_env.reset(update_stats=update_stats)
         obs_attacker, obs_defender = obs
-        attacker_state = self.update_state(attacker_obs=obs_attacker, defender_obs=obs_defender, state=[],
-                                           attacker=True)
-        defender_state = self.update_state(defender_obs=obs_defender, attacker_obs=obs_attacker, state=[],
-                                           attacker=False)
-        # print("attacker state:{}".format(attacker_state))
-        # print("attacker state shape:{}".format(attacker_state.shape))
-        # print("defender state shape:{}".format(defender_state.shape))
-        # print("defender state:{}".format(defender_state))
-        return [attacker_state.flatten(), defender_state.flatten()]
+
+        if self.pg_agent_config.cnn_feature_extractor:
+            attacker_state = self.grid_obs(obs_attacker, obs_defender, attacker=True)
+            defender_state = self.grid_obs(obs_attacker, obs_defender, attacker=True)
+            return [attacker_state, defender_state]
+        else:
+            attacker_state = self.update_state(attacker_obs=obs_attacker, defender_obs=obs_defender, state=[],
+                                               attacker=True)
+            defender_state = self.update_state(defender_obs=obs_defender, attacker_obs=obs_attacker, state=[],
+                                               attacker=False)
+            # print("attacker state:{}".format(attacker_state))
+            # print("attacker state shape:{}".format(attacker_state.shape))
+            # print("defender state shape:{}".format(defender_state.shape))
+            # print("defender state:{}".format(defender_state))
+            return [attacker_state.flatten(), defender_state.flatten()]
 
     def render(self, mode='human'):
         return self.idsgame_env.render(mode=mode)
@@ -176,7 +186,7 @@ class BaselineEnvWrapper(gym.Env):
                 if np.isnan(attacker_obs_1).any():
                     t = attacker_obs[idx]
                 else:
-                    t = attacker_obs_1.tolist()
+                    t = row.tolist()
                     if not self.idsgame_env.local_view_features() or not attacker:
                         t.append(attacker_obs[idx][-1])
                     else:
@@ -184,14 +194,20 @@ class BaselineEnvWrapper(gym.Env):
                         t.append(attacker_obs[idx][-1])
                 normalized_attacker_features.append(t)
 
-            defender_obs_1 = defender_obs[:, 0:-1] / np.linalg.norm(defender_obs[:, 0:-1])
+            if attacker and self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                defender_obs_1 = defender_obs[:, 0:-1] / np.linalg.norm(defender_obs[:, 0:-1])
+            else:
+                defender_obs_1 = defender_obs / np.linalg.norm(defender_obs)
             normalized_defender_features = []
             for idx, row in enumerate(defender_obs_1):
                 if np.isnan(defender_obs_1).any():
                     t = defender_obs[idx]
                 else:
-                    t = defender_obs_1.tolist()
-                    t.append(defender_obs[idx][-1])
+                    if attacker and self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                        t = row.tolist()
+                        t.append(defender_obs[idx][-1])
+                    else:
+                        t = row
 
                 normalized_defender_features.append(t)
 
@@ -246,6 +262,14 @@ class BaselineEnvWrapper(gym.Env):
             else:
                 if self.pg_agent_config.state_length == 1:
                     if not self.idsgame_env.local_view_features() or not attacker:
+                        if self.idsgame_env.idsgame_config.game_config.reconnaissance_actions and attacker:
+                            combined_features = []
+                            for idx, row in enumerate(attacker_obs):
+                                combined_row = np.append(row, defender_obs[idx])
+                                combined_features.append(combined_row)
+                            return np.array(combined_features)
+                            return np.append(attacker_obs, defender_obs)
+
                         return np.append(attacker_obs, defender_obs)
                     else:
                         return np.append(attacker_obs, neighbor_defense_attributes)
@@ -278,3 +302,57 @@ class BaselineEnvWrapper(gym.Env):
             else:
                 state = np.append(state[1:], np.array([defender_obs]), axis=0)
             return state
+
+    def grid_obs(self, attacker_obs, defender_obs, attacker=True):
+        if attacker and self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+            a_obs_len = self.idsgame_env.idsgame_config.game_config.num_attack_types + 1
+            defender_obs = attacker_obs[:, a_obs_len:]
+            attacker_obs = attacker_obs[:, 0:a_obs_len]
+            attacker_position = attacker_obs[:, -1]
+            attacker_obs = attacker_obs[:, 0:-1]
+        elif self.idsgame_env.fully_observed():
+            a_obs_len = self.idsgame_env.idsgame_config.game_config.num_attack_types + 1
+            attacker_position = attacker_obs[:, -1]
+            attacker_obs = attacker_obs[:, 0:-1]
+            defender_obs = defender_obs[:, 0:-1]
+
+        attack_plane = attacker_obs
+        defense_plane = defender_obs
+        position_plane = np.zeros(attack_plane.shape)
+        for idx, present in enumerate(attacker_position):
+            position_plane[idx] = np.full(position_plane.shape[1], present)
+
+        reachable_plane = np.zeros(attack_plane.shape)
+        attacker_row, attacker_col = self.idsgame_env.state.attacker_pos
+        attacker_matrix_id = self.idsgame_env.idsgame_config.game_config.network_config.get_adjacency_matrix_id(attacker_row, attacker_col)
+        for node_id in range(len(attack_plane)):
+            node_row, node_col = self.idsgame_env.idsgame_config.game_config.network_config.get_node_pos(node_id)
+            adj_matrix_id = self.idsgame_env.idsgame_config.game_config.network_config.get_adjacency_matrix_id(node_row,node_col)
+            reachable = self.idsgame_env.idsgame_config.game_config.network_config.adjacency_matrix[attacker_matrix_id][adj_matrix_id] == int(1)
+            if reachable:
+                val = 1
+            else:
+                val = 0
+            reachable_plane[node_id] = np.full(reachable_plane.shape[1], val)
+
+
+        row_difference_plane = np.zeros(attack_plane.shape)
+        for node_id in range(len(attack_plane)):
+            node_row, node_col = self.idsgame_env.idsgame_config.game_config.network_config.get_node_pos(node_id)
+            row_difference = attacker_row-node_row
+            row_difference_plane[node_id] = np.full(row_difference_plane.shape[1], row_difference)
+
+        attack_defense_difference_plane = attacker_obs - defender_obs
+
+        # print("attack plane:")
+        # print(attack_plane)
+        # print("defense plane:")
+        # print(defense_plane)
+        # print("position plane:")
+        # print(position_plane)
+        feature_frames = np.stack([attack_plane, defense_plane, position_plane, reachable_plane, row_difference_plane,
+                                   attack_defense_difference_plane],
+                                  axis=0)
+        return feature_frames
+
+

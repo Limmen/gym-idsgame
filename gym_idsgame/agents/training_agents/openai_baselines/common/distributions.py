@@ -274,7 +274,8 @@ class CategoricalDistribution(Distribution):
         try:
             action = self.distribution.sample()
         except Exception as e:
-            print("Nan values in distribution, consider using a lower learnign rate or gradient clipping")
+            print("Nan values in distribution, consider using a lower learning rate or gradient clipping")
+            print(str(e))
             action = 0
         return th.tensor(action).type(th.LongTensor)
 

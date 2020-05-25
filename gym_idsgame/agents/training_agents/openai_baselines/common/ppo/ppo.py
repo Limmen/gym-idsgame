@@ -23,7 +23,9 @@ from gym_idsgame.agents.training_agents.openai_baselines.common.vec_env.base_vec
 from gym_idsgame.agents.training_agents.openai_baselines.common.callbacks import BaseCallback
 from gym_idsgame.agents.training_agents.openai_baselines.common.ppo.ppo_policies import PPOPolicy
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
-
+from gym_idsgame.agents.training_agents.openai_baselines.common.common_policies import (BasePolicy, register_policy, MlpExtractor,
+                                                                                     create_sde_features_extractor, NatureCNN,
+                                                                                     BaseFeaturesExtractor, FlattenExtractor)
 
 class PPO(BaseRLModel):
     """
@@ -130,7 +132,6 @@ class PPO(BaseRLModel):
     def _setup_model(self) -> None:
         self._setup_lr_schedule()
         self.set_random_seed(self.seed)
-
         self.attacker_rollout_buffer = RolloutBuffer(self.n_steps, self.attacker_observation_space,
                                                      self.attacker_action_space, self.device,
                                                      gamma=self.gamma, gae_lambda=self.gae_lambda,
@@ -139,14 +140,23 @@ class PPO(BaseRLModel):
                                                      self.defender_action_space, self.device,
                                                      gamma=self.gamma, gae_lambda=self.gae_lambda,
                                                      n_envs=self.n_envs)
+        if not self.pg_agent_config.cnn_feature_extractor:
+            feature_extractor_class = FlattenExtractor
+        else:
+            feature_extractor_class = NatureCNN
+
         self.attacker_policy = PPOPolicy(self.attacker_observation_space, self.attacker_action_space,
                                          self.lr_schedule_a, use_sde=self.use_sde, device=self.device,
-                                         pg_agent_config=self.pg_agent_config, **self.policy_kwargs)
+                                         pg_agent_config=self.pg_agent_config,
+                                         features_extractor_class=feature_extractor_class,
+                                         **self.policy_kwargs)
         self.attacker_policy = self.attacker_policy.to(self.device)
 
         self.defender_policy = PPOPolicy(self.defender_observation_space, self.defender_action_space,
                                          self.lr_schedule_a, use_sde=self.use_sde, device=self.device,
-                                         pg_agent_config=self.pg_agent_config, **self.policy_kwargs)
+                                         pg_agent_config=self.pg_agent_config,
+                                         features_extractor_class=feature_extractor_class,
+                                         **self.policy_kwargs)
         self.defender_policy = self.defender_policy.to(self.device)
 
         self.clip_range = get_schedule_fn(self.clip_range)

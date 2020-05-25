@@ -426,7 +426,7 @@ class IdsGameEnv(gym.Env, ABC):
             #         blocked_attacks += 1
             # norm_factor = self.state.game_step if self.state.game_step > 0 else 1
             # reward = (blocked_attacks)/norm_factor
-            return -1*constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
+            return 0, added_detection
 
     def get_successful_attack_reward(self) -> Union[int, int]:
         """
@@ -3649,9 +3649,9 @@ class IdsGameMinimalDefenseV18Env(AttackerEnv):
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
         if idsgame_config is None:
-            game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=3, max_value=9,
-                                     min_random_a_val=0, min_random_d_val=9, min_random_det_val=1)
-            game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+            game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=5, max_value=5,
+                                     min_random_a_val=0, min_random_d_val=5, min_random_det_val=1)
+            game_config.set_initial_state(defense_val=5, attack_val=0, num_vulnerabilities_per_node=1, det_val=3,
                                           vulnerability_val=0, num_vulnerabilities_per_layer=1)
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False

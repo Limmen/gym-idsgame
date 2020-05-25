@@ -20,6 +20,7 @@
         "batch_size": 2000,
         "checkpoint_freq": 5000,
         "clip_gradient": false,
+        "cnn_feature_extractor": true,
         "critic_loss_fn": "MSE",
         "defender": false,
         "defender_load_path": null,
@@ -40,8 +41,20 @@
         "gpu_id": 0,
         "hidden_activation": "ReLU",
         "hidden_dim": 64,
-        "input_dim_attacker": 60,
-        "input_dim_defender": 60,
+        "input_dim_attacker": {
+            "py/tuple": [
+                3,
+                4,
+                3
+            ]
+        },
+        "input_dim_defender": {
+            "py/tuple": [
+                3,
+                4,
+                3
+            ]
+        },
         "logger": null,
         "lr_decay_rate": 0.999,
         "lr_exp_decay": false,
@@ -64,7 +77,7 @@
         "random_seed": 0,
         "render": false,
         "save_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v17/minimal_defense/ppo_openai/results/data",
-        "state_length": 4,
+        "state_length": 1,
         "tensorboard": true,
         "tensorboard_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v17/minimal_defense/ppo_openai/results/tensorboard",
         "train_log_frequency": 1,

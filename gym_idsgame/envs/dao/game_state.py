@@ -268,9 +268,9 @@ class GameState():
         :param network_config: NetworkConfig
         :return: reward
         """
-        reward = -1*constants.GAME_CONFIG.POSITIVE_REWARD \
+        reward = 0*constants.GAME_CONFIG.POSITIVE_REWARD \
             if self.reconnaissance_state[node_id][attack_type] == self.defense_values[node_id][attack_type] \
-            else 0.1*constants.GAME_CONFIG.POSITIVE_REWARD
+            else 1*constants.GAME_CONFIG.POSITIVE_REWARD
         self.reconnaissance_state[node_id][attack_type] = self.defense_values[node_id][attack_type]
         return reward
 

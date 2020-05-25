@@ -65,28 +65,54 @@ class NatureCNN(BaseFeaturesExtractor):
 
     def __init__(self, pg_agent_config : PolicyGradientAgentConfig, observation_space: gym.spaces.Box,
                  features_dim: int = 512):
-        super(NatureCNN, self).__init__(pg_agent_config, observation_space, features_dim)
+        super(NatureCNN, self).__init__(pg_agent_config, observation_space, pg_agent_config.features_dim)
         # We assume CxWxH images (channels first)
         # Re-ordering will be done by pre-preprocessing or wrapper
-        assert is_image_space(observation_space), ('You should use NatureCNN '
-                                                   f'only with images not with {observation_space} '
-                                                   '(you are probably using `CnnPolicy` instead of `MlpPolicy`)')
+        # assert is_image_space(observation_space), ('You should use NatureCNN '
+        #                                            f'only with images not with {observation_space} '
+        #                                            '(you are probably using `CnnPolicy` instead of `MlpPolicy`)')
         n_input_channels = observation_space.shape[0]
-        self.cnn = nn.Sequential(nn.Conv2d(n_input_channels, 32, kernel_size=8, stride=4, padding=0),
+        # self.cnn = nn.Sequential(nn.Conv2d(n_input_channels, out_channels=2, kernel_size=1, stride=1, padding=0),
+        #                          nn.ReLU(),
+        #                          nn.Conv2d(in_channels=2, out_channels=2, kernel_size=2, stride=1, padding=0),
+        #                          nn.ReLU(),
+        #                          nn.Conv2d(in_channels=2, out_channels=2, kernel_size=2, stride=1, padding=0),
+        #                          nn.ReLU(),
+        #                          nn.Flatten())
+        # self.cnn = nn.Sequential(nn.Conv2d(n_input_channels, out_channels=8, kernel_size=1, stride=1, padding=0),
+        #                          nn.ReLU(),
+        #                          nn.Conv2d(in_channels=8, out_channels=8, kernel_size=1, stride=1, padding=0),
+        #                          nn.ReLU(),
+        #                          nn.Conv2d(in_channels=8, out_channels=8, kernel_size=1, stride=1, padding=0),
+        #                          nn.ReLU(),
+        #                          nn.Flatten())
+        self.cnn = nn.Sequential(nn.Conv2d(n_input_channels, out_channels=64, kernel_size=1, stride=1, padding=0),
                                  nn.ReLU(),
-                                 nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=0),
+                                 nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1, padding=0),
                                  nn.ReLU(),
-                                 nn.Conv2d(64, 32, kernel_size=3, stride=1, padding=0),
+                                 nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1, padding=0),
                                  nn.ReLU(),
                                  nn.Flatten())
+        # self.cnn = nn.Sequential(nn.Conv2d(n_input_channels, 32, kernel_size=8, stride=4, padding=0),
+        #                          nn.ReLU(),
+        #                          nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=0),
+        #                          nn.ReLU(),
+        #                          nn.Conv2d(64, 32, kernel_size=3, stride=1, padding=0),
+        #                          nn.ReLU(),
+        #                          nn.Flatten())
 
         # Compute shape by doing one forward pass
         with th.no_grad():
             n_flatten = self.cnn(th.as_tensor(observation_space.sample()[None]).float()).shape[1]
+            #print("sample shape:{}".format(observation_space.sample().shape))
+            #n_flatten = 4
+            #print("n_flatten?{}".format(n_flatten))
 
-        self.linear = nn.Sequential(nn.Linear(n_flatten, features_dim), nn.ReLU())
+        self.linear = nn.Sequential(nn.Linear(n_flatten, pg_agent_config.features_dim), nn.ReLU())
 
     def forward(self, observations: th.Tensor) -> th.Tensor:
+        if len(observations.shape) == 3:
+            observations = observations.unsqueeze(0)
         return self.linear(self.cnn(observations))
 
 
@@ -118,7 +144,7 @@ class BasePolicy(nn.Module):
                  features_extractor_class: Type[BaseFeaturesExtractor] = FlattenExtractor,
                  features_extractor_kwargs: Optional[Dict[str, Any]] = None,
                  features_extractor: Optional[nn.Module] = None,
-                 normalize_images: bool = True,
+                 normalize_images: bool = False,
                  optimizer_class: Type[th.optim.Optimizer] = th.optim.Adam,
                  optimizer_kwargs: Optional[Dict[str, Any]] = None,
                  squash_output: bool = False):

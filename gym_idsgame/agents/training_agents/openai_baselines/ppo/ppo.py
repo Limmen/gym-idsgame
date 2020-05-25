@@ -31,7 +31,11 @@ class OpenAiPPOAgent(PolicyGradientAgent):
             net_arch.append(self.config.hidden_dim)
         policy_kwargs = dict(activation_fn=self.get_hidden_activation(), net_arch=net_arch)
         device = "cpu" if not self.config.gpu else "cuda:" + str(self.config.gpu_id)
-        model = PPO("MlpPolicy", self.env,
+        policy = "MlpPolicy"
+        if self.config.cnn_feature_extractor:
+            policy = "CnnPolicy"
+        print("policy:{}".format(policy))
+        model = PPO(policy, self.env,
                     learning_rate=self.config.alpha_attacker,
                     n_steps=self.config.batch_size,
                     n_epochs=self.config.optimization_iterations,

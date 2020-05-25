@@ -66,7 +66,7 @@ class PPOPolicy(BasePolicy):
                  squash_output: bool = False,
                  features_extractor_class: Type[BaseFeaturesExtractor] = FlattenExtractor,
                  features_extractor_kwargs: Optional[Dict[str, Any]] = None,
-                 normalize_images: bool = True,
+                 normalize_images: bool = False,
                  optimizer_class: Type[th.optim.Optimizer] = th.optim.Adam,
                  optimizer_kwargs: Optional[Dict[str, Any]] = None,
                  pg_agent_config : PolicyGradientAgentConfig = None):
@@ -76,7 +76,6 @@ class PPOPolicy(BasePolicy):
             # Small values to avoid NaN in ADAM optimizer
             if optimizer_class == th.optim.Adam:
                 optimizer_kwargs['eps'] = 1e-5
-
         super(PPOPolicy, self).__init__(pg_agent_config, observation_space, action_space,
                                         device,
                                         features_extractor_class,
@@ -261,16 +260,20 @@ class PPOPolicy(BasePolicy):
         :param latent_sde: (Optional[th.Tensor]) Latent code for the gSDE exploration function
         :return: (Distribution) Action distribution
         """
+        #print("latent_pi shape:{}".format(latent_pi.shape))
         mean_actions = th.nn.functional.softmax(self.action_net(latent_pi)).squeeze()
+        #print("mean actions shape:{}".format(mean_actions.shape))
         mean_actions = mean_actions.to(device)
         action_probs_1 = mean_actions.clone()
+        #print("action_probs_1 shape:{}".format(action_probs_1.shape))
+        #print("non legal:{}".format(non_legal_actions))
         if non_legal_actions is not None and len(non_legal_actions) > 0:
             if len(action_probs_1.shape) == 1:
-                #action_probs_1[non_legal_actions] = 0.000000000001 # Don't set to zero due to invalid distribution errors
-                action_probs_1[non_legal_actions] = 0.0
+                action_probs_1[non_legal_actions] = 0.000000000001 # Don't set to zero due to invalid distribution errors
+                #action_probs_1[non_legal_actions] = 0.0
             elif len(action_probs_1.shape) == 2:
-                #action_probs_1[:, non_legal_actions] = 0.000000000001  # Don't set to zero due to invalid distribution errors
-                action_probs_1[:,non_legal_actions] = 0.0
+                action_probs_1[:, non_legal_actions] = 0.000000000001  # Don't set to zero due to invalid distribution errors
+                #action_probs_1[:,non_legal_actions] = 0.0
             else:
                 raise AssertionError("Invalid shape of action probabilties")
         action_probs_1 = action_probs_1.to(device)
@@ -399,7 +402,7 @@ class CnnPolicy(PPOPolicy):
                  squash_output: bool = False,
                  features_extractor_class: Type[BaseFeaturesExtractor] = NatureCNN,
                  features_extractor_kwargs: Optional[Dict[str, Any]] = None,
-                 normalize_images: bool = True,
+                 normalize_images: bool = False,
                  optimizer_class: Type[th.optim.Optimizer] = th.optim.Adam,
                  optimizer_kwargs: Optional[Dict[str, Any]] = None):
         super(CnnPolicy, self).__init__(observation_space,
