@@ -521,6 +521,8 @@ class GameFrame(pyglet.window.Window):
                                  self.idsgame_config.game_config.num_vulnerabilities_per_layer,
                                  num_vulnerabilities_per_node=self.idsgame_config.game_config.num_vulnerabilities_per_node
                                  )
+        if self.idsgame_config.randomize_starting_position:
+            self.game_state.randomize_attacker_position(self.idsgame_config.game_config.network_config)
         self.set_state(self.game_state)
         self.reset_events()
         self.unschedule_events()

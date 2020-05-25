@@ -277,7 +277,8 @@ class CategoricalDistribution(Distribution):
             print("Nan values in distribution, consider using a lower learning rate or gradient clipping")
             print(str(e))
             action = 0
-        return th.tensor(action).type(th.LongTensor)
+            return th.tensor(action).type(th.LongTensor)
+        return action
 
     def entropy(self) -> th.Tensor:
         return self.distribution.entropy()

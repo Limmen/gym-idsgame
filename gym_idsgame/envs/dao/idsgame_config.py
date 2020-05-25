@@ -14,7 +14,7 @@ class IdsGameConfig:
                  defender_agent: Agent = None, attacker_agent: Agent = None, initial_state_path: str = None,
                  save_trajectories :bool = False, save_attack_stats : bool = False,
                  randomize_env : bool = False, local_view_observations : bool = False,
-                 reconnaissance_actions : bool = False):
+                 reconnaissance_actions : bool = False, randomize_starting_position : bool = False):
         """
         Constructor, initializes the config
 
@@ -29,6 +29,7 @@ class IdsGameConfig:
         :param local_view_observations: boolean flag whether features are provided in a "local view" mode
         :param reconnaissance_actions: a boolean flag that indicates whether reconnaissance activities are enabled for
                                        the attacker
+        :param randomize_starting_position: if true, the starting position of the attacker is randomized
         """
         self.render_config = render_config
         self.game_config = game_config
@@ -45,3 +46,4 @@ class IdsGameConfig:
         self.randomize_env = randomize_env
         self.local_view_observations = local_view_observations
         self.reconnaissance_actions = reconnaissance_actions
+        self.randomize_starting_position = randomize_starting_position

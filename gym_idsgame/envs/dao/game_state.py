@@ -450,6 +450,11 @@ class GameState():
             defense_observation[node_id] = np.append(self.defense_values[node_id], self.defense_det[node_id])
         return defense_observation
 
+    def randomize_attacker_position(self, network_config : NetworkConfig):
+        rnd_row = np.random.choice(list(range(1, network_config.num_rows)))
+        rnd_col = np.random.choice(list(range(0, network_config.num_cols)))
+        self.attacker_pos = (rnd_row, rnd_col)
+
     def restart(self) -> None:
         """
         Resets the game state, clears up all the history

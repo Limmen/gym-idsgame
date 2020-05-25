@@ -14,6 +14,7 @@ class BaselineEnvWrapper(gym.Env):
         self.idsgame_env = gym.make(env_name, idsgame_config=idsgame_config,
                                     save_dir=save_dir,
                                     initial_state_path=initial_state_path)
+        self.idsgame_env.idsgame_config.randomize_starting_position = True
         #self.idsgame_env.idsgame_config.render_config.attacker_view = True
         self.pg_agent_config = pg_agent_config
         self.attacker_action_space = self.idsgame_env.attacker_action_space

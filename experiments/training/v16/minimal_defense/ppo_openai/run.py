@@ -73,7 +73,7 @@ def default_config() -> ClientConfig:
                                                 gpu=False, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
-                                                state_length=1, normalize_features=False, merged_ad_features=True,
+                                                state_length=1, normalize_features=True, merged_ad_features=True,
                                                 zero_mean_features=False, gpu_id=0, lstm_network=False,
                                                 lstm_seq_length=4, num_lstm_layers=2, optimization_iterations=10,
                                                 eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95,

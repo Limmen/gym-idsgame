@@ -64,7 +64,7 @@
         "max_gradient_norm": 0.5,
         "merged_ad_features": true,
         "min_epsilon": 0.01,
-        "normalize_features": false,
+        "normalize_features": true,
         "num_episodes": 100000000,
         "num_hidden_layers": 2,
         "num_lstm_layers": 2,

@@ -227,6 +227,8 @@ class IdsGameEnv(gym.Env, ABC):
                             num_vulnerabilities_per_node=self.idsgame_config.game_config.num_vulnerabilities_per_node)
         self.a_cumulative_reward = 0
         self.d_cumulative_reward = 0
+        if self.idsgame_config.randomize_starting_position:
+            self.state.randomize_attacker_position(self.idsgame_config.game_config.network_config)
         if self.viewer is not None:
             self.viewer.gameframe.reset()
         observation = self.get_observation()
