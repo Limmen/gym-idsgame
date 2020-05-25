@@ -33,7 +33,8 @@ class PolicyGradientAgentConfig:
                  normalize_features : bool = False, gpu_id: int = 0, merged_ad_features : bool = False,
                  optimization_iterations : int = 28, eps_clip : float = 0.2, zero_mean_features : bool = False,
                  lstm_network : bool = False, lstm_seq_length : int = 4, num_lstm_layers : int = 4,
-                 gae_lambda : float = 0.95, cnn_feature_extractor : bool = False, features_dim : int = 44
+                 gae_lambda : float = 0.95, cnn_feature_extractor : bool = False, features_dim : int = 44,
+                 flatten_feature_planes : bool = False
                  ):
         """
         Initialize environment and hyperparameters
@@ -101,6 +102,7 @@ class PolicyGradientAgentConfig:
         :param gae_lambda: gae_lambda parameter of PPO
         :param cnn_feature_extractor: boolean flag, if true, use CNN instead of MLP or LSTM
         :param features_dim: number of features in final layer of CNN before softmax
+        :param flatten_feature_planes: boolean flag whether to use a flat input of all feature planes used for CNN
         """
         self.gamma = gamma
         self.alpha_attacker = alpha_attacker
@@ -165,6 +167,7 @@ class PolicyGradientAgentConfig:
         self.gae_lambda = gae_lambda
         self.cnn_feature_extractor = cnn_feature_extractor
         self.features_dim = features_dim
+        self.flatten_feature_planes = flatten_feature_planes
 
 
     def to_str(self) -> str:

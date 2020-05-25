@@ -52,6 +52,10 @@ class BaselineEnvWrapper(gym.Env):
             attacker_state = self.grid_obs(obs_prime_attacker, obs_prime_defender, attacker=True)
             defender_state = self.grid_obs(obs_prime_attacker, obs_prime_defender, attacker=True)
             return [attacker_state, defender_state], [attacker_reward, defender_reward], done, info
+        elif self.pg_agent_config.flatten_feature_planes:
+            attacker_state = self.grid_obs(obs_prime_attacker, obs_prime_defender, attacker=True)
+            defender_state = self.grid_obs(obs_prime_attacker, obs_prime_defender, attacker=True)
+            return [attacker_state.flatten(), defender_state.flatten()], [attacker_reward, defender_reward], done, info
         else:
             attacker_state = self.update_state(attacker_obs=obs_prime_attacker, defender_obs=obs_prime_defender, state=[],
                                                attacker=True)
@@ -69,6 +73,10 @@ class BaselineEnvWrapper(gym.Env):
             attacker_state = self.grid_obs(obs_attacker, obs_defender, attacker=True)
             defender_state = self.grid_obs(obs_attacker, obs_defender, attacker=True)
             return [attacker_state, defender_state]
+        elif self.pg_agent_config.flatten_feature_planes:
+            attacker_state = self.grid_obs(obs_attacker, obs_defender, attacker=True)
+            defender_state = self.grid_obs(obs_attacker, obs_defender, attacker=True)
+            return [attacker_state.flatten(), defender_state.flatten()]
         else:
             attacker_state = self.update_state(attacker_obs=obs_attacker, defender_obs=obs_defender, state=[],
                                                attacker=True)

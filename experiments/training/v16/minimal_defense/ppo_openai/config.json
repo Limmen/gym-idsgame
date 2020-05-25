@@ -20,7 +20,7 @@
         "batch_size": 2000,
         "checkpoint_freq": 5000,
         "clip_gradient": false,
-        "cnn_feature_extractor": true,
+        "cnn_feature_extractor": false,
         "critic_loss_fn": "MSE",
         "defender": false,
         "defender_load_path": null,
@@ -34,6 +34,7 @@
         "eval_render": false,
         "eval_sleep": 0.9,
         "features_dim": 512,
+        "flatten_feature_planes": true,
         "gae_lambda": 0.95,
         "gamma": 1,
         "gif_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v16/minimal_defense/ppo_openai/results/gifs",
@@ -41,21 +42,9 @@
         "gpu": false,
         "gpu_id": 0,
         "hidden_activation": "ReLU",
-        "hidden_dim": 32,
-        "input_dim_attacker": {
-            "py/tuple": [
-                6,
-                3,
-                4
-            ]
-        },
-        "input_dim_defender": {
-            "py/tuple": [
-                6,
-                3,
-                4
-            ]
-        },
+        "hidden_dim": 128,
+        "input_dim_attacker": 72,
+        "input_dim_defender": 72,
         "logger": null,
         "lr_decay_rate": 0.999,
         "lr_exp_decay": false,
@@ -66,7 +55,7 @@
         "min_epsilon": 0.01,
         "normalize_features": true,
         "num_episodes": 100000000,
-        "num_hidden_layers": 2,
+        "num_hidden_layers": 4,
         "num_lstm_layers": 2,
         "opponent_pool": false,
         "opponent_pool_config": null,
