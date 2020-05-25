@@ -262,7 +262,12 @@ class PPOPolicy(BasePolicy):
         """
         # print("latent_pi shape:{}".format(latent_pi.shape))
         # print("action net shape:{}".format(self.action_net(latent_pi).shape))
-        mean_actions = th.nn.functional.softmax(self.action_net(latent_pi), dim=1).squeeze()
+        if len(latent_pi.shape) == 2:
+            mean_actions = th.nn.functional.softmax(self.action_net(latent_pi), dim=1).squeeze()
+        elif len(latent_pi.shape) == 2:
+            mean_actions = th.nn.functional.softmax(self.action_net(latent_pi), dim=0).squeeze()
+        else:
+            raise AssertionError("Shape not recognized")
         #print("mean actions shape:{}".format(mean_actions.shape))
         mean_actions = mean_actions.to(device)
         action_probs_1 = mean_actions.clone()

@@ -19,13 +19,19 @@ class BaselineEnvWrapper(gym.Env):
         self.pg_agent_config = pg_agent_config
         self.attacker_action_space = self.idsgame_env.attacker_action_space
         self.defender_action_space = self.idsgame_env.defender_action_space
+        attacker_obs_shape = self.pg_agent_config.input_dim_attacker
+        defender_obs_shape = self.pg_agent_config.input_dim_defender
+        if type(attacker_obs_shape) != tuple:
+            attacker_obs_shape = (attacker_obs_shape,)
+        if type(defender_obs_shape) != tuple:
+            defender_obs_shape = (defender_obs_shape,)
         self.attacker_observation_space = gym.spaces.Box(low=0,
                                                          high=self.idsgame_env.idsgame_config.game_config.max_value,
-                                                         shape=self.pg_agent_config.input_dim_attacker,
+                                                         shape=attacker_obs_shape,
                                                          dtype=np.float32)
         self.defender_observation_space = gym.spaces.Box(low=0,
                                                          high=self.idsgame_env.idsgame_config.game_config.max_value,
-                                                         shape=self.pg_agent_config.input_dim_defender,
+                                                         shape=defender_obs_shape,
                                                          dtype=np.float32)
         self.prev_episode_hacked = False
         self.prev_episode_detected = False
