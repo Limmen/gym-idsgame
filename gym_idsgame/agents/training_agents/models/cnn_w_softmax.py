@@ -3,7 +3,6 @@ A CNN model with Softmax output defined in PyTorch
 """
 import torch
 from typing import List
-import torchvision.models as models
 from gym_idsgame.agents.training_agents.models.idsgame_resnet import IdsGameResNet
 
 class CNNwithSoftmax(torch.nn.Module):
@@ -206,7 +205,7 @@ def test() -> None:
     input_dim = (6, 3, 4)
     output_dim = 44
     hidden_dim = 64
-    batch_size = 64
+    batch_size = 1
 
     # Create model
     model = CNNwithSoftmax(input_dim, output_dim, hidden_dim, num_hidden_layers=2, conv_kernels=[2,1,1,2,2,2],

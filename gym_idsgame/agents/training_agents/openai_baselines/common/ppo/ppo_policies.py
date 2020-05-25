@@ -196,7 +196,8 @@ class PPOPolicy(BasePolicy):
                     self.action_net: 0.01,
                     self.value_net: 1
                 }[module]
-                module.apply(partial(self.init_weights, gain=gain))
+                if self.pg_agent_config.cnn_type != 4:
+                    module.apply(partial(self.init_weights, gain=gain))
         # Setup optimizer with initial learning rate
         self.optimizer = self.optimizer_class(self.parameters(), lr=lr_schedule(1), **self.optimizer_kwargs)
 
