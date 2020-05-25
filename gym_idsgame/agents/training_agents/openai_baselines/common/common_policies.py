@@ -110,6 +110,14 @@ class NatureCNN(BaseFeaturesExtractor):
 
         elif pg_agent_config.cnn_type == 4:
             self.cnn = IdsGameResNet(in_channels=6, output_dim=44)
+        elif pg_agent_config.cnn_type == 5:
+            self.cnn = nn.Sequential(nn.Conv2d(n_input_channels, out_channels=64, kernel_size=1, stride=1, padding=0),
+                                     nn.ReLU(),
+                                     nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1, padding=0),
+                                     nn.ReLU(),
+                                     nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1, padding=0),
+                                     nn.ReLU(),
+                                     nn.Flatten())
 
         if not self.pg_agent_config.cnn_type == 4:
             # Compute shape by doing one forward pass

@@ -78,7 +78,7 @@ def default_config() -> ClientConfig:
                                                 lstm_seq_length=4, num_lstm_layers=2, optimization_iterations=10,
                                                 eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95,
                                                 cnn_feature_extractor=True, features_dim=512,
-                                                flatten_feature_planes=True)
+                                                flatten_feature_planes=False, cnn_type=5)
     # input_dim_attacker = (4 + 2) * 3,
     # output_dim_attacker = 4 * 3,
     # input_dim_defender = (4 + 2) * 3,
