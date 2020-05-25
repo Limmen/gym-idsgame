@@ -3,6 +3,8 @@ A CNN model with Softmax output defined in PyTorch
 """
 import torch
 from typing import List
+import torchvision.models as models
+from gym_idsgame.agents.training_agents.models.idsgame_resnet import IdsGameResNet
 
 class CNNwithSoftmax(torch.nn.Module):
     """
@@ -154,21 +156,23 @@ class CNNwithSoftmax(torch.nn.Module):
         #                          torch.nn.Linear(768, 44),
         #                          torch.nn.Softmax())
 
-        self.cnn = torch.nn.Sequential(torch.nn.Conv2d(6, out_channels=64, kernel_size=1, stride=1, padding=0),
-                                       torch.nn.MaxPool2d(kernel_size=2, stride=1,padding=0),
-                                       torch.nn.ReLU(),
-                                       torch.nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1,
-                                                       padding=0),
-                                       torch.nn.MaxPool2d(kernel_size=1, stride=1, padding=0),
-                                       torch.nn.ReLU(),
-                                       torch.nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1,
-                                                       padding=0),
-                                       torch.nn.MaxPool2d(kernel_size=1, stride=1, padding=0),
-                                       torch.nn.ReLU(),
-                                       torch.nn.Flatten(),
-                                       torch.nn.Linear(384, 44),
-                                       torch.nn.Softmax())
-
+        # self.cnn = torch.nn.Sequential(torch.nn.Conv2d(6, out_channels=64, kernel_size=1, stride=1, padding=0),
+        #                                torch.nn.MaxPool2d(kernel_size=2, stride=1,padding=0),
+        #                                torch.nn.ReLU(),
+        #                                torch.nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1,
+        #                                                padding=0),
+        #                                torch.nn.MaxPool2d(kernel_size=1, stride=1, padding=0),
+        #                                torch.nn.ReLU(),
+        #                                torch.nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1,
+        #                                                padding=0),
+        #                                torch.nn.MaxPool2d(kernel_size=1, stride=1, padding=0),
+        #                                torch.nn.ReLU(),
+        #                                torch.nn.Flatten(),
+        #                                torch.nn.Linear(768, 44),
+        #                                torch.nn.Softmax())
+        #resnet18 = models.resnet18(pretrained=False, num_classes=44)
+        my_resnet = IdsGameResNet(in_channels=6)
+        self.cnn = my_resnet
         # self.cnn = torch.nn.Sequential(torch.nn.Conv2d(3, out_channels=2, kernel_size=1, stride=1, padding=0),
         #                          torch.nn.ReLU(),
         #                          torch.nn.Conv2d(in_channels=2, out_channels=2, kernel_size=2, stride=1, padding=0),
@@ -179,6 +183,7 @@ class CNNwithSoftmax(torch.nn.Module):
         #                          torch.nn.Linear(6, 44),
         #                          torch.nn.Softmax())
         y = self.cnn(y)
+        print("got output!:{}".format(y.shape))
         #print("y shape:{}".format(y.shape))
         # for i in range(len(self.layers)):
         #     print("layer i:{}".format(i))

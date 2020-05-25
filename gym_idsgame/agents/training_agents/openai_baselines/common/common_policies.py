@@ -11,6 +11,7 @@ from stable_baselines3.common.preprocessing import preprocess_obs, get_flattened
 from stable_baselines3.common.utils import get_device
 from gym_idsgame.agents.training_agents.openai_baselines.common.vec_env.vec_transpose import VecTransposeImage
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
+from gym_idsgame.agents.training_agents.models.idsgame_resnet import IdsGameResNet
 
 class BaseFeaturesExtractor(nn.Module):
     """
@@ -66,67 +67,64 @@ class NatureCNN(BaseFeaturesExtractor):
     def __init__(self, pg_agent_config : PolicyGradientAgentConfig, observation_space: gym.spaces.Box,
                  features_dim: int = 512):
         super(NatureCNN, self).__init__(pg_agent_config, observation_space, pg_agent_config.features_dim)
-        # We assume CxWxH images (channels first)
-        # Re-ordering will be done by pre-preprocessing or wrapper
-        # assert is_image_space(observation_space), ('You should use NatureCNN '
-        #                                            f'only with images not with {observation_space} '
-        #                                            '(you are probably using `CnnPolicy` instead of `MlpPolicy`)')
+
         n_input_channels = observation_space.shape[0]
-        # self.cnn = nn.Sequential(nn.Conv2d(n_input_channels, out_channels=2, kernel_size=1, stride=1, padding=0),
-        #                          nn.ReLU(),
-        #                          nn.Conv2d(in_channels=2, out_channels=2, kernel_size=2, stride=1, padding=0),
-        #                          nn.ReLU(),
-        #                          nn.Conv2d(in_channels=2, out_channels=2, kernel_size=2, stride=1, padding=0),
-        #                          nn.ReLU(),
-        #                          nn.Flatten())
-        # self.cnn = nn.Sequential(nn.Conv2d(n_input_channels, out_channels=8, kernel_size=1, stride=1, padding=0),
-        #                          nn.ReLU(),
-        #                          nn.Conv2d(in_channels=8, out_channels=8, kernel_size=1, stride=1, padding=0),
-        #                          nn.ReLU(),
-        #                          nn.Conv2d(in_channels=8, out_channels=8, kernel_size=1, stride=1, padding=0),
-        #                          nn.ReLU(),
-        #                          nn.Flatten())
-        self.cnn = nn.Sequential(nn.Conv2d(n_input_channels, out_channels=64, kernel_size=1, stride=1, padding=0),
-                                 nn.MaxPool2d(kernel_size=1, stride=1, padding=0),
-                                 nn.ReLU(),
-                                 nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1, padding=0),
-                                 nn.MaxPool2d(kernel_size=1, stride=1, padding=0),
-                                 nn.ReLU(),
-                                 nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1, padding=0),
-                                 nn.MaxPool2d(kernel_size=1, stride=1, padding=0),
-                                 nn.ReLU(),
-                                 nn.Flatten())
-        # self.cnn = nn.Sequential(nn.Conv2d(n_input_channels, out_channels=64, kernel_size=1, stride=1, padding=0),
-        #                          nn.MaxPool2d(kernel_size=2, stride=1, padding=0),
-        #                          nn.ReLU(),
-        #                          nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1, padding=0),
-        #                          nn.MaxPool2d(kernel_size=2, stride=1, padding=0),
-        #                          nn.ReLU(),
-        #                          nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1, padding=0),
-        #                          nn.MaxPool2d(kernel_size=1, stride=1, padding=0),
-        #                          nn.ReLU(),
-        #                          nn.Flatten())
-        # self.cnn = nn.Sequential(nn.Conv2d(n_input_channels, 32, kernel_size=8, stride=4, padding=0),
-        #                          nn.ReLU(),
-        #                          nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=0),
-        #                          nn.ReLU(),
-        #                          nn.Conv2d(64, 32, kernel_size=3, stride=1, padding=0),
-        #                          nn.ReLU(),
-        #                          nn.Flatten())
+        if pg_agent_config.cnn_type == 0:
+            self.cnn = nn.Sequential(nn.Conv2d(n_input_channels, out_channels=2, kernel_size=1, stride=1, padding=0),
+                                     nn.ReLU(),
+                                     nn.Conv2d(in_channels=2, out_channels=2, kernel_size=2, stride=1, padding=0),
+                                     nn.ReLU(),
+                                     nn.Conv2d(in_channels=2, out_channels=2, kernel_size=2, stride=1, padding=0),
+                                     nn.ReLU(),
+                                     nn.Flatten())
+        elif pg_agent_config.cnn_type == 1:
+            self.cnn = nn.Sequential(nn.Conv2d(n_input_channels, out_channels=8, kernel_size=1, stride=1, padding=0),
+                                     nn.ReLU(),
+                                     nn.Conv2d(in_channels=8, out_channels=8, kernel_size=1, stride=1, padding=0),
+                                     nn.ReLU(),
+                                     nn.Conv2d(in_channels=8, out_channels=8, kernel_size=1, stride=1, padding=0),
+                                     nn.ReLU(),
+                                     nn.Flatten())
+        elif pg_agent_config.cnn_type == 2:
+            self.cnn = nn.Sequential(nn.Conv2d(n_input_channels, out_channels=64, kernel_size=1, stride=1, padding=0),
+                                     nn.MaxPool2d(kernel_size=2, stride=1, padding=0),
+                                     nn.ReLU(),
+                                     nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1, padding=0),
+                                     nn.MaxPool2d(kernel_size=2, stride=1, padding=0),
+                                     nn.ReLU(),
+                                     nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1, padding=0),
+                                     nn.MaxPool2d(kernel_size=1, stride=1, padding=0),
+                                     nn.ReLU(),
+                                     nn.Flatten())
+        elif pg_agent_config.cnn_type == 3:
+            self.cnn = nn.Sequential(nn.Conv2d(n_input_channels, out_channels=64, kernel_size=1, stride=1, padding=0),
+                                     nn.MaxPool2d(kernel_size=1, stride=1, padding=0),
+                                     nn.ReLU(),
+                                     nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1, padding=0),
+                                     nn.MaxPool2d(kernel_size=1, stride=1, padding=0),
+                                     nn.ReLU(),
+                                     nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1, padding=0),
+                                     nn.MaxPool2d(kernel_size=1, stride=1, padding=0),
+                                     nn.ReLU(),
+                                     nn.Flatten())
 
-        # Compute shape by doing one forward pass
-        with th.no_grad():
-            n_flatten = self.cnn(th.as_tensor(observation_space.sample()[None]).float()).shape[1]
-            #print("sample shape:{}".format(observation_space.sample().shape))
-            #n_flatten = 4
-            #print("n_flatten?{}".format(n_flatten))
+        elif pg_agent_config.cnn_type == 4:
+            self.cnn = IdsGameResNet(in_channels=6, output_dim=44)
 
-        self.linear = nn.Sequential(nn.Linear(n_flatten, pg_agent_config.features_dim), nn.ReLU())
+        if not self.pg_agent_config.cnn_type == 4:
+            # Compute shape by doing one forward pass
+            with th.no_grad():
+                n_flatten = self.cnn(th.as_tensor(observation_space.sample()[None]).float()).shape[1]
+
+            self.linear = nn.Sequential(nn.Linear(n_flatten, pg_agent_config.features_dim), nn.ReLU())
 
     def forward(self, observations: th.Tensor) -> th.Tensor:
         if len(observations.shape) == 3:
             observations = observations.unsqueeze(0)
-        return self.linear(self.cnn(observations))
+        if not self.pg_agent_config.cnn_type == 4:
+            return self.linear(self.cnn(observations))
+        else:
+            return self.cnn(observations)
 
 
 class BasePolicy(nn.Module):
