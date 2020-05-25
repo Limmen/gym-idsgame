@@ -317,7 +317,17 @@ class BaselineEnvWrapper(gym.Env):
             defender_obs = defender_obs[:, 0:-1]
 
         attack_plane = attacker_obs
+        if self.pg_agent_config.normalize_features:
+            attack_plane_row_sums = attack_plane.sum(axis=1)
+            normalized_attack_plane = attack_plane / attack_plane_row_sums[:, np.newaxis]
+            normalized_attack_plane = np.nan_to_num(normalized_attack_plane, nan=0.0)
+
         defense_plane = defender_obs
+        if self.pg_agent_config.normalize_features:
+            defense_plane_row_sums = defense_plane.sum(axis=1)
+            normalized_defense_plane = defense_plane / defense_plane_row_sums[:, np.newaxis]
+            normalized_defense_plane = np.nan_to_num(normalized_defense_plane, nan=0.0)
+
         position_plane = np.zeros(attack_plane.shape)
         for idx, present in enumerate(attacker_position):
             position_plane[idx] = np.full(position_plane.shape[1], present)
@@ -343,6 +353,10 @@ class BaselineEnvWrapper(gym.Env):
             row_difference_plane[node_id] = np.full(row_difference_plane.shape[1], row_difference)
 
         attack_defense_difference_plane = attacker_obs - defender_obs
+        if self.pg_agent_config.normalize_features:
+            attack_defense_difference_plane_row_sums = attack_defense_difference_plane.sum(axis=1)
+            normalized_attack_defense_difference_plane = attack_defense_difference_plane / attack_defense_difference_plane_row_sums[:, np.newaxis]
+            normalized_attack_defense_difference_plane = np.nan_to_num(normalized_attack_defense_difference_plane, nan=0.0)
 
         # print("attack plane:")
         # print(attack_plane)
@@ -350,9 +364,19 @@ class BaselineEnvWrapper(gym.Env):
         # print(defense_plane)
         # print("position plane:")
         # print(position_plane)
-        feature_frames = np.stack([attack_plane, defense_plane, position_plane, reachable_plane, row_difference_plane,
-                                   attack_defense_difference_plane],
+        if self.pg_agent_config.normalize_features:
+            feature_frames = np.stack([normalized_attack_plane, normalized_defense_plane, position_plane, reachable_plane, row_difference_plane,
+                                       normalized_attack_defense_difference_plane],
                                   axis=0)
+        else:
+            feature_frames = np.stack(
+                [attack_plane, defense_plane, position_plane, reachable_plane,
+                 row_difference_plane,
+                 attack_defense_difference_plane],
+                axis=0)
+        print("feature_frames:")
+        print(feature_frames)
+        raise AssertionError("test")
         return feature_frames
 
 
