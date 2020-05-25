@@ -34,6 +34,7 @@ class DefendMinimalValueBotAgent(BotAgent):
                                                                                     game_state), actions))
         min_node_value = float("inf")
         min_action_id = -1
+        min_action_ids = []
         for id, node in enumerate(self.game_config.network_config.node_list):
             if node == NodeType.SERVER.value or node == NodeType.DATA.value:
                 min_idx = np.argmin(game_state.defense_values[id])
@@ -43,12 +44,21 @@ class DefendMinimalValueBotAgent(BotAgent):
                     if game_state.defense_det[id] < min_node_value and action_id in legal_actions:
                         min_node_value = game_state.defense_det[id]
                         min_action_id = action_id
+                        min_action_ids = []
+                    elif game_state.defense_det[id] < min_node_value and action_id in legal_actions:
+                        min_action_ids.append(action_id)
+
                 else:
                     action_id = idsgame_util.get_defense_action_id(id, min_idx, self.game_config)
                     if game_state.defense_values[id][min_idx] < min_node_value and action_id in legal_actions:
                         min_node_value = game_state.defense_values[id][min_idx]
                         min_action_id = action_id
-        if min_action_id == -1:
+                        min_action_ids = []
+                    elif game_state.defense_values[id][min_idx] == min_node_value and action_id in legal_actions:
+                        min_action_ids.append(action_id)
+        if min_action_ids != -1 and len(min_action_ids) > 1:
+          min_action_id = np.random.choice(min_action_ids)
+        elif min_action_id == -1:
             if len(legal_actions) == 0:
                 min_action_id = np.random.choice(actions)
             else:
