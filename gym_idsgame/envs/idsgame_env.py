@@ -428,7 +428,7 @@ class IdsGameEnv(gym.Env, ABC):
             #         blocked_attacks += 1
             # norm_factor = self.state.game_step if self.state.game_step > 0 else 1
             # reward = (blocked_attacks)/norm_factor
-            return 0, added_detection
+            return -constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
 
     def get_successful_attack_reward(self) -> Union[int, int]:
         """

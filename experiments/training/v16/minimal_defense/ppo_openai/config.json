@@ -20,7 +20,7 @@
         "batch_size": 2000,
         "checkpoint_freq": 5000,
         "clip_gradient": false,
-        "cnn_feature_extractor": false,
+        "cnn_feature_extractor": true,
         "critic_loss_fn": "MSE",
         "defender": false,
         "defender_load_path": null,
@@ -43,8 +43,20 @@
         "gpu_id": 0,
         "hidden_activation": "ReLU",
         "hidden_dim": 128,
-        "input_dim_attacker": 72,
-        "input_dim_defender": 72,
+        "input_dim_attacker": {
+            "py/tuple": [
+                6,
+                3,
+                4
+            ]
+        },
+        "input_dim_defender": {
+            "py/tuple": [
+                6,
+                3,
+                4
+            ]
+        },
         "logger": null,
         "lr_decay_rate": 0.999,
         "lr_exp_decay": false,
@@ -53,7 +65,7 @@
         "max_gradient_norm": 0.5,
         "merged_ad_features": true,
         "min_epsilon": 0.01,
-        "normalize_features": true,
+        "normalize_features": false,
         "num_episodes": 100000000,
         "num_hidden_layers": 4,
         "num_lstm_layers": 2,

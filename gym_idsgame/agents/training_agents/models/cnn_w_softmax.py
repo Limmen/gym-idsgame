@@ -144,15 +144,30 @@ class CNNwithSoftmax(torch.nn.Module):
         # print("y shape:{}".format(y.shape))
         # y = torch.nn.Softmax()(y)
 
+        # self.cnn = torch.nn.Sequential(torch.nn.Conv2d(6, out_channels=64, kernel_size=1, stride=1, padding=0),
+        #                          torch.nn.ReLU(),
+        #                          torch.nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1, padding=0),
+        #                          torch.nn.ReLU(),
+        #                          torch.nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1, padding=0),
+        #                          torch.nn.ReLU(),
+        #                          torch.nn.Flatten(),
+        #                          torch.nn.Linear(768, 44),
+        #                          torch.nn.Softmax())
+
         self.cnn = torch.nn.Sequential(torch.nn.Conv2d(6, out_channels=64, kernel_size=1, stride=1, padding=0),
-                                 torch.nn.ReLU(),
-                                 torch.nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1, padding=0),
-                                 torch.nn.ReLU(),
-                                 torch.nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1, padding=0),
-                                 torch.nn.ReLU(),
-                                 torch.nn.Flatten(),
-                                 torch.nn.Linear(768, 44),
-                                 torch.nn.Softmax())
+                                       torch.nn.MaxPool2d(kernel_size=2, stride=1,padding=0),
+                                       torch.nn.ReLU(),
+                                       torch.nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1,
+                                                       padding=0),
+                                       torch.nn.MaxPool2d(kernel_size=2, stride=1, padding=0),
+                                       torch.nn.ReLU(),
+                                       torch.nn.Conv2d(in_channels=64, out_channels=64, kernel_size=1, stride=1,
+                                                       padding=0),
+                                       torch.nn.MaxPool2d(kernel_size=1, stride=1, padding=0),
+                                       torch.nn.ReLU(),
+                                       torch.nn.Flatten(),
+                                       torch.nn.Linear(128, 44),
+                                       torch.nn.Softmax())
 
         # self.cnn = torch.nn.Sequential(torch.nn.Conv2d(3, out_channels=2, kernel_size=1, stride=1, padding=0),
         #                          torch.nn.ReLU(),

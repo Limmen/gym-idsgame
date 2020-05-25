@@ -227,7 +227,7 @@ class PPOPolicy(BasePolicy):
                                                          non_legal_actions=non_legal_actions, device=device)
 
         actions = distribution.get_actions(deterministic=deterministic)
-        actions = th.tensor(np.array([actions]))
+        actions = th.tensor(np.array([actions]).astype(np.int32))
         actions = actions.to(self.device)
         log_prob = distribution.log_prob(actions)
         return actions, values, log_prob
