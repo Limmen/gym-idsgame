@@ -247,13 +247,13 @@ class BaseRLModel(ABC):
                 train_defender, a_pool, d_pool, total_num_episodes)
         self.pg_agent_config.logger.info(log_str)
         print(log_str)
-        if update_stats and self.pg_agent_config.tensorboard:
-            self.log_tensorboard(iteration, avg_attacker_episode_rewards, avg_defender_episode_rewards,
-                                 avg_episode_steps,
-                                 avg_episode_attacker_loss, avg_episode_defender_loss, hack_probability,
-                                 attacker_cumulative_reward, defender_cumulative_reward, self.pg_agent_config.epsilon,
-                                 lr_attacker,
-                                 lr_defender, hack_probability_total, a_pool, d_pool, eval=eval)
+        # if update_stats and self.pg_agent_config.tensorboard:
+        #     self.log_tensorboard(iteration, avg_attacker_episode_rewards, avg_defender_episode_rewards,
+        #                          avg_episode_steps,
+        #                          avg_episode_attacker_loss, avg_episode_defender_loss, hack_probability,
+        #                          attacker_cumulative_reward, defender_cumulative_reward, self.pg_agent_config.epsilon,
+        #                          lr_attacker,
+        #                          lr_defender, hack_probability_total, a_pool, d_pool, eval=eval)
         if update_stats:
             result.avg_episode_steps.append(avg_episode_steps)
             result.avg_attacker_episode_rewards.append(avg_attacker_episode_rewards)
@@ -454,7 +454,7 @@ class BaseRLModel(ABC):
         self.n_envs = env.num_envs
         self.env = env
 
-    def get_torch_variables(self) -> Tuple[List[str], List[str]]:
+    def get_torch_variables(self, attacker:bool = True) -> Tuple[List[str], List[str]]:
         """
         Get the name of the torch variable that will be saved.
         ``th.save`` and ``th.load`` will be used with the right device
@@ -463,8 +463,10 @@ class BaseRLModel(ABC):
         :return: (Tuple[List[str], List[str]])
             name of the variables with state dicts to save, name of additional torch tensors,
         """
-        state_dicts = ["policy"]
-
+        if attacker:
+            state_dicts = ["attacker_policy"]
+        else:
+            state_dicts = ["defender_policy"]
         return state_dicts, []
 
     @abstractmethod
@@ -784,7 +786,8 @@ class BaseRLModel(ABC):
         """
         return ["policy", "device", "env", "eval_env", "replay_buffer", "rollout_buffer", "_vec_normalize_env"]
 
-    def save(self, path: str, exclude: Optional[List[str]] = None, include: Optional[List[str]] = None) -> None:
+    def save(self, path: str, exclude: Optional[List[str]] = None, include: Optional[List[str]] = None,
+             attacker : bool = True) -> None:
         """
         Save all the attributes of the object and the model parameters in a zip-file.
 
@@ -805,7 +808,7 @@ class BaseRLModel(ABC):
         if include is not None:
             exclude = [param_name for param_name in exclude if param_name not in include]
 
-        state_dicts_names, tensors_names = self.get_torch_variables()
+        state_dicts_names, tensors_names = self.get_torch_variables(attacker=attacker)
         # any params that are in the save vars must not be saved by data
         torch_variables = state_dicts_names + tensors_names
         for torch_var in torch_variables:

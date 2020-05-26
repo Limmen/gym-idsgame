@@ -531,11 +531,14 @@ class PPO(BaseRLModel):
 
         return self
 
-    def get_torch_variables(self) -> Tuple[List[str], List[str]]:
+    def get_torch_variables(self, attacker:bool = True) -> Tuple[List[str], List[str]]:
         """
         cf base class
         """
-        state_dicts = ["policy", "policy.optimizer"]
+        if attacker:
+            state_dicts = ["attacker_policy", "attacker_policy.optimizer"]
+        else:
+            state_dicts = ["defender_policy", "defender_policy.optimizer"]
 
         return state_dicts, []
 
@@ -550,15 +553,14 @@ class PPO(BaseRLModel):
             if self.pg_agent_config.attacker:
                 path = self.pg_agent_config.save_dir + "/" + time_str + "_attacker_policy_network.zip"
                 self.pg_agent_config.logger.info("Saving policy-network to: {}".format(path))
-                print("Saving policy-network to: {}".format(path))
-                self.save(path)
-            if self.config.defender:
+                self.save(path, exclude=["tensorboard_writer"])
+            if self.pg_agent_config.defender:
                 path = self.pg_agent_config.save_dir + "/" + time_str + "_defender_policy_network.zip"
                 self.pg_agent_config.logger.info("Saving policy-network to: {}".format(path))
                 print("Saving policy-network to: {}".format(path))
                 self.save(path)
         else:
-            self.config.logger.warning("Save path not defined, not saving policy-networks to disk")
+            self.pg_agent_config.logger.warning("Save path not defined, not saving policy-networks to disk")
             print("Save path not defined, not saving policy-networks to disk")
 
     def update_state(self, attacker_obs: np.ndarray = None, defender_obs: np.ndarray = None,

@@ -23,7 +23,7 @@ class GameState():
                  done: bool = False, detected: bool = False, attack_type: int = 0, num_hacks: int = 0,
                  hacked: bool = False, min_random_a_val :int = 0, min_random_d_val :int = 0,
                  min_random_det_val :int = 0,
-                 max_value : int = 9, reconnaissace_state : np.ndarray = None):
+                 max_value : int = 9, reconnaissance_state : np.ndarray = None):
         """
         Constructor, initializes the DTO
 
@@ -46,13 +46,13 @@ class GameState():
         :param min_random_d_val: minimum defense value when randomizing the state
         :param min_random_det_val: minimum detection value when randomizing the state
         :param max_value: the maximum value of attack/defense attributes
-        :param reconnaissace_state: the state of the reconnaissance activities by the attacker
+        :param reconnaissance_state: the state of the reconnaissance activities by the attacker
         """
         self.attack_values = attack_values
         self.defense_values = defense_values
         self.defense_det = defense_det
         self.attacker_pos = attacker_pos
-        self.reconnaissance_state = reconnaissace_state
+        self.reconnaissance_state = reconnaissance_state
         self.game_step = game_step
         self.attacker_cumulative_reward = attacker_cumulative_reward
         self.defender_cumulative_reward = defender_cumulative_reward
@@ -163,6 +163,12 @@ class GameState():
                 attack_values[node_id] = a_vals
                 for vuln_id in vulnerabilities:
                     defense_values[node_id][vuln_id] = vulnerability_val  # vulnerability (lower defense)
+
+        if randomize_state:
+            for node_id in range(len(reconnaissance_state)):
+                for attack_id in range(reconnaissance_state.shape[1]):
+                    if np.random.rand() < 0.2:
+                        reconnaissance_state[node_id][attack_id] = defense_values[node_id][attack_id]
         self.attack_values = attack_values.astype(np.int32)
         self.defense_values = defense_values.astype(np.int32)
         self.defense_det = det_values.astype(np.int32)
