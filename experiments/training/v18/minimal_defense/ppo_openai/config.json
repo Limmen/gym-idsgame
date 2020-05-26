@@ -20,7 +20,7 @@
         "batch_size": 2000,
         "checkpoint_freq": 5000,
         "clip_gradient": false,
-        "cnn_feature_extractor": true,
+        "cnn_feature_extractor": false,
         "cnn_type": 5,
         "critic_loss_fn": "MSE",
         "defender": false,
@@ -30,7 +30,7 @@
         "epsilon_decay": 0.9999,
         "eval_episodes": 100,
         "eval_epsilon": 0.0,
-        "eval_frequency": 25000,
+        "eval_frequency": 100000,
         "eval_log_frequency": 1,
         "eval_render": false,
         "eval_sleep": 0.9,
@@ -43,21 +43,9 @@
         "gpu": false,
         "gpu_id": 0,
         "hidden_activation": "ReLU",
-        "hidden_dim": 128,
-        "input_dim_attacker": {
-            "py/tuple": [
-                6,
-                3,
-                4
-            ]
-        },
-        "input_dim_defender": {
-            "py/tuple": [
-                6,
-                3,
-                4
-            ]
-        },
+        "hidden_dim": 64,
+        "input_dim_attacker": 15,
+        "input_dim_defender": 15,
         "logger": null,
         "lr_decay_rate": 0.999,
         "lr_exp_decay": false,
