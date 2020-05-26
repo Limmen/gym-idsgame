@@ -34,7 +34,8 @@ class PolicyGradientAgentConfig:
                  optimization_iterations : int = 28, eps_clip : float = 0.2, zero_mean_features : bool = False,
                  lstm_network : bool = False, lstm_seq_length : int = 4, num_lstm_layers : int = 4,
                  gae_lambda : float = 0.95, cnn_feature_extractor : bool = False, features_dim : int = 44,
-                 flatten_feature_planes : bool = False, cnn_type : int = 0
+                 flatten_feature_planes : bool = False, cnn_type : int = 0, ent_coef : float = 0.0,
+                 vf_coef: float = 0.5
                  ):
         """
         Initialize environment and hyperparameters
@@ -104,6 +105,8 @@ class PolicyGradientAgentConfig:
         :param features_dim: number of features in final layer of CNN before softmax
         :param flatten_feature_planes: boolean flag whether to use a flat input of all feature planes used for CNN
         :param cnn_type: type of CNN
+        :param ent_coef: entropy coefficient
+        :param vf_coef: value coefficient
         """
         self.gamma = gamma
         self.alpha_attacker = alpha_attacker
@@ -170,6 +173,8 @@ class PolicyGradientAgentConfig:
         self.features_dim = features_dim
         self.flatten_feature_planes = flatten_feature_planes
         self.cnn_type = cnn_type
+        self.ent_coef = ent_coef
+        self.vf_coef = vf_coef
 
 
     def to_str(self) -> str:

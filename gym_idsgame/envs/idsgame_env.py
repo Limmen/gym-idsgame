@@ -3654,7 +3654,7 @@ class IdsGameMinimalDefenseV18Env(AttackerEnv):
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=8, max_value=9,
                                      min_random_a_val=0, min_random_d_val=8, min_random_det_val=1)
-            game_config.set_initial_state(defense_val=8, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+            game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
                                           vulnerability_val=0, num_vulnerabilities_per_layer=1)
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False

@@ -47,7 +47,9 @@ class OpenAiPPOAgent(PolicyGradientAgent):
                     seed=self.config.random_seed,
                     policy_kwargs=policy_kwargs,
                     device=device,
-                    pg_agent_config=self.config)
+                    pg_agent_config=self.config,
+                    vf_coef=self.config.vf_coef,
+                    ent_coef = self.config.ent_coef)
 
         # Video config
         if self.config.video:

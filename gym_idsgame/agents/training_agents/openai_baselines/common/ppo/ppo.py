@@ -394,7 +394,6 @@ class PPO(BaseRLModel):
                     entropy_loss = -th.mean(entropy)
 
                 entropy_losses.append(entropy_loss.item())
-
                 loss = policy_loss + self.ent_coef * entropy_loss + self.vf_coef * value_loss
 
                 # Optimization step
