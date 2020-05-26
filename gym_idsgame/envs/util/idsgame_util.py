@@ -80,7 +80,7 @@ def is_attack_legal(target_pos: Union[int, int], attacker_pos: Union[int, int], 
 
 
 def is_attack_id_legal(attack_id: int, game_config: GameConfig, attacker_pos: Union[int, int], game_state : GameState,
-                       past_positions: List[int] = None) -> bool:
+                       past_positions: List[int] = None, past_reconnaissance_activities: List = None) -> bool:
     """
     Check if a given attack is legal or not.
 
@@ -95,6 +95,12 @@ def is_attack_id_legal(attack_id: int, game_config: GameConfig, attacker_pos: Un
     if not reconnaissance:
         if game_state.attack_values[server_id][attack_type] >= game_config.max_value:
             return False
+    if reconnaissance and past_reconnaissance_activities is not None:
+        for rec_act in past_reconnaissance_activities[-5:]:
+            node_id, rec_type = rec_act
+            if node_id == server_id and rec_type == attack_type:
+                #print("illegal rec type, past:{}".format(past_reconnaissance_activities))
+                return False
     return is_attack_legal(server_pos, attacker_pos, game_config.network_config, past_positions)
 
 

@@ -79,6 +79,7 @@ class IdsGameEnv(gym.Env, ABC):
         self.past_moves = []
         self.past_positions = []
         self.past_positions.append(self.state.attacker_pos)
+        self.past_reconnaissance_activities = []
         self.save_initial_state()
         self.furthest_hack = self.idsgame_config.game_config.network_config.num_rows-1
         self.a_cumulative_reward = 0
@@ -143,6 +144,7 @@ class IdsGameEnv(gym.Env, ABC):
                                   self.idsgame_config.game_config.network_config)
             else:
                 rec_reward = self.state.reconnaissance(target_node_id, attack_type)
+                self.past_reconnaissance_activities.append((target_node_id, attack_type))
                 reward = (rec_reward, 0)
 
             self.state.add_attack_event(target_pos, attack_type, self.state.attacker_pos, reconnaissance)
@@ -212,6 +214,7 @@ class IdsGameEnv(gym.Env, ABC):
         """
         self.past_moves = []
         self.past_positions = []
+        self.past_reconnaissance_activities = []
         self.furthest_hack = self.idsgame_config.game_config.network_config.num_rows-1
         self.steps_beyond_done = None
         self.state.new_game(self.idsgame_config.game_config.initial_state, self.a_cumulative_reward,
@@ -310,7 +313,8 @@ class IdsGameEnv(gym.Env, ABC):
         :return: True if legal otherwise False
         """
         return util.is_attack_id_legal(attack_action, self.idsgame_config.game_config, self.state.attacker_pos,
-                                       self.state, self.past_positions)
+                                       self.state, self.past_positions,
+                                       past_reconnaissance_activities = self.past_reconnaissance_activities)
 
     def is_defense_legal(self, defense_action: int) -> bool:
         """
@@ -3652,9 +3656,9 @@ class IdsGameMinimalDefenseV18Env(AttackerEnv):
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
         if idsgame_config is None:
-            game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=8, max_value=9,
-                                     min_random_a_val=0, min_random_d_val=8, min_random_det_val=1)
-            game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
+            game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
+                                     min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
+            game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
                                           vulnerability_val=0, num_vulnerabilities_per_layer=1)
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
