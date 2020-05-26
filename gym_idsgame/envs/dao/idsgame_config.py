@@ -14,7 +14,8 @@ class IdsGameConfig:
                  defender_agent: Agent = None, attacker_agent: Agent = None, initial_state_path: str = None,
                  save_trajectories :bool = False, save_attack_stats : bool = False,
                  randomize_env : bool = False, local_view_observations : bool = False,
-                 reconnaissance_actions : bool = False, randomize_starting_position : bool = False):
+                 reconnaissance_actions : bool = False, randomize_starting_position : bool = False,
+                 reconnaissance_bool_features : bool = False):
         """
         Constructor, initializes the config
 
@@ -30,6 +31,8 @@ class IdsGameConfig:
         :param reconnaissance_actions: a boolean flag that indicates whether reconnaissance activities are enabled for
                                        the attacker
         :param randomize_starting_position: if true, the starting position of the attacker is randomized
+        :param reconnaissance_bool_features: boolean flag whether to include boolean features that indicate if
+                                             reconnaissance have been done for a certain defense type
         """
         self.render_config = render_config
         self.game_config = game_config
@@ -47,3 +50,4 @@ class IdsGameConfig:
         self.local_view_observations = local_view_observations
         self.reconnaissance_actions = reconnaissance_actions
         self.randomize_starting_position = randomize_starting_position
+        self.reconnaissance_bool_features = reconnaissance_bool_features

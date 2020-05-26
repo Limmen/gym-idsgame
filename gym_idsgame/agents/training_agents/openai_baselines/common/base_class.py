@@ -247,13 +247,13 @@ class BaseRLModel(ABC):
                 train_defender, a_pool, d_pool, total_num_episodes)
         self.pg_agent_config.logger.info(log_str)
         print(log_str)
-        # if update_stats and self.pg_agent_config.tensorboard:
-        #     self.log_tensorboard(iteration, avg_attacker_episode_rewards, avg_defender_episode_rewards,
-        #                          avg_episode_steps,
-        #                          avg_episode_attacker_loss, avg_episode_defender_loss, hack_probability,
-        #                          attacker_cumulative_reward, defender_cumulative_reward, self.pg_agent_config.epsilon,
-        #                          lr_attacker,
-        #                          lr_defender, hack_probability_total, a_pool, d_pool, eval=eval)
+        if update_stats and self.pg_agent_config.tensorboard:
+            self.log_tensorboard(iteration, avg_attacker_episode_rewards, avg_defender_episode_rewards,
+                                 avg_episode_steps,
+                                 avg_episode_attacker_loss, avg_episode_defender_loss, hack_probability,
+                                 attacker_cumulative_reward, defender_cumulative_reward, self.pg_agent_config.epsilon,
+                                 lr_attacker,
+                                 lr_defender, hack_probability_total, a_pool, d_pool, eval=eval)
         if update_stats:
             result.avg_episode_steps.append(avg_episode_steps)
             result.avg_attacker_episode_rewards.append(avg_attacker_episode_rewards)

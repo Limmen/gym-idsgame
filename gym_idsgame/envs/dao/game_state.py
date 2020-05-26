@@ -274,9 +274,9 @@ class GameState():
         :param network_config: NetworkConfig
         :return: reward
         """
-        reward = -0.25*constants.GAME_CONFIG.POSITIVE_REWARD \
+        reward = -1*constants.GAME_CONFIG.POSITIVE_REWARD \
             if self.reconnaissance_state[node_id][attack_type] == self.defense_values[node_id][attack_type] \
-            else 0.25*constants.GAME_CONFIG.POSITIVE_REWARD
+            else 0*constants.GAME_CONFIG.POSITIVE_REWARD
         self.reconnaissance_state[node_id][attack_type] = self.defense_values[node_id][attack_type]
         return reward
 
@@ -330,7 +330,8 @@ class GameState():
             det_prob = self.defense_det[node_id] / 10
             return np.random.rand() < det_prob/100
 
-    def get_attacker_observation(self, network_config: NetworkConfig, local_view=False, reconnaissance = False) -> np.ndarray:
+    def get_attacker_observation(self, network_config: NetworkConfig, local_view=False, reconnaissance = False,
+                                 reconnaissance_bool_features = False) -> np.ndarray:
         """
         Converts the state of the dynamical system into an observation for the attacker. As the environment
         is a partially observed markov decision process, the attacker observation is only a subset of the game state
@@ -338,14 +339,19 @@ class GameState():
         :param network_config: the network configuration of the game
         :param local_view: boolean flag indicating whether observations are provided in a local view or not
         :param reconnaissance: boolean flag indicating whether reconnaissance states should be included
+        :param reconnaissance_bool_features: boolean flag whether to include boolean features that indicate if
+                                             reconnaissance have been done for a certain defense type
         :return: An observation of the environment
         """
         if not reconnaissance:
             # +1 to have an extra feature that indicates if this is the node that the attacker is currently in
             attack_observation = np.zeros((len(network_config.node_list), self.attack_values.shape[1] + 1))
-        else:
+        elif reconnaissance and not reconnaissance_bool_features:
             # +1 to have an extra feature that indicates if this is the node that the attacker is currently in
             attack_observation = np.zeros((len(network_config.node_list), (self.attack_values.shape[1]*2 + 1)))
+        else:
+            # +1 to have an extra feature that indicates if this is the node that the attacker is currently in
+            attack_observation = np.zeros((len(network_config.node_list), (self.attack_values.shape[1] * 3 + 1)))
 
         current_pos = self.attacker_pos
         current_node_id = network_config.get_node_id(current_pos)
@@ -369,17 +375,36 @@ class GameState():
                 if node_id == current_node_id:
                     if not reconnaissance:
                         attack_observation[node_id] = np.append(self.attack_values[node_id], 1)
-                    else:
+                    elif reconnaissance and not reconnaissance_bool_features:
                         attack_observation[node_id] = np.append(np.append(self.attack_values[node_id], 1),
                                                                 self.reconnaissance_state[node_id])
+                    else:
+                        reconaissance_bool = np.zeros(self.attack_values.shape[1])
+                        for idx, s in enumerate(self.reconnaissance_state[node_id]):
+                            if s != constants.GAME_CONFIG.INITIAL_RECONNAISSANCE_STATE:
+                                reconaissance_bool[idx] = 1
+                            else:
+                                reconaissance_bool[idx] = 0
+                        attack_observation[node_id] = np.append(np.append(np.append(self.attack_values[node_id], 1),
+                                                                self.reconnaissance_state[node_id]), reconaissance_bool)
                 elif network_config.fully_observed:
                     attack_observation[node_id] = np.append(self.attack_values[node_id], 0)
                 elif network_config.adjacency_matrix[current_adjacency_matrix_id][node_adjacency_matrix_id]:
                     if not reconnaissance:
                         attack_observation[node_id] = np.append(self.attack_values[node_id], 0)
-                    else:
+                    elif reconnaissance and not reconnaissance_bool_features:
                         attack_observation[node_id] = np.append(np.append(self.attack_values[node_id], 0),
                                                                 self.reconnaissance_state[node_id])
+                    else:
+                        reconaissance_bool = np.zeros(self.attack_values.shape[1])
+                        for idx, s in enumerate(self.reconnaissance_state[node_id]):
+                            if s != constants.GAME_CONFIG.INITIAL_RECONNAISSANCE_STATE:
+                                reconaissance_bool[idx] = 1
+                            else:
+                                reconaissance_bool[idx] = 0
+                        attack_observation[node_id] = np.append(np.append(np.append(self.attack_values[node_id], 1),
+                                                                          self.reconnaissance_state[node_id]),
+                                                                reconaissance_bool)
 
         if local_view:
             # sort by row then col
