@@ -328,7 +328,7 @@ class GameState():
             return np.random.rand() < self.defense_det[node_id] / 10
         else:
             det_prob = self.defense_det[node_id] / 10
-            return np.random.rand() < det_prob/100
+            return np.random.rand() < det_prob/10
 
     def get_attacker_observation(self, network_config: NetworkConfig, local_view=False, reconnaissance = False,
                                  reconnaissance_bool_features = False) -> np.ndarray:

@@ -404,7 +404,8 @@ class IdsGameEnv(gym.Env, ABC):
             # norm_factor = self.state.game_step if self.state.game_step > 0 else 1
             # reward = -((unblocked_attacks)/norm_factor)
             # #print("reward:{}".format(reward))
-            return 1 * constants.GAME_CONFIG.POSITIVE_REWARD, 0
+            return constants.GAME_CONFIG.POSITIVE_REWARD, 0
+            #return 1 * constants.GAME_CONFIG.POSITIVE_REWARD, 0
 
     def get_detect_reward(self, target_node_id : int, attack_type : int, detection_value) -> Union[int, int]:
         """
@@ -432,6 +433,7 @@ class IdsGameEnv(gym.Env, ABC):
             #         blocked_attacks += 1
             # norm_factor = self.state.game_step if self.state.game_step > 0 else 1
             # reward = (blocked_attacks)/norm_factor
+            #return 0*constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
             return -constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
 
     def get_successful_attack_reward(self) -> Union[int, int]:
@@ -455,7 +457,7 @@ class IdsGameEnv(gym.Env, ABC):
             attack_row, attack_col = self.state.attacker_pos
             if attack_row < self.furthest_hack:
                 self.furthest_hack = attack_row
-                return constants.GAME_CONFIG.POSITIVE_REWARD, 0
+                return 1*constants.GAME_CONFIG.POSITIVE_REWARD, 0
             elif attack_row > self.furthest_hack:
                 return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
             return 0, 0
@@ -3656,9 +3658,9 @@ class IdsGameMinimalDefenseV18Env(AttackerEnv):
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
         if idsgame_config is None:
-            game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
-                                     min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
-            game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
+            game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=8,
+                                     min_random_a_val=0, min_random_d_val=8, min_random_det_val=1)
+            game_config.set_initial_state(defense_val=8, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
                                           vulnerability_val=0, num_vulnerabilities_per_layer=1)
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
@@ -3758,7 +3760,7 @@ class IdsGameV18Env(AttackDefenseEnv):
     [AttackDefenseEnv] 1 layer, 1 server per layer, 4 attack-defense-values
     [Initial State] Defense: 2, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 0
     [Rewards] Dense
-    [Version] 17
+    [Version] 18
     [Observations] partially observed
     [Environment] Random
     [Local View] No
