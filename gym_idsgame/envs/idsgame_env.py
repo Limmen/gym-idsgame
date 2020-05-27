@@ -457,13 +457,13 @@ class IdsGameEnv(gym.Env, ABC):
             attack_row, attack_col = self.state.attacker_pos
             if attack_row < self.furthest_hack:
                 self.furthest_hack = attack_row
-                # extra_reward = 0
-                # for rec_act in self.past_reconnaissance_activities:
-                #     node_id, rec_type = rec_act
-                #     server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
-                #     if node_id == server_id and rec_type == attack_type:
-                #         extra_reward = 1
-                return 1*constants.GAME_CONFIG.POSITIVE_REWARD, 0
+                extra_reward = 0
+                for rec_act in self.past_reconnaissance_activities:
+                    node_id, rec_type = rec_act
+                    server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
+                    if node_id == server_id:
+                        extra_reward = 1
+                return extra_reward + 1*constants.GAME_CONFIG.POSITIVE_REWARD, 0
             elif attack_row > self.furthest_hack:
                 return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
             return 0, 0
