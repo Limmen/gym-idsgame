@@ -274,10 +274,11 @@ class GameState():
         :param network_config: NetworkConfig
         :return: reward
         """
-        reward = 0*constants.GAME_CONFIG.POSITIVE_REWARD \
-            if self.reconnaissance_state[node_id][attack_type] == self.defense_values[node_id][attack_type] \
+        reward = -1*constants.GAME_CONFIG.POSITIVE_REWARD \
+            if (self.reconnaissance_state[node_id] == self.defense_values[node_id]).all() \
             else 0*constants.GAME_CONFIG.POSITIVE_REWARD
-        self.reconnaissance_state[node_id][attack_type] = self.defense_values[node_id][attack_type]
+        # self.reconnaissance_state[node_id][attack_type] = self.defense_values[node_id][attack_type]
+        self.reconnaissance_state[node_id] = self.defense_values[node_id]
         return reward
 
     def defend(self, node_id: int, defense_type: int, max_value: int, network_config: NetworkConfig,

@@ -76,7 +76,7 @@ class GameConfig():
         if not self.reconnaissance_actions:
             self.num_attack_actions = self.num_attack_types * self.num_nodes
         else:
-            self.num_attack_actions = (self.num_attack_types * 2) * self.num_nodes
+            self.num_attack_actions = (self.num_attack_types +1) * self.num_nodes
 
     def set_load_initial_state(self, initial_state_path: str) -> None:
         """

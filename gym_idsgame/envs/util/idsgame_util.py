@@ -95,12 +95,12 @@ def is_attack_id_legal(attack_id: int, game_config: GameConfig, attacker_pos: Un
     if not reconnaissance:
         if game_state.attack_values[server_id][attack_type] >= game_config.max_value:
             return False
-    if reconnaissance and past_reconnaissance_activities is not None:
-        for rec_act in past_reconnaissance_activities[-5:]:
-            node_id, rec_type = rec_act
-            if node_id == server_id and rec_type == attack_type:
-                #print("illegal rec type, past:{}".format(past_reconnaissance_activities))
-                return False
+    # if reconnaissance and past_reconnaissance_activities is not None:
+    #     for rec_act in past_reconnaissance_activities[-5:]:
+    #         node_id, rec_type = rec_act
+    #         if node_id == server_id and rec_type == attack_type:
+    #             #print("illegal rec type, past:{}".format(past_reconnaissance_activities))
+    #             return False
     return is_attack_legal(server_pos, attacker_pos, game_config.network_config, past_positions)
 
 
@@ -115,7 +115,8 @@ def interpret_attack_action(action: int, game_config: GameConfig) -> Union[int, 
     if not game_config.reconnaissance_actions:
         server_id = action // game_config.num_attack_types
     else:
-        server_id = action // (game_config.num_attack_types*2)
+        server_id = action // (game_config.num_attack_types +1)
+        #server_id = action // (game_config.num_attack_types*2)
 
     server_pos = game_config.network_config.get_node_pos(server_id)
     attack_type = get_attack_type(action, game_config)
