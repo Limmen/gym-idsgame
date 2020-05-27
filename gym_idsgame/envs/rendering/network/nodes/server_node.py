@@ -100,14 +100,15 @@ class ServerNode(ResourceNode):
             for edge in self.outgoing_edges:
                 edge.colors = color_list
         else:
-            assert len(self.horizontal_edges) > 0
-            if attacker_col < self.col:
-                self.horizontal_edges[0].colors = color_list
-            else:
-                if len(self.horizontal_edges) > 1:
-                    self.horizontal_edges[1].colors = color_list
-                else:
+            #assert len(self.horizontal_edges) > 0
+            if len(self.horizontal_edges) > 0:
+                if attacker_col < self.col:
                     self.horizontal_edges[0].colors = color_list
+                else:
+                    if len(self.horizontal_edges) > 1:
+                        self.horizontal_edges[1].colors = color_list
+                    else:
+                        self.horizontal_edges[0].colors = color_list
 
         lbl_color = constants.RENDERING.RED_ALPHA
         self.attack_label.color = lbl_color
@@ -133,14 +134,15 @@ class ServerNode(ResourceNode):
             for edge in self.outgoing_edges:
                 edge.colors = color_list
         else:
-            assert len(self.horizontal_edges) > 0
-            if attacker_col < self.col:
-                self.horizontal_edges[0].colors = color_list
-            else:
-                if len(self.horizontal_edges) > 1:
-                    self.horizontal_edges[1].colors = color_list
-                else:
+            #assert len(self.horizontal_edges) > 0
+            if len(self.horizontal_edges) > 0:
+                if attacker_col < self.col:
                     self.horizontal_edges[0].colors = color_list
+                else:
+                    if len(self.horizontal_edges) > 1:
+                        self.horizontal_edges[1].colors = color_list
+                    else:
+                        self.horizontal_edges[0].colors = color_list
         lbl_color = constants.RENDERING.BLACK_ALPHA
         self.attack_label.color = lbl_color
         self.color = constants.RENDERING.WHITE

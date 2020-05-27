@@ -122,8 +122,11 @@ class PPO(BaseRLModel):
         self.tb_writer = None
         self.pg_agent_config = pg_agent_config
         self.iteration = 0
-        self.tensorboard_writer = SummaryWriter(self.pg_agent_config.tensorboard_dir)
-        self.tensorboard_writer.add_hparams(self.pg_agent_config.hparams_dict(), {})
+        try:
+            self.tensorboard_writer = SummaryWriter(self.pg_agent_config.tensorboard_dir)
+            self.tensorboard_writer.add_hparams(self.pg_agent_config.hparams_dict(), {})
+        except:
+            pass
 
         if _init_setup_model:
             self._setup_model()
@@ -256,8 +259,6 @@ class PPO(BaseRLModel):
 
             joint_actions = np.array([[clipped_attacker_actions, clipped_defender_actions]])
             new_a_obs, new_d_obs, a_rewards, d_rewards, dones, infos = env.step(joint_actions, update_stats=True)
-            #print("a_reward:{}, d_reward:{}".format(a_rewards, d_rewards))
-            #print("a_rewards:{}".format(a_rewards))
 
             if callback.on_step() is False:
                 return False

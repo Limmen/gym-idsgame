@@ -202,7 +202,8 @@ class PPOPolicy(BasePolicy):
         self.optimizer = self.optimizer_class(self.parameters(), lr=lr_schedule(1), **self.optimizer_kwargs)
 
     def forward(self, obs: th.Tensor, env : IdsGameEnv,
-                deterministic: bool = False, device: str = "cuda", attacker = True) -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
+                deterministic: bool = False, device: str = "cuda", attacker = True,
+                non_legal_actions=None) -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
         """
         Forward pass in all the networks (actor and critic)
 
@@ -215,14 +216,15 @@ class PPOPolicy(BasePolicy):
         values = self.value_net(latent_vf)
 
         # Masking
-        if attacker:
-            actions = list(range(env.num_attack_actions()))
-            legal_actions = list(filter(lambda action: env.is_attack_legal(action), actions))
-            non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action), actions))
-        else:
-            actions = list(range(env.num_defense_actions()))
-            legal_actions = list(filter(lambda action: env.is_defense_legal(action), actions))
-            non_legal_actions = list(filter(lambda action: not env.is_defense_legal(action), actions))
+        if non_legal_actions is None:
+            if attacker:
+                actions = list(range(env.num_attack_actions))
+                legal_actions = list(filter(lambda action: env.is_attack_legal(action), actions))
+                non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action), actions))
+            else:
+                actions = list(range(env.num_defense_actions))
+                legal_actions = list(filter(lambda action: env.is_defense_legal(action), actions))
+                non_legal_actions = list(filter(lambda action: not env.is_defense_legal(action), actions))
 
         distribution = self._get_action_dist_from_latent(latent_pi, latent_sde=latent_sde,
                                                          non_legal_actions=non_legal_actions, device=device)

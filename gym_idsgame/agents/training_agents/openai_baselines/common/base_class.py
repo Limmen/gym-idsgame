@@ -576,7 +576,6 @@ class BaseRLModel(ABC):
 
         # Open the zip archive and load data
         try:
-            print("load path:{}".format(load_path))
             with zipfile.ZipFile(load_path, "r") as archive:
                 namelist = archive.namelist()
                 # If data or parameters is not in the

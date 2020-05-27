@@ -21,6 +21,7 @@ from gym_idsgame.agents.training_agents.policy_gradient.reinforce.reinforce_atta
 from gym_idsgame.agents.training_agents.policy_gradient.actor_critic.actor_critic import ActorCriticAgent
 from gym_idsgame.agents.training_agents.policy_gradient.ppo.ppo import PPOAgent
 from gym_idsgame.agents.training_agents.openai_baselines.ppo.ppo import OpenAiPPOAgent
+from gym_idsgame.agents.training_agents.openai_baselines.ppo.ppo_attacker_bot_agent import PPOBaselineAttackerBotAgent
 from gym_idsgame.agents.training_agents.train_agent import TrainAgent
 from gym_idsgame.agents.bot_agents.bot_agent import BotAgent
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
@@ -283,6 +284,12 @@ class Runner:
                                      "model must be specified")
                 attacker = ReinforceAttackerBotAgent(config.pg_agent_config, env.idsgame_config.game_config,
                                                     config.pg_agent_config.attacker_load_path)
+            elif config.attacker_type == AgentType.PPO_OPENAI_AGENT.value:
+                if config.pg_agent_config is None or config.pg_agent_config.attacker_load_path is None:
+                    raise ValueError("To run a simulation with a pretrained OpenAIPPO agent, the path to the saved "
+                                     "model must be specified")
+                attacker = PPOBaselineAttackerBotAgent(config.pg_agent_config, env.idsgame_config.game_config,
+                                                    config.pg_agent_config.attacker_load_path, env=env)
             else:
                 raise AssertionError("Attacker type not recognized: {}".format(config.attacker_type))
             env.idsgame_config.attacker_agent = attacker

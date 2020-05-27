@@ -40,6 +40,8 @@ class BaselineEnvWrapper(gym.Env):
             'render.modes': ['human', 'rgb_array'],
             'video.frames_per_second': 50  # Video rendering speed
         }
+        self.num_attack_actions = self.idsgame_env.num_attack_actions
+        self.num_defense_actions = self.idsgame_env.num_defense_actions
         # self.observation_space = self.idsgame_env.pg_agent_config
 
     def step(self, action):
@@ -112,12 +114,6 @@ class BaselineEnvWrapper(gym.Env):
         :return: True if legal otherwise False
         """
         return self.idsgame_env.is_defense_legal(defense_action)
-
-    def num_attack_actions(self):
-        return self.idsgame_env.num_attack_actions
-
-    def num_defense_actions(self):
-        return self.idsgame_env.num_defense_actions
 
     def hack_probability(self):
         if self.num_games > 0:
