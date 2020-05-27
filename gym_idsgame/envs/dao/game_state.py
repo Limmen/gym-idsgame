@@ -275,7 +275,7 @@ class GameState():
         :param network_config: NetworkConfig
         :return: reward
         """
-        reward = -1*constants.GAME_CONFIG.POSITIVE_REWARD \
+        reward = 0*constants.GAME_CONFIG.POSITIVE_REWARD \
             if (self.reconnaissance_state[node_id] == self.defense_values[node_id]).all() \
             else 0*constants.GAME_CONFIG.POSITIVE_REWARD
         # self.reconnaissance_state[node_id][attack_type] = self.defense_values[node_id][attack_type]
@@ -330,6 +330,7 @@ class GameState():
             return np.random.rand() < self.defense_det[node_id] / 10
         else:
             det_prob = self.defense_det[node_id] / 10
+            #det_prob = self.defense_det[node_id] / 10
             return np.random.rand() < det_prob
 
     def get_attacker_observation(self, network_config: NetworkConfig, local_view=False, reconnaissance = False,

@@ -181,8 +181,11 @@ class IdsGameEnv(gym.Env, ABC):
                         reward = self.get_blocked_attack_reward(target_node_id, attack_type)
                 if self.idsgame_config.save_attack_stats:
                     self.attack_detections.append([target_node_id, detected, self.state.defense_det[target_node_id]])
-        #else:
-            #print("illegal action: {},{}, action: {}".format(target_pos, attacker_pos, action))
+        else:
+            reward = -constants.GAME_CONFIG.POSITIVE_REWARD, 0
+            self.state.done = True
+            self.state.detected = True
+
         if self.state.done:
             if self.steps_beyond_done is None:
                 self.steps_beyond_done = 0
@@ -456,14 +459,15 @@ class IdsGameEnv(gym.Env, ABC):
         else:
             attack_row, attack_col = self.state.attacker_pos
             if attack_row < self.furthest_hack:
-                self.furthest_hack = attack_row
-                extra_reward = 0
-                for rec_act in self.past_reconnaissance_activities:
-                    node_id, rec_type = rec_act
-                    server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
-                    if node_id == server_id:
-                        extra_reward = 1
-                return extra_reward + 1*constants.GAME_CONFIG.POSITIVE_REWARD, 0
+                # self.furthest_hack = attack_row
+                # extra_reward = 0
+                # for rec_act in self.past_reconnaissance_activities:
+                #     node_id, rec_type = rec_act
+                #     server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
+                #     if node_id == server_id:
+                #         extra_reward = 1
+                #return extra_reward + 1*constants.GAME_CONFIG.POSITIVE_REWARD, 0
+                return 1 * constants.GAME_CONFIG.POSITIVE_REWARD, 0
             elif attack_row > self.furthest_hack:
                 return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
             return 0, 0
@@ -3669,7 +3673,7 @@ class IdsGameMinimalDefenseV18Env(AttackerEnv):
             # game_config.set_initial_state(defense_val=8, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
             #                               vulnerability_val=0, num_vulnerabilities_per_layer=1)
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
-                                     min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
+                                     min_random_a_val=0, min_random_d_val=4, min_random_det_val=1)
             game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
                                           vulnerability_val=0, num_vulnerabilities_per_layer=1)
             game_config.dense_rewards_v2 = True

@@ -92,9 +92,9 @@ def is_attack_id_legal(attack_id: int, game_config: GameConfig, attacker_pos: Un
     :return: True if legal otherwise False
     """
     server_id, server_pos, attack_type, reconnaissance = interpret_attack_action(attack_id, game_config)
-    if not reconnaissance:
-        if game_state.attack_values[server_id][attack_type] >= game_config.max_value:
-            return False
+    # if not reconnaissance:
+    #     if game_state.attack_values[server_id][attack_type] >= game_config.max_value:
+    #         return False
     # if reconnaissance and past_reconnaissance_activities is not None:
     #     for rec_act in past_reconnaissance_activities[-5:]:
     #         node_id, rec_type = rec_act
