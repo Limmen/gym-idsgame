@@ -101,7 +101,6 @@ class PPO(BaseRLModel):
                  device: Union[th.device, str] = 'auto',
                  _init_setup_model: bool = True,
                  pg_agent_config : PolicyGradientAgentConfig = None):
-
         super(PPO, self).__init__(policy, env, PPOPolicy, learning_rate, policy_kwargs=policy_kwargs,
                                   verbose=verbose, device=device, use_sde=use_sde, sde_sample_freq=sde_sample_freq,
                                   create_eval_env=create_eval_env, support_multi_env=True, seed=seed,

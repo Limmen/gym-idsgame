@@ -166,9 +166,10 @@ class GameState():
 
         if randomize_state:
             for node_id in range(len(reconnaissance_state)):
-                for attack_id in range(reconnaissance_state.shape[1]):
-                    if np.random.rand() < 0.2:
-                        reconnaissance_state[node_id][attack_id] = defense_values[node_id][attack_id]
+                if np.random.rand() < 0.5:
+                    reconnaissance_state[node_id] = defense_values[node_id]
+                # for attack_id in range(reconnaissance_state.shape[1]):
+                #     if np.random.rand() < 0.2:
         self.attack_values = attack_values.astype(np.int32)
         self.defense_values = defense_values.astype(np.int32)
         self.defense_det = det_values.astype(np.int32)
@@ -274,7 +275,7 @@ class GameState():
         :param network_config: NetworkConfig
         :return: reward
         """
-        reward = -0*constants.GAME_CONFIG.POSITIVE_REWARD \
+        reward = -1*constants.GAME_CONFIG.POSITIVE_REWARD \
             if (self.reconnaissance_state[node_id] == self.defense_values[node_id]).all() \
             else 0*constants.GAME_CONFIG.POSITIVE_REWARD
         # self.reconnaissance_state[node_id][attack_type] = self.defense_values[node_id][attack_type]

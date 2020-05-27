@@ -498,7 +498,7 @@ class BaseRLModel(ABC):
         raise NotImplementedError()
 
     @classmethod
-    def load(cls, load_path: str, env: Optional[GymEnv] = None, **kwargs):
+    def load(cls, load_path: str, env: Optional[GymEnv] = None, policy_class = None, **kwargs):
         """
         Load the model from a zip-file
 
@@ -519,17 +519,18 @@ class BaseRLModel(ABC):
                              f"Stored kwargs: {data['policy_kwargs']}, specified kwargs: {kwargs['policy_kwargs']}")
 
         # check if observation space and action space are part of the saved parameters
-        if ("observation_space" not in data or "action_space" not in data) and "env" not in data:
-            raise ValueError("The observation_space and action_space was not given, can't verify new environments")
+        # if ("observation_space" not in data or "action_space" not in data) and "env" not in data:
+        #     raise ValueError("The observation_space and action_space was not given, can't verify new environments")
         # check if given env is valid
-        if env is not None:
-            cls.check_env(env, data["observation_space"], data["action_space"])
+        # if env is not None:
+        #     cls.check_env(env, data["observation_space"], data["action_space"])
         # if no new env was given use stored env if possible
         if env is None and "env" in data:
             env = data["env"]
 
+        #print("data:{}".format(data.keys()))
         # noinspection PyArgumentList
-        model = cls(policy=data["policy_class"], env=env, device='auto', _init_setup_model=False)
+        model = cls(env, policy_class, device='auto', _init_setup_model=False)
 
         # load parameters
         model.__dict__.update(data)
@@ -575,6 +576,7 @@ class BaseRLModel(ABC):
 
         # Open the zip archive and load data
         try:
+            print("load path:{}".format(load_path))
             with zipfile.ZipFile(load_path, "r") as archive:
                 namelist = archive.namelist()
                 # If data or parameters is not in the
