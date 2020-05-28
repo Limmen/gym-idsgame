@@ -283,8 +283,14 @@ class BaselineEnvWrapper(gym.Env):
                             for idx, row in enumerate(attacker_obs):
                                 combined_row = np.append(row, defender_obs[idx])
                                 combined_features.append(combined_row)
+                            if self.idsgame_env.idsgame_config.reconnaissance_bool_features:
+                                combined_features = np.array(combined_features)
+                                f = np.zeros((combined_features.shape[0], combined_features.shape[1] + d_bool_features.shape[1]))
+                                for i in range(combined_features.shape[0]):
+                                    f[i] = np.append(combined_features[i], d_bool_features[i])
+                                combined_features = f
                             return np.array(combined_features)
-                            return np.append(attacker_obs, defender_obs)
+                            #return np.append(attacker_obs, defender_obs)
 
                         return np.append(attacker_obs, defender_obs)
                     else:

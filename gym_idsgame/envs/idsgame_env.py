@@ -459,7 +459,7 @@ class IdsGameEnv(gym.Env, ABC):
         else:
             attack_row, attack_col = self.state.attacker_pos
             if attack_row < self.furthest_hack:
-                # self.furthest_hack = attack_row
+                self.furthest_hack = attack_row
                 # extra_reward = 0
                 # for rec_act in self.past_reconnaissance_activities:
                 #     node_id, rec_type = rec_act
