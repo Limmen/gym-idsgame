@@ -85,10 +85,10 @@ class BaselineEnvWrapper(gym.Env):
                                                attacker=True)
             defender_state = self.update_state(defender_obs=obs_defender, attacker_obs=obs_attacker, state=[],
                                                attacker=False)
-            # print("attacker state:{}".format(attacker_state))
-            # print("attacker state shape:{}".format(attacker_state.shape))
-            # print("defender state shape:{}".format(defender_state.shape))
-            # print("defender state:{}".format(defender_state))
+            print("attacker state:{}".format(attacker_state))
+            print("attacker state shape:{}".format(attacker_state.shape))
+            print("defender state shape:{}".format(defender_state.shape))
+            print("defender state:{}".format(defender_state))
             return [attacker_state.flatten(), defender_state.flatten()]
 
     def render(self, mode='human'):
@@ -135,10 +135,16 @@ class BaselineEnvWrapper(gym.Env):
         :param attacker: boolean flag whether it is attacker or not
         :return: new state
         """
+        print("update state attackerobs:{}".format(attacker_obs))
+        print("update state defenderobs:{}".format(defender_obs))
         if attacker and self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
             a_obs_len = self.idsgame_env.idsgame_config.game_config.num_attack_types + 1
-            defender_obs = attacker_obs[:, a_obs_len:]
+            defender_obs = attacker_obs[:, a_obs_len:a_obs_len+self.idsgame_env.idsgame_config.game_config.num_attack_types]
+            if self.idsgame_env.idsgame_config.reconnaissance_bool_features:
+                print("{}".format(a_obs_len+self.idsgame_env.idsgame_config.game_config.num_attack_types))
+                d_bool_features = attacker_obs[:, a_obs_len+self.idsgame_env.idsgame_config.game_config.num_attack_types:]
             attacker_obs = attacker_obs[:, 0:a_obs_len]
+            print("d_bool_features:{}".format(d_bool_features))
 
         if not attacker and self.idsgame_env.local_view_features():
             attacker_obs = self.idsgame_env.state.get_attacker_observation(
@@ -266,6 +272,13 @@ class BaselineEnvWrapper(gym.Env):
                             t.append(det_values[idx])
                         features.append(t)
                 features = np.array(features)
+                if self.idsgame_env.idsgame_config.reconnaissance_bool_features:
+                    f = np.zeros((features.shape[0], features.shape[1] + d_bool_features.shape[1]))
+                    print("f shape:{}, {}, {}".format(f.shape, features.shape[1], d_bool_features.shape[1]))
+                    for i in range(features.shape[0]):
+                        f[i] = np.append(features[i], d_bool_features[i])
+                    features = f
+                    print("features shape:{}".format(features.shape))
                 if self.pg_agent_config.state_length == 1:
                     return features
                 if len(state) == 0:

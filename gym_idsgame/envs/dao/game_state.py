@@ -74,6 +74,7 @@ class GameState():
         self.hacked = hacked
         self.action_descriptors = ["Injection", "Authentication", "CrossSite", "References", "Misssconfiguration",
                                    "Exposure", "Access", "Forgery", "Vulnerabilities", "Redirects"]
+        self.reconnaissance_actions = []
 
     def default_state(self, node_list: List[int], attacker_pos: Union[int, int], num_attack_types: int,
                       network_config: NetworkConfig, randomize_state : bool = False) -> None:
@@ -225,6 +226,7 @@ class GameState():
                            det_val=det_val, vulnerability_val=vulnerability_val)
         self.detected = False
         self.hacked = False
+        self.reconnaissance_actions = []
 
     def copy(self) -> "GameState":
         """
@@ -280,6 +282,7 @@ class GameState():
             else 0*constants.GAME_CONFIG.POSITIVE_REWARD
         # self.reconnaissance_state[node_id][attack_type] = self.defense_values[node_id][attack_type]
         self.reconnaissance_state[node_id] = self.defense_values[node_id]
+        self.reconnaissance_actions.append(node_id)
         return reward
 
     def defend(self, node_id: int, defense_type: int, max_value: int, network_config: NetworkConfig,
@@ -354,7 +357,7 @@ class GameState():
             attack_observation = np.zeros((len(network_config.node_list), (self.attack_values.shape[1]*2 + 1)))
         else:
             # +1 to have an extra feature that indicates if this is the node that the attacker is currently in
-            attack_observation = np.zeros((len(network_config.node_list), (self.attack_values.shape[1] * 3 + 1)))
+            attack_observation = np.zeros((len(network_config.node_list), (self.attack_values.shape[1] * 2 + 2)))
 
         current_pos = self.attacker_pos
         current_node_id = network_config.get_node_id(current_pos)
@@ -382,12 +385,9 @@ class GameState():
                         attack_observation[node_id] = np.append(np.append(self.attack_values[node_id], 1),
                                                                 self.reconnaissance_state[node_id])
                     else:
-                        reconaissance_bool = np.zeros(self.attack_values.shape[1])
-                        for idx, s in enumerate(self.reconnaissance_state[node_id]):
-                            if s != constants.GAME_CONFIG.INITIAL_RECONNAISSANCE_STATE:
-                                reconaissance_bool[idx] = 1
-                            else:
-                                reconaissance_bool[idx] = 0
+                        reconaissance_bool = [0]
+                        if node_id in self.reconnaissance_actions:
+                            reconaissance_bool = [1]
                         attack_observation[node_id] = np.append(np.append(np.append(self.attack_values[node_id], 1),
                                                                 self.reconnaissance_state[node_id]), reconaissance_bool)
                 elif network_config.fully_observed:
@@ -399,12 +399,9 @@ class GameState():
                         attack_observation[node_id] = np.append(np.append(self.attack_values[node_id], 0),
                                                                 self.reconnaissance_state[node_id])
                     else:
-                        reconaissance_bool = np.zeros(self.attack_values.shape[1])
-                        for idx, s in enumerate(self.reconnaissance_state[node_id]):
-                            if s != constants.GAME_CONFIG.INITIAL_RECONNAISSANCE_STATE:
-                                reconaissance_bool[idx] = 1
-                            else:
-                                reconaissance_bool[idx] = 0
+                        reconaissance_bool = [0]
+                        if node_id in self.reconnaissance_actions:
+                            reconaissance_bool = [1]
                         attack_observation[node_id] = np.append(np.append(np.append(self.attack_values[node_id], 1),
                                                                           self.reconnaissance_state[node_id]),
                                                                 reconaissance_bool)
