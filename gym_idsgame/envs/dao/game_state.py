@@ -166,7 +166,7 @@ class GameState():
 
         if randomize_state:
             for node_id in range(len(reconnaissance_state)):
-                if np.random.rand() < 0.5:
+                if np.random.rand() < 0.2:
                     reconnaissance_state[node_id] = defense_values[node_id]
                 # for attack_id in range(reconnaissance_state.shape[1]):
                 #     if np.random.rand() < 0.2:
