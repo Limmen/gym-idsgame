@@ -286,6 +286,11 @@ class PPOPolicy(BasePolicy):
         #     else:
         #         raise AssertionError("Invalid shape of action probabilties")
         action_probs_1 = action_probs_1.to(device)
+        if np.random.rand() < 0.0001:
+            p = action_probs_1.detach().numpy()
+            filter_indices = [4,9,14]
+            f = p[filter_indices]
+            print("reconnaissance probabilities: {}".format(np.sum(f)))
 
         if isinstance(self.action_dist, DiagGaussianDistribution):
             return self.action_dist.proba_distribution(mean_actions, self.log_std)

@@ -16,7 +16,7 @@ class BaselineEnvWrapper(gym.Env):
                                     initial_state_path=initial_state_path)
         self.idsgame_env.idsgame_config.randomize_starting_position = True
         self.idsgame_env.idsgame_config.render_config.attacker_view = True
-        #self.idsgame_env.idsgame_config.reconnaissance_bool_features = True
+        self.idsgame_env.idsgame_config.reconnaissance_bool_features = True
         self.pg_agent_config = pg_agent_config
         self.attacker_action_space = self.idsgame_env.attacker_action_space
         self.defender_action_space = self.idsgame_env.defender_action_space
