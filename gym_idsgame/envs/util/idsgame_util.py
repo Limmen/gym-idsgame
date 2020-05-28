@@ -179,7 +179,7 @@ def get_attack_type(action: int, game_config: GameConfig) -> int:
     if not game_config.reconnaissance_actions:
         attack_defense_type = action % game_config.num_attack_types
     else:
-        attack_defense_type = action % (game_config.num_attack_types*2)
+        attack_defense_type = action % (game_config.num_attack_types+1)
     return attack_defense_type
 
 
