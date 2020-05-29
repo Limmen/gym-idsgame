@@ -27,8 +27,8 @@ class NetworkConfig:
         self.graph_layout = self.__default_graph_layout()
         self.adjacency_matrix = self.__default_adjacency_matrix()
         self.fully_observed = fully_observed
-        self.max_neighbors = self.__max_num_neighbors()
         self.relative_neighbor_positions = relative_neighbor_positions
+        self.max_neighbors = self.__max_num_neighbors()
 
     def __max_num_neighbors(self):
         max_neighbors = 0

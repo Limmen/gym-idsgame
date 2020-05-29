@@ -72,11 +72,14 @@ class GameConfig():
                                              self.num_attack_types, network_config=self.network_config)
         self.dense_rewards = dense_rewards
 
-    def set_attack_actions(self):
+    def set_attack_actions(self, local_view : bool = False):
         if not self.reconnaissance_actions:
             self.num_attack_actions = self.num_attack_types * self.num_nodes
         else:
-            self.num_attack_actions = (self.num_attack_types +1) * self.num_nodes
+            if not local_view:
+                self.num_attack_actions = (self.num_attack_types +1) * self.num_nodes
+            else:
+                self.num_attack_actions = (self.num_attack_types + 1) * self.network_config.max_neighbors
 
     def set_load_initial_state(self, initial_state_path: str) -> None:
         """

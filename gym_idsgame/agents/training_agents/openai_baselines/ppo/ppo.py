@@ -30,7 +30,7 @@ class OpenAiPPOAgent(PolicyGradientAgent):
 
         :return: the training result
         """
-        self.env.idsgame_config.render_config.attacker_view = self.config.render_attacker_viewq
+        self.env.idsgame_env.idsgame_config.render_config.attacker_view = self.config.render_attacker_view
         # Custom MLP policy
         net_arch = []
         for l in range(self.config.num_hidden_layers):

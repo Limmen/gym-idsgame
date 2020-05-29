@@ -226,7 +226,6 @@ class PPOPolicy(BasePolicy):
         #         legal_actions = list(filter(lambda action: env.is_defense_legal(action), actions))
         #         non_legal_actions = list(filter(lambda action: not env.is_defense_legal(action), actions))
         distribution = self._get_action_dist_from_latent(latent_pi, latent_sde=latent_sde, device=device)
-
         actions = distribution.get_actions(deterministic=deterministic)
         actions = th.tensor(np.array([actions]).astype(np.int32))
         actions = actions.to(self.device)

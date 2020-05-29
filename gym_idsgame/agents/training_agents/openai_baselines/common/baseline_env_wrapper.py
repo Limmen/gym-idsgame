@@ -43,12 +43,15 @@ class BaselineEnvWrapper(gym.Env):
             'render.modes': ['human', 'rgb_array'],
             'video.frames_per_second': 50  # Video rendering speed
         }
-        self.num_attack_actions = self.idsgame_env.num_attack_actions
+        self.num_attack_actions = self.pg_agent_config.output_dim_attacker
         self.num_defense_actions = self.idsgame_env.num_defense_actions
 
     def step(self, action):
         attacker_action = action[0][0]
         defender_action = action[1][0]
+        if self.idsgame_env.local_view_features():
+            attacker_obs, _ = self.idsgame_env.get_observation()
+            attacker_action = self.convert_local_attacker_action_to_global(attacker_action, attacker_obs)
         joint_action = (attacker_action, defender_action)
         obs_prime, reward, done, info = self.idsgame_env.step(joint_action)
         attacker_reward, defender_reward = reward
@@ -66,6 +69,8 @@ class BaselineEnvWrapper(gym.Env):
                                                attacker=True)
             defender_state = self.update_state(defender_obs=obs_prime_defender, attacker_obs=obs_prime_attacker, state=[],
                                                attacker=False)
+            # print("got attacker state:{}, defender_State:{}".format(attacker_state, defender_state))
+            # print("got attacker state:{}, defender_State:{}".format(attacker_state.shape, defender_state.shape))
             return [attacker_state.flatten(), defender_state.flatten()], [attacker_reward, defender_reward], done, info
 
     def reset(self, update_stats: False):
@@ -87,6 +92,8 @@ class BaselineEnvWrapper(gym.Env):
                                                attacker=True)
             defender_state = self.update_state(defender_obs=obs_defender, attacker_obs=obs_attacker, state=[],
                                                attacker=False)
+            # print("got attacker state:{}, defender_State:{}".format(attacker_state, defender_state))
+            # print("got attacker state:{}, defender_State:{}".format(attacker_state.shape, defender_state.shape))
             return [attacker_state.flatten(), defender_state.flatten()]
 
     def render(self, mode='human'):
@@ -94,6 +101,16 @@ class BaselineEnvWrapper(gym.Env):
 
     def close(self):
         return self.idsgame_env.close()
+
+    def convert_local_attacker_action_to_global(self, action_id, attacker_obs):
+        num_attack_types = self.idsgame_env.idsgame_config.game_config.num_attack_types
+        neighbor = action_id // (num_attack_types+1)
+        attack_type = action_id % (num_attack_types+1)
+        target_id = int(attacker_obs[neighbor][num_attack_types])
+        if target_id == -1:
+            return -1
+        attacker_action = target_id * (num_attack_types+1) + attack_type
+        return attacker_action
 
     def is_attack_legal(self, attack_action: int) -> bool:
         """
@@ -134,17 +151,26 @@ class BaselineEnvWrapper(gym.Env):
         :return: new state
         """
         if attacker and self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+            #if not self.idsgame_env.local_view_features():
             a_obs_len = self.idsgame_env.idsgame_config.game_config.num_attack_types + 1
             defender_obs = attacker_obs[:, a_obs_len:a_obs_len+self.idsgame_env.idsgame_config.game_config.num_attack_types]
             if self.idsgame_env.idsgame_config.reconnaissance_bool_features:
                 d_bool_features = attacker_obs[:, a_obs_len+self.idsgame_env.idsgame_config.game_config.num_attack_types:]
             attacker_obs = attacker_obs[:, 0:a_obs_len]
+            # else:
+            #     a_obs_len = self.idsgame_env.idsgame_config.game_config.num_attack_types + 1
+            #     defender_obs = attacker_obs[:,
+            #                    a_obs_len:a_obs_len + self.idsgame_env.idsgame_config.game_config.num_attack_types]
+            #     if self.idsgame_env.idsgame_config.reconnaissance_bool_features:
+            #         d_bool_features = attacker_obs[:,
+            #                           a_obs_len + self.idsgame_env.idsgame_config.game_config.num_attack_types:]
+            #     attacker_obs = attacker_obs[:, 0:a_obs_len]
 
         if not attacker and self.idsgame_env.local_view_features():
             attacker_obs = self.idsgame_env.state.get_attacker_observation(
                 self.idsgame_env.idsgame_config.game_config.network_config,
                 local_view=False,
-            reconnaissance=self.idsgame_env.idsgame_config.reconnaissance_actions)
+                reconnaissance=self.idsgame_env.idsgame_config.reconnaissance_actions)
 
         # Zero mean
         if self.pg_agent_config.zero_mean_features:
@@ -228,11 +254,13 @@ class BaselineEnvWrapper(gym.Env):
             defender_obs = np.array(normalized_defender_features)
 
         if self.idsgame_env.local_view_features() and attacker:
-            neighbor_defense_attributes = np.zeros((attacker_obs.shape[0], defender_obs.shape[1]))
-            for node in range(attacker_obs.shape[0]):
-                if int(attacker_obs[node][-1]) == 1:
-                    id = int(attacker_obs[node][-2])
+            if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                neighbor_defense_attributes = np.zeros((attacker_obs.shape[0], defender_obs.shape[1]))
+                for node in range(attacker_obs.shape[0]):
+                    id = int(attacker_obs[node][-1])
                     neighbor_defense_attributes[node] = defender_obs[id]
+            else:
+                neighbor_defense_attributes = defender_obs
 
         if self.idsgame_env.fully_observed() or \
                 (self.idsgame_env.idsgame_config.game_config.reconnaissance_actions and attacker):
@@ -252,16 +280,22 @@ class BaselineEnvWrapper(gym.Env):
                             t.append(det_values[idx])
                         features.append(t)
                 else:
-                    node_ids = attacker_obs[:, -2]
-                    node_reachable = attacker_obs[:, -1]
+                    node_ids = attacker_obs[:, -1]
+                    #node_reachable = attacker_obs[:, -1]
                     if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
                         det_values = neighbor_defense_attributes[:, -1]
-                    temp = neighbor_defense_attributes[:, 0:-1] - attacker_obs[:, 0:-2]
+                    if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                        temp = neighbor_defense_attributes[:, 0:-1] - attacker_obs[:, 0:-1]
+                    else:
+                        temp = np.full(neighbor_defense_attributes.shape, -1)
+                        for i in range(len(neighbor_defense_attributes)):
+                            if np.sum(neighbor_defense_attributes[i]) > 0:
+                                temp[i] = neighbor_defense_attributes[i] - attacker_obs[i, 0:-1]
                     features = []
                     for idx, row in enumerate(temp):
                         t = row.tolist()
                         t.append(node_ids[idx])
-                        t.append(node_reachable[idx])
+                        #t.append(node_reachable[idx])
                         if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
                             t.append(det_values[idx])
                         features.append(t)

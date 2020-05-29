@@ -167,7 +167,7 @@ class GameState():
 
         # if randomize_state:
         #     for node_id in range(len(reconnaissance_state)):
-        #         if np.random.rand() < 0.25:
+        #         if np.random.rand() < 0.5:
         #             reconnaissance_state[node_id] = defense_values[node_id]
         #             self.reconnaissance_actions.append(node_id)
                 # for attack_id in range(reconnaissance_state.shape[1]):
@@ -357,7 +357,7 @@ class GameState():
             # +1 to have an extra feature that indicates if this is the node that the attacker is currently in
             attack_observation = np.zeros((len(network_config.node_list), (self.attack_values.shape[1]*2 + 1)))
         else:
-            # +1 to have an extra feature that indicates if this is the node that the attacker is currently in
+            # +2 to have an extra feature that indicates if this is the node that the attacker is currently in and reconnaissance bool feature
             attack_observation = np.zeros((len(network_config.node_list), (self.attack_values.shape[1] * 2 + 2)))
 
         current_pos = self.attacker_pos
@@ -375,7 +375,18 @@ class GameState():
             if local_view:
                 if network_config.adjacency_matrix[current_adjacency_matrix_id][node_adjacency_matrix_id] \
                         and node_id != current_node_id:
-                    neighbor_data = np.append(self.attack_values[node_id], node_id)
+                    if not reconnaissance:
+                        neighbor_data = np.append(self.attack_values[node_id], node_id)
+                    elif reconnaissance and not reconnaissance_bool_features:
+                        neighbor_data = np.append(np.append(self.attack_values[node_id], self.reconnaissance_state[node_id]),
+                                                  node_id)
+                    else:
+                        reconaissance_bool = [0]
+                        if node_id in self.reconnaissance_actions:
+                            reconaissance_bool = [1]
+                        neighbor_data = np.append(np.append(
+                            np.append(self.attack_values[node_id], node_id), self.reconnaissance_state[node_id]),
+                            reconaissance_bool)
                     neighbor_row, neighbor_col = network_config.get_node_pos(node_id)
                     neighbors.append((neighbor_row, neighbor_col, neighbor_data))
             else:
@@ -411,8 +422,13 @@ class GameState():
             # sort by row then col
             sorted_neighbors = sorted(neighbors, key=lambda x: (x[0], x[1]))
             neighbor_data = np.array(list(map(lambda x: x[2], sorted_neighbors)))
-            neighbor_ids = neighbor_data[:,-1]
-            local_view_obs = np.zeros((network_config.max_neighbors, self.attack_values.shape[1] + 2))
+            neighbor_ids = neighbor_data[:,self.attack_values.shape[1]]
+            if not reconnaissance:
+                local_view_obs = np.full((network_config.max_neighbors, self.attack_values.shape[1] + 1), -1)
+            elif reconnaissance and not reconnaissance_bool_features:
+                local_view_obs = np.full((network_config.max_neighbors, self.attack_values.shape[1]*2 + 1), -1)
+            else:
+                local_view_obs = np.full((network_config.max_neighbors, self.attack_values.shape[1] * 2 + 2), -1)
             for n in range(network_config.max_neighbors):
                 rel_neighbor_pos = network_config.relative_neighbor_positions[n]
                 neighbor_pos = (current_row + rel_neighbor_pos[0], current_col + rel_neighbor_pos[1])
@@ -420,7 +436,7 @@ class GameState():
                     node_id = neighbor_ids[i]
                     node_pos = network_config.get_node_pos(node_id)
                     if node_pos == neighbor_pos and node_pos[0] <= current_row:
-                        local_view_obs[n] = np.append(neighbor_data[i], 1)
+                        local_view_obs[n] = neighbor_data[i]
             attack_observation = np.array(local_view_obs)
         return attack_observation
 

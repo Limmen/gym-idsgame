@@ -146,7 +146,6 @@ class PPO(BaseRLModel):
             feature_extractor_class = FlattenExtractor
         else:
             feature_extractor_class = NatureCNN
-
         self.attacker_policy = PPOPolicy(self.attacker_observation_space, self.attacker_action_space,
                                          self.lr_schedule_a, use_sde=self.use_sde, device=self.device,
                                          pg_agent_config=self.pg_agent_config,
@@ -576,7 +575,7 @@ class PPO(BaseRLModel):
         if not attacker and self.env.local_view_features():
             attacker_obs = self.env.state.get_attacker_observation(
                 self.envs[0].env.idsgame_env.idsgame_config.game_config.network_config,
-                local_view=False,
+                local_view=self.envs[0].env.idsgame_config.local_view_observations,
             reconnaissance=self.envs[0].env.idsgame_env.idsgame_config.reconnaissance_actions)
 
         # Zero mean
