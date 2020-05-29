@@ -25,6 +25,12 @@ class OpenAiPPOAgent(PolicyGradientAgent):
 
 
     def train(self) -> ExperimentResult:
+        """
+        Starts the training loop and returns the result when complete
+
+        :return: the training result
+        """
+        self.env.idsgame_config.render_config.attacker_view = self.config.render_attacker_viewq
         # Custom MLP policy
         net_arch = []
         for l in range(self.config.num_hidden_layers):

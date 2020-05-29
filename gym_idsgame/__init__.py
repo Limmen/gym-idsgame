@@ -11,7 +11,9 @@ from gym.envs.registration import register
 # [Version] 0
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_defense-v0',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV0Env',
@@ -24,7 +26,9 @@ register(
 # [Version] 0
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-minimal_defense-v0',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV0Env',
@@ -37,7 +41,9 @@ register(
 # [Version] 0
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_attack-v0',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV0Env',
@@ -50,7 +56,9 @@ register(
 # [Version] 0
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-maximal_attack-v0',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV0Env',
@@ -63,7 +71,9 @@ register(
 # [Version] 0
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-v0',
     entry_point='gym_idsgame.envs:IdsGameV0Env',
@@ -78,7 +88,9 @@ register(
 # [Version] 1
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_defense-v1',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV1Env',
@@ -91,7 +103,9 @@ register(
 # [Version] 1
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-minimal_defense-v1',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV1Env',
@@ -104,7 +118,9 @@ register(
 # [Version] 1
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_attack-v1',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV1Env',
@@ -117,7 +133,9 @@ register(
 # [Version] 1
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-maximal_attack-v1',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV1Env',
@@ -130,7 +148,9 @@ register(
 # [Version] 1
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-v1',
     entry_point='gym_idsgame.envs:IdsGameV1Env',
@@ -145,7 +165,9 @@ register(
 # [Version] 2
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_defense-v2',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV2Env',
@@ -158,7 +180,9 @@ register(
 # [Version] 2
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-minimal_defense-v2',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV2Env',
@@ -171,7 +195,9 @@ register(
 # [Version] 2
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_attack-v2',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV2Env',
@@ -184,7 +210,9 @@ register(
 # [Version] 2
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-maximal_attack-v2',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV2Env',
@@ -197,7 +225,9 @@ register(
 # [Version] 2
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-v2',
     entry_point='gym_idsgame.envs:IdsGameV2Env',
@@ -212,7 +242,9 @@ register(
 # [Version] 3
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_defense-v3',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV3Env',
@@ -225,7 +257,9 @@ register(
 # [Version] 3
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-minimal_defense-v3',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV3Env',
@@ -238,7 +272,9 @@ register(
 # [Version] 3
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_attack-v3',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV3Env',
@@ -251,7 +287,9 @@ register(
 # [Version] 3
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-maximal_attack-v3',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV3Env',
@@ -264,7 +302,9 @@ register(
 # [Version] 3
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-v3',
     entry_point='gym_idsgame.envs:IdsGameV3Env',
@@ -279,7 +319,9 @@ register(
 # [Version] 4
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_defense-v4',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV4Env',
@@ -292,7 +334,9 @@ register(
 # [Version] 4
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-minimal_defense-v4',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV4Env',
@@ -305,7 +349,9 @@ register(
 # [Version] 4
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_attack-v4',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV4Env',
@@ -318,7 +364,9 @@ register(
 # [Version] 4
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-maximal_attack-v4',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV4Env',
@@ -331,7 +379,9 @@ register(
 # [Version] 4
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-v4',
     entry_point='gym_idsgame.envs:IdsGameV4Env',
@@ -346,7 +396,9 @@ register(
 # [Version] 5
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_defense-v5',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV5Env',
@@ -360,7 +412,9 @@ register(
 # [Version] 5
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-minimal_defense-v5',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV5Env',
@@ -373,7 +427,9 @@ register(
 # [Version] 5
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_attack-v5',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV5Env',
@@ -387,7 +443,9 @@ register(
 # [Version] 5
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-maximal_attack-v5',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV5Env',
@@ -400,7 +458,9 @@ register(
 # [Version] 5
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-v5',
     entry_point='gym_idsgame.envs:IdsGameV5Env',
@@ -415,7 +475,9 @@ register(
 # [Version] 6
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_defense-v6',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV6Env',
@@ -429,7 +491,9 @@ register(
 # [Version] 6
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-minimal_defense-v6',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV6Env',
@@ -442,7 +506,9 @@ register(
 # [Version] 6
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_attack-v6',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV6Env',
@@ -456,7 +522,9 @@ register(
 # [Version] 6
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-maximal_attack-v6',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV6Env',
@@ -469,7 +537,9 @@ register(
 # [Version] 5
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-v6',
     entry_point='gym_idsgame.envs:IdsGameV6Env',
@@ -484,7 +554,9 @@ register(
 # [Version] 7
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_defense-v7',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV7Env',
@@ -497,7 +569,9 @@ register(
 # [Version] 7
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-minimal_defense-v7',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV7Env',
@@ -510,7 +584,9 @@ register(
 # [Version] 7
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_attack-v7',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV7Env',
@@ -523,7 +599,9 @@ register(
 # [Version] 7
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-maximal_attack-v7',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV7Env',
@@ -536,7 +614,9 @@ register(
 # [Version] 7
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-v7',
     entry_point='gym_idsgame.envs:IdsGameV7Env',
@@ -551,7 +631,9 @@ register(
 # [Version] 8
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_defense-v8',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV8Env',
@@ -564,7 +646,9 @@ register(
 # [Version] 8
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-minimal_defense-v8',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV8Env',
@@ -577,7 +661,9 @@ register(
 # [Version] 8
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_attack-v8',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV8Env',
@@ -590,7 +676,9 @@ register(
 # [Version] 8
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-maximal_attack-v8',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV8Env',
@@ -603,7 +691,9 @@ register(
 # [Version] 8
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-v8',
     entry_point='gym_idsgame.envs:IdsGameV8Env',
@@ -618,7 +708,9 @@ register(
 # [Version] 9
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_defense-v9',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV9Env',
@@ -631,7 +723,9 @@ register(
 # [Version] 9
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-minimal_defense-v9',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV9Env',
@@ -644,7 +738,9 @@ register(
 # [Version] 9
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_attack-v9',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV9Env',
@@ -657,7 +753,9 @@ register(
 # [Version] 9
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-maximal_attack-v9',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV9Env',
@@ -670,7 +768,9 @@ register(
 # [Version] 9
 # [Observations] partially observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-v9',
     entry_point='gym_idsgame.envs:IdsGameV9Env',
@@ -686,7 +786,9 @@ register(
 # [Version] 10
 # [Observations] fully observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_defense-v10',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV10Env',
@@ -699,7 +801,9 @@ register(
 # [Version] 10
 # [Observations] fully observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-minimal_defense-v10',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV10Env',
@@ -712,7 +816,9 @@ register(
 # [Version] 10
 # [Observations] fully observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_attack-v10',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV10Env',
@@ -725,7 +831,9 @@ register(
 # [Version] 10
 # [Observations] fully observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-maximal_attack-v10',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV10Env',
@@ -738,7 +846,9 @@ register(
 # [Version] 10
 # [Observations] fully observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-v10',
     entry_point='gym_idsgame.envs:IdsGameV10Env',
@@ -753,7 +863,9 @@ register(
 # [Version] 11
 # [Observations] fully observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_defense-v11',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV11Env',
@@ -766,7 +878,9 @@ register(
 # [Version] 11
 # [Observations] fully observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-minimal_defense-v11',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV11Env',
@@ -779,7 +893,9 @@ register(
 # [Version] 11
 # [Observations] fully observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_attack-v11',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV11Env',
@@ -792,7 +908,9 @@ register(
 # [Version] 11
 # [Observations] fully observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-maximal_attack-v11',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV11Env',
@@ -805,7 +923,9 @@ register(
 # [Version] 11
 # [Observations] fully observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-v11',
     entry_point='gym_idsgame.envs:IdsGameV11Env',
@@ -821,7 +941,9 @@ register(
 # [Version] 12
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_defense-v12',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV12Env',
@@ -835,7 +957,9 @@ register(
 # [Version] 12
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-minimal_defense-v12',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV12Env',
@@ -849,7 +973,9 @@ register(
 # [Version] 12
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_attack-v12',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV12Env',
@@ -863,7 +989,9 @@ register(
 # [Version] 12
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-maximal_attack-v12',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV12Env',
@@ -877,7 +1005,9 @@ register(
 # [Version] 12
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-v12',
     entry_point='gym_idsgame.envs:IdsGameV12Env',
@@ -892,7 +1022,9 @@ register(
 # [Version] 13
 # [Observations] fully observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_defense-v13',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV13Env',
@@ -905,7 +1037,9 @@ register(
 # [Version] 13
 # [Observations] fully observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-minimal_defense-v13',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV13Env',
@@ -918,7 +1052,9 @@ register(
 # [Version] 13
 # [Observations] fully observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_attack-v13',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV13Env',
@@ -931,7 +1067,9 @@ register(
 # [Version] 13
 # [Observations] fully observed
 # [Environment] Deterministic
+# [Attacker Starting Position] Start node
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-maximal_attack-v13',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV13Env',
@@ -943,8 +1081,10 @@ register(
 # [Rewards] Dense
 # [Version] 13
 # [Observations] fully observed
+# [Attacker Starting Position] Start node
 # [Environment] Deterministic
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-v13',
     entry_point='gym_idsgame.envs:IdsGameV13Env',
@@ -959,8 +1099,10 @@ register(
 # [Version] 14
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Start node
 # [Local View] Yes
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_defense-v14',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV14Env',
@@ -973,8 +1115,10 @@ register(
 # [Version] 14
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Start node
 # [Local View] Yes
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-minimal_defense-v14',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV14Env',
@@ -987,8 +1131,10 @@ register(
 # [Version] 14
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Start node
 # [Local View] Yes
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_attack-v14',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV14Env',
@@ -1001,8 +1147,10 @@ register(
 # [Version] 14
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Start node
 # [Local View] Yes
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-maximal_attack-v14',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV14Env',
@@ -1015,8 +1163,10 @@ register(
 # [Version] 14
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Start node
 # [Local View] Yes
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-v14',
     entry_point='gym_idsgame.envs:IdsGameV14Env',
@@ -1031,8 +1181,10 @@ register(
 # [Version] 15
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Start node
 # [Local View] Yes
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_defense-v15',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV15Env',
@@ -1045,8 +1197,10 @@ register(
 # [Version] 15
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Start node
 # [Local View] Yes
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-minimal_defense-v15',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV15Env',
@@ -1059,8 +1213,10 @@ register(
 # [Version] 15
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Start node
 # [Local View] Yes
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_attack-v15',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV15Env',
@@ -1073,8 +1229,10 @@ register(
 # [Version] 15
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Start node
 # [Local View] Yes
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-maximal_attack-v15',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV15Env',
@@ -1087,8 +1245,10 @@ register(
 # [Version] 15
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Start node
 # [Local View] Yes
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-v15',
     entry_point='gym_idsgame.envs:IdsGameV15Env',
@@ -1104,8 +1264,10 @@ register(
 # [Version] 16
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Random
 # [Local View] No
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_defense-v16',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV16Env',
@@ -1118,8 +1280,10 @@ register(
 # [Version] 16
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Random
 # [Local View] No
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-minimal_defense-v16',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV16Env',
@@ -1132,8 +1296,10 @@ register(
 # [Version] 16
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Random
 # [Local View] No
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_attack-v16',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV16Env',
@@ -1146,8 +1312,10 @@ register(
 # [Version] 16
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Random
 # [Local View] No
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-maximal_attack-v16',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV16Env',
@@ -1160,8 +1328,10 @@ register(
 # [Version] 16
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Random
 # [Local View] No
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-v16',
     entry_point='gym_idsgame.envs:IdsGameV16Env',
@@ -1176,8 +1346,10 @@ register(
 # [Version] 17
 # [Observations] partially observed
 # [Environment] Random
+# [Attacker Starting Position] Random
 # [Local View] No
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_defense-v17',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV17Env',
@@ -1190,8 +1362,10 @@ register(
 # [Version] 17
 # [Observations] partially observed
 # [Environment] Random
+# [Attacker Starting Position] Random
 # [Local View] No
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-minimal_defense-v17',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV17Env',
@@ -1204,8 +1378,10 @@ register(
 # [Version] 17
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Random
 # [Local View] No
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-random_attack-v17',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV17Env',
@@ -1218,8 +1394,10 @@ register(
 # [Version] 17
 # [Observations] partially observed
 # [Environment] Random
+# [Attacker Starting Position] Random
 # [Local View] No
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-maximal_attack-v17',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV17Env',
@@ -1232,8 +1410,10 @@ register(
 # [Version] 17
 # [Observations] partially observed
 # [Environment] Random
+# [Attacker Starting Position] Random
 # [Local View] No
 # [Reconnaissance activities] disabled
+# [Reconnaissance bool features] No
 register(
     id='idsgame-v17',
     entry_point='gym_idsgame.envs:IdsGameV17Env',
@@ -1248,8 +1428,10 @@ register(
 # [Version] 18
 # [Observations] partially observed
 # [Environment] Random
+# [Attacker Starting Position] Random
 # [Local View] No
 # [Reconnaissance activities] enabled
+# [Reconnaissance bool features] Yes
 register(
     id='idsgame-random_defense-v18',
     entry_point='gym_idsgame.envs:IdsGameRandomDefenseV18Env',
@@ -1262,8 +1444,10 @@ register(
 # [Version] 18
 # [Observations] partially observed
 # [Environment] Random
+# [Attacker Starting Position] Random
 # [Local View] No
 # [Reconnaissance activities] enabled
+# [Reconnaissance bool features] Yes
 register(
     id='idsgame-minimal_defense-v18',
     entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV18Env',
@@ -1276,8 +1460,10 @@ register(
 # [Version] 18
 # [Observations] fully observed
 # [Environment] Random
+# [Attacker Starting Position] Random
 # [Local View] No
 # [Reconnaissance activities] enabled
+# [Reconnaissance bool features] Yes
 register(
     id='idsgame-random_attack-v18',
     entry_point='gym_idsgame.envs:IdsGameRandomAttackV18Env',
@@ -1290,8 +1476,10 @@ register(
 # [Version] 18
 # [Observations] partially observed
 # [Environment] Random
+# [Attacker Starting Position] Random
 # [Local View] No
 # [Reconnaissance activities] enabled
+# [Reconnaissance bool features] Yes
 register(
     id='idsgame-maximal_attack-v18',
     entry_point='gym_idsgame.envs:IdsGameMaximalAttackV18Env',
@@ -1304,8 +1492,10 @@ register(
 # [Version] 18
 # [Observations] partially observed
 # [Environment] Random
+# [Attacker Starting Position] Random
 # [Local View] No
 # [Reconnaissance activities] enabled
+# [Reconnaissance bool features] Yes
 register(
     id='idsgame-v18',
     entry_point='gym_idsgame.envs:IdsGameV18Env',

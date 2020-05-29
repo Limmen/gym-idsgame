@@ -35,7 +35,7 @@ class PolicyGradientAgentConfig:
                  lstm_network : bool = False, lstm_seq_length : int = 4, num_lstm_layers : int = 4,
                  gae_lambda : float = 0.95, cnn_feature_extractor : bool = False, features_dim : int = 44,
                  flatten_feature_planes : bool = False, cnn_type : int = 0, ent_coef : float = 0.0,
-                 vf_coef: float = 0.5
+                 vf_coef: float = 0.5, render_attacker_view : bool = False
                  ):
         """
         Initialize environment and hyperparameters
@@ -105,8 +105,9 @@ class PolicyGradientAgentConfig:
         :param features_dim: number of features in final layer of CNN before softmax
         :param flatten_feature_planes: boolean flag whether to use a flat input of all feature planes used for CNN
         :param cnn_type: type of CNN
-        :param ent_coef: entropy coefficient
-        :param vf_coef: value coefficient
+        :param ent_coef: entropy coefficient for PPO
+        :param vf_coef: value coefficient for PPO
+        :param render_attacker_view: if True, show attacker view when rendering rather than spectator view
         """
         self.gamma = gamma
         self.alpha_attacker = alpha_attacker
@@ -175,6 +176,7 @@ class PolicyGradientAgentConfig:
         self.cnn_type = cnn_type
         self.ent_coef = ent_coef
         self.vf_coef = vf_coef
+        self.render_attacker_view = render_attacker_view
 
 
     def to_str(self) -> str:
@@ -191,7 +193,8 @@ class PolicyGradientAgentConfig:
                "alternating_period:{30},normalize_features:{31},alpha_defender:{32},gpu_id:{33}," \
                "merged_ad_features:{34},optimization_iterations{35},eps_clip:{36},zero_mean_features:{37}," \
                "input_dim_defender:{38},input_dim_attacker:{39},lstm_network:{40},num_hidden_layers:{41}," \
-               "lstm_seq_length:{41},num_lstm_layers:{42},gae_lambda:{43},cnn_feature_exatractor:{44}".format(
+               "lstm_seq_length:{41},num_lstm_layers:{42},gae_lambda:{43},cnn_feature_exatractor:{44}," \
+               "features_dim:{45},flatten_feature_planes:{46},cnn_type:{47},ent_coef:{48},vf_coef:{49}".format(
             self.gamma, self.alpha_attacker, self.epsilon, self.render, self.eval_sleep, self.epsilon_decay,
             self.min_epsilon, self.eval_episodes, self.train_log_frequency, self.eval_log_frequency, self.video,
             self.video_fps, self.video_dir, self.num_episodes, self.eval_render, self.gifs, self.gif_dir,
@@ -201,7 +204,8 @@ class PolicyGradientAgentConfig:
             self.normalize_features, self.alpha_defender, self.gpu_id, self.merged_ad_features,
             self.optimization_iterations, self.eps_clip, self.zero_mean_features, self.input_dim_defender,
             self.input_dim_attacker, self.lstm_network, self.num_hidden_layers, self.lstm_seq_length,
-            self.num_lstm_layers, self.gae_lambda, self.cnn_feature_extractor)
+            self.num_lstm_layers, self.gae_lambda, self.cnn_feature_extractor, self.features_dim,
+            self.flatten_feature_planes,self.ent_coef, self.vf_coef)
 
     def to_csv(self, file_path: str) -> None:
         """
@@ -269,6 +273,11 @@ class PolicyGradientAgentConfig:
             writer.writerow(["num_lstm_layers", str(self.num_lstm_layers)])
             writer.writerow(["gae_lambda", str(self.gae_lambda)])
             writer.writerow(["cnn_feature_extractor", str(self.cnn_feature_extractor)])
+            writer.writerow(["features_dim", str(self.features_dim)])
+            writer.writerow(["flatten_feature_planes", str(self.flatten_feature_planes)])
+            writer.writerow(["cnn_type", str(self.cnn_type)])
+            writer.writerow(["ent_coef", str(self.ent_coef)])
+            writer.writerow(["vf_coef", str(self.vf_coef)])
             if self.opponent_pool and self.opponent_pool_config is not None:
                 writer.writerow(["pool_maxsize", str(self.opponent_pool_config.pool_maxsize)])
                 writer.writerow(["pool_increment_period", str(self.opponent_pool_config.pool_increment_period)])
@@ -297,7 +306,10 @@ class PolicyGradientAgentConfig:
         hparams["checkpoint_freq"] = self.checkpoint_freq
         hparams["random_seed"] = self.random_seed
         hparams["eval_epsilon"] = self.eval_epsilon
-        #hparams["input_dim_attacker"] = self.input_dim_attacker
+        if type(self.input_dim_attacker) == tuple:
+            hparams["input_dim_attacker"] = sum(list(self.input_dim_attacker))
+        else:
+            hparams["input_dim_attacker"] = self.input_dim_attacker
         hparams["output_dim_attacker"] = self.output_dim_attacker
         hparams["hidden_dim"] = self.hidden_dim
         hparams["batch_size"] = self.batch_size
@@ -321,12 +333,20 @@ class PolicyGradientAgentConfig:
         hparams["optimization_iterations"] = self.optimization_iterations
         hparams["eps_clip"] = self.eps_clip
         hparams["zero_mean_features"] = self.zero_mean_features
-        #hparams["input_dim_defender"] = self.input_dim_defender
+        if type(self.input_dim_defender) == tuple:
+            hparams["input_dim_defender"] = sum(list(self.input_dim_defender))
+        else:
+            hparams["input_dim_defender"] = self.input_dim_defender
         hparams["lstm_network"] = self.lstm_network
         hparams["lstm_seq_length"] = self.lstm_seq_length
         hparams["num_lstm_layers"] = self.num_lstm_layers
         hparams["gae_lambda"] = self.gae_lambda
         hparams["cnn_feature_extractor"] = self.cnn_feature_extractor
+        hparams["features_dim"] = self.features_dim
+        hparams["flatten_feature_planes"] = self.flatten_feature_planes
+        hparams["cnn_type"] = self.cnn_type
+        hparams["ent_coef"] = self.ent_coef
+        hparams["vf_coef"] = self.vf_coef
         if self.opponent_pool and self.opponent_pool_config is not None:
             hparams["pool_maxsize"] = self.opponent_pool_config.pool_maxsize
             hparams["pool_increment_period"] = self.opponent_pool_config.pool_increment_period

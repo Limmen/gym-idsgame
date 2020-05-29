@@ -13,7 +13,7 @@ import gym_idsgame.envs.util.idsgame_util as util
 
 class PPOBaselineAttackerBotAgent(BotAgent):
     """
-    Class implementing an attack policy that acts greedily according to a given Q-table
+    Class implementing an attack policy that acts greedily according to a given policy network
     """
 
     def __init__(self, pg_config: PolicyGradientAgentConfig, game_config: GameConfig, model_path: str = None,

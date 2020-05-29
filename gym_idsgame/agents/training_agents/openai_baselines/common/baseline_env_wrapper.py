@@ -1,3 +1,6 @@
+"""
+A wrapper environment to integrate idsgame-env with the OpenAI baselines library
+"""
 import gym
 import numpy as np
 from sklearn import preprocessing
@@ -6,6 +9,9 @@ from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import P
 
 
 class BaselineEnvWrapper(gym.Env):
+    """
+    A wrapper environment to integrate idsgame-env with the OpenAI baselines library
+    """
 
     def __init__(self, env_name: str, idsgame_config: IdsGameConfig = None, save_dir: str = None,
                  initial_state_path: str = None,
@@ -14,9 +20,6 @@ class BaselineEnvWrapper(gym.Env):
         self.idsgame_env = gym.make(env_name, idsgame_config=idsgame_config,
                                     save_dir=save_dir,
                                     initial_state_path=initial_state_path)
-        self.idsgame_env.idsgame_config.randomize_starting_position = True
-        self.idsgame_env.idsgame_config.render_config.attacker_view = True
-        self.idsgame_env.idsgame_config.reconnaissance_bool_features = True
         self.pg_agent_config = pg_agent_config
         self.attacker_action_space = self.idsgame_env.attacker_action_space
         self.defender_action_space = self.idsgame_env.defender_action_space
@@ -42,7 +45,6 @@ class BaselineEnvWrapper(gym.Env):
         }
         self.num_attack_actions = self.idsgame_env.num_attack_actions
         self.num_defense_actions = self.idsgame_env.num_defense_actions
-        # self.observation_space = self.idsgame_env.pg_agent_config
 
     def step(self, action):
         attacker_action = action[0][0]
@@ -290,7 +292,6 @@ class BaselineEnvWrapper(gym.Env):
                                     f[i] = np.append(combined_features[i], d_bool_features[i])
                                 combined_features = f
                             return np.array(combined_features)
-                            #return np.append(attacker_obs, defender_obs)
 
                         return np.append(attacker_obs, defender_obs)
                     else:
@@ -341,16 +342,10 @@ class BaselineEnvWrapper(gym.Env):
         attack_plane = attacker_obs
         if self.pg_agent_config.normalize_features:
             normalized_attack_plane = preprocessing.normalize(attack_plane)
-            # attack_plane_row_sums = attack_plane.sum(axis=1)
-            # normalized_attack_plane = attack_plane / attack_plane_row_sums[:, np.newaxis]
-            # normalized_attack_plane = np.nan_to_num(normalized_attack_plane, nan=0.0)
 
         defense_plane = defender_obs
         if self.pg_agent_config.normalize_features:
             normalized_defense_plane = preprocessing.normalize(defense_plane)
-            # defense_plane_row_sums = defense_plane.sum(axis=1)
-            # normalized_defense_plane = defense_plane / defense_plane_row_sums[:, np.newaxis]
-            # normalized_defense_plane = np.nan_to_num(normalized_defense_plane, nan=0.0)
 
         position_plane = np.zeros(attack_plane.shape)
         for idx, present in enumerate(attacker_position):
@@ -382,16 +377,7 @@ class BaselineEnvWrapper(gym.Env):
         attack_defense_difference_plane = attacker_obs - defender_obs
         if self.pg_agent_config.normalize_features:
             normalized_attack_defense_difference_plane = preprocessing.normalize(attack_defense_difference_plane)
-            # attack_defense_difference_plane_row_sums = attack_defense_difference_plane.sum(axis=1)
-            # normalized_attack_defense_difference_plane = attack_defense_difference_plane / attack_defense_difference_plane_row_sums[:, np.newaxis]
-            # normalized_attack_defense_difference_plane = np.nan_to_num(normalized_attack_defense_difference_plane, nan=0.0)
 
-        # print("attack plane:")
-        # print(attack_plane)
-        # print("defense plane:")
-        # print(defense_plane)
-        # print("position plane:")
-        # print(position_plane)
         if self.pg_agent_config.normalize_features:
             feature_frames = np.stack([normalized_attack_plane, normalized_defense_plane, position_plane, reachable_plane,
                                        normalized_row_difference_plance,
