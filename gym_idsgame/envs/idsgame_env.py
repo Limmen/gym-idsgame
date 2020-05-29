@@ -185,9 +185,10 @@ class IdsGameEnv(gym.Env, ABC):
                 if self.idsgame_config.save_attack_stats:
                     self.attack_detections.append([target_node_id, detected, self.state.defense_det[target_node_id]])
         else:
-            reward = -100*constants.GAME_CONFIG.POSITIVE_REWARD, 0
-            self.state.done = True
-            self.state.detected = True
+            print("illegal action")
+            # reward = -100*constants.GAME_CONFIG.POSITIVE_REWARD, 0
+            # self.state.done = True
+            # self.state.detected = True
 
         if self.state.done:
             if self.steps_beyond_done is None:
@@ -417,7 +418,7 @@ class IdsGameEnv(gym.Env, ABC):
                     server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
                     if node_id == server_id:
                         extra_reward = 1
-            return extra_reward + 100 * constants.GAME_CONFIG.POSITIVE_REWARD, 0
+            return extra_reward + 1 * constants.GAME_CONFIG.POSITIVE_REWARD, 0
 
     def get_detect_reward(self, target_node_id : int, attack_type : int, detection_value) -> Union[int, int]:
         """
@@ -446,7 +447,7 @@ class IdsGameEnv(gym.Env, ABC):
             # norm_factor = self.state.game_step if self.state.game_step > 0 else 1
             # reward = (blocked_attacks)/norm_factor
             #return 0*constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
-            return -100*constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
+            return -1*constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
 
     def get_successful_attack_reward(self, attack_type : int) -> Union[int, int]:
         """
@@ -476,9 +477,9 @@ class IdsGameEnv(gym.Env, ABC):
                         server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
                         if node_id == server_id:
                             extra_reward = 1
-                return extra_reward + 100*constants.GAME_CONFIG.POSITIVE_REWARD, 0
+                return extra_reward + 1*constants.GAME_CONFIG.POSITIVE_REWARD, 0
             elif attack_row > self.furthest_hack:
-                return -100*constants.GAME_CONFIG.POSITIVE_REWARD, 0
+                return -1*constants.GAME_CONFIG.POSITIVE_REWARD, 0
             return 0, 0
 
     def get_blocked_attack_reward(self, target_node_id : int, attack_type : int) -> Union[int, int]:

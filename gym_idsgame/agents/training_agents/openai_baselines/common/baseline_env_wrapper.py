@@ -119,6 +119,11 @@ class BaselineEnvWrapper(gym.Env):
         :param attack_action: the attack to verify
         :return: True if legal otherwise False
         """
+        if self.idsgame_env.local_view_features():
+            attacker_obs, _ = self.idsgame_env.get_observation()
+            attack_action = self.convert_local_attacker_action_to_global(attack_action, attacker_obs)
+            if attack_action == -1:
+                return False
         return self.idsgame_env.is_attack_legal(attack_action)
 
     def is_defense_legal(self, defense_action: int) -> bool:

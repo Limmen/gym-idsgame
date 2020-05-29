@@ -15,6 +15,7 @@ from gym_idsgame.agents.training_agents.openai_baselines.common.distributions im
 
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
+from gym_idsgame.agents.training_agents.openai_baselines.common.baseline_env_wrapper import BaselineEnvWrapper
 
 class PPOPolicy(BasePolicy):
     """
@@ -203,7 +204,7 @@ class PPOPolicy(BasePolicy):
 
     def forward(self, obs: th.Tensor, env : IdsGameEnv,
                 deterministic: bool = False, device: str = "cuda", attacker = True,
-                non_legal_actions=None) -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
+                non_legal_actions=None, wrapper_env: BaselineEnvWrapper = None) -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
         """
         Forward pass in all the networks (actor and critic)
 
@@ -214,18 +215,27 @@ class PPOPolicy(BasePolicy):
         latent_pi, latent_vf, latent_sde = self._get_latent(obs)
         # Evaluate the values for the given observations
         values = self.value_net(latent_vf)
-
+        np_obs = obs.numpy()
         # Masking
-        # if non_legal_actions is None:
-        #     if attacker:
-        #         actions = list(range(env.num_attack_actions))
-        #         legal_actions = list(filter(lambda action: env.is_attack_legal(action), actions))
-        #         non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action), actions))
-        #     else:
-        #         actions = list(range(env.num_defense_actions))
-        #         legal_actions = list(filter(lambda action: env.is_defense_legal(action), actions))
-        #         non_legal_actions = list(filter(lambda action: not env.is_defense_legal(action), actions))
-        distribution = self._get_action_dist_from_latent(latent_pi, latent_sde=latent_sde, device=device)
+        if non_legal_actions is None:
+            if attacker:
+                actions = list(range(env.num_attack_actions))
+                if wrapper_env is not None:
+                    legal_actions = list(filter(lambda action: env.is_attack_legal(
+                        wrapper_env.convert_local_attacker_action_to_global(action, np_obs)), actions))
+                else:
+                    legal_actions = list(filter(lambda action: env.is_attack_legal(action), actions))
+                if wrapper_env is not None:
+                    non_legal_actions = list(filter(lambda action: not env.is_attack_legal(
+                        wrapper_env.convert_local_attacker_action_to_global(action, np_obs)), actions))
+                else:
+                    non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action), actions))
+            else:
+                actions = list(range(env.num_defense_actions))
+                legal_actions = list(filter(lambda action: env.is_defense_legal(action), actions))
+                non_legal_actions = list(filter(lambda action: not env.is_defense_legal(action), actions))
+        distribution = self. _get_action_dist_from_latent(latent_pi, latent_sde=latent_sde, device=device,
+                                                         non_legal_actions=non_legal_actions)
         actions = distribution.get_actions(deterministic=deterministic)
         actions = th.tensor(np.array([actions]).astype(np.int32))
         actions = actions.to(self.device)
@@ -261,48 +271,30 @@ class PPOPolicy(BasePolicy):
         :return: (Distribution) Action distribution
         """
         mean_actions = self.action_net(latent_pi)
-        # print("latent_pi shape:{}".format(latent_pi.shape))
-        # # print("action net shape:{}".format(self.action_net(latent_pi).shape))
-        # if len(latent_pi.shape) == 2:
-        #     print("latent_pi1:{}".format(th.sum(latent_pi[0])))
-        #     print("latent_pi2:{}".format(th.sum(latent_pi[1])))
-        #     mean_actions = th.nn.functional.softmax(self.action_net(latent_pi), dim=1).squeeze()
-        #     print("sum 1: {}".format(th.sum(th.nn.functional.softmax(self.action_net(latent_pi), dim=1).squeeze())))
-        #     print("sum 2: {}".format(th.sum(th.nn.functional.softmax(self.action_net(latent_pi), dim=1))))
-        #     print("sum 3: {}".format(th.sum(th.nn.functional.softmax(self.action_net(latent_pi), dim=0).squeeze())))
-        #     print("sum 4: {}".format(th.sum(th.nn.functional.softmax(self.action_net(latent_pi), dim=0))))
-        # elif len(latent_pi.shape) == 1:
-        #     mean_actions = th.nn.functional.softmax(self.action_net(latent_pi), dim=0).squeeze()
-        # else:
-        #     raise AssertionError("Shape not recognized")
-        # #print("mean actions shape:{}".format(mean_actions.shape))
-        # mean_actions = mean_actions.to(device)
-        # action_probs_1 = mean_actions.clone()
-        # #print("action_probs_1 shape:{}".format(action_probs_1.shape))
-        # #print("non legal:{}".format(non_legal_actions))
-        # # if non_legal_actions is not None and len(non_legal_actions) > 0:
-        # #     if len(action_probs_1.shape) == 1:
-        # #         action_probs_1[non_legal_actions] = 0.000000000001 # Don't set to zero due to invalid distribution errors
-        # #         #action_probs_1[non_legal_actions] = 0.0
-        # #     elif len(action_probs_1.shape) == 2:
-        # #         action_probs_1[:, non_legal_actions] = 0.000000000001  # Don't set to zero due to invalid distribution errors
-        # #         #action_probs_1[:,non_legal_actions] = 0.0
-        # #     else:
-        # #         raise AssertionError("Invalid shape of action probabilties")
-        # action_probs_1 = action_probs_1.to(device)
-        # #if np.random.rand() < 0.0001:
-        # p = action_probs_1.detach().numpy()
-        # filter_indices = [4,9,14]
-        # f = p[filter_indices]
-        # sum = np.sum(f)
-        # if sum > 1:
-        #     print("reconnaissance probabilities: {}".format(np.sum(f)))
+        if len(latent_pi.shape) == 2:
+            mean_actions = th.nn.functional.softmax(self.action_net(latent_pi), dim=1).squeeze()
+        elif len(latent_pi.shape) == 1:
+            mean_actions = th.nn.functional.softmax(self.action_net(latent_pi), dim=0).squeeze()
+        else:
+            raise AssertionError("Shape not recognized")
+        mean_actions = mean_actions.to(device)
+        action_probs_1 = mean_actions.clone()
+        if non_legal_actions is not None and len(non_legal_actions) > 0:
+            if len(action_probs_1.shape) == 1:
+                #action_probs_1[non_legal_actions] = 0.000000000001 # Don't set to zero due to invalid distribution errors
+                action_probs_1[non_legal_actions] = 0.0
+            elif len(action_probs_1.shape) == 2:
+                #action_probs_1[:, non_legal_actions] = 0.000000000001  # Don't set to zero due to invalid distribution errors
+                action_probs_1[:,non_legal_actions] = 0.0
+            else:
+                raise AssertionError("Invalid shape of action probabilties")
+        action_probs_1 = action_probs_1.to(device)
 
         if isinstance(self.action_dist, DiagGaussianDistribution):
             return self.action_dist.proba_distribution(mean_actions, self.log_std)
         elif isinstance(self.action_dist, CategoricalDistribution):
             # Here mean_actions are the logits before the softmax
-            return self.action_dist.proba_distribution(action_logits=mean_actions)
+            return self.action_dist.proba_distribution(action_logits=action_probs_1)
         elif isinstance(self.action_dist, MultiCategoricalDistribution):
             # Here mean_actions are the flattened logits
             return self.action_dist.proba_distribution(action_logits=mean_actions)
@@ -315,7 +307,7 @@ class PPOPolicy(BasePolicy):
             raise ValueError('Invalid action distribution')
 
     def _predict(self, observation: th.Tensor, env : IdsGameEnv, deterministic: bool = False,
-                  device : str = "cuda", attacker = True) -> th.Tensor:
+                  device : str = "cuda", attacker = True, wrapper_env : BaselineEnvWrapper = None) -> th.Tensor:
         """
         Get the action according to the policy for a given observation.
 
@@ -326,19 +318,27 @@ class PPOPolicy(BasePolicy):
         latent_pi, _, latent_sde = self._get_latent(observation)
 
         # Masking
-        # if attacker:
-        #     actions = list(range(env.num_attack_actions))
-        #     legal_actions = list(filter(lambda action: env.is_attack_legal(action), actions))
-        #     non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action), actions))
-        # else:
-        #     actions = list(range(env.num_defense_actions))
-        #     legal_actions = list(filter(lambda action: env.is_defense_legal(action), actions))
-        #     non_legal_actions = list(filter(lambda action: not env.is_defense_legal(action), actions))
-        distribution = self._get_action_dist_from_latent(latent_pi, latent_sde, device=device)
+        if attacker:
+            actions = list(range(env.num_attack_actions))
+            if wrapper_env is not None:
+                legal_actions = list(filter(lambda action: env.is_attack_legal(wrapper_env.convert_local_attacker_action_to_global(action, observation)), actions))
+            else:
+                legal_actions = list(filter(lambda action: env.is_attack_legal(action), actions))
+            if wrapper_env is not None:
+                non_legal_actions = list(filter(lambda action: not env.is_attack_legal(wrapper_env.convert_local_attacker_action_to_global(action, observation)), actions))
+            else:
+                non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action), actions))
+        else:
+            actions = list(range(env.num_defense_actions))
+            legal_actions = list(filter(lambda action: env.is_defense_legal(action), actions))
+            non_legal_actions = list(filter(lambda action: not env.is_defense_legal(action), actions))
+        distribution = self._get_action_dist_from_latent(latent_pi, latent_sde, device=device,
+                                                         non_legal_actions=non_legal_actions)
         return distribution.get_actions(deterministic=False)
 
     def evaluate_actions(self, obs: th.Tensor,
-                         actions: th.Tensor, env : IdsGameEnv, attacker = False) -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
+                         actions: th.Tensor, env : IdsGameEnv, attacker = False,
+                         wrapper_env : BaselineEnvWrapper = None) -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
         """
         Evaluate actions according to the current policy,
         given the observations.
@@ -351,16 +351,25 @@ class PPOPolicy(BasePolicy):
         latent_pi, latent_vf, latent_sde = self._get_latent(obs)
 
         # Masking
-        # if attacker:
-        #     all_actions = list(range(env.num_attack_actions))
-        #     legal_actions = list(filter(lambda action: env.is_attack_legal(action), all_actions))
-        #     non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action), all_actions))
-        # else:
-        #     all_actions = list(range(env.num_defense_actions))
-        #     legal_actions = list(filter(lambda action: env.is_defense_legal(action), all_actions))
-        #     non_legal_actions = list(filter(lambda action: not env.is_defense_legal(action), all_actions))
+        if attacker:
+            all_actions = list(range(env.num_attack_actions))
+            if wrapper_env is not None:
+                legal_actions = list(filter(lambda action: env.is_attack_legal(
+                    wrapper_env.convert_local_attacker_action_to_global(action, obs)), actions))
+            else:
+                legal_actions = list(filter(lambda action: env.is_attack_legal(action), actions))
+            if wrapper_env is not None:
+                non_legal_actions = list(filter(lambda action: not env.is_attack_legal(
+                    wrapper_env.convert_local_attacker_action_to_global(action, obs)), actions))
+            else:
+                non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action), actions))
+        else:
+            all_actions = list(range(env.num_defense_actions))
+            legal_actions = list(filter(lambda action: env.is_defense_legal(action), all_actions))
+            non_legal_actions = list(filter(lambda action: not env.is_defense_legal(action), all_actions))
 
-        distribution = self._get_action_dist_from_latent(latent_pi, latent_sde, device=self.device)
+        distribution = self._get_action_dist_from_latent(latent_pi, latent_sde, device=self.device,
+                                                         non_legal_actions=non_legal_actions)
         log_prob = distribution.log_prob(actions)
         values = self.value_net(latent_vf)
         return values, log_prob, distribution.entropy()
