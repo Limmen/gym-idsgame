@@ -41,8 +41,14 @@ class OpenAiPPOAgent(PolicyGradientAgent):
         if self.config.cnn_feature_extractor:
             policy = "CnnPolicy"
         print("policy:{}".format(policy))
+        #learning_rate=self.config.alpha_attacker,
+        t = self.config.alpha_attacker
+        lr_decay = lambda x: t*x
+        #lr_decay = torch.optim.lr_scheduler.ExponentialLR(optimizer=self.attacker_optimizer,
+                                                                        #gamma=self.config.lr_decay_rate)
+        self.config.alpha_attacker = lr_decay
         model = PPO(policy, self.env,
-                    learning_rate=self.config.alpha_attacker,
+                    learning_rate=self.linear_schedule,
                     n_steps=self.config.batch_size,
                     n_epochs=self.config.optimization_iterations,
                     gamma=self.config.gamma,
@@ -90,6 +96,26 @@ class OpenAiPPOAgent(PolicyGradientAgent):
         self.train_result = model.train_result
         self.eval_result = model.eval_result
         return model.train_result
+
+    def linear_schedule(self, initial_value):
+        """
+        Linear learning rate schedule.
+        :param initial_value: (float or str)
+        :return: (function)
+        """
+        if isinstance(initial_value, str):
+            initial_value = float(initial_value)
+
+        def func(progress):
+            """
+            Progress will decrease from 1 (beginning) to 0
+            :param progress: (float)
+            :return: (float)
+            """
+            print("progress:{}".format(progress))
+            return progress * initial_value
+
+        return func
 
 
     def get_hidden_activation(self):

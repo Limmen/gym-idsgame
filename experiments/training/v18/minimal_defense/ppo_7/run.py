@@ -51,7 +51,7 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.000005, epsilon=1, render=False,
+    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.000008, epsilon=1, render=False,
                                                 alpha_defender=0.0001,
                                                 eval_sleep=0.9,
                                                 min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
@@ -78,7 +78,7 @@ def default_config() -> ClientConfig:
                                                 lstm_seq_length=4, num_lstm_layers=2, optimization_iterations=10,
                                                 eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95,
                                                 cnn_feature_extractor=False, features_dim=512,
-                                                flatten_feature_planes=False, cnn_type=5, vf_coef=0.5, ent_coef=0.01,
+                                                flatten_feature_planes=False, cnn_type=5, vf_coef=0.5, ent_coef=0.05,
                                                 render_attacker_view=True)
     # input_dim_attacker = (3, 3, 5),
     # output_dim_attacker = (5 * 2) * 3,

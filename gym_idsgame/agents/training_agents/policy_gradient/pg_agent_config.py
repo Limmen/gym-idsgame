@@ -218,7 +218,8 @@ class PolicyGradientAgentConfig:
             writer = csv.writer(f)
             writer.writerow(["parameter", "value"])
             writer.writerow(["gamma", str(self.gamma)])
-            writer.writerow(["alpha_attacker", str(self.alpha_attacker)])
+            # if type(self.alpha_attacker) == float:
+            #     writer.writerow(["alpha_attacker", str(self.alpha_attacker)])
             writer.writerow(["epsilon", str(self.epsilon)])
             writer.writerow(["render", str(self.render)])
             writer.writerow(["eval_sleep", str(self.eval_sleep)])

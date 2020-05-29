@@ -364,13 +364,13 @@ class BaseRLModel(ABC):
         """
         # Log the current learning rate
         if attacker:
-            logger.logkv("learning_rate", self.lr_schedule_a(self._current_progress))
+            print("learning_rate:{}".format(self.lr_schedule_a(self._current_progress)))
             if not isinstance(optimizers, list):
                 optimizers = [optimizers]
             for optimizer in optimizers:
                 update_learning_rate(optimizer, self.lr_schedule_a(self._current_progress))
         else:
-            logger.logkv("learning_rate", self.lr_schedule_d(self._current_progress))
+            print("learning rate:{}".format(self.lr_schedule_d(self._current_progress)))
             if not isinstance(optimizers, list):
                 optimizers = [optimizers]
             for optimizer in optimizers:

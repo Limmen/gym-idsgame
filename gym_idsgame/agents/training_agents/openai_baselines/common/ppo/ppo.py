@@ -154,7 +154,7 @@ class PPO(BaseRLModel):
         self.attacker_policy = self.attacker_policy.to(self.device)
 
         self.defender_policy = PPOPolicy(self.defender_observation_space, self.defender_action_space,
-                                         self.lr_schedule_a, use_sde=self.use_sde, device=self.device,
+                                         self.lr_schedule_d, use_sde=self.use_sde, device=self.device,
                                          pg_agent_config=self.pg_agent_config,
                                          features_extractor_class=feature_extractor_class,
                                          **self.policy_kwargs)
