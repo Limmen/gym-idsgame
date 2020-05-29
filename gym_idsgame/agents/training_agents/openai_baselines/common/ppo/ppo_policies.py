@@ -215,7 +215,7 @@ class PPOPolicy(BasePolicy):
         latent_pi, latent_vf, latent_sde = self._get_latent(obs)
         # Evaluate the values for the given observations
         values = self.value_net(latent_vf)
-        np_obs = obs.numpy()
+        np_obs = obs.cpu().numpy()
         # Masking
         if non_legal_actions is None:
             if attacker:

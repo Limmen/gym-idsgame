@@ -45,6 +45,7 @@ class BaselineEnvWrapper(gym.Env):
         }
         self.num_attack_actions = self.pg_agent_config.output_dim_attacker
         self.num_defense_actions = self.idsgame_env.num_defense_actions
+        self.latest_obs = False
 
     def step(self, action):
         attacker_action = action[0][0]
@@ -54,6 +55,7 @@ class BaselineEnvWrapper(gym.Env):
             attacker_action = self.convert_local_attacker_action_to_global(attacker_action, attacker_obs)
         joint_action = (attacker_action, defender_action)
         obs_prime, reward, done, info = self.idsgame_env.step(joint_action)
+        self.latest_obs = obs_prime
         attacker_reward, defender_reward = reward
         obs_prime_attacker, obs_prime_defender = obs_prime
         if self.pg_agent_config.cnn_feature_extractor:
@@ -78,6 +80,7 @@ class BaselineEnvWrapper(gym.Env):
         self.prev_episode_detected = self.idsgame_env.state.detected
         obs = self.idsgame_env.reset(update_stats=update_stats)
         obs_attacker, obs_defender = obs
+        self.latest_obs = obs
 
         if self.pg_agent_config.cnn_feature_extractor:
             attacker_state = self.grid_obs(obs_attacker, obs_defender, attacker=True)
@@ -120,8 +123,8 @@ class BaselineEnvWrapper(gym.Env):
         :return: True if legal otherwise False
         """
         if self.idsgame_env.local_view_features():
-            attacker_obs, _ = self.idsgame_env.get_observation()
-            attack_action = self.convert_local_attacker_action_to_global(attack_action, attacker_obs)
+            #attacker_obs, _ = self.idsgame_env.get_observation()
+            attack_action = self.convert_local_attacker_action_to_global(attack_action, self.latest_obs[0])
             if attack_action == -1:
                 return False
         return self.idsgame_env.is_attack_legal(attack_action)
