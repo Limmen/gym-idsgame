@@ -173,8 +173,8 @@ def get_attack_type(action: int, game_config: GameConfig) -> int:
     Utility method for getting the attack type of action-id
 
     :param action: action-id
-    :param game_config: game configuration
-    :return: action type
+  :param game_config: game configuration
+      :return: action type
     """
     if not game_config.reconnaissance_actions:
         attack_defense_type = action % game_config.num_attack_types
