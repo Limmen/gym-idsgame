@@ -71,8 +71,6 @@ class BaselineEnvWrapper(gym.Env):
                                                attacker=True)
             defender_state = self.update_state(defender_obs=obs_prime_defender, attacker_obs=obs_prime_attacker, state=[],
                                                attacker=False)
-            # print("got attacker state:{}, defender_State:{}".format(attacker_state, defender_state))
-            # print("got attacker state:{}, defender_State:{}".format(attacker_state.shape, defender_state.shape))
             return [attacker_state.flatten(), defender_state.flatten()], [attacker_reward, defender_reward], done, info
 
     def reset(self, update_stats: False):
@@ -95,8 +93,6 @@ class BaselineEnvWrapper(gym.Env):
                                                attacker=True)
             defender_state = self.update_state(defender_obs=obs_defender, attacker_obs=obs_attacker, state=[],
                                                attacker=False)
-            # print("got attacker state:{}, defender_State:{}".format(attacker_state, defender_state))
-            # print("got attacker state:{}, defender_State:{}".format(attacker_state.shape, defender_state.shape))
             return [attacker_state.flatten(), defender_state.flatten()]
 
     def render(self, mode='human'):
@@ -289,7 +285,6 @@ class BaselineEnvWrapper(gym.Env):
                         features.append(t)
                 else:
                     node_ids = attacker_obs[:, -1]
-                    #node_reachable = attacker_obs[:, -1]
                     if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
                         det_values = neighbor_defense_attributes[:, -1]
                     if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
@@ -337,7 +332,16 @@ class BaselineEnvWrapper(gym.Env):
 
                         return np.append(attacker_obs, defender_obs)
                     else:
-                        return np.append(attacker_obs, neighbor_defense_attributes)
+                        if self.idsgame_env.idsgame_config.reconnaissance_bool_features:
+                            f = np.zeros((attacker_obs.shape[0], attacker_obs.shape[1] + neighbor_defense_attributes.shape[1] + d_bool_features.shape[1]))
+                            for i in range(f.shape[0]):
+                                f[i] = np.append(np.append(attacker_obs[i], neighbor_defense_attributes[i]), d_bool_features[i])
+                        else:
+                            f = np.zeros((attacker_obs.shape[0],
+                                          attacker_obs.shape[1] + neighbor_defense_attributes.shape[1]))
+                            for i in range(f.shape[0]):
+                                f[i] = np.append(attacker_obs[i], neighbor_defense_attributes[i])
+                        return f
                 if len(state) == 0:
                     if not self.idsgame_env.local_view_features() or not attacker:
                         temp = np.append(attacker_obs, defender_obs)

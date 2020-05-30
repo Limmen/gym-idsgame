@@ -212,7 +212,7 @@ class PPOPolicy(BasePolicy):
         :param deterministic: (bool) Whether to sample or use deterministic actions
         :return: (Tuple[th.Tensor, th.Tensor, th.Tensor]) action, value and log probability of the action
         """
-        latent_pi, latent_vf, latent_sde = self._get_latent(obs)
+        latent_pi, latent_vf, latent_sde = self._get_latent(obs.to(device))
         # Evaluate the values for the given observations
         values = self.value_net(latent_vf)
         np_obs = obs.cpu().numpy()
@@ -270,7 +270,6 @@ class PPOPolicy(BasePolicy):
         :param latent_sde: (Optional[th.Tensor]) Latent code for the gSDE exploration function
         :return: (Distribution) Action distribution
         """
-        mean_actions = self.action_net(latent_pi)
         if len(latent_pi.shape) == 2:
             mean_actions = th.nn.functional.softmax(self.action_net(latent_pi), dim=1).squeeze()
         elif len(latent_pi.shape) == 1:
