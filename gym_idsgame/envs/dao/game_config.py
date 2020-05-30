@@ -14,7 +14,8 @@ class GameConfig():
                  num_servers_per_layer: int = 2, num_attack_types: int = 10, max_value: int = 9,
                  initial_state: GameState = None, manual_defender: bool = False, initial_state_path :str = None,
                  dense_rewards = False, min_random_a_val :int = 0, min_random_d_val :int = 0,
-                 min_random_det_val :int = 0, dense_rewards_v2 = False, reconnaissance_actions : bool = False):
+                 min_random_det_val :int = 0, dense_rewards_v2 = False, reconnaissance_actions : bool = False,
+                 max_random_v_val : int = 1):
         """
         Class constructor, initializes the DTO
 
@@ -34,6 +35,7 @@ class GameConfig():
         :param min_random_det_val: minimum detection value when randomizing the state
         :param reconnaissance_actions: a boolean flag that indicates whether reconnaissance activities are enabled for
                                        the attacker
+        :param max_random_v_val: maximum random vulnerability value when usign randomized environment
         """
         self.reconnaissance_actions = reconnaissance_actions
         self.manual_attacker = manual_attacker
@@ -59,6 +61,7 @@ class GameConfig():
         self.det_val = 2
         self.dense_rewards_v2 = dense_rewards_v2
         self.vulnerabilitiy_val = 0
+        self.max_random_v_val = max_random_v_val
         self.num_vulnerabilities_per_layer = None
         if network_config is None:
             self.network_config = NetworkConfig(self.num_rows, self.num_cols, connected_layers=False)
@@ -67,7 +70,8 @@ class GameConfig():
             self.initial_state = GameState.load(self.initial_state)
         if self.initial_state is None and self.initial_state_path is None:
             self.initial_state = GameState(min_random_a_val=min_random_a_val, min_random_det_val=min_random_det_val,
-                                           min_random_d_val=min_random_d_val, max_value=self.max_value)
+                                           min_random_d_val=min_random_d_val, max_value=self.max_value,
+                                           max_random_v_val=self.max_random_v_val)
             self.initial_state.default_state(self.network_config.node_list, self.network_config.start_pos,
                                              self.num_attack_types, network_config=self.network_config)
         self.dense_rewards = dense_rewards

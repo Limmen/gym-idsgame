@@ -23,7 +23,7 @@ class GameState():
                  done: bool = False, detected: bool = False, attack_type: int = 0, num_hacks: int = 0,
                  hacked: bool = False, min_random_a_val :int = 0, min_random_d_val :int = 0,
                  min_random_det_val :int = 0,
-                 max_value : int = 9, reconnaissance_state : np.ndarray = None):
+                 max_value : int = 9, reconnaissance_state : np.ndarray = None, max_random_v_val = 2):
         """
         Constructor, initializes the DTO
 
@@ -47,6 +47,7 @@ class GameState():
         :param min_random_det_val: minimum detection value when randomizing the state
         :param max_value: the maximum value of attack/defense attributes
         :param reconnaissance_state: the state of the reconnaissance activities by the attacker
+        :param max_random_v_val
         """
         self.attack_values = attack_values
         self.defense_values = defense_values
@@ -75,6 +76,7 @@ class GameState():
         self.action_descriptors = ["Injection", "Authentication", "CrossSite", "References", "Misssconfiguration",
                                    "Exposure", "Access", "Forgery", "Vulnerabilities", "Redirects"]
         self.reconnaissance_actions = []
+        self.max_random_v_val = max_random_v_val
 
     def default_state(self, node_list: List[int], attacker_pos: Union[int, int], num_attack_types: int,
                       network_config: NetworkConfig, randomize_state : bool = False) -> None:
@@ -106,7 +108,7 @@ class GameState():
 
 
     def set_state(self, node_list : List, num_attack_types : int, defense_val :int = 2, attack_val :int = 0,
-                  num_vulnerabilities_per_node : int = 1, det_val : int = 2, vulnerability_val : int = 0,
+                  num_vulnerabilities_per_node : int = 1, det_val : int = 2, vulnerability_val: int = 0,
                   num_vulnerabilities_per_layer : int = 1,
                   network_config : NetworkConfig = None, randomize_state : bool = False):
         """
@@ -133,6 +135,7 @@ class GameState():
         d_val = defense_val
         a_val = attack_val
         de_val = det_val
+        v_val = vulnerability_val
 
         vulnerabilities_per_layer = np.zeros((network_config.num_rows, network_config.num_cols))
         for row in range(1, network_config.num_rows-1):
@@ -157,19 +160,21 @@ class GameState():
                                     np.random.choice(list(range(self.min_random_a_val, attack_val + 1))))
                         de_val = max(self.min_random_det_val,
                                      np.random.choice(list(range(self.min_random_det_val, det_val + 1))))
+                        v_val = max(vulnerability_val,
+                                     np.random.choice(list(range(vulnerability_val, self.max_random_v_val + 1))))
                     d_vals.append(d_val)
                     a_vals.append(a_val)
                 defense_values[node_id] = d_vals
                 det_values[node_id] = de_val
                 attack_values[node_id] = a_vals
                 for vuln_id in vulnerabilities:
-                    defense_values[node_id][vuln_id] = vulnerability_val  # vulnerability (lower defense)
+                    defense_values[node_id][vuln_id] = v_val  # vulnerability (lower defense)
 
-        if randomize_state:
-            for node_id in range(len(reconnaissance_state)):
-                if np.random.rand() < 0.5:
-                    reconnaissance_state[node_id] = defense_values[node_id]
-                    self.reconnaissance_actions.append(node_id)
+        # if randomize_state:
+        #     for node_id in range(len(reconnaissance_state)):
+        #         if np.random.rand() < 0.5:
+        #             reconnaissance_state[node_id] = defense_values[node_id]
+        #             self.reconnaissance_actions.append(node_id)
                 # for attack_id in range(reconnaissance_state.shape[1]):
                 #     if np.random.rand() < 0.2:
         self.attack_values = attack_values.astype(np.int32)
@@ -236,7 +241,8 @@ class GameState():
         :return: a copy of the current state
         """
         new_state = GameState(min_random_a_val=self.min_random_a_val, min_random_d_val=self.min_random_d_val,
-                              min_random_det_val=self.min_random_det_val, max_value=self.max_value)
+                              min_random_det_val=self.min_random_det_val, max_value=self.max_value,
+                              max_random_v_val=self.max_random_v_val)
         new_state.attack_values = np.copy(self.attack_values)
         new_state.defense_values = np.copy(self.defense_values)
         new_state.defense_det = np.copy(self.defense_det)

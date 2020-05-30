@@ -90,6 +90,7 @@ class IdsGameEnv(gym.Env, ABC):
         self.total_attacks = []
         self.defenses = []
         self.attacks = []
+        self.num_unsuccessful_attacks = 0
 
     # -------- API ------------
     def step(self, action: int) -> Union[np.ndarray, int, bool, dict]:
@@ -171,8 +172,10 @@ class IdsGameEnv(gym.Env, ABC):
                         self.state.hacked = True
                         reward = self.get_hack_reward()
                     else:
-                        reward = self.get_successful_attack_reward(attack_type)
+                        pass
+                        #reward = self.get_successful_attack_reward(attack_type)
             else:
+                self.num_unsuccessful_attacks += 1
                 self.past_positions.append(self.state.attacker_pos)
                 detected = self.state.simulate_detection(target_node_id, reconnaissance=reconnaissance)
                 if detected:
@@ -245,6 +248,7 @@ class IdsGameEnv(gym.Env, ABC):
         self.past_positions.append(self.state.attacker_pos)
         self.defenses = []
         self.attacks = []
+        self.num_unsuccessful_attacks = 0
         return observation
 
     def restart(self) -> np.ndarray:
@@ -411,14 +415,16 @@ class IdsGameEnv(gym.Env, ABC):
             # norm_factor = self.state.game_step if self.state.game_step > 0 else 1
             # reward = -((unblocked_attacks)/norm_factor)
             # #print("reward:{}".format(reward))
-            extra_reward = 0
-            if self.idsgame_config.extra_reconnaisasnce_reward:
-                for rec_act in self.past_reconnaissance_activities:
-                    node_id, rec_type = rec_act
-                    server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
-                    if node_id == server_id:
-                        extra_reward = 1
-            return extra_reward + 1 * constants.GAME_CONFIG.POSITIVE_REWARD, 0
+
+            # extra_reward = 0
+            # if self.idsgame_config.extra_reconnaisasnce_reward:
+            #     for rec_act in self.past_reconnaissance_activities:
+            #         node_id, rec_type = rec_act
+            #         server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
+            #         if node_id == server_id:
+            #             extra_reward = 1
+            # return extra_reward + 1 * constants.GAME_CONFIG.POSITIVE_REWARD, 0
+            return 100/math.pow(max(1, self.num_unsuccessful_attacks),2), 0
 
     def get_detect_reward(self, target_node_id : int, attack_type : int, detection_value) -> Union[int, int]:
         """
@@ -447,7 +453,8 @@ class IdsGameEnv(gym.Env, ABC):
             # norm_factor = self.state.game_step if self.state.game_step > 0 else 1
             # reward = (blocked_attacks)/norm_factor
             #return 0*constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
-            return -1*constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
+            #return -1*constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
+            return math.pow(self.num_unsuccessful_attacks,2), 0
 
     def get_successful_attack_reward(self, attack_type : int) -> Union[int, int]:
         """
@@ -3876,7 +3883,8 @@ class IdsGameMinimalDefenseV18Env(AttackerEnv):
         """
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=7,
-                                     min_random_a_val=0, min_random_d_val=7, min_random_det_val=1)
+                                     min_random_a_val=0, min_random_d_val=7, min_random_det_val=1,
+                                     max_random_v_val=1)
             game_config.set_initial_state(defense_val=7, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
                                           vulnerability_val=1, num_vulnerabilities_per_layer=1)
             game_config.dense_rewards_v2 = True

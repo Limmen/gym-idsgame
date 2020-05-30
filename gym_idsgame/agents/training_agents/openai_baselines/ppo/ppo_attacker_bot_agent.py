@@ -72,7 +72,9 @@ class PPOBaselineAttackerBotAgent(BotAgent):
             traceback.print_exc()
 
         if self.idsgame_env.local_view_features():
-            return self.convert_local_attacker_action_to_global(attacker_actions.item(), attacker_obs)
+            attack = self.convert_local_attacker_action_to_global(attacker_actions.item(), attacker_obs)
+            print("predicted attacK.{}, legal:{}".format(attack, self.idsgame_env.is_attack_legal(attack)))
+            return attack
         else:
             return attacker_actions.item()
 
