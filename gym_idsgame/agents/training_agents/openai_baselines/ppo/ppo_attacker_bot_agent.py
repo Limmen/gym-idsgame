@@ -280,7 +280,19 @@ class PPOBaselineAttackerBotAgent(BotAgent):
 
                         return np.append(attacker_obs, defender_obs)
                     else:
-                        return np.append(attacker_obs, neighbor_defense_attributes)
+                        if self.idsgame_env.idsgame_config.reconnaissance_bool_features:
+                            f = np.zeros((attacker_obs.shape[0],
+                                          attacker_obs.shape[1] + neighbor_defense_attributes.shape[1] +
+                                          d_bool_features.shape[1]))
+                            for i in range(f.shape[0]):
+                                f[i] = np.append(np.append(attacker_obs[i], neighbor_defense_attributes[i]),
+                                                 d_bool_features[i])
+                        else:
+                            f = np.zeros((attacker_obs.shape[0],
+                                          attacker_obs.shape[1] + neighbor_defense_attributes.shape[1]))
+                            for i in range(f.shape[0]):
+                                f[i] = np.append(attacker_obs[i], neighbor_defense_attributes[i])
+                        return f
                 if len(state) == 0:
                     if not self.idsgame_env.local_view_features() or not attacker:
                         temp = np.append(attacker_obs, defender_obs)
