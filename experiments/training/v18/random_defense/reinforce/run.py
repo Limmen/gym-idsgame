@@ -70,7 +70,7 @@ def default_config() -> ClientConfig:
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
                                                 state_length=1, normalize_features=False, merged_ad_features=False,
                                                 zero_mean_features=False, gpu_id=0)
-    env_name = "idsgame-random_defense-v17"
+    env_name = "idsgame-random_defense-v18"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.REINFORCE_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),

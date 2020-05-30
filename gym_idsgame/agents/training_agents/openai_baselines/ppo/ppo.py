@@ -3,6 +3,7 @@ An agent for the IDSGameEnv that uses the PPO Policy Gradient algorithm from Ope
 """
 import time
 import torch
+import math
 from gym_idsgame.envs.rendering.video.idsgame_monitor import IdsGameMonitor
 from gym_idsgame.agents.training_agents.openai_baselines.common.baseline_env_wrapper import BaselineEnvWrapper
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
@@ -41,12 +42,12 @@ class OpenAiPPOAgent(PolicyGradientAgent):
         if self.config.cnn_feature_extractor:
             policy = "CnnPolicy"
         print("policy:{}".format(policy))
-        #learning_rate=self.config.alpha_attacker,
-        t = self.config.alpha_attacker
-        lr_decay = lambda x: t*x
-        #lr_decay = torch.optim.lr_scheduler.ExponentialLR(optimizer=self.attacker_optimizer,
-                                                                        #gamma=self.config.lr_decay_rate)
-        self.config.alpha_attacker = lr_decay
+
+        if self.config.lr_progress_decay:
+            temp = self.config.alpha_attacker
+            lr_decay_func = lambda x: temp*math.pow(x, self.config.lr_progress_power_decay)
+            self.config.alpha_attacker = lr_decay_func
+
         model = PPO(policy, self.env,
                     learning_rate=self.linear_schedule,
                     n_steps=self.config.batch_size,

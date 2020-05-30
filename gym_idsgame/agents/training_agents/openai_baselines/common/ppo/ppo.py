@@ -499,7 +499,8 @@ class PPO(BaseRLModel):
                                  defender_episode_rewards=episode_defender_rewards, episode_steps=episode_steps,
                                  episode_avg_attacker_loss=episode_avg_attacker_loss,
                                  episode_avg_defender_loss=episode_avg_defender_loss,
-                                 eval=False, update_stats=True, lr_attacker=attacker_lr, lr_defender=defender_lr,
+                                 eval=False, update_stats=True, lr_attacker=self.lr_schedule_a(self._current_progress),
+                                 lr_defender=self.lr_schedule_d(self._current_progress),
                                  total_num_episodes=self.num_train_games_total)
                 episode_attacker_rewards = []
                 episode_defender_rewards = []

@@ -378,8 +378,7 @@ class GameState():
                     if not reconnaissance:
                         neighbor_data = np.append(self.attack_values[node_id], node_id)
                     elif reconnaissance and not reconnaissance_bool_features:
-                        neighbor_data = np.append(np.append(self.attack_values[node_id], self.reconnaissance_state[node_id]),
-                                                  node_id)
+                        neighbor_data = np.append(np.append(self.attack_values[node_id], node_id), self.reconnaissance_state[node_id]),
                     else:
                         reconaissance_bool = [0]
                         if node_id in self.reconnaissance_actions:

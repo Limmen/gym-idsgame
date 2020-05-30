@@ -932,6 +932,7 @@ class PPOAgent(PolicyGradientAgent):
         self.config.logger.info("Starting Evaluation")
         time_str = str(time.time())
 
+        print("reset eval hacks: {}".format(self.num_eval_hacks))
         self.num_eval_games = 0
         self.num_eval_hacks = 0
 

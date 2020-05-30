@@ -74,7 +74,7 @@ def default_config() -> ClientConfig:
                                                 zero_mean_features=False, gpu_id=0, lstm_network=False,
                                                 lstm_seq_length=4, num_lstm_layers=2
                                                 )
-    env_name = "idsgame-maximal_attack-v17"
+    env_name = "idsgame-maximal_attack-v18"
     client_config = ClientConfig(env_name=env_name, defender_type=AgentType.REINFORCE_AGENT.value,
                                  mode=RunnerMode.TRAIN_DEFENDER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),

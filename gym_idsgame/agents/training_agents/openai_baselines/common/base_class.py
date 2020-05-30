@@ -231,14 +231,14 @@ class BaseRLModel(ABC):
             else self.eval_defender_cumulative_reward
         if eval:
             log_str = "[Eval] iter:{},avg_a_R:{:.2f},avg_d_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
-                      "acc_D_R:{:.2f},lr_a:{:.2E},lr_d:{:.2E},c_h:{:.2f}".format(
+                      "acc_D_R:{:.2f},lr_a:{:.4E},lr_d:{:.4E},c_h:{:.2f}".format(
                 iteration, avg_attacker_episode_rewards, avg_defender_episode_rewards, avg_episode_steps,
                 hack_probability,
                 attacker_cumulative_reward, defender_cumulative_reward, lr_attacker, lr_defender,
                 hack_probability_total)
         else:
             log_str = "[Train] iter: {:.2f} epsilon:{:.2f},avg_a_R:{:.2f},avg_d_R:{:.2f},avg_t:{:.2f},avg_h:{:.2f},acc_A_R:{:.2f}," \
-                      "acc_D_R:{:.2f},A_loss:{:.6f},D_loss:{:.6f},lr_a:{:.2E},lr_d:{:.2E},c_h:{:.2f},Tr_A:{},Tr_D:{}," \
+                      "acc_D_R:{:.2f},A_loss:{:.6f},D_loss:{:.6f},lr_a:{:.4E},lr_d:{:.4E},c_h:{:.2f},Tr_A:{},Tr_D:{}," \
                       "a_pool:{},d_pool:{},episode:{}".format(
                 iteration, self.pg_agent_config.epsilon, avg_attacker_episode_rewards, avg_defender_episode_rewards,
                 avg_episode_steps, hack_probability, attacker_cumulative_reward, defender_cumulative_reward,
@@ -364,13 +364,11 @@ class BaseRLModel(ABC):
         """
         # Log the current learning rate
         if attacker:
-            print("learning_rate:{}".format(self.lr_schedule_a(self._current_progress)))
             if not isinstance(optimizers, list):
                 optimizers = [optimizers]
             for optimizer in optimizers:
                 update_learning_rate(optimizer, self.lr_schedule_a(self._current_progress))
         else:
-            print("learning rate:{}".format(self.lr_schedule_d(self._current_progress)))
             if not isinstance(optimizers, list):
                 optimizers = [optimizers]
             for optimizer in optimizers:

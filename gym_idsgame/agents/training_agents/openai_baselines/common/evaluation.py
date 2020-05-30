@@ -104,6 +104,7 @@ def evaluate_policy(model, env, n_eval_episodes=10, deterministic=True,
         # Update eval stats
         model.num_eval_games += 1
         model.num_eval_games_total += 1
+
         if env.envs[0].idsgame_env.state.detected:
             model.eval_attacker_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
             model.eval_defender_cumulative_reward += constants.GAME_CONFIG.POSITIVE_REWARD
@@ -112,6 +113,7 @@ def evaluate_policy(model, env, n_eval_episodes=10, deterministic=True,
             model.eval_defender_cumulative_reward -= constants.GAME_CONFIG.POSITIVE_REWARD
             model.num_eval_hacks += 1
             model.num_eval_hacks_total += 1
+
 
         # Log average metrics every <self.config.eval_log_frequency> episodes
         if episode % pg_agent_config.eval_log_frequency == 0:
@@ -135,11 +137,6 @@ def evaluate_policy(model, env, n_eval_episodes=10, deterministic=True,
             env.envs[0].generate_gif(pg_agent_config.gif_dir + "episode_" + str(train_episode) + "_"
                                   + time_str + ".gif", pg_agent_config.video_fps)
 
-        # Reset for new eval episode
-        done = False
-        obs = env.reset()
-        obs_a = obs[0]
-        obs_d = obs[1]
 
     # Log average eval statistics
     if model.num_eval_hacks > 0:
@@ -147,7 +144,6 @@ def evaluate_policy(model, env, n_eval_episodes=10, deterministic=True,
     if model.num_eval_games_total > 0:
         model.eval_cumulative_hack_probability = float(model.num_eval_hacks_total) / float(
             model.num_eval_games_total)
-
     model.log_metrics(train_episode, model.eval_result, episode_attacker_rewards, episode_defender_rewards,
                      episode_steps, eval=True, update_stats=True)
 

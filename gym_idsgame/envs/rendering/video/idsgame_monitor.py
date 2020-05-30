@@ -23,6 +23,7 @@ class IdsGameMonitor(Wrapper):
         self.enabled = False
         self.episode_id = 0
         self._monitor_id = None
+        self.openai_baseline_reset = True
         self.env_semantics_autoreset = env.metadata.get('semantics.autoreset')
         self._start(directory, video_callable, force, resume,
                             write_upon_reset, uid, mode)
@@ -40,12 +41,12 @@ class IdsGameMonitor(Wrapper):
         return observation, reward, done, info
 
     def reset(self, **kwargs):
-        if self.openai_baseline and len(self.episode_frames) > 0:
+        if (self.openai_baseline and len(self.episode_frames) > 0) or (self.openai_baseline and not self.openai_baseline_reset):
             return
         self._before_reset()
         observation = self.env.reset(**kwargs)
         self._after_reset(observation)
-
+        self.openai_baseline_reset = False
         return observation
 
     def set_monitor_mode(self, mode):
@@ -189,8 +190,9 @@ class IdsGameMonitor(Wrapper):
         if (self.episode_frames is not None and len(self.episode_frames) > 0
                 and (self.episode_id-1) % (self.video_frequency) == 0):
             imageio.mimsave(path, self.episode_frames, fps=fps)
-            if self.openai_baseline:
-                self.episode_frames = []
+        if self.openai_baseline:
+            self.episode_frames = []
+            self.openai_baseline_reset = True
 
     def _before_reset(self):
         if not self.enabled: return

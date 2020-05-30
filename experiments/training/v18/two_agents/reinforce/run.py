@@ -73,7 +73,7 @@ def default_config() -> ClientConfig:
                                                 normalize_features=False, merged_ad_features=False,
                                                 zero_mean_features=False, gpu_id=0
                                                 )
-    env_name = "idsgame-v17"
+    env_name = "idsgame-v18"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.REINFORCE_AGENT.value,
                                  defender_type=AgentType.REINFORCE_AGENT.value,
                                  mode=RunnerMode.TRAIN_DEFENDER_AND_ATTACKER.value,
