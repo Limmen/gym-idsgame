@@ -172,8 +172,7 @@ class IdsGameEnv(gym.Env, ABC):
                         self.state.hacked = True
                         reward = self.get_hack_reward()
                     else:
-                        pass
-                        #reward = self.get_successful_attack_reward(attack_type)
+                        reward = self.get_successful_attack_reward(attack_type)
             else:
                 self.num_unsuccessful_attacks += 1
                 self.past_positions.append(self.state.attacker_pos)
@@ -454,7 +453,7 @@ class IdsGameEnv(gym.Env, ABC):
             # reward = (blocked_attacks)/norm_factor
             #return 0*constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
             #return -1*constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
-            return math.pow(self.num_unsuccessful_attacks,2), 0
+            return -math.pow(self.num_unsuccessful_attacks,2), 0
 
     def get_successful_attack_reward(self, attack_type : int) -> Union[int, int]:
         """
@@ -469,9 +468,11 @@ class IdsGameEnv(gym.Env, ABC):
             attack_row, attack_col = self.state.attacker_pos
             if attack_row < self.furthest_hack:
                 self.furthest_hack = attack_row
-                return constants.GAME_CONFIG.POSITIVE_REWARD, -constants.GAME_CONFIG.POSITIVE_REWARD
+                return 10/math.pow(max(1, self.num_unsuccessful_attacks),2), 0
+                #return constants.GAME_CONFIG.POSITIVE_REWARD, -constants.GAME_CONFIG.POSITIVE_REWARD
             elif attack_row > self.furthest_hack:
-                return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
+                return -math.pow(self.num_unsuccessful_attacks,2)
+                #return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
             return 0,0
         else:
             attack_row, attack_col = self.state.attacker_pos

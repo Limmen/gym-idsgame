@@ -170,11 +170,11 @@ class GameState():
                 for vuln_id in vulnerabilities:
                     defense_values[node_id][vuln_id] = v_val  # vulnerability (lower defense)
 
-        # if randomize_state:
-        #     for node_id in range(len(reconnaissance_state)):
-        #         if np.random.rand() < 0.5:
-        #             reconnaissance_state[node_id] = defense_values[node_id]
-        #             self.reconnaissance_actions.append(node_id)
+        if randomize_state:
+            for node_id in range(len(reconnaissance_state)):
+                if np.random.rand() < 0.25:
+                    reconnaissance_state[node_id] = defense_values[node_id]
+                    self.reconnaissance_actions.append(node_id)
                 # for attack_id in range(reconnaissance_state.shape[1]):
                 #     if np.random.rand() < 0.2:
         self.attack_values = attack_values.astype(np.int32)
