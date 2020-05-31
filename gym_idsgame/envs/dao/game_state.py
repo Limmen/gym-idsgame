@@ -505,9 +505,21 @@ class GameState():
         return defense_observation
 
     def randomize_attacker_position(self, network_config : NetworkConfig):
-        rnd_row = np.random.choice(list(range(1, network_config.num_rows)))
-        rnd_col = np.random.choice(list(range(0, network_config.num_cols)))
-        self.attacker_pos = (rnd_row, rnd_col)
+        temp_rows = list(range(1, network_config.num_rows))
+        temp_cols = list(range(0, network_config.num_cols))
+        positions = []
+        for r in temp_rows:
+            for c in temp_cols:
+                node_id = network_config.get_node_id((r, c))
+                if network_config.node_list[node_id] == NodeType.SERVER.value \
+                        or network_config.node_list[node_id] == NodeType.START.value:
+                    positions.append((r, c))
+        rnd_idx = np.random.choice(list(range(len(positions))))
+        rnd_pos = positions[rnd_idx]
+        id = network_config.get_node_id(rnd_pos)
+        if network_config.node_list[id] == NodeType.START.value:
+            rnd_pos = network_config.start_pos
+        self.attacker_pos = rnd_pos
 
     def restart(self) -> None:
         """
