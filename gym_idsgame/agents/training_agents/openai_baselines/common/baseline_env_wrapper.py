@@ -76,9 +76,9 @@ class BaselineEnvWrapper(gym.Env):
             self.defender_state = defender_state
             return [attacker_state, defender_state], [attacker_reward, defender_reward], done, info
         else:
-            attacker_state = self.update_state(attacker_obs=obs_prime_attacker, defender_obs=obs_prime_defender, state=[],
+            attacker_state = self.update_state(attacker_obs=obs_prime_attacker, defender_obs=obs_prime_defender, state=self.attacker_state,
                                                attacker=True)
-            defender_state = self.update_state(defender_obs=obs_prime_defender, attacker_obs=obs_prime_attacker, state=[],
+            defender_state = self.update_state(defender_obs=obs_prime_defender, attacker_obs=obs_prime_attacker, state=self.defender_state,
                                                attacker=False)
             self.attacker_state = attacker_state
             self.defender_state = defender_state
@@ -378,7 +378,6 @@ class BaselineEnvWrapper(gym.Env):
                 #     temp = np.append(attacker_obs, defender_obs)
                 # else:
                 #     temp = np.append(attacker_obs, neighbor_defense_attributes)
-                print("TEST")
                 state = np.append(state[1:], np.array([f]), axis=0)
             return state
         else:

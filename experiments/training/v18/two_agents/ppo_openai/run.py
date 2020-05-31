@@ -53,7 +53,7 @@ def default_config() -> ClientConfig:
     :return: Default configuration for the experiment
     """
     opponent_pool_config = OpponentPoolConfig(pool_maxsize=100000,
-                                              pool_increment_period=100,
+                                              pool_increment_period=300,
                                               head_to_head_period=1,
                                               quality_scores=True,
                                               quality_score_eta=0.01,
@@ -72,16 +72,16 @@ def default_config() -> ClientConfig:
                                                 video_frequency=1001,
                                                 save_dir=default_output_dir() + "/results/data",
                                                 checkpoint_freq=2500000,
-                                                input_dim_attacker=((4 * 2 + 2) * 2),
+                                                input_dim_attacker=((4 * 2 + 2) * 2)*8,
                                                 output_dim_attacker=(4 + 1) * 2,
-                                                input_dim_defender=((4 + 1) * 3),
+                                                input_dim_defender=((4 + 1) * 3)*8,
                                                 output_dim_defender=5 * 3,
-                                                hidden_dim=32,
-                                                num_hidden_layers=2, batch_size=2000,
+                                                hidden_dim=128,
+                                                num_hidden_layers=4, batch_size=2000,
                                                 gpu=False, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
-                                                state_length=1, normalize_features=False, merged_ad_features=False,
+                                                state_length=8, normalize_features=False, merged_ad_features=False,
                                                 zero_mean_features=False, gpu_id=0, lstm_network=False,
                                                 lstm_seq_length=4, num_lstm_layers=2, optimization_iterations=10,
                                                 eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95,
@@ -90,7 +90,7 @@ def default_config() -> ClientConfig:
                                                 render_attacker_view=False, lr_progress_power_decay=4,
                                                 lr_progress_decay=True, use_sde=False, sde_sample_freq=4,
                                                 opponent_pool=True, opponent_pool_config=opponent_pool_config,
-                                                alternating_optimization=True, alternating_period=100)
+                                                alternating_optimization=True, alternating_period=300)
     env_name = "idsgame-v18"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.PPO_OPENAI_AGENT.value,
                                  defender_type=AgentType.PPO_OPENAI_AGENT.value,
