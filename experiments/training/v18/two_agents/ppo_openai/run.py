@@ -59,7 +59,7 @@ def default_config() -> ClientConfig:
                                               quality_score_eta=0.01,
                                               initial_quality=1000,
                                               pool_prob=0.5)
-    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.000003, epsilon=1, render=False,
+    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.000008, epsilon=1, render=False,
                                                 alpha_defender=0.000003,
                                                 eval_sleep=0.9,
                                                 min_epsilon=0.01, eval_episodes=1000, train_log_frequency=1,
@@ -71,12 +71,12 @@ def default_config() -> ClientConfig:
                                                 eval_frequency=175000, attacker=True, defender=True,
                                                 video_frequency=1001,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=2500000,
+                                                checkpoint_freq=250,
                                                 input_dim_attacker=((4 * 2 + 2) * 2)*8,
                                                 output_dim_attacker=(4 + 1) * 2,
                                                 input_dim_defender=((4 + 1) * 3)*8,
                                                 output_dim_defender=5 * 3,
-                                                hidden_dim=128,
+                                                hidden_dim=64,
                                                 num_hidden_layers=4, batch_size=2000,
                                                 gpu=False, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
@@ -90,7 +90,8 @@ def default_config() -> ClientConfig:
                                                 render_attacker_view=False, lr_progress_power_decay=4,
                                                 lr_progress_decay=True, use_sde=False, sde_sample_freq=4,
                                                 opponent_pool=True, opponent_pool_config=opponent_pool_config,
-                                                alternating_optimization=True, alternating_period=300)
+                                                alternating_optimization=True, alternating_period=300,
+                                                baselines_in_pool=True)
     env_name = "idsgame-v18"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.PPO_OPENAI_AGENT.value,
                                  defender_type=AgentType.PPO_OPENAI_AGENT.value,

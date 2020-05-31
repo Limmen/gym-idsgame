@@ -28,6 +28,10 @@ from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import P
 from gym_idsgame.agents.training_agents.openai_baselines.common.common_policies import (BasePolicy, register_policy, MlpExtractor,
                                                                                      create_sde_features_extractor, NatureCNN,
                                                                                      BaseFeaturesExtractor, FlattenExtractor)
+from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
+from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
+from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
+from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
 
 class PPO(BaseRLModel):
     """
@@ -131,6 +135,24 @@ class PPO(BaseRLModel):
             self.defender_pool = []
             self.train_attacker = True
             self.train_defender = False
+            if self.pg_agent_config.baselines_in_pool:
+                if self.pg_agent_config.opponent_pool_config.quality_scores:
+                    self.defender_pool.append([DefendMinimalValueBotAgent(self.env.envs[0].idsgame_env.idsgame_config.game_config), self.pg_agent_config.opponent_pool_config.initial_quality])
+                    self.defender_pool.append(
+                        [RandomDefenseBotAgent(self.env.envs[0].idsgame_env.idsgame_config.game_config), self.pg_agent_config.opponent_pool_config.initial_quality])
+                    self.attacker_pool.append(
+                        [AttackMaximalValueBotAgent(self.env.envs[0].idsgame_env.idsgame_config.game_config, self.env.envs[0].idsgame_env),
+                         self.pg_agent_config.opponent_pool_config.initial_quality])
+                    self.attacker_pool.append(
+                        [RandomAttackBotAgent(self.env.envs[0].idsgame_env.idsgame_config.game_config,
+                                                    self.env.envs[0].idsgame_env),
+                         self.pg_agent_config.opponent_pool_config.initial_quality])
+                else:
+                    self.defender_pool.append(DefendMinimalValueBotAgent(self.env.envs[0].idsgame_env.idsgame_config.game_config))
+                    self.defender_pool.append([RandomDefenseBotAgent(self.env.envs[0].idsgame_env.idsgame_config.game_config)])
+                    self.attacker_pool.append(RandomAttackBotAgent(self.env.envs[0].idsgame_env.idsgame_config.game_config,
+                                                    self.env.envs[0].idsgame_env))
+                #self.attacker_pool.append()
         try:
             self.tensorboard_writer = SummaryWriter(self.pg_agent_config.tensorboard_dir)
             self.tensorboard_writer.add_hparams(self.pg_agent_config.hparams_dict(), {})
@@ -270,9 +292,13 @@ class PPO(BaseRLModel):
                     attacker_actions = attacker_actions.cpu().numpy()
 
                     if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
-                        defender_actions, defender_values, defender_log_probs = self.defender_opponent.forward(
-                            obs_tensor_d, self.env.envs[0], device=self.device, attacker=False)
-                        defender_actions = defender_actions.cpu().numpy()
+                        if isinstance(self.defender_opponent, PPOPolicy):
+                            defender_actions, defender_values, defender_log_probs = self.defender_opponent.forward(
+                                obs_tensor_d, self.env.envs[0], device=self.device, attacker=False)
+                            defender_actions = defender_actions.cpu().numpy()
+                        else:
+                            action = self.defender_opponent.action(self.env.envs[0].idsgame_env.state)
+                            defender_actions = np.array([action])
 
                 if self.pg_agent_config.defender and self.train_defender:
                     defender_actions, defender_values, defender_log_probs = self.defender_policy.forward(
@@ -280,9 +306,13 @@ class PPO(BaseRLModel):
                     defender_actions = defender_actions.cpu().numpy()
 
                     if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
-                        attacker_actions, attacker_values, attacker_log_probs = self.attacker_opponent.forward(
-                            obs_tensor_a, self.env.envs[0], device=self.device, attacker=True)
-                        attacker_actions = attacker_actions.cpu().numpy()
+                        if isinstance(self.defender_opponent, PPOPolicy):
+                            attacker_actions, attacker_values, attacker_log_probs = self.attacker_opponent.forward(
+                                obs_tensor_a, self.env.envs[0], device=self.device, attacker=True)
+                            attacker_actions = attacker_actions.cpu().numpy()
+                        else:
+                            action = self.attacker_opponent.action(self.env.envs[0].idsgame_env.state)
+                            attacker_actions = np.array([action])
 
             # Rescale and perform action
             clipped_attacker_actions = attacker_actions
@@ -315,10 +345,20 @@ class PPO(BaseRLModel):
                     defender_actions = defender_actions.reshape(-1, 1)
 
             if self.pg_agent_config.attacker:
-                attacker_rollout_buffer.add(self._last_obs_a, attacker_actions, a_rewards, dones, attacker_values, attacker_log_probs)
+                if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
+                    if self.train_attacker:
+                        attacker_rollout_buffer.add(self._last_obs_a, attacker_actions, a_rewards, dones, attacker_values, attacker_log_probs)
+                else:
+                    attacker_rollout_buffer.add(self._last_obs_a, attacker_actions, a_rewards, dones, attacker_values,
+                                                attacker_log_probs)
             if self.pg_agent_config.defender:
-                defender_rollout_buffer.add(self._last_obs_d, defender_actions, d_rewards, dones, defender_values,
-                                            defender_log_probs)
+                if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
+                    if self.train_defender:
+                        defender_rollout_buffer.add(self._last_obs_d, defender_actions, d_rewards, dones, defender_values,
+                                                    defender_log_probs)
+                else:
+                    defender_rollout_buffer.add(self._last_obs_d, defender_actions, d_rewards, dones, defender_values,
+                                                defender_log_probs)
             self._last_obs_a = new_a_obs
             self._last_obs_d = new_d_obs
 
@@ -666,13 +706,13 @@ class PPO(BaseRLModel):
         if self.pg_agent_config.save_dir is not None:
             if self.pg_agent_config.attacker:
                 path = self.pg_agent_config.save_dir + "/" + time_str + "_attacker_policy_network.zip"
-                self.pg_agent_config.logger.info("Saving policy-network to: {}".format(path))
-                self.save(path, exclude=["tensorboard_writer"])
+                self.pg_agent_config.logger.info("Saving attacker policy-network to: {}".format(path))
+                self.save(path, exclude=["tensorboard_writer", "attacker_pool", "defender_pool"])
             if self.pg_agent_config.defender:
                 path = self.pg_agent_config.save_dir + "/" + time_str + "_defender_policy_network.zip"
                 self.pg_agent_config.logger.info("Saving policy-network to: {}".format(path))
-                print("Saving policy-network to: {}".format(path))
-                self.save(path)
+                self.pg_agent_config.logger.info("Saving defender policy-network to: {}".format(path))
+                self.save(path, exclude=["tensorboard_writer", "attacker_pool", "defender_pool"])
         else:
             self.pg_agent_config.logger.warning("Save path not defined, not saving policy-networks to disk")
             print("Save path not defined, not saving policy-networks to disk")

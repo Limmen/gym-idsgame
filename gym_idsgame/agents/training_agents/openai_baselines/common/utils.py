@@ -3,7 +3,7 @@ import random
 
 import numpy as np
 import torch as th
-
+from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
 
 def set_random_seed(seed: int, using_cuda: bool = False) -> None:
     """
@@ -89,7 +89,7 @@ def constant_fn(val: float) -> Callable:
     return func
 
 
-def get_device(device: Union[th.device, str] = 'auto') -> th.device:
+def get_device(device: Union[th.device, str] = 'auto', pg_agent_config : PolicyGradientAgentConfig = None) -> th.device:
     """
     Retrieve PyTorch device.
     It checks that the requested device is available first.
@@ -99,15 +99,17 @@ def get_device(device: Union[th.device, str] = 'auto') -> th.device:
     :param device: (Union[str, th.device]) One for 'auto', 'cuda', 'cpu'
     :return: (th.device)
     """
-    return th.device("cpu")
-    # # Cuda by default
-    # if device == 'auto':
-    #     device = 'cuda'
-    # # Force conversion to th.device
-    # device = th.device(device)
-    #
-    # # Cuda not available
-    # if device == th.device('cuda') and not th.cuda.is_available():
-    #     return th.device('cpu')
+    if pg_agent_config is not None:
+        device = "cpu" if not pg_agent_config.gpu else "cuda:" + str(pg_agent_config.gpu_id)
+        return th.device(device)
+    # Cuda by default
+    if device == 'auto':
+        device = 'cuda'
+    # Force conversion to th.device
+    device = th.device(device)
 
-    #return device
+    # Cuda not available
+    if device == th.device('cuda') and not th.cuda.is_available():
+        return th.device('cpu')
+
+    return device

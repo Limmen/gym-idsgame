@@ -221,7 +221,7 @@ class Runner:
             attacker = TabularQAttackerBotAgent(env.idsgame_config.game_config,
                                                 config.q_agent_config.attacker_load_path)
         elif config.attacker_type == AgentType.RANDOM.value:
-            attacker = RandomAttackBotAgent(env.idsgame_config.game_config)
+            attacker = RandomAttackBotAgent(env.idsgame_config.game_config, env)
         elif config.attacker_type == AgentType.ATTACK_MAXIMAL_VALUE.value:
             attacker = AttackMaximalValueBotAgent(env.idsgame_config.game_config, env)
         else:
@@ -275,7 +275,7 @@ class Runner:
                 attacker = TabularQAttackerBotAgent(env.idsgame_config.game_config,
                                                     config.q_agent_config.attacker_load_path)
             elif config.attacker_type == AgentType.RANDOM.value:
-                attacker = RandomAttackBotAgent(env.idsgame_config.game_config)
+                attacker = RandomAttackBotAgent(env.idsgame_config.game_config, env)
             elif config.attacker_type == AgentType.ATTACK_MAXIMAL_VALUE.value:
                 attacker = AttackMaximalValueBotAgent(env.idsgame_config.game_config, env)
             elif config.attacker_type == AgentType.REINFORCE_AGENT.value:

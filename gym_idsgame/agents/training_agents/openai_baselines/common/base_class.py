@@ -79,10 +79,10 @@ class BaseRLModel(ABC):
         # else:
         #     self.policy_class = policy
 
-        self.device = get_device(device)
+        self.pg_agent_config = pg_agent_config
+        self.device = get_device(device, pg_agent_config)
         if verbose > 0:
             print(f"Using {self.device} device")
-        self.pg_agent_config = pg_agent_config
         self.env = None  # type: Optional[GymEnv]
         # get VecNormalize object if needed
         self._vec_normalize_env = unwrap_vec_normalize(env)
@@ -496,7 +496,8 @@ class BaseRLModel(ABC):
         raise NotImplementedError()
 
     @classmethod
-    def load(cls, load_path: str, env: Optional[GymEnv] = None, policy_class = None, **kwargs):
+    def load(cls, load_path: str, env: Optional[GymEnv] = None, policy_class = None,
+             pg_agent_config : PolicyGradientAgentConfig = None, **kwargs):
         """
         Load the model from a zip-file
 
@@ -505,7 +506,7 @@ class BaseRLModel(ABC):
             (can be None if you only need prediction from a trained model) has priority over any saved environment
         :param kwargs: extra arguments to change the model when loading
         """
-        data, params, tensors = cls._load_from_file(load_path)
+        data, params, tensors = cls._load_from_file(load_path, pg_agent_config=pg_agent_config)
 
         if 'policy_kwargs' in data:
             for arg_to_remove in ['device']:
@@ -550,7 +551,7 @@ class BaseRLModel(ABC):
         return model
 
     @staticmethod
-    def _load_from_file(load_path: str, load_data: bool = True) -> (Tuple[Optional[Dict[str, Any]],
+    def _load_from_file(load_path: str, load_data: bool = True, pg_agent_config: PolicyGradientAgentConfig = None) -> (Tuple[Optional[Dict[str, Any]],
                                                                           Optional[TensorDict],
                                                                           Optional[TensorDict]]):
         """ Load model data from a .zip archive
@@ -570,7 +571,7 @@ class BaseRLModel(ABC):
                     raise ValueError(f"Error: the file {load_path} could not be found")
 
         # set device to cpu if cuda is not available
-        device = get_device()
+        device = get_device(None, pg_agent_config)
 
         # Open the zip archive and load data
         try:

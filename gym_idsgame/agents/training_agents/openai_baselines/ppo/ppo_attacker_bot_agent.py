@@ -44,7 +44,7 @@ class PPOBaselineAttackerBotAgent(BotAgent):
         if self.config.cnn_feature_extractor:
             policy = "CnnPolicy"
         # Initialize models
-        self.model = PPO.load(self.config.attacker_load_path, policy)
+        self.model = PPO.load(self.config.attacker_load_path, policy, self.config)
 
     def action(self, game_state: GameState) -> int:
         """

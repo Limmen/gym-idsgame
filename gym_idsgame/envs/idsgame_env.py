@@ -771,7 +771,7 @@ class IdsGameRandomAttackV0Env(DefenderEnv):
                                           vulnerability_val=0, num_vulnerabilities_per_layer=1)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v0"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -803,7 +803,7 @@ class IdsGameMaximalAttackV0Env(DefenderEnv):
                                           vulnerability_val=0, num_vulnerabilities_per_layer=1)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v0"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -933,7 +933,7 @@ class IdsGameRandomAttackV1Env(DefenderEnv):
                                           vulnerability_val=0, num_vulnerabilities_per_layer=1)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v1"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -965,7 +965,7 @@ class IdsGameMaximalAttackV1Env(DefenderEnv):
                                           vulnerability_val=0, num_vulnerabilities_per_layer=1)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v1"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -1094,7 +1094,7 @@ class IdsGameRandomAttackV2Env(DefenderEnv):
                                           vulnerability_val=0, num_vulnerabilities_per_layer=2)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v2"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -1126,7 +1126,7 @@ class IdsGameMaximalAttackV2Env(DefenderEnv):
                                           vulnerability_val=0, num_vulnerabilities_per_layer=2)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v2"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -1255,7 +1255,7 @@ class IdsGameRandomAttackV3Env(DefenderEnv):
                                           vulnerability_val=0, num_vulnerabilities_per_layer=3)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v3"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -1287,7 +1287,7 @@ class IdsGameMaximalAttackV3Env(DefenderEnv):
                                           vulnerability_val=0, num_vulnerabilities_per_layer=3)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v3"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -1416,7 +1416,7 @@ class IdsGameRandomAttackV4Env(DefenderEnv):
                                           vulnerability_val=0, num_vulnerabilities_per_layer=5)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v4"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -1448,7 +1448,7 @@ class IdsGameMaximalAttackV4Env(DefenderEnv):
                                           vulnerability_val=0, num_vulnerabilities_per_layer=5)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v4"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -1583,7 +1583,7 @@ class IdsGameRandomAttackV5Env(DefenderEnv):
                                                        connected_layers=True)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v5"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -1618,7 +1618,7 @@ class IdsGameMaximalAttackV5Env(DefenderEnv):
                                                        connected_layers=True)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v5"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -1758,7 +1758,7 @@ class IdsGameRandomAttackV6Env(DefenderEnv):
             game_config.dense_rewards = True
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v6"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -1794,7 +1794,7 @@ class IdsGameMaximalAttackV6Env(DefenderEnv):
             game_config.dense_rewards = True
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v6"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -1929,7 +1929,7 @@ class IdsGameRandomAttackV7Env(DefenderEnv):
             game_config.dense_rewards = True
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v7"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -1962,7 +1962,7 @@ class IdsGameMaximalAttackV7Env(DefenderEnv):
             game_config.dense_rewards = True
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v7"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -2095,7 +2095,7 @@ class IdsGameRandomAttackV8Env(DefenderEnv):
             game_config.dense_rewards = True
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v8"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -2128,7 +2128,7 @@ class IdsGameMaximalAttackV8Env(DefenderEnv):
             game_config.dense_rewards = True
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v8"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -2261,7 +2261,7 @@ class IdsGameRandomAttackV9Env(DefenderEnv):
             game_config.dense_rewards = True
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v9"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -2294,7 +2294,7 @@ class IdsGameMaximalAttackV9Env(DefenderEnv):
             game_config.dense_rewards = True
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v9"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -2430,7 +2430,7 @@ class IdsGameRandomAttackV10Env(DefenderEnv):
             game_config.network_config.fully_observed = True
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v10"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -2464,7 +2464,7 @@ class IdsGameMaximalAttackV10Env(DefenderEnv):
             game_config.network_config.fully_observed = True
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v10"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -2600,7 +2600,7 @@ class IdsGameRandomAttackV11Env(DefenderEnv):
             game_config.network_config.fully_observed = True
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v11"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -2634,7 +2634,7 @@ class IdsGameMaximalAttackV11Env(DefenderEnv):
             game_config.network_config.fully_observed = True
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v11"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -2775,7 +2775,7 @@ class IdsGameRandomAttackV12Env(DefenderEnv):
             game_config.network_config.fully_observed = True
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v12"
             idsgame_config.randomize_env = True
@@ -2811,7 +2811,7 @@ class IdsGameMaximalAttackV12Env(DefenderEnv):
             game_config.network_config.fully_observed = True
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v12"
             idsgame_config.randomize_env = True
@@ -2951,7 +2951,7 @@ class IdsGameRandomAttackV13Env(DefenderEnv):
             game_config.network_config.fully_observed = True
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v13"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -2985,7 +2985,7 @@ class IdsGameMaximalAttackV13Env(DefenderEnv):
             game_config.network_config.fully_observed = True
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v13"
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
@@ -3135,7 +3135,7 @@ class IdsGameRandomAttackV14Env(DefenderEnv):
             game_config.network_config.relative_neighbor_positions = [(-1, 0), (1, 0)]
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v14"
             idsgame_config.randomize_env = True
@@ -3174,7 +3174,7 @@ class IdsGameMaximalAttackV14Env(DefenderEnv):
             game_config.network_config.relative_neighbor_positions = [(-1, 0), (1, 0)]
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v14"
             idsgame_config.randomize_env = True
@@ -3332,7 +3332,7 @@ class IdsGameRandomAttackV15Env(DefenderEnv):
             game_config.network_config.relative_neighbor_positions = [(-1, 0), (1, 0)]
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v15"
             idsgame_config.randomize_env = True
@@ -3371,7 +3371,7 @@ class IdsGameMaximalAttackV15Env(DefenderEnv):
             game_config.network_config.relative_neighbor_positions = [(-1, 0), (1, 0)]
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v15"
             idsgame_config.randomize_env = True
@@ -3530,7 +3530,7 @@ class IdsGameRandomAttackV16Env(DefenderEnv):
             game_config.network_config.relative_neighbor_positions = [(-1, 0), (1, 0)]
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v16"
             idsgame_config.randomize_env = True
@@ -3570,7 +3570,7 @@ class IdsGameMaximalAttackV16Env(DefenderEnv):
             game_config.network_config.relative_neighbor_positions = [(-1, 0), (1, 0)]
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v16"
             idsgame_config.randomize_env = True
@@ -3728,7 +3728,7 @@ class IdsGameRandomAttackV17Env(DefenderEnv):
             game_config.network_config.fully_observed = False
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v17"
             idsgame_config.randomize_env = True
@@ -3767,7 +3767,7 @@ class IdsGameMaximalAttackV17Env(DefenderEnv):
             game_config.network_config.fully_observed = False
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v17"
             idsgame_config.randomize_env = True
@@ -3940,7 +3940,7 @@ class IdsGameRandomAttackV18Env(DefenderEnv):
             game_config.set_attack_actions(local_view=True)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = RandomAttackBotAgent(game_config)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-random_attack-v18"
             idsgame_config.randomize_env = True

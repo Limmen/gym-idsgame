@@ -190,7 +190,7 @@ class BasePolicy(nn.Module):
         self.pg_agent_config = pg_agent_config
         self.observation_space = observation_space
         self.action_space = action_space
-        self.device = get_device(device)
+        self.device = get_device(device, self.pg_agent_config)
         self.features_extractor = features_extractor
         self.normalize_images = normalize_images
         self._squash_output = squash_output
@@ -402,7 +402,7 @@ class BasePolicy(nn.Module):
         th.save({'state_dict': self.state_dict(), 'data': self._get_data()}, path)
 
     @classmethod
-    def load(cls, path: str, device: Union[th.device, str] = 'auto') -> 'BasePolicy':
+    def load(cls, path: str, device: Union[th.device, str] = 'auto', pg_agent_config: PolicyGradientAgentConfig = None) -> 'BasePolicy':
         """
         Load policy from path.
 
@@ -410,7 +410,7 @@ class BasePolicy(nn.Module):
         :param device: ( Union[th.device, str]) Device on which the policy should be loaded.
         :return: (BasePolicy)
         """
-        device = get_device(device)
+        device = get_device(device, pg_agent_config)
         saved_variables = th.load(path, map_location=device)
         # Create policy object
         model = cls(**saved_variables['data'])

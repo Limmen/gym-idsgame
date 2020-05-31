@@ -66,7 +66,7 @@ class OpenAiPPOAgent(PolicyGradientAgent):
                     use_sde=self.config.use_sde,
                     sde_sample_freq=self.config.sde_sample_freq)
         if self.config.attacker_load_path is not None:
-            PPO.load(self.config.attacker_load_path, policy)
+            PPO.load(self.config.attacker_load_path, policy, self.config)
 
 
         # Video config
