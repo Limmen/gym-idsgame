@@ -51,7 +51,7 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.000008, epsilon=1, render=False,
+    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.00008, epsilon=1, render=False,
                                                 alpha_defender=0.0001,
                                                 eval_sleep=0.9,
                                                 min_epsilon=0.01, eval_episodes=1000, train_log_frequency=1,

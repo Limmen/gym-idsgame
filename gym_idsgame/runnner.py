@@ -223,7 +223,7 @@ class Runner:
         elif config.attacker_type == AgentType.RANDOM.value:
             attacker = RandomAttackBotAgent(env.idsgame_config.game_config)
         elif config.attacker_type == AgentType.ATTACK_MAXIMAL_VALUE.value:
-            attacker = AttackMaximalValueBotAgent(env.idsgame_config.game_config)
+            attacker = AttackMaximalValueBotAgent(env.idsgame_config.game_config, env)
         else:
             raise AssertionError("Attacker type not recognized: {}".format(config.attacker_type))
         env.idsgame_config.defender_agent = defender
@@ -277,7 +277,7 @@ class Runner:
             elif config.attacker_type == AgentType.RANDOM.value:
                 attacker = RandomAttackBotAgent(env.idsgame_config.game_config)
             elif config.attacker_type == AgentType.ATTACK_MAXIMAL_VALUE.value:
-                attacker = AttackMaximalValueBotAgent(env.idsgame_config.game_config)
+                attacker = AttackMaximalValueBotAgent(env.idsgame_config.game_config, env)
             elif config.attacker_type == AgentType.REINFORCE_AGENT.value:
                 if config.pg_agent_config is None or config.pg_agent_config.attacker_load_path is None:
                     raise ValueError("To run a simulation with a pretrained REINFORCE agent, the path to the saved "

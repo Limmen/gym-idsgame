@@ -36,7 +36,8 @@ class PolicyGradientAgentConfig:
                  gae_lambda : float = 0.95, cnn_feature_extractor : bool = False, features_dim : int = 44,
                  flatten_feature_planes : bool = False, cnn_type : int = 0, ent_coef : float = 0.0,
                  vf_coef: float = 0.5, render_attacker_view : bool = False, lr_progress_decay : bool = False,
-                 lr_progress_power_decay : int = 1, use_sde : bool = False, sde_sample_freq : int = 4
+                 lr_progress_power_decay : int = 1, use_sde : bool = False, sde_sample_freq : int = 4,
+                 seq_cnn : bool = False
                  ):
         """
         Initialize environment and hyperparameters
@@ -113,6 +114,7 @@ class PolicyGradientAgentConfig:
         :param lr_progress_power_decay: the power that the progress is raised before lr decay
         :param use_sde: boolean flag whether to use state-dependent exploration
         :param sde_sample_freq: frequency of sampling in state-dependent exploration
+        :param seq_cnn: boolean flag whether to use sequence-like frame input
         """
         self.gamma = gamma
         self.alpha_attacker = alpha_attacker
@@ -186,6 +188,7 @@ class PolicyGradientAgentConfig:
         self.lr_progress_power_decay = lr_progress_power_decay
         self.use_sde = use_sde
         self.sde_sample_freq = sde_sample_freq
+        self.seq_cnn = seq_cnn
 
 
     def to_str(self) -> str:

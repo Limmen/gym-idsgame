@@ -354,13 +354,13 @@ class PPO(BaseRLModel):
                             else:
                                 self.defender_opponent = self.defender_pool[self.defender_opponent_idx]
 
-                if self.pg_agent_config.defender and self.train_defender:
-                    if np.random.rand() < self.pg_agent_config.opponent_pool_config.pool_prob:
-                        self.attacker_opponent_idx = self.sample_opponent(attacker=True)
-                        if self.pg_agent_config.opponent_pool_config.quality_scores:
-                            self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx][0]
-                        else:
-                            self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx]
+                    if self.pg_agent_config.defender and self.train_defender:
+                        if np.random.rand() < self.pg_agent_config.opponent_pool_config.pool_prob:
+                            self.attacker_opponent_idx = self.sample_opponent(attacker=True)
+                            if self.pg_agent_config.opponent_pool_config.quality_scores:
+                                self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx][0]
+                            else:
+                                self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx]
 
 
         if self.pg_agent_config.attacker:

@@ -119,6 +119,20 @@ class NatureCNN(BaseFeaturesExtractor):
                                      nn.ReLU(),
                                      nn.Flatten())
 
+        elif pg_agent_config.cnn_type == 6:
+            self.cnn = nn.Sequential(nn.Conv2d(n_input_channels, out_channels=2, kernel_size=3, stride=1, padding=0),
+                                           nn.ReLU(),
+                                           nn.Conv2d(in_channels=2, out_channels=2, kernel_size=3, stride=1,
+                                                           padding=0),
+                                           nn.ReLU(),
+                                           nn.Conv2d(in_channels=2, out_channels=2, kernel_size=2, stride=1,
+                                                           padding=0),
+                                           nn.ReLU(),
+                                           nn.Conv2d(in_channels=2, out_channels=2, kernel_size=1, stride=1,
+                                                           padding=0),
+                                           nn.ReLU(),
+                                           nn.Flatten())
+
         if not self.pg_agent_config.cnn_type == 4:
             # Compute shape by doing one forward pass
             with th.no_grad():

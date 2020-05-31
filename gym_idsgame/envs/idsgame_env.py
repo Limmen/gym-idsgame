@@ -90,6 +90,7 @@ class IdsGameEnv(gym.Env, ABC):
         self.total_attacks = []
         self.defenses = []
         self.attacks = []
+        self.hacked_nodes = []
 
     # -------- API ------------
     def step(self, action: int) -> Union[np.ndarray, int, bool, dict]:
@@ -166,6 +167,7 @@ class IdsGameEnv(gym.Env, ABC):
                 if not reconnaissance:
                     self.past_positions.append(target_pos)
                     self.state.attacker_pos = target_pos
+                    self.hacked_nodes.append(target_node_id)
                     if target_pos == self.idsgame_config.game_config.network_config.data_pos:
                         self.state.done = True
                         self.state.hacked = True
@@ -179,9 +181,9 @@ class IdsGameEnv(gym.Env, ABC):
                     self.state.done = True
                     self.state.detected = True
                     reward = self.get_detect_reward(target_node_id,  attack_type, self.state.defense_det[target_node_id])
-                else:
-                    if not reconnaissance:
-                        reward = self.get_blocked_attack_reward(target_node_id, attack_type)
+                # else:
+                #     if not reconnaissance:
+                #         reward = self.get_blocked_attack_reward(target_node_id, attack_type)
                 if self.idsgame_config.save_attack_stats:
                     self.attack_detections.append([target_node_id, detected, self.state.defense_det[target_node_id]])
         else:
@@ -245,6 +247,7 @@ class IdsGameEnv(gym.Env, ABC):
         self.past_positions.append(self.state.attacker_pos)
         self.defenses = []
         self.attacks = []
+        self.hacked_nodes = []
         return observation
 
     def restart(self) -> np.ndarray:
@@ -412,14 +415,15 @@ class IdsGameEnv(gym.Env, ABC):
             # reward = -((unblocked_attacks)/norm_factor)
             # #print("reward:{}".format(reward))
 
-            extra_reward = 0
-            if self.idsgame_config.extra_reconnaisasnce_reward:
-                for rec_act in self.past_reconnaissance_activities:
-                    node_id, rec_type = rec_act
-                    server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
-                    if node_id == server_id:
-                        extra_reward = 1
-            return extra_reward + 1 * constants.GAME_CONFIG.POSITIVE_REWARD, 0
+            # extra_reward = 0
+            # if self.idsgame_config.extra_reconnaisasnce_reward:
+            #     for rec_act in self.past_reconnaissance_activities:
+            #         node_id, rec_type = rec_act
+            #         server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
+            #         if node_id == server_id:
+            #             extra_reward = 1
+            # return extra_reward + 1 * constants.GAME_CONFIG.POSITIVE_REWARD, -constants.GAME_CONFIG.POSITIVE_REWARD
+            return len(self.hacked_nodes), -len(self.hacked_nodes)
 
     def get_detect_reward(self, target_node_id : int, attack_type : int, detection_value) -> Union[int, int]:
         """
@@ -448,7 +452,8 @@ class IdsGameEnv(gym.Env, ABC):
             # norm_factor = self.state.game_step if self.state.game_step > 0 else 1
             # reward = (blocked_attacks)/norm_factor
             #return 0*constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
-            return -1*constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
+            #return -1 * constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
+            return -constants.GAME_CONFIG.POSITIVE_REWARD,(self.idsgame_config.game_config.num_nodes - len(self.hacked_nodes))
 
     def get_successful_attack_reward(self, attack_type : int) -> Union[int, int]:
         """
@@ -478,7 +483,7 @@ class IdsGameEnv(gym.Env, ABC):
                         server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
                         if node_id == server_id:
                             extra_reward = 1
-                return extra_reward + constants.GAME_CONFIG.POSITIVE_REWARD, -constants.GAME_CONFIG.POSITIVE_REWARD
+                return extra_reward + constants.GAME_CONFIG.POSITIVE_REWARD, 0
             elif attack_row > self.furthest_hack:
                 return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
             return 0, 0
@@ -495,17 +500,18 @@ class IdsGameEnv(gym.Env, ABC):
         elif self.idsgame_config.game_config.dense_rewards and not self.idsgame_config.game_config.dense_rewards_v2:
             return 0, 0
         else:
-            upd_defenses = []
-            match = False
-            for defense in self.defenses:
-                if ((defense[0] == target_node_id and defense[1] == attack_type)) \
-                        and not match:
-                   match = True
-                else:
-                    upd_defenses.append(defense)
-            self.defenses = upd_defenses
-            if match:
-                return 0, constants.GAME_CONFIG.POSITIVE_REWARD
+            # upd_defenses = []
+            # match = False
+            # for defense in self.defenses:
+            #     if ((defense[0] == target_node_id and defense[1] == attack_type)) \
+            #             and not match:
+            #        match = True
+            #     else:
+            #         upd_defenses.append(defense)
+            # self.defenses = upd_defenses
+            # if match:
+            #     return 0, constants.GAME_CONFIG.POSITIVE_REWARD
+            # upd_defenses = []
             return 0, 0
 
     def get_observation(self) -> Union[np.ndarray, np.ndarray]:
@@ -3979,7 +3985,7 @@ class IdsGameMaximalAttackV18Env(DefenderEnv):
             game_config.set_attack_actions(local_view=True)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
-            attacker_agent = AttackMaximalValueBotAgent(game_config)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
             idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
             idsgame_config.render_config.caption = "idsgame-maximal_attack-v18"
             idsgame_config.randomize_env = True

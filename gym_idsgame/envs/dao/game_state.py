@@ -259,6 +259,7 @@ class GameState():
         new_state.attack_defense_type = self.attack_defense_type
         new_state.num_hacks = self.num_hacks
         new_state.hacked = self.hacked
+        new_state.reconnaissance_actions = self.reconnaissance_actions
         return new_state
 
     def attack(self, node_id: int, attack_type: int, max_value: int, network_config: NetworkConfig) -> None:

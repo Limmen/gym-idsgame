@@ -96,7 +96,6 @@ class PPOPolicy(BasePolicy):
         self.activation_fn = activation_fn
         self.ortho_init = ortho_init
         self.pg_agent_config = pg_agent_config
-
         self.features_extractor = features_extractor_class(self.pg_agent_config, self.observation_space,
                                                            **self.features_extractor_kwargs)
         self.features_dim = self.features_extractor.features_dim
