@@ -80,7 +80,7 @@ def default_config() -> ClientConfig:
                                                 cnn_feature_extractor=False, features_dim=512,
                                                 flatten_feature_planes=False, cnn_type=5, vf_coef=0.5, ent_coef=0.01,
                                                 render_attacker_view=True, lr_progress_power_decay=4,
-                                                lr_progress_decay=True)
+                                                lr_progress_decay=True, use_sde=False, sde_sample_freq=4)
     # input_dim_attacker = (3, 3, 5),
     # output_dim_attacker = (5 * 2) * 3,
     # input_dim_defender = (3, 3, 5),

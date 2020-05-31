@@ -62,7 +62,9 @@ class OpenAiPPOAgent(PolicyGradientAgent):
                     device=device,
                     pg_agent_config=self.config,
                     vf_coef=self.config.vf_coef,
-                    ent_coef=self.config.ent_coef)
+                    ent_coef=self.config.ent_coef,
+                    use_sde=self.config.use_sde,
+                    sde_sample_freq=self.config.sde_sample_freq)
         if self.config.attacker_load_path is not None:
             PPO.load(self.config.attacker_load_path, policy)
 

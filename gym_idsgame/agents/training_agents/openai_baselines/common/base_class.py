@@ -13,7 +13,7 @@ import numpy as np
 
 from stable_baselines3.common import logger
 from gym_idsgame.agents.training_agents.openai_baselines.common.ppo.ppo_policies import BasePolicy
-from stable_baselines3.common.utils import set_random_seed, get_schedule_fn, update_learning_rate, get_device
+from gym_idsgame.agents.training_agents.openai_baselines.common.utils import set_random_seed, get_schedule_fn, update_learning_rate, get_device
 from stable_baselines3.common.preprocessing import is_image_space
 from stable_baselines3.common.save_util import data_to_json, json_to_data, recursive_getattr, recursive_setattr
 from stable_baselines3.common.type_aliases import GymEnv, TensorDict, RolloutReturn, MaybeCallback

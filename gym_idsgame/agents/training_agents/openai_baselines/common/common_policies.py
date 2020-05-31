@@ -8,7 +8,7 @@ import torch.nn as nn
 import numpy as np
 
 from stable_baselines3.common.preprocessing import preprocess_obs, get_flattened_obs_dim, is_image_space
-from stable_baselines3.common.utils import get_device
+from gym_idsgame.agents.training_agents.openai_baselines.common.utils import get_device
 from gym_idsgame.agents.training_agents.openai_baselines.common.vec_env.vec_transpose import VecTransposeImage
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
 from gym_idsgame.agents.training_agents.models.idsgame_resnet import IdsGameResNet

@@ -5,7 +5,8 @@ import gym
 from gym import spaces
 import torch as th
 import torch.nn.functional as F
-
+import copy
+from scipy.special import softmax
 # Check if tensorboard is available for pytorch
 # TODO: finish tensorboard integration
 # try:
@@ -18,7 +19,8 @@ from torch.utils.tensorboard import SummaryWriter
 from gym_idsgame.agents.training_agents.openai_baselines.common.base_class import BaseRLModel
 from stable_baselines3.common.type_aliases import GymEnv, MaybeCallback
 from stable_baselines3.common.buffers import RolloutBuffer
-from stable_baselines3.common.utils import get_schedule_fn
+from gym_idsgame.agents.training_agents.openai_baselines.common.utils import get_schedule_fn
+
 from gym_idsgame.agents.training_agents.openai_baselines.common.vec_env.base_vec_env import VecEnv
 from gym_idsgame.agents.training_agents.openai_baselines.common.callbacks import BaseCallback
 from gym_idsgame.agents.training_agents.openai_baselines.common.ppo.ppo_policies import PPOPolicy
@@ -122,6 +124,13 @@ class PPO(BaseRLModel):
         self.tb_writer = None
         self.pg_agent_config = pg_agent_config
         self.iteration = 0
+        self.train_attacker = True
+        self.train_defender = True
+        if self.pg_agent_config.opponent_pool and self.pg_agent_config.opponent_pool_config is not None:
+            self.attacker_pool = []
+            self.defender_pool = []
+            self.train_attacker = True
+            self.train_defender = False
         try:
             self.tensorboard_writer = SummaryWriter(self.pg_agent_config.tensorboard_dir)
             self.tensorboard_writer.add_hparams(self.pg_agent_config.hparams_dict(), {})
@@ -167,6 +176,22 @@ class PPO(BaseRLModel):
                                                 'pass `None` to deactivate vf clipping')
 
             self.clip_range_vf = get_schedule_fn(self.clip_range_vf)
+
+        if self.pg_agent_config.opponent_pool and self.pg_agent_config.opponent_pool_config is not None:
+            self.add_model_to_pool(attacker=True)
+            self.add_model_to_pool(attacker=False)
+
+            self.defender_opponent_idx = self.sample_opponent(attacker=False)
+            if self.pg_agent_config.opponent_pool_config.quality_scores:
+                self.defender_opponent = self.defender_pool[self.defender_opponent_idx][0]
+            else:
+                self.defender_opponent = self.defender_pool[self.defender_opponent_idx]
+
+            self.attacker_opponent_idx = self.sample_opponent(attacker=True)
+            if self.pg_agent_config.opponent_pool_config.quality_scores:
+                self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx][0]
+            else:
+                self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx]
 
     def predict(self, observation: np.ndarray,
                 state: Optional[np.ndarray] = None,
@@ -239,14 +264,25 @@ class PPO(BaseRLModel):
                 # Convert to pytorch tensor
                 obs_tensor_a = th.as_tensor(self._last_obs_a).to(self.device)
                 obs_tensor_d = th.as_tensor(self._last_obs_d).to(self.device)
-                if self.pg_agent_config.attacker:
+                if self.pg_agent_config.attacker and self.train_attacker:
                     attacker_actions, attacker_values, attacker_log_probs = self.attacker_policy.forward(
                         obs_tensor_a, self.env.envs[0], device=self.device, attacker=True)
                     attacker_actions = attacker_actions.cpu().numpy()
-                if self.pg_agent_config.defender:
+
+                    if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
+                        defender_actions, defender_values, defender_log_probs = self.defender_opponent.forward(
+                            obs_tensor_d, self.env.envs[0], device=self.device, attacker=False)
+                        defender_actions = defender_actions.cpu().numpy()
+
+                if self.pg_agent_config.defender and self.train_defender:
                     defender_actions, defender_values, defender_log_probs = self.defender_policy.forward(
                         obs_tensor_d,  self.env.envs[0], device=self.device, attacker=False)
                     defender_actions = defender_actions.cpu().numpy()
+
+                    if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
+                        attacker_actions, attacker_values, attacker_log_probs = self.attacker_opponent.forward(
+                            obs_tensor_a, self.env.envs[0], device=self.device, attacker=True)
+                        attacker_actions = attacker_actions.cpu().numpy()
 
             # Rescale and perform action
             clipped_attacker_actions = attacker_actions
@@ -263,19 +299,13 @@ class PPO(BaseRLModel):
                 return False
 
 
-            # Record episode metrics
+            # Record step metrics
             self._update_info_buffer(infos)
             n_steps += 1
             self.num_timesteps += env.num_envs
             episode_attacker_reward += a_rewards
             episode_defender_reward += d_rewards
             episode_step +=1
-            # Record episode metrics
-            self.num_train_games += 1
-            self.num_train_games_total += 1
-            if env.envs[0].prev_episode_hacked:
-                self.num_train_hacks += 1
-                self.num_train_hacks_total += 1
 
             if isinstance(self.attacker_action_space, gym.spaces.Discrete):
                 # Reshape in case of discrete action
@@ -293,12 +323,45 @@ class PPO(BaseRLModel):
             self._last_obs_d = new_d_obs
 
             if dones:
+                # Record episode metrics
+                self.num_train_games += 1
+                self.num_train_games_total += 1
+                if env.envs[0].prev_episode_hacked:
+                    self.num_train_hacks += 1
+                    self.num_train_hacks_total += 1
                 episode_attacker_rewards.append(episode_attacker_reward)
                 episode_defender_rewards.append(episode_defender_reward)
                 episode_steps.append(episode_step)
                 episode_attacker_reward = 0
                 episode_defender_reward = 0
                 episode_step = 0
+
+                # Update opponent pool qualities
+                if self.pg_agent_config.opponent_pool and self.pg_agent_config.opponent_pool_config is not None \
+                        and self.pg_agent_config.opponent_pool_config.quality_scores:
+                    if self.train_attacker and self.defender_opponent_idx is not None and env.envs[0].prev_episode_hacked:
+                        self.update_quality_score(self.defender_opponent_idx, attacker=False)
+                    if self.train_defender and self.attacker_opponent_idx is not None and not env.envs[0].prev_episode_hacked:
+                        self.update_quality_score(self.attacker_opponent_idx, attacker=True)
+
+                # Sample new opponents
+                if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
+                    if self.pg_agent_config.attacker and self.train_attacker:
+                        if np.random.rand() < self.pg_agent_config.opponent_pool_config.pool_prob:
+                            self.defender_opponent_idx = self.sample_opponent(attacker=False)
+                            if self.pg_agent_config.opponent_pool_config.quality_scores:
+                                self.defender_opponent = self.defender_pool[self.defender_opponent_idx][0]
+                            else:
+                                self.defender_opponent = self.defender_pool[self.defender_opponent_idx]
+
+                if self.pg_agent_config.defender and self.train_defender:
+                    if np.random.rand() < self.pg_agent_config.opponent_pool_config.pool_prob:
+                        self.attacker_opponent_idx = self.sample_opponent(attacker=True)
+                        if self.pg_agent_config.opponent_pool_config.quality_scores:
+                            self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx][0]
+                        else:
+                            self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx]
+
 
         if self.pg_agent_config.attacker:
             attacker_rollout_buffer.compute_returns_and_advantage(attacker_values, dones=dones)
@@ -345,12 +408,12 @@ class PPO(BaseRLModel):
                 # TODO: investigate why there is no issue with the gradient
                 # if that line is commented (as in SAC)
                 if self.use_sde:
-                    if attacker:
+                    if attacker and self.train_attacker:
                         self.attacker_policy.reset_noise(batch_size)
                     else:
                         self.defender_policy.reset_noise(batch_size)
 
-                if attacker:
+                if attacker and self.train_attacker:
                     values, log_prob, entropy = self.attacker_policy.evaluate_actions(
                         rollout_data.observations, actions, self.env.envs[0], attacker=True)
                 else:
@@ -472,6 +535,13 @@ class PPO(BaseRLModel):
         attacker_lr = 0.0
         defender_lr = 0.0
 
+        if self.pg_agent_config.opponent_pool and self.pg_agent_config.opponent_pool_config is not None:
+            attacker_pool_iteration = 0
+            defender_pool_iteration = 0
+
+        if self.pg_agent_config.alternating_optimization:
+            optimization_iteration = 0
+
         while self.num_timesteps < total_timesteps:
             continue_training, rollouts_attacker_rewards, rollouts_defender_rewards, rollouts_steps = \
                 self.collect_rollouts(self.env, callback, self.attacker_rollout_buffer, self.defender_rollout_buffer,
@@ -494,6 +564,11 @@ class PPO(BaseRLModel):
                 else:
                     self.train_hack_probability = 0.0
                     self.train_cumulative_hack_probability = 0.0
+                a_pool = 0
+                d_pool = 0
+                if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
+                    a_pool = len(self.attacker_pool)
+                    d_pool = len(self.defender_pool)
                 self.log_metrics(iteration=self.iteration, result=self.train_result,
                                  attacker_episode_rewards=episode_attacker_rewards,
                                  defender_episode_rewards=episode_defender_rewards, episode_steps=episode_steps,
@@ -501,7 +576,11 @@ class PPO(BaseRLModel):
                                  episode_avg_defender_loss=episode_avg_defender_loss,
                                  eval=False, update_stats=True, lr_attacker=self.lr_schedule_a(self._current_progress),
                                  lr_defender=self.lr_schedule_d(self._current_progress),
-                                 total_num_episodes=self.num_train_games_total)
+                                 total_num_episodes=self.num_train_games_total,
+                                 train_attacker=(self.pg_agent_config.attacker and self.train_attacker),
+                                 train_defender=(self.pg_agent_config.defender and self.train_defender),
+                                 a_pool=a_pool, d_pool=d_pool
+                                 )
                 episode_attacker_rewards = []
                 episode_defender_rewards = []
                 episode_avg_attacker_loss = []
@@ -509,6 +588,28 @@ class PPO(BaseRLModel):
                 episode_steps = []
                 self.num_train_games = 0
                 self.num_train_hacks = 0
+
+                if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
+                    if self.train_attacker:
+                        attacker_pool_iteration += 1
+                    if self.train_defender:
+                        defender_pool_iteration += 1
+
+                if self.pg_agent_config.alternating_optimization:
+                    optimization_iteration += 1
+
+                # If using opponent pool, update the pool
+                if self.pg_agent_config.opponent_pool and self.pg_agent_config.opponent_pool_config is not None:
+                    if self.train_defender:
+                        if defender_pool_iteration > self.pg_agent_config.opponent_pool_config.pool_increment_period:
+                            self.add_model_to_pool(attacker=False)
+                            defender_pool_iteration = 0
+
+                    if self.train_attacker:
+                        if attacker_pool_iteration > self.pg_agent_config.opponent_pool_config.pool_increment_period:
+                            self.add_model_to_pool(attacker=True)
+                            attacker_pool_iteration = 0
+
 
             # Save models every <self.config.checkpoint_frequency> iterations
             if self.iteration % self.pg_agent_config.checkpoint_freq == 0:
@@ -519,12 +620,26 @@ class PPO(BaseRLModel):
                         self.pg_agent_config.save_dir + "/" + time_str + "_train_results_checkpoint.csv")
                     self.eval_result.to_csv(self.pg_agent_config.save_dir + "/" + time_str + "_eval_results_checkpoint.csv")
 
-            if self.pg_agent_config.attacker:
+            if self.pg_agent_config.attacker and self.train_attacker:
                 entropy_loss, pg_loss, value_loss, attacker_lr = self.train(self.n_epochs, batch_size=self.batch_size, attacker=True)
                 episode_avg_attacker_loss.append(entropy_loss + pg_loss + value_loss)
-            if self.pg_agent_config.defender:
+            if self.pg_agent_config.defender and self.train_defender:
                 entropy_loss, pg_loss, value_loss, defender_lr = self.train(self.n_epochs, batch_size=self.batch_size, attacker=False)
                 episode_avg_defender_loss.append(entropy_loss + pg_loss + value_loss)
+
+            # If doing alternating optimization and the alternating period is up, change agent that is optimized
+            if self.pg_agent_config.alternating_optimization:
+                print("optimization_iteration:{}".format(optimization_iteration))
+                if self.train_attacker and optimization_iteration > self.pg_agent_config.alternating_period:
+                    print("switch training to defender")
+                    self.train_attacker = False
+                    self.train_defender = True
+                    optimization_iteration = 0
+                elif self.train_defender and optimization_iteration > self.pg_agent_config.alternating_period:
+                    print("switch training to attacker")
+                    self.train_attacker = True
+                    self.train_defender = False
+                    optimization_iteration = 0
 
         callback.on_training_end()
 
@@ -562,168 +677,99 @@ class PPO(BaseRLModel):
             self.pg_agent_config.logger.warning("Save path not defined, not saving policy-networks to disk")
             print("Save path not defined, not saving policy-networks to disk")
 
-    def update_state(self, attacker_obs: np.ndarray = None, defender_obs: np.ndarray = None,
-                     state: np.ndarray = None, attacker: bool = True) -> np.ndarray:
+
+    def add_model_to_pool(self, attacker=True) -> None:
         """
-        Update approximative Markov state
+        Adds a model to the pool of opponents
 
-        :param attacker_obs: attacker obs
-        :param defender_obs: defender observation
-        :param state: current state
-        :param attacker: boolean flag whether it is attacker or not
-        :return: new state
+        :param attacker: boolean flag indicating whether adding attacker model or defender model
+        :return: None
         """
-        if not attacker and self.env.local_view_features():
-            attacker_obs = self.env.state.get_attacker_observation(
-                self.envs[0].env.idsgame_env.idsgame_config.game_config.network_config,
-                local_view=self.envs[0].env.idsgame_config.local_view_observations,
-            reconnaissance=self.envs[0].env.idsgame_env.idsgame_config.reconnaissance_actions)
-
-        # Zero mean
-        if self.pg_agent_config.zero_mean_features:
-            if not self.env.local_view_features() or not attacker:
-                attacker_obs_1 = attacker_obs[:, 0:-1]
-            else:
-                attacker_obs_1 = attacker_obs[:, 0:-2]
-            zero_mean_attacker_features = []
-            for idx, row in enumerate(attacker_obs_1):
-                mean = np.mean(row)
-                if mean != 0:
-                    t = row - mean
-                else:
-                    t = row
-                if np.isnan(t).any():
-                    t = attacker_obs[idx]
-                else:
-                    t = t.tolist()
-                    if not self.env.local_view_features() or not attacker:
-                        t.append(attacker_obs[idx][-1])
-                    else:
-                        t.append(attacker_obs[idx][-2])
-                        t.append(attacker_obs[idx][-1])
-                zero_mean_attacker_features.append(t)
-
-            defender_obs_1 = defender_obs[:, 0:-1]
-            zero_mean_defender_features = []
-            for idx, row in enumerate(defender_obs_1):
-                mean = np.mean(row)
-                if mean != 0:
-                    t = row - mean
-                else:
-                    t = row
-                if np.isnan(t).any():
-                    t = defender_obs[idx]
-                else:
-                    t = t.tolist()
-                    t.append(defender_obs[idx][-1])
-                zero_mean_defender_features.append(t)
-
-            attacker_obs = np.array(zero_mean_attacker_features)
-            defender_obs = np.array(zero_mean_defender_features)
-
-        # Normalize
-        if self.pg_agent_config.normalize_features:
-            if not self.env.local_view_features() or not attacker:
-                attacker_obs_1 = attacker_obs[:, 0:-1] / np.linalg.norm(attacker_obs[:, 0:-1])
-            else:
-                attacker_obs_1 = attacker_obs[:, 0:-2] / np.linalg.norm(attacker_obs[:, 0:-2])
-            normalized_attacker_features = []
-            for idx, row in enumerate(attacker_obs_1):
-                if np.isnan(attacker_obs_1).any():
-                    t = attacker_obs[idx]
-                else:
-                    t = attacker_obs_1.tolist()
-                    if not self.env.local_view_features() or not attacker:
-                        t.append(attacker_obs[idx][-1])
-                    else:
-                        t.append(attacker_obs[idx][-2])
-                        t.append(attacker_obs[idx][-1])
-                normalized_attacker_features.append(t)
-
-            defender_obs_1 = defender_obs[:, 0:-1] / np.linalg.norm(defender_obs[:, 0:-1])
-            normalized_defender_features = []
-            for idx, row in enumerate(defender_obs_1):
-                if np.isnan(defender_obs_1).any():
-                    t = defender_obs[idx]
-                else:
-                    t = defender_obs_1.tolist()
-                    t.append(defender_obs[idx][-1])
-
-                normalized_defender_features.append(t)
-
-            attacker_obs = np.array(normalized_attacker_features)
-            defender_obs = np.array(normalized_defender_features)
-
-        if self.env.local_view_features() and attacker:
-            neighbor_defense_attributes = np.zeros((attacker_obs.shape[0], defender_obs.shape[1]))
-            for node in range(attacker_obs.shape[0]):
-                if int(attacker_obs[node][-1]) == 1:
-                    id = int(attacker_obs[node][-2])
-                    neighbor_defense_attributes[node] = defender_obs[id]
-
-        if self.env.fully_observed():
-            if self.pg_agent_config.merged_ad_features:
-                if not self.env.local_view_features() or not attacker:
-                    a_pos = attacker_obs[:, -1]
-                    det_values = defender_obs[:, -1]
-                    temp = defender_obs[:, 0:-1] - attacker_obs[:, 0:-1]
-                    features = []
-                    for idx, row in enumerate(temp):
-                        t = row.tolist()
-                        t.append(a_pos[idx])
-                        t.append(det_values[idx])
-                        features.append(t)
-                else:
-                    node_ids = attacker_obs[:, -2]
-                    node_reachable = attacker_obs[:, -1]
-                    det_values = neighbor_defense_attributes[:, -1]
-                    temp = neighbor_defense_attributes[:, 0:-1] - attacker_obs[:, 0:-2]
-                    features = []
-                    for idx, row in enumerate(temp):
-                        t = row.tolist()
-                        t.append(node_ids[idx])
-                        t.append(node_reachable[idx])
-                        t.append(det_values[idx])
-                        features.append(t)
-                features = np.array(features)
-                if self.pg_agent_config.state_length == 1:
-                    return features
-                if len(state) == 0:
-                    s = np.array([features] * self.pg_agent_config.state_length)
-                    return s
-                state = np.append(state[1:], np.array([features]), axis=0)
-            else:
-                if self.pg_agent_config.state_length == 1:
-                    if not self.env.local_view_features() or not attacker:
-                        return np.append(attacker_obs, defender_obs)
-                    else:
-                        return np.append(attacker_obs, neighbor_defense_attributes)
-                if len(state) == 0:
-                    if not self.env.local_view_features() or not attacker:
-                        temp = np.append(attacker_obs, defender_obs)
-                    else:
-                        temp = np.append(attacker_obs, neighbor_defense_attributes)
-                    s = np.array([temp] * self.pg_agent_config.state_length)
-                    return s
-                if not self.env.local_view_features() or not attacker:
-                    temp = np.append(attacker_obs, defender_obs)
-                else:
-                    temp = np.append(attacker_obs, neighbor_defense_attributes)
-                state = np.append(state[1:], np.array([temp]), axis=0)
-            return state
-        else:
-            if self.pg_agent_config.state_length == 1:
-                if attacker:
-                    return np.array(attacker_obs)
-                else:
-                    return np.array(defender_obs)
-            if len(state) == 0:
-                if attacker:
-                    return np.array([attacker_obs] * self.pg_agent_config.state_length)
-                else:
-                    return np.array([defender_obs] * self.pg_agent_config.state_length)
+        if self.pg_agent_config.opponent_pool and self.pg_agent_config.opponent_pool_config is not None:
             if attacker:
-                state = np.append(state[1:], np.array([attacker_obs]), axis=0)
+                model_copy = copy.deepcopy(self.attacker_policy)
+                if len(self.attacker_pool) >= self.pg_agent_config.opponent_pool_config.pool_maxsize:
+                    self.attacker_pool.pop(0)
+                if self.pg_agent_config.opponent_pool_config.quality_scores:
+                    if len(self.attacker_pool) == 0:
+                        self.attacker_pool.append([model_copy, self.pg_agent_config.opponent_pool_config.initial_quality])
+                    elif len(self.attacker_pool) > 0:
+                        qualities = self.get_attacker_pool_quality_scores()
+                        max_q = max(qualities)
+                        self.attacker_pool.append([model_copy, max_q])
+                else:
+                    self.attacker_pool.append(model_copy)
             else:
-                state = np.append(state[1:], np.array([defender_obs]), axis=0)
-            return state
+                model_copy = copy.deepcopy(self.defender_policy)
+                if len(self.defender_pool) >= self.pg_agent_config.opponent_pool_config.pool_maxsize:
+                    self.defender_pool.pop(0)
+                if self.pg_agent_config.opponent_pool_config.quality_scores:
+                    if len(self.defender_pool) == 0:
+                        self.defender_pool.append([model_copy, self.pg_agent_config.opponent_pool_config.initial_quality])
+                    elif len(self.defender_pool) > 0:
+                        qualities = self.get_defender_pool_quality_scores()
+                        max_q = max(qualities)
+                        self.defender_pool.append([model_copy, max_q])
+                else:
+                    self.defender_pool.append(model_copy)
+
+    def sample_opponent(self, attacker=True):
+        if attacker:
+            if self.pg_agent_config.opponent_pool_config.quality_scores:
+                quality_scores = self.get_attacker_pool_quality_scores()
+                softmax_dist = self.get_softmax_distribution(quality_scores)
+                return np.random.choice(list(range(len(self.attacker_pool))), size=1, p=softmax_dist)[0]
+            else:
+                return np.random.choice(list(range(len(self.attacker_pool))), size=1)[0]
+        else:
+            if self.pg_agent_config.opponent_pool_config.quality_scores:
+                quality_scores = self.get_defender_pool_quality_scores()
+                softmax_dist = self.get_softmax_distribution(quality_scores)
+                return np.random.choice(list(range(len(self.defender_pool))), size=1, p=softmax_dist)[0]
+            else:
+                return np.random.choice(list(range(len(self.defender_pool))), size=1)[0]
+
+    def get_attacker_pool_quality_scores(self):
+        """
+        :return: Returns the quality scores from the attacker pool
+        """
+        return list(map(lambda x: x[1], self.attacker_pool))
+
+    def get_defender_pool_quality_scores(self):
+        """
+        :return: Returns the quality scores from the defender pool
+        """
+        return list(map(lambda x: x[1], self.defender_pool))
+
+    def get_softmax_distribution(self, qualities) -> np.ndarray:
+        """
+        Converts a list of quality scores into a distribution with softmax
+
+        :param qualities: the list of quality scores
+        :return: the softmax distribution
+        """
+        return softmax(qualities)
+
+    def update_quality_score(self, opponent_idx: int, attacker: bool = True) -> None:
+        """
+        Updates the quality score of an opponent in the opponent pool. Using same update rule as was used in
+        "Dota 2 with Large Scale Deep Reinforcement Learning" by Berner et. al.
+
+        :param opponent_idx: the index of the opponent in the pool
+        :param attacker: boolean flag whether attacker or defender pool to be updated
+        :return: None
+        """
+        if attacker:
+            N = len(self.attacker_pool)
+            qualities = self.get_attacker_pool_quality_scores()
+            dist = self.get_softmax_distribution(qualities)
+            p = dist[opponent_idx]
+            self.attacker_pool[opponent_idx][1] = self.attacker_pool[opponent_idx][1] - \
+                                                  (self.pg_agent_config.opponent_pool_config.quality_score_eta / (N * p))
+        else:
+            N = len(self.defender_pool)
+            qualities = self.get_defender_pool_quality_scores()
+            dist = self.get_softmax_distribution(qualities)
+            p = dist[opponent_idx]
+            self.defender_pool[opponent_idx][1] = self.defender_pool[opponent_idx][1] - \
+                                                  (self.pg_agent_config.opponent_pool_config.quality_score_eta / (N * p))

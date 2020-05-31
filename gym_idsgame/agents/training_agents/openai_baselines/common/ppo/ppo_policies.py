@@ -203,7 +203,7 @@ class PPOPolicy(BasePolicy):
         self.optimizer = self.optimizer_class(self.parameters(), lr=lr_schedule(1), **self.optimizer_kwargs)
 
     def forward(self, obs: th.Tensor, env : IdsGameEnv,
-                deterministic: bool = False, device: str = "cuda", attacker = True,
+                deterministic: bool = False, device: str = "cpu", attacker = True,
                 non_legal_actions=None, wrapper_env: BaselineEnvWrapper = None) -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
         """
         Forward pass in all the networks (actor and critic)
@@ -234,6 +234,7 @@ class PPOPolicy(BasePolicy):
                 actions = list(range(env.num_defense_actions))
                 legal_actions = list(filter(lambda action: env.is_defense_legal(action), actions))
                 non_legal_actions = list(filter(lambda action: not env.is_defense_legal(action), actions))
+
         distribution = self. _get_action_dist_from_latent(latent_pi, latent_sde=latent_sde, device=device,
                                                          non_legal_actions=non_legal_actions)
         actions = distribution.get_actions(deterministic=deterministic)
@@ -262,7 +263,7 @@ class PPOPolicy(BasePolicy):
         return latent_pi, latent_vf, latent_sde
 
     def _get_action_dist_from_latent(self, latent_pi: th.Tensor, latent_sde: Optional[th.Tensor] = None,
-                                     non_legal_actions : List = None, device="cuda") -> Distribution:
+                                     non_legal_actions : List = None, device="cpu") -> Distribution:
         """
         Retrieve action distribution given the latent codes.
 
@@ -280,11 +281,11 @@ class PPOPolicy(BasePolicy):
         action_probs_1 = mean_actions.clone()
         if non_legal_actions is not None and len(non_legal_actions) > 0:
             if len(action_probs_1.shape) == 1:
-                #action_probs_1[non_legal_actions] = 0.000000000001 # Don't set to zero due to invalid distribution errors
-                action_probs_1[non_legal_actions] = 0.0
+                action_probs_1[non_legal_actions] = 0.000000000001 # Don't set to zero due to invalid distribution errors
+                #action_probs_1[non_legal_actions] = 0.0
             elif len(action_probs_1.shape) == 2:
-                #action_probs_1[:, non_legal_actions] = 0.000000000001  # Don't set to zero due to invalid distribution errors
-                action_probs_1[:,non_legal_actions] = 0.0
+                action_probs_1[:, non_legal_actions] = 0.000000000001  # Don't set to zero due to invalid distribution errors
+                #action_probs_1[:,non_legal_actions] = 0.0
             else:
                 raise AssertionError("Invalid shape of action probabilties")
         action_probs_1 = action_probs_1.to(device)
@@ -306,7 +307,7 @@ class PPOPolicy(BasePolicy):
             raise ValueError('Invalid action distribution')
 
     def _predict(self, observation: th.Tensor, env : IdsGameEnv, deterministic: bool = False,
-                  device : str = "cuda", attacker = True, wrapper_env : BaselineEnvWrapper = None) -> th.Tensor:
+                  device : str = "cpu", attacker = True, wrapper_env : BaselineEnvWrapper = None) -> th.Tensor:
         """
         Get the action according to the policy for a given observation.
 

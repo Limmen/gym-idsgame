@@ -9,6 +9,7 @@ from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.config.hp_tuning_config import HpTuningConfig
 from gym_idsgame.runnner import Runner
 from experiments.util import plotting_util, util, hp_tuning
+from gym_idsgame.agents.training_agents.common.opponent_pool_config import OpponentPoolConfig
 
 
 def get_script_path():
@@ -51,31 +52,45 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.0001, alpha_defender=0.0001,
-                                                epsilon=1, render=False,
+    opponent_pool_config = OpponentPoolConfig(pool_maxsize=100000,
+                                              pool_increment_period=100,
+                                              head_to_head_period=1,
+                                              quality_scores=True,
+                                              quality_score_eta=0.01,
+                                              initial_quality=1000,
+                                              pool_prob=0.5)
+    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.000003, epsilon=1, render=False,
+                                                alpha_defender=0.000003,
                                                 eval_sleep=0.9,
-                                                min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
-                                                epsilon_decay=0.9999, video=True, eval_log_frequency=1,
+                                                min_epsilon=0.01, eval_episodes=1000, train_log_frequency=1,
+                                                epsilon_decay=0.9999, video=True, eval_log_frequency=500,
                                                 video_fps=5, video_dir=default_output_dir() + "/results/videos",
                                                 num_episodes=100000000,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
-                                                eval_frequency=250000, attacker=True, defender=True,
-                                                video_frequency=101,
+                                                eval_frequency=175000, attacker=True, defender=True,
+                                                video_frequency=1001,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=5000, input_dim_attacker=(4 + 1) * 3,
-                                                output_dim_attacker=4 * 3,
-                                                input_dim_defender=(4 + 1) * 3,
+                                                checkpoint_freq=250,
+                                                input_dim_attacker=((4 * 2 + 2) * 2),
+                                                output_dim_attacker=(4 + 1) * 2,
+                                                input_dim_defender=((4 + 1) * 3),
                                                 output_dim_defender=5 * 3,
                                                 hidden_dim=32,
                                                 num_hidden_layers=2, batch_size=2000,
-                                                gpu=True, tensorboard=True,
+                                                gpu=False, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
                                                 state_length=1, normalize_features=False, merged_ad_features=False,
                                                 zero_mean_features=False, gpu_id=0, lstm_network=False,
                                                 lstm_seq_length=4, num_lstm_layers=2, optimization_iterations=10,
-                                                eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95)
+                                                eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95,
+                                                cnn_feature_extractor=False, features_dim=512,
+                                                flatten_feature_planes=False, cnn_type=5, vf_coef=0.5, ent_coef=0.01,
+                                                render_attacker_view=False, lr_progress_power_decay=4,
+                                                lr_progress_decay=True, use_sde=False, sde_sample_freq=4,
+                                                opponent_pool=True, opponent_pool_config=opponent_pool_config,
+                                                alternating_optimization=True, alternating_period=100)
     env_name = "idsgame-v18"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.PPO_OPENAI_AGENT.value,
                                  defender_type=AgentType.PPO_OPENAI_AGENT.value,

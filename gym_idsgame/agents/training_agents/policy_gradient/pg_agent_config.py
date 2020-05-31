@@ -36,7 +36,7 @@ class PolicyGradientAgentConfig:
                  gae_lambda : float = 0.95, cnn_feature_extractor : bool = False, features_dim : int = 44,
                  flatten_feature_planes : bool = False, cnn_type : int = 0, ent_coef : float = 0.0,
                  vf_coef: float = 0.5, render_attacker_view : bool = False, lr_progress_decay : bool = False,
-                 lr_progress_power_decay : int = 1
+                 lr_progress_power_decay : int = 1, use_sde : bool = False, sde_sample_freq : int = 4
                  ):
         """
         Initialize environment and hyperparameters
@@ -111,6 +111,8 @@ class PolicyGradientAgentConfig:
         :param render_attacker_view: if True, show attacker view when rendering rather than spectator view
         :param lr_progress_decay: boolean flag whether learning rate is decayed with respect to progress
         :param lr_progress_power_decay: the power that the progress is raised before lr decay
+        :param use_sde: boolean flag whether to use state-dependent exploration
+        :param sde_sample_freq: frequency of sampling in state-dependent exploration
         """
         self.gamma = gamma
         self.alpha_attacker = alpha_attacker
@@ -182,6 +184,8 @@ class PolicyGradientAgentConfig:
         self.render_attacker_view = render_attacker_view
         self.lr_progress_decay = lr_progress_decay
         self.lr_progress_power_decay = lr_progress_power_decay
+        self.use_sde = use_sde
+        self.sde_sample_freq = sde_sample_freq
 
 
     def to_str(self) -> str:
@@ -200,7 +204,7 @@ class PolicyGradientAgentConfig:
                "input_dim_defender:{38},input_dim_attacker:{39},lstm_network:{40},num_hidden_layers:{41}," \
                "lstm_seq_length:{41},num_lstm_layers:{42},gae_lambda:{43},cnn_feature_exatractor:{44}," \
                "features_dim:{45},flatten_feature_planes:{46},cnn_type:{47},ent_coef:{48},vf_coef:{49}," \
-               "lr_progress_decay:{50},lr_progress_power_decay:{51}".format(
+               "lr_progress_decay:{50},lr_progress_power_decay:{51},use_sde:{52},sde_sample_freq:{53}".format(
             self.gamma, self.alpha_attacker, self.epsilon, self.render, self.eval_sleep, self.epsilon_decay,
             self.min_epsilon, self.eval_episodes, self.train_log_frequency, self.eval_log_frequency, self.video,
             self.video_fps, self.video_dir, self.num_episodes, self.eval_render, self.gifs, self.gif_dir,
@@ -212,7 +216,7 @@ class PolicyGradientAgentConfig:
             self.input_dim_attacker, self.lstm_network, self.num_hidden_layers, self.lstm_seq_length,
             self.num_lstm_layers, self.gae_lambda, self.cnn_feature_extractor, self.features_dim,
             self.flatten_feature_planes,self.ent_coef, self.vf_coef, self.lr_progress_decay,
-            self.lr_progress_power_decay)
+            self.lr_progress_power_decay, self.use_sde, self.sde_sample_freq)
 
     def to_csv(self, file_path: str) -> None:
         """
@@ -288,6 +292,8 @@ class PolicyGradientAgentConfig:
             writer.writerow(["vf_coef", str(self.vf_coef)])
             writer.writerow(["lr_progress_decay", str(self.lr_progress_decay)])
             writer.writerow(["lr_progress_power_decay", str(self.lr_progress_power_decay)])
+            writer.writerow(["use_sde", str(self.use_sde)])
+            writer.writerow(["sde_sample_freq", str(self.sde_sample_freq)])
             if self.opponent_pool and self.opponent_pool_config is not None:
                 writer.writerow(["pool_maxsize", str(self.opponent_pool_config.pool_maxsize)])
                 writer.writerow(["pool_increment_period", str(self.opponent_pool_config.pool_increment_period)])
@@ -359,6 +365,8 @@ class PolicyGradientAgentConfig:
         hparams["vf_coef"] = self.vf_coef
         hparams["lr_progress_decay"] = self.lr_progress_decay
         hparams["lr_progress_power_decay"] = self.lr_progress_power_decay
+        hparams["use_sde"] = self.use_sde
+        hparams["sde_sample_freq"] = self.sde_sample_freq
         if self.opponent_pool and self.opponent_pool_config is not None:
             hparams["pool_maxsize"] = self.opponent_pool_config.pool_maxsize
             hparams["pool_increment_period"] = self.opponent_pool_config.pool_increment_period
