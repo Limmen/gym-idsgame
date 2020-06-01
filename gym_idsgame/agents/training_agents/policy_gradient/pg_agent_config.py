@@ -37,7 +37,7 @@ class PolicyGradientAgentConfig:
                  flatten_feature_planes : bool = False, cnn_type : int = 0, ent_coef : float = 0.0,
                  vf_coef: float = 0.5, render_attacker_view : bool = False, lr_progress_decay : bool = False,
                  lr_progress_power_decay : int = 1, use_sde : bool = False, sde_sample_freq : int = 4,
-                 seq_cnn : bool = False, baselines_in_pool : bool = False
+                 seq_cnn : bool = False, baselines_in_pool : bool = False, one_hot_obs : bool = False
                  ):
         """
         Initialize environment and hyperparameters
@@ -116,6 +116,7 @@ class PolicyGradientAgentConfig:
         :param sde_sample_freq: frequency of sampling in state-dependent exploration
         :param seq_cnn: boolean flag whether to use sequence-like frame input
         :param baselines_in_pool: boolean flag whether to include baseline policies in opponent pool
+        :param one_hot_obs: if true, use one hot encoded features
         """
         self.gamma = gamma
         self.alpha_attacker = alpha_attacker
@@ -191,6 +192,7 @@ class PolicyGradientAgentConfig:
         self.sde_sample_freq = sde_sample_freq
         self.seq_cnn = seq_cnn
         self.baselines_in_pool = baselines_in_pool
+        self.one_hot_obs = one_hot_obs
 
 
     def to_str(self) -> str:
@@ -210,7 +212,7 @@ class PolicyGradientAgentConfig:
                "lstm_seq_length:{41},num_lstm_layers:{42},gae_lambda:{43},cnn_feature_exatractor:{44}," \
                "features_dim:{45},flatten_feature_planes:{46},cnn_type:{47},ent_coef:{48},vf_coef:{49}," \
                "lr_progress_decay:{50},lr_progress_power_decay:{51},use_sde:{52},sde_sample_freq:{53}," \
-               "baselines_in_pool:{54}".format(
+               "baselines_in_pool:{54},one_hot_bs:{55}".format(
             self.gamma, self.alpha_attacker, self.epsilon, self.render, self.eval_sleep, self.epsilon_decay,
             self.min_epsilon, self.eval_episodes, self.train_log_frequency, self.eval_log_frequency, self.video,
             self.video_fps, self.video_dir, self.num_episodes, self.eval_render, self.gifs, self.gif_dir,
@@ -222,7 +224,7 @@ class PolicyGradientAgentConfig:
             self.input_dim_attacker, self.lstm_network, self.num_hidden_layers, self.lstm_seq_length,
             self.num_lstm_layers, self.gae_lambda, self.cnn_feature_extractor, self.features_dim,
             self.flatten_feature_planes,self.ent_coef, self.vf_coef, self.lr_progress_decay,
-            self.lr_progress_power_decay, self.use_sde, self.sde_sample_freq, self.baselines_in_pool)
+            self.lr_progress_power_decay, self.use_sde, self.sde_sample_freq, self.baselines_in_pool, self.one_hot_obs)
 
     def to_csv(self, file_path: str) -> None:
         """
@@ -301,6 +303,7 @@ class PolicyGradientAgentConfig:
             writer.writerow(["use_sde", str(self.use_sde)])
             writer.writerow(["sde_sample_freq", str(self.sde_sample_freq)])
             writer.writerow(["baselines_in_pool", str(self.baselines_in_pool)])
+            writer.writerow(["one_hot_obs", str(self.one_hot_obs)])
             if self.opponent_pool and self.opponent_pool_config is not None:
                 writer.writerow(["pool_maxsize", str(self.opponent_pool_config.pool_maxsize)])
                 writer.writerow(["pool_increment_period", str(self.opponent_pool_config.pool_increment_period)])
@@ -375,6 +378,7 @@ class PolicyGradientAgentConfig:
         hparams["use_sde"] = self.use_sde
         hparams["sde_sample_freq"] = self.sde_sample_freq
         hparams["baselines_in_pool"] = self.baselines_in_pool
+        hparams["one_hot_obs"] = self.one_hot_obs
         if self.opponent_pool and self.opponent_pool_config is not None:
             hparams["pool_maxsize"] = self.opponent_pool_config.pool_maxsize
             hparams["pool_increment_period"] = self.opponent_pool_config.pool_increment_period

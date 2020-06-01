@@ -172,7 +172,7 @@ class GameState():
 
         if randomize_state:
             for node_id in range(len(reconnaissance_state)):
-                if np.random.rand() < 0.25:
+                if np.random.rand() < 0.5:
                     reconnaissance_state[node_id] = defense_values[node_id]
                     self.reconnaissance_actions.append(node_id)
                 # for attack_id in range(reconnaissance_state.shape[1]):

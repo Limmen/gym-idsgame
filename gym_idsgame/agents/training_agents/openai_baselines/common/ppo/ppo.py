@@ -306,7 +306,7 @@ class PPO(BaseRLModel):
                     defender_actions = defender_actions.cpu().numpy()
 
                     if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
-                        if isinstance(self.defender_opponent, PPOPolicy):
+                        if isinstance(self.attacker_opponent, PPOPolicy):
                             attacker_actions, attacker_values, attacker_log_probs = self.attacker_opponent.forward(
                                 obs_tensor_a, self.env.envs[0], device=self.device, attacker=True)
                             attacker_actions = attacker_actions.cpu().numpy()

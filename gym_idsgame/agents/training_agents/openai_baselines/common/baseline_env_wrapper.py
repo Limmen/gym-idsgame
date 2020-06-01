@@ -75,6 +75,10 @@ class BaselineEnvWrapper(gym.Env):
             self.attacker_state = attacker_state
             self.defender_state = defender_state
             return [attacker_state, defender_state], [attacker_reward, defender_reward], done, info
+        elif self.pg_agent_config.one_hot_obs:
+            attacker_state = self.one_hot_obs(attacker_obs=obs_prime_attacker, defender_obs=obs_prime_defender, attacker=True)
+            defender_state = self.one_hot_obs(attacker_obs=obs_prime_attacker, defender_obs=obs_prime_defender, attacker=False)
+            return [attacker_state.flatten(), defender_state.flatten()], [attacker_reward, defender_reward], done, info
         else:
             attacker_state = self.update_state(attacker_obs=obs_prime_attacker, defender_obs=obs_prime_defender, state=self.attacker_state,
                                                attacker=True)
@@ -109,6 +113,10 @@ class BaselineEnvWrapper(gym.Env):
             self.attacker_state = attacker_state
             self.defender_state = defender_state
             return [self.attacker_state, self.defender_state]
+        elif self.pg_agent_config.one_hot_obs:
+            attacker_state = self.one_hot_obs(attacker_obs=obs_attacker, defender_obs=obs_defender, attacker=True)
+            defender_state = self.one_hot_obs(attacker_obs=obs_attacker, defender_obs=obs_defender, attacker=False)
+            return [attacker_state.flatten(), defender_state.flatten()]
 
         else:
             attacker_state = self.update_state(attacker_obs=obs_attacker, defender_obs=obs_defender, state=self.attacker_state,
@@ -536,5 +544,88 @@ class BaselineEnvWrapper(gym.Env):
         # print(feature_frames)
         # raise AssertionError("test")
         return feature_frames
+
+    def one_hot_obs(self, attacker_obs, defender_obs, attacker=True):
+        attack_types = self.idsgame_env.idsgame_config.game_config.num_attack_types
+        max_value = self.idsgame_env.idsgame_config.game_config.max_value
+        num_nodes = self.idsgame_env.idsgame_config.game_config.num_nodes
+
+        if attacker and self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+            #if not self.idsgame_env.local_view_features():
+            a_obs_len = self.idsgame_env.idsgame_config.game_config.num_attack_types + 1
+            defender_obs = attacker_obs[:, a_obs_len:a_obs_len+self.idsgame_env.idsgame_config.game_config.num_attack_types]
+            if self.idsgame_env.idsgame_config.reconnaissance_bool_features:
+                d_bool_features = attacker_obs[:, a_obs_len+self.idsgame_env.idsgame_config.game_config.num_attack_types:]
+            attacker_obs = attacker_obs[:, 0:a_obs_len]
+
+        if self.idsgame_env.local_view_features() and attacker:
+            if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                neighbor_defense_attributes = np.zeros((attacker_obs.shape[0], defender_obs.shape[1]))
+                for node in range(attacker_obs.shape[0]):
+                    id = int(attacker_obs[node][-1])
+                    neighbor_defense_attributes[node] = defender_obs[id]
+            else:
+                neighbor_defense_attributes = defender_obs
+
+        if self.idsgame_env.fully_observed() or \
+                (self.idsgame_env.idsgame_config.game_config.reconnaissance_actions and attacker):
+            if self.pg_agent_config.merged_ad_features:
+                if not self.idsgame_env.local_view_features() or not attacker:
+                    a_pos = attacker_obs[:, -1]
+                    if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                        det_values = defender_obs[:, -1]
+                        temp = defender_obs[:, 0:-1] - attacker_obs[:, 0:-1]
+                    else:
+                        temp = defender_obs[:, 0:] - attacker_obs[:, 0:-1]
+                    features = []
+                    for idx, row in enumerate(temp):
+                        t = row.tolist()
+                        #t.append(a_pos[idx])
+                        if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                            t.append(det_values[idx])
+                        features.append(t)
+                else:
+                    node_ids = attacker_obs[:, -1]
+                    if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                        det_values = neighbor_defense_attributes[:, -1]
+                    if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                        temp = neighbor_defense_attributes[:, 0:-1] - attacker_obs[:, 0:-1]
+                    else:
+                        temp = np.full(neighbor_defense_attributes.shape, -1)
+                        for i in range(len(neighbor_defense_attributes)):
+                            if np.sum(neighbor_defense_attributes[i]) > 0:
+                                temp[i] = neighbor_defense_attributes[i] - attacker_obs[i, 0:-1]
+                    features = []
+                    for idx, row in enumerate(temp):
+                        t = row.tolist()
+                        t.append(node_ids[idx])
+                        #t.append(node_reachable[idx])
+                        if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                            t.append(det_values[idx])
+                        features.append(t)
+                features = np.array(features)
+                # if self.idsgame_env.idsgame_config.reconnaissance_bool_features:
+                #     f = np.zeros((features.shape[0], features.shape[1] + d_bool_features.shape[1]))
+                #     for i in range(features.shape[0]):
+                #         f[i] = np.append(features[i], d_bool_features[i])
+                #     features = f
+        if attacker:
+            a_obs = np.zeros((num_nodes, attack_types*((max_value+1)*2+1)))
+            values_list = list(range(-max_value, max_value+1))
+            for n in range(num_nodes):
+                for t in range(attack_types):
+                    for v in range(-max_value, max_value+1):
+                        if features[n][t] == v:
+                            a_obs[n][t*((max_value+1)*2) + values_list.index(v)] = 1
+            a_obs[:,-1] = a_pos
+        # print("attacker obs:{}, defender_obs:{}".format(attacker_obs, defender_obs))
+        # print("a_obs:{}".format(a_obs))
+        # print("a_obs shape:{}".format(a_obs.shape))
+        # print("flatten shape:{}".format(a_obs.flatten().shape))
+        # raise AssertionError("Test")
+        if attacker:
+            return a_obs
+        else:
+            return defender_obs
 
 
