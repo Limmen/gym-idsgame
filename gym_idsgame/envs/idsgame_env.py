@@ -4071,7 +4071,7 @@ class IdsGameRandomDefenseV19Env(AttackerEnv):
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
-            game_config.network_config.relative_neighbor_positions = [(-1, 0), (-1, -1), (1, 0)]
+            game_config.network_config.relative_neighbor_positions = [(-1, 0), (-1, -1), (1, 0), (-1, 1)]
             game_config.network_config.max_neighbors = len(game_config.network_config.relative_neighbor_positions)
             game_config.set_attack_actions(local_view=True)
             if initial_state_path is not None:
@@ -4116,7 +4116,7 @@ class IdsGameMinimalDefenseV19Env(AttackerEnv):
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
-            game_config.network_config.relative_neighbor_positions = [(-1, 0), (-1, -1), (1, 0)]
+            game_config.network_config.relative_neighbor_positions = [(-1, 0), (-1, -1), (1, 0), (-1, 1)]
             game_config.network_config.max_neighbors = len(game_config.network_config.relative_neighbor_positions)
             game_config.set_attack_actions(local_view=True)
             if initial_state_path is not None:
@@ -4161,7 +4161,7 @@ class IdsGameRandomAttackV19Env(DefenderEnv):
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
-            game_config.network_config.relative_neighbor_positions = [(-1, 0), (-1, -1), (1, 0)]
+            game_config.network_config.relative_neighbor_positions = [(-1, 0), (-1, -1), (1, 0), (-1, 1)]
             game_config.network_config.max_neighbors = len(game_config.network_config.relative_neighbor_positions)
             game_config.set_attack_actions(local_view=True)
             if initial_state_path is not None:
@@ -4206,7 +4206,7 @@ class IdsGameMaximalAttackV19Env(DefenderEnv):
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
-            game_config.network_config.relative_neighbor_positions = [(-1, 0), (-1, -1), (1, 0)]
+            game_config.network_config.relative_neighbor_positions = [(-1, 0), (-1, -1), (1, 0), (-1, 1)]
             game_config.network_config.max_neighbors = len(game_config.network_config.relative_neighbor_positions)
             game_config.set_attack_actions(local_view=True)
             if initial_state_path is not None:

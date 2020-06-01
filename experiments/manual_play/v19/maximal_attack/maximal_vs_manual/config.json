@@ -9,7 +9,7 @@
     "initial_state_path": null,
     "logger": null,
     "mode": 4,
-    "output_dir": "/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v19/maximal_attack/maximal_vs_manual",
+    "output_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/manual_play/v19/maximal_attack/maximal_vs_manual",
     "pg_agent_config": null,
     "py/object": "gym_idsgame.config.client_config.ClientConfig",
     "q_agent_config": null,

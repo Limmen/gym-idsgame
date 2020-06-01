@@ -399,7 +399,7 @@ class GameFrame(pyglet.window.Window):
         for i in range(self.idsgame_config.game_config.num_rows - 1):
             for j in range(self.idsgame_config.game_config.num_cols):
                 node = self.resource_network.grid[i][j]
-                if node is not None:
+                if node is not None and node.node_type != NodeType.EMPTY:
                     node.toggle_attacker_view()
         self.attacker_sprite.show()
 
@@ -414,7 +414,7 @@ class GameFrame(pyglet.window.Window):
         for i in range(self.idsgame_config.game_config.num_rows - 1):
             for j in range(self.idsgame_config.game_config.num_cols):
                 node = self.resource_network.grid[i][j]
-                if node is not None:
+                if node is not None and node.node_type != NodeType.EMPTY:
                     node.toggle_defender_view()
         self.attacker_sprite.hide()
 

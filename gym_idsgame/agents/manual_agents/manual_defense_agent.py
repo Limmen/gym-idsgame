@@ -18,6 +18,7 @@ class ManualDefenseAgent(Agent):
         """
         super(ManualDefenseAgent, self).__init__(idsgame_config.game_config)
         self.idsgame_config = idsgame_config
+        self.idsgame_config.render_config.attacker_view = True
         self.idsgame_config.render_config.manual_default()
         viewer = Viewer(self.idsgame_config)
         viewer.manual_start_defender()
