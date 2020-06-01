@@ -3903,7 +3903,7 @@ class IdsGameMinimalDefenseV18Env(AttackerEnv):
             idsgame_config.randomize_starting_position = True
             #idsgame_config.local_view_observations = True
             idsgame_config.local_view_observations = False
-            #idsgame_config.reconnaissance_bool_features = True
+            idsgame_config.reconnaissance_bool_features = False
             idsgame_config.reconnaissance_actions = True
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
 

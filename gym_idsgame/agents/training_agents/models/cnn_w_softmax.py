@@ -181,17 +181,25 @@ class CNNwithSoftmax(torch.nn.Module):
         #                          torch.nn.Flatten(),
         #                          torch.nn.Linear(6, 44),
         #                          torch.nn.Softmax())
-        self.cnn = torch.nn.Sequential(torch.nn.Conv2d(3, out_channels=2, kernel_size=3, stride=1, padding=0),
-                                 torch.nn.ReLU(),
-                                 torch.nn.Conv2d(in_channels=2, out_channels=2, kernel_size=3, stride=1, padding=0),
+        # self.cnn = torch.nn.Sequential(torch.nn.Conv2d(3, out_channels=2, kernel_size=3, stride=1, padding=0),
+        #                          torch.nn.ReLU(),
+        #                          torch.nn.Conv2d(in_channels=2, out_channels=2, kernel_size=3, stride=1, padding=0),
+        #                          torch.nn.ReLU(),
+        #                          torch.nn.Conv2d(in_channels=2, out_channels=2, kernel_size=2, stride=1, padding=0),
+        #                          torch.nn.ReLU(),
+        #                          torch.nn.Conv2d(in_channels=2, out_channels=2, kernel_size=1, stride=1,padding=0),
+        #                          torch.nn.ReLU(),
+        #                          torch.nn.Flatten(),
+        #                          torch.nn.Linear(18, 10),
+        #                          torch.nn.Softmax())
+
+        self.cnn = torch.nn.Sequential(torch.nn.Conv2d(3, out_channels=2, kernel_size=1, stride=1, padding=0),
                                  torch.nn.ReLU(),
                                  torch.nn.Conv2d(in_channels=2, out_channels=2, kernel_size=2, stride=1, padding=0),
                                  torch.nn.ReLU(),
-                                 torch.nn.Conv2d(in_channels=2, out_channels=2, kernel_size=1, stride=1,padding=0),
+                                 torch.nn.Conv2d(in_channels=2, out_channels=2, kernel_size=2, stride=1, padding=0),
                                  torch.nn.ReLU(),
-                                 torch.nn.Flatten(),
-                                 torch.nn.Linear(18, 10),
-                                 torch.nn.Softmax())
+                                 torch.nn.Flatten())
         y = self.cnn(y)
         #print("y shape:{}".format(y.shape))
         # for i in range(len(self.layers)):
@@ -212,7 +220,7 @@ def test() -> None:
     :return: None
     """
     # Constants
-    input_dim = (3, 8, 8)
+    input_dim = (3, 60, 60)
     output_dim = 10
     hidden_dim = 64
     batch_size = 1

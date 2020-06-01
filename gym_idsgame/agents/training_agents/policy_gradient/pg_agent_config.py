@@ -37,7 +37,8 @@ class PolicyGradientAgentConfig:
                  flatten_feature_planes : bool = False, cnn_type : int = 0, ent_coef : float = 0.0,
                  vf_coef: float = 0.5, render_attacker_view : bool = False, lr_progress_decay : bool = False,
                  lr_progress_power_decay : int = 1, use_sde : bool = False, sde_sample_freq : int = 4,
-                 seq_cnn : bool = False, baselines_in_pool : bool = False, one_hot_obs : bool = False
+                 seq_cnn : bool = False, baselines_in_pool : bool = False, one_hot_obs : bool = False,
+                 grid_image_obs : bool = False
                  ):
         """
         Initialize environment and hyperparameters
@@ -117,6 +118,7 @@ class PolicyGradientAgentConfig:
         :param seq_cnn: boolean flag whether to use sequence-like frame input
         :param baselines_in_pool: boolean flag whether to include baseline policies in opponent pool
         :param one_hot_obs: if true, use one hot encoded features
+        :param grid_image_obs: if true, use grid image obs
         """
         self.gamma = gamma
         self.alpha_attacker = alpha_attacker
@@ -193,6 +195,7 @@ class PolicyGradientAgentConfig:
         self.seq_cnn = seq_cnn
         self.baselines_in_pool = baselines_in_pool
         self.one_hot_obs = one_hot_obs
+        self.grid_image_obs = grid_image_obs
 
 
     def to_str(self) -> str:

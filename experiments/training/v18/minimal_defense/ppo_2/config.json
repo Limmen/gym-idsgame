@@ -9,7 +9,7 @@
     "initial_state_path": null,
     "logger": null,
     "mode": 0,
-    "output_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v18/minimal_defense/ppo_openai",
+    "output_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v18/minimal_defense/ppo_2",
     "pg_agent_config": {
         "alpha_attacker": 8e-06,
         "alpha_defender": 0.0001,
@@ -21,8 +21,8 @@
         "batch_size": 2000,
         "checkpoint_freq": 250,
         "clip_gradient": false,
-        "cnn_feature_extractor": false,
-        "cnn_type": 5,
+        "cnn_feature_extractor": true,
+        "cnn_type": 0,
         "critic_loss_fn": "MSE",
         "defender": false,
         "defender_load_path": null,
@@ -40,14 +40,27 @@
         "flatten_feature_planes": false,
         "gae_lambda": 0.95,
         "gamma": 1,
-        "gif_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v18/minimal_defense/ppo_openai/results/gifs",
+        "gif_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v18/minimal_defense/ppo_2/results/gifs",
         "gifs": true,
         "gpu": false,
         "gpu_id": 0,
+        "grid_image_obs": true,
         "hidden_activation": "ReLU",
         "hidden_dim": 64,
-        "input_dim_attacker": 18,
-        "input_dim_defender": 15,
+        "input_dim_attacker": {
+            "py/tuple": [
+                3,
+                60,
+                60
+            ]
+        },
+        "input_dim_defender": {
+            "py/tuple": [
+                3,
+                60,
+                60
+            ]
+        },
         "logger": null,
         "lr_decay_rate": 0.999,
         "lr_exp_decay": false,
@@ -73,17 +86,17 @@
         "random_seed": 0,
         "render": false,
         "render_attacker_view": true,
-        "save_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v18/minimal_defense/ppo_openai/results/data",
+        "save_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v18/minimal_defense/ppo_2/results/data",
         "sde_sample_freq": 4,
         "seq_cnn": false,
         "state_length": 1,
         "tensorboard": true,
-        "tensorboard_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v18/minimal_defense/ppo_openai/results/tensorboard",
+        "tensorboard_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v18/minimal_defense/ppo_2/results/tensorboard",
         "train_log_frequency": 1,
         "use_sde": false,
         "vf_coef": 0.5,
         "video": true,
-        "video_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v18/minimal_defense/ppo_openai/results/videos",
+        "video_dir": "/Users/kimham/workspace/rl/gym-idsgame/experiments/training/v18/minimal_defense/ppo_2/results/videos",
         "video_fps": 5,
         "video_frequency": 1001,
         "zero_mean_features": false

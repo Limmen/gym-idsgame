@@ -423,6 +423,10 @@ class GameState():
                         attack_observation[node_id] = np.append(np.append(np.append(self.attack_values[node_id], 1),
                                                                           self.reconnaissance_state[node_id]),
                                                                 reconaissance_bool)
+                elif reconnaissance:
+                    attack_values = np.zeros((self.attack_values.shape[1]))
+                    attack_observation[node_id] = np.append(np.append(attack_values, 0),
+                                                            self.reconnaissance_state[node_id])
 
         if local_view:
             # sort by row then col

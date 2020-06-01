@@ -4,9 +4,12 @@ A wrapper environment to integrate idsgame-env with the OpenAI baselines library
 import gym
 import numpy as np
 from sklearn import preprocessing
+import matplotlib.pyplot as plt
+import matplotlib
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
-
+from gym_idsgame.envs.constants import constants
+import gym_idsgame.envs.util.idsgame_util as util
 
 class BaselineEnvWrapper(gym.Env):
     """
@@ -61,15 +64,15 @@ class BaselineEnvWrapper(gym.Env):
         self.latest_obs = obs_prime
         attacker_reward, defender_reward = reward
         obs_prime_attacker, obs_prime_defender = obs_prime
-        if self.pg_agent_config.cnn_feature_extractor and not self.pg_agent_config.flatten_feature_planes and not self.pg_agent_config.seq_cnn:
+        if self.pg_agent_config.cnn_feature_extractor and not self.pg_agent_config.flatten_feature_planes and not self.pg_agent_config.seq_cnn and not self.pg_agent_config.grid_image_obs:
             attacker_state = self.grid_obs(obs_prime_attacker, obs_prime_defender, attacker=True)
             defender_state = self.grid_obs(obs_prime_attacker, obs_prime_defender, attacker=True)
             return [attacker_state, defender_state], [attacker_reward, defender_reward], done, info
-        elif self.pg_agent_config.flatten_feature_planes and not self.pg_agent_config.seq_cnn:
+        elif self.pg_agent_config.flatten_feature_planes and not self.pg_agent_config.seq_cnn and not self.pg_agent_config.grid_image_obs:
             attacker_state = self.grid_obs(obs_prime_attacker, obs_prime_defender, attacker=True)
             defender_state = self.grid_obs(obs_prime_attacker, obs_prime_defender, attacker=True)
             return [attacker_state.flatten(), defender_state.flatten()], [attacker_reward, defender_reward], done, info
-        elif self.pg_agent_config.seq_cnn:
+        elif self.pg_agent_config.seq_cnn and not self.pg_agent_config.grid_image_obs:
             attacker_state = self.grid_seq_obs(obs_prime_attacker, obs_prime_defender, self.attacker_state, self.defender_state, attacker=True)
             defender_state = self.grid_seq_obs(obs_prime_attacker, obs_prime_defender, self.attacker_state, self.defender_state, attacker=True)
             self.attacker_state = attacker_state
@@ -79,6 +82,10 @@ class BaselineEnvWrapper(gym.Env):
             attacker_state = self.one_hot_obs(attacker_obs=obs_prime_attacker, defender_obs=obs_prime_defender, attacker=True)
             defender_state = self.one_hot_obs(attacker_obs=obs_prime_attacker, defender_obs=obs_prime_defender, attacker=False)
             return [attacker_state.flatten(), defender_state.flatten()], [attacker_reward, defender_reward], done, info
+        elif self.pg_agent_config.grid_image_obs:
+            attacker_state = self.image_grid_obs(attacker_obs=obs_prime_attacker, defender_obs=obs_prime_defender, attacker=True)
+            #defender_state = self.image_grid_obs(attacker_obs= obs_prime_attacker, defender_obs=obs_prime_defender, attacker=False)
+            return [attacker_state, attacker_state], [attacker_reward, defender_reward], done, info
         else:
             attacker_state = self.update_state(attacker_obs=obs_prime_attacker, defender_obs=obs_prime_defender, state=self.attacker_state,
                                                attacker=True)
@@ -97,15 +104,15 @@ class BaselineEnvWrapper(gym.Env):
         obs_attacker, obs_defender = obs
         self.latest_obs = obs
 
-        if self.pg_agent_config.cnn_feature_extractor and not self.pg_agent_config.flatten_feature_planes and not self.pg_agent_config.seq_cnn:
+        if self.pg_agent_config.cnn_feature_extractor and not self.pg_agent_config.flatten_feature_planes and not self.pg_agent_config.seq_cnn and not self.pg_agent_config.grid_image_obs:
             attacker_state = self.grid_obs(obs_attacker, obs_defender, attacker=True)
             defender_state = self.grid_obs(obs_attacker, obs_defender, attacker=True)
             return [attacker_state, defender_state]
-        elif self.pg_agent_config.flatten_feature_planes and not self.pg_agent_config.seq_cnn:
+        elif self.pg_agent_config.flatten_feature_planes and not self.pg_agent_config.seq_cnn and not self.pg_agent_config.grid_image_obs:
             attacker_state = self.grid_obs(obs_attacker, obs_defender, attacker=True)
             defender_state = self.grid_obs(obs_attacker, obs_defender, attacker=True)
             return [attacker_state.flatten(), defender_state.flatten()]
-        elif self.pg_agent_config.seq_cnn:
+        elif self.pg_agent_config.seq_cnn and not self.pg_agent_config.grid_image_obs:
             attacker_state = self.grid_seq_obs(obs_attacker, obs_defender, self.attacker_state,
                                                self.defender_state, attacker=True)
             defender_state = self.grid_seq_obs(obs_attacker, obs_defender, self.attacker_state,
@@ -117,7 +124,10 @@ class BaselineEnvWrapper(gym.Env):
             attacker_state = self.one_hot_obs(attacker_obs=obs_attacker, defender_obs=obs_defender, attacker=True)
             defender_state = self.one_hot_obs(attacker_obs=obs_attacker, defender_obs=obs_defender, attacker=False)
             return [attacker_state.flatten(), defender_state.flatten()]
-
+        elif self.pg_agent_config.grid_image_obs:
+            attacker_state = self.image_grid_obs(attacker_obs=obs_attacker, defender_obs=obs_defender, attacker=True)
+            #defender_state = self.image_grid_obs(attacker_obs=obs_attacker, defender_obs=obs_defender, attacker=False)
+            return [attacker_state, attacker_state]
         else:
             attacker_state = self.update_state(attacker_obs=obs_attacker, defender_obs=obs_defender, state=self.attacker_state,
                                                attacker=True)
@@ -628,4 +638,98 @@ class BaselineEnvWrapper(gym.Env):
         else:
             return defender_obs
 
+    def image_grid_obs(self, attacker_obs, defender_obs, attacker=True):
+        if attacker and self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+            #if not self.idsgame_env.local_view_features():
+            a_obs_len = self.idsgame_env.idsgame_config.game_config.num_attack_types + 1
+            defender_obs = attacker_obs[:, a_obs_len:a_obs_len+self.idsgame_env.idsgame_config.game_config.num_attack_types]
+            if self.idsgame_env.idsgame_config.reconnaissance_bool_features:
+                d_bool_features = attacker_obs[:, a_obs_len+self.idsgame_env.idsgame_config.game_config.num_attack_types:]
+            attacker_obs = attacker_obs[:, 0:a_obs_len]
+
+        if self.idsgame_env.local_view_features() and attacker:
+            if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                neighbor_defense_attributes = np.zeros((attacker_obs.shape[0], defender_obs.shape[1]))
+                for node in range(attacker_obs.shape[0]):
+                    id = int(attacker_obs[node][-1])
+                    neighbor_defense_attributes[node] = defender_obs[id]
+            else:
+                neighbor_defense_attributes = defender_obs
+
+        if self.idsgame_env.fully_observed() or \
+                (self.idsgame_env.idsgame_config.game_config.reconnaissance_actions and attacker):
+            if self.pg_agent_config.merged_ad_features:
+                if not self.idsgame_env.local_view_features() or not attacker:
+                    a_pos = attacker_obs[:, -1]
+                    if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                        det_values = defender_obs[:, -1]
+                        temp = defender_obs[:, 0:-1] - attacker_obs[:, 0:-1]
+                    else:
+                        temp = defender_obs[:, 0:] - attacker_obs[:, 0:-1]
+                    features = []
+                    for idx, row in enumerate(temp):
+                        t = row.tolist()
+                        #t.append(a_pos[idx])
+                        if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                            t.append(det_values[idx])
+                        features.append(t)
+                else:
+                    node_ids = attacker_obs[:, -1]
+                    if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                        det_values = neighbor_defense_attributes[:, -1]
+                    if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                        temp = neighbor_defense_attributes[:, 0:-1] - attacker_obs[:, 0:-1]
+                    else:
+                        temp = np.full(neighbor_defense_attributes.shape, -1)
+                        for i in range(len(neighbor_defense_attributes)):
+                            if np.sum(neighbor_defense_attributes[i]) > 0:
+                                temp[i] = neighbor_defense_attributes[i] - attacker_obs[i, 0:-1]
+                    features = []
+                    for idx, row in enumerate(temp):
+                        t = row.tolist()
+                        t.append(node_ids[idx])
+                        #t.append(node_reachable[idx])
+                        if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                            t.append(det_values[idx])
+                        features.append(t)
+                features = np.array(features)
+
+        colors = set()
+        rank_ids = [2,3,4,5]
+        features[0, :] = [1,2,3,4]
+        for n in range(len(a_pos)):
+            if a_pos[n] == 1:
+                features[n,:] = np.full(features.shape[1], 0)
+                colors.add(0)
+            elif np.all(features[n] == constants.GAME_CONFIG.INITIAL_RECONNAISSANCE_STATE):
+                features[n,:] = np.full(features.shape[1], 1)
+                colors.add(1)
+            else:
+                values = features[n,:]
+                sorted_values = sorted(values, key=lambda x: x)
+                for i in range(len(values)):
+                    idx = sorted_values.index(values[i])
+                    values[i] = rank_ids[idx]
+                    colors.add(rank_ids[idx])
+                features[n, :] = values
+        #print("features:{}".format(features))
+        cmap = matplotlib.colors.ListedColormap(['white', 'red', "Blue", "gray", "yellow",
+                                                  "green", "#A4940A", "#FFE600"], N=len(colors))
+        fig = plt.figure(figsize=(3, 3))
+        plt.pcolor(features[::-1], cmap=cmap, edgecolors='k', linewidths=3)
+        plt.axis("off")
+        data = util.get_img_from_fig(fig, dpi=20)
+        data = np.rollaxis(data, 2, 0)
+        plt.close()
+        #print("data shape:{}".format(data.shape))
+        #print("data shape:{}".format(data.shape))
+        #fig2 = plt.figure(figsize=(4, 4))
+        #ax = plt.Axes(fig2, [0., 0., 1., 1.])
+        #ax.set_axis_off()
+        #fig2.add_axes(ax)
+        #ax.imshow(data)
+        #plt.show()
+        #raise AssertionError("test")
+        return data
+        #return defender_obs
 
