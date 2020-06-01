@@ -404,9 +404,17 @@ class PPO(BaseRLModel):
 
 
         if self.pg_agent_config.attacker:
-            attacker_rollout_buffer.compute_returns_and_advantage(attacker_values, dones=dones)
+            if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
+                if self.train_attacker:
+                    attacker_rollout_buffer.compute_returns_and_advantage(attacker_values, dones=dones)
+            else:
+                attacker_rollout_buffer.compute_returns_and_advantage(attacker_values, dones=dones)
         if self.pg_agent_config.defender:
-            defender_rollout_buffer.compute_returns_and_advantage(defender_values, dones=dones)
+            if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
+                if self.train_defender:
+                    defender_rollout_buffer.compute_returns_and_advantage(defender_values, dones=dones)
+            else:
+                defender_rollout_buffer.compute_returns_and_advantage(defender_values, dones=dones)
 
         callback.on_rollout_end()
 
