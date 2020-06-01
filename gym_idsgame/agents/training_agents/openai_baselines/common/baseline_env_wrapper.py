@@ -731,5 +731,4 @@ class BaselineEnvWrapper(gym.Env):
         #plt.show()
         #raise AssertionError("test")
         return data
-        #return defender_obs
 
