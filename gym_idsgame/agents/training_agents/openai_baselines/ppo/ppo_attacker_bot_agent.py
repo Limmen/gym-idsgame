@@ -44,7 +44,7 @@ class PPOBaselineAttackerBotAgent(BotAgent):
         if self.config.cnn_feature_extractor:
             policy = "CnnPolicy"
         # Initialize models
-        self.model = PPO.load(self.config.attacker_load_path, policy, self.config)
+        self.model = PPO.load(self.config.attacker_load_path, policy, pg_agent_config=self.config)
 
     def action(self, game_state: GameState) -> int:
         """
@@ -73,7 +73,6 @@ class PPOBaselineAttackerBotAgent(BotAgent):
 
         if self.idsgame_env.local_view_features():
             attack = self.convert_local_attacker_action_to_global(attacker_actions.item(), attacker_obs)
-            print("predicted attacK.{}, legal:{}".format(attack, self.idsgame_env.is_attack_legal(attack)))
             return attack
         else:
             return attacker_actions.item()

@@ -105,6 +105,7 @@ def get_device(device: Union[th.device, str] = 'auto', pg_agent_config : PolicyG
     # Cuda by default
     if device == 'auto':
         device = 'cuda'
+
     # Force conversion to th.device
     device = th.device(device)
 

@@ -130,7 +130,7 @@ class PPO(BaseRLModel):
         self.iteration = 0
         self.train_attacker = True
         self.train_defender = True
-        if self.pg_agent_config.opponent_pool and self.pg_agent_config.opponent_pool_config is not None:
+        if self.pg_agent_config is not None and self.pg_agent_config.opponent_pool and self.pg_agent_config.opponent_pool_config is not None:
             self.attacker_pool = []
             self.defender_pool = []
             self.train_attacker = True
