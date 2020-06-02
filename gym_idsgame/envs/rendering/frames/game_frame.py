@@ -161,11 +161,14 @@ class GameFrame(pyglet.window.Window):
                             attack_node_id, attack_node_pos, attack_type, reconnaissance = util.interpret_attack_action(
                                 attack_id, self.idsgame_config.game_config)
                             attack_row, attack_col = attack_node_pos
+                            legal = util.is_attack_legal(attack_node_pos, self.attacker_sprite.pos,
+                                                 self.idsgame_config.game_config.network_config)
 
                             if not reconnaissance:
                                 self.game_state.attack(attack_node_id, attack_type,
                                                        self.idsgame_config.game_config.max_value,
-                                                       self.idsgame_config.game_config.network_config)
+                                                       self.idsgame_config.game_config.network_config,
+                                                       reconnaissaince_enabled=self.idsgame_config.reconnaissance_actions)
                             else:
                                 self.game_state.reconnaissance(attack_node_id, attack_type)
 
@@ -229,7 +232,8 @@ class GameFrame(pyglet.window.Window):
                                 if not reconnaissance:
                                     self.game_state.attack(node.id, self.game_state.attack_defense_type,
                                                            self.idsgame_config.game_config.max_value,
-                                                           self.idsgame_config.game_config.network_config)
+                                                           self.idsgame_config.game_config.network_config,
+                                                           reconnaissaince_enabled=self.idsgame_config.reconnaissance_actions)
                                 else:
                                     attack_type = self.game_state.attack_defense_type - \
                                                   self.idsgame_config.game_config.num_attack_types

@@ -262,7 +262,8 @@ class GameState():
         new_state.reconnaissance_actions = self.reconnaissance_actions
         return new_state
 
-    def attack(self, node_id: int, attack_type: int, max_value: int, network_config: NetworkConfig) -> None:
+    def attack(self, node_id: int, attack_type: int, max_value: int, network_config: NetworkConfig,
+               reconnaissaince_enabled : bool = False) -> None:
         """
         Increments the attack value of the specified node and attack type
 
@@ -270,10 +271,15 @@ class GameState():
         :param attack_type: the type of attack attribute to increment
         :param max_value: the maximum defense value
         :param network_config: NetworkConfig
+        :param reconnaissaince_enabled: boolean flag indicating whether reconnaissance actions are enabled or not
         :return: None
         """
         if network_config.node_list[node_id] != NodeType.START and self.attack_values[node_id][attack_type] < max_value:
             self.attack_values[node_id][attack_type] += 1
+        if reconnaissaince_enabled:
+            if network_config.node_list[node_id] != NodeType.START and \
+                    self.attack_values[node_id][attack_type] > self.reconnaissance_state[node_id][attack_type]:
+                self.reconnaissance_state[node_id][attack_type] = self.attack_values[node_id][attack_type]
 
     def reconnaissance(self, node_id: int, attack_type: int) -> int:
         """

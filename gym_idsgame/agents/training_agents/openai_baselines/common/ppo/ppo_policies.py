@@ -162,7 +162,8 @@ class PPOPolicy(BasePolicy):
             lr_schedule(1) is the initial learning rate
         """
         self.mlp_extractor = MlpExtractor(self.features_dim, net_arch=self.net_arch,
-                                          activation_fn=self.activation_fn, device=self.device)
+                                          activation_fn=self.activation_fn, device=self.device,
+                                          pg_agent_config=self.pg_agent_config)
 
         latent_dim_pi = self.mlp_extractor.latent_dim_pi
 

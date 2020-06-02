@@ -566,9 +566,10 @@ class MlpExtractor(nn.Module):
     def __init__(self, feature_dim: int,
                  net_arch: List[Union[int, Dict[str, List[int]]]],
                  activation_fn: Type[nn.Module],
-                 device: Union[th.device, str] = 'auto'):
+                 device: Union[th.device, str] = 'auto',
+                 pg_agent_config: PolicyGradientAgentConfig = None):
         super(MlpExtractor, self).__init__()
-        device = get_device(device)
+        device = get_device(device, pg_agent_config)
         shared_net, policy_net, value_net = [], [], []
         policy_only_layers = []  # Layer sizes of the network that only belongs to the policy network
         value_only_layers = []  # Layer sizes of the network that only belongs to the value network

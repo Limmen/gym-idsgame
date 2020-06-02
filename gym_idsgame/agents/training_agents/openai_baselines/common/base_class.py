@@ -529,7 +529,8 @@ class BaseRLModel(ABC):
 
         #print("data:{}".format(data.keys()))
         # noinspection PyArgumentList
-        model = cls(env, policy_class, device='auto', _init_setup_model=False)
+        device = "cpu" if not pg_agent_config.gpu else "cuda:" + str(pg_agent_config.gpu_id)
+        model = cls(env, policy_class, device=device, _init_setup_model=False, pg_agent_config=pg_agent_config)
 
         # load parameters
         model.__dict__.update(data)
