@@ -186,8 +186,8 @@ class IdsGameEnv(gym.Env, ABC):
                 #         reward = self.get_blocked_attack_reward(target_node_id, attack_type)
                 if self.idsgame_config.save_attack_stats:
                     self.attack_detections.append([target_node_id, detected, self.state.defense_det[target_node_id]])
-        # else:
-        #     print("illegal action:{}".format(attack_action))
+        else:
+            print("illegal action:{}".format(attack_action))
             # reward = -100*constants.GAME_CONFIG.POSITIVE_REWARD, 0
             # self.state.done = True
             # self.state.detected = True
