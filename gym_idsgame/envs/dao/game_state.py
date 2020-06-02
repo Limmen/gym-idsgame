@@ -355,10 +355,9 @@ class GameState():
         :return: True if the node was detected, otherwise False
         """
         if not reconnaissance:
-            return np.random.rand() < (self.defense_det[node_id]/10)*reconnaissance_detection_factor
+            return np.random.rand() < self.defense_det[node_id]/10
         else:
-            det_prob = self.defense_det[node_id] / 10
-            #det_prob = self.defense_det[node_id] / 10
+            det_prob = (self.defense_det[node_id] / 10)*reconnaissance_detection_factor
             return np.random.rand() < det_prob
 
     def get_attacker_observation(self, network_config: NetworkConfig, local_view=False, reconnaissance = False,
