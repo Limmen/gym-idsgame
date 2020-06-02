@@ -182,7 +182,8 @@ class IdsGameEnv(gym.Env, ABC):
             else:
                 self.num_failed_attacks += 1
                 self.past_positions.append(self.state.attacker_pos)
-                detected = self.state.simulate_detection(target_node_id, reconnaissance=reconnaissance)
+                detected = self.state.simulate_detection(target_node_id, reconnaissance=reconnaissance,
+                                                         reconnaissance_detection_factor=self.idsgame_config.reconnaissance_detection_factor)
                 if detected:
                     self.state.done = True
                     self.state.detected = True

@@ -17,7 +17,7 @@ class IdsGameConfig:
                  reconnaissance_actions : bool = False, randomize_starting_position : bool = False,
                  reconnaissance_bool_features : bool = False, extra_reconnaissance_reward : bool = False,
                  reconnaissance_reward : bool = False, randomize_visibility : bool = True,
-                 visibility_p : float = 0.5):
+                 visibility_p : float = 0.5, reconnaissance_detection_factor = 1):
         """
         Constructor, initializes the config
 
@@ -40,6 +40,7 @@ class IdsGameConfig:
         :param reconnaissance_reward: whether to give a reward for reconnaissance actions when new info is found
         :param randomize_visibility: whether to randomize visibilty during training (for partailly observed envs only)
         :param visibility_p: when randomizing visibility, set to visible with this probability
+        :param reconnaissance_detection_factor: factor to multiple reconnaissance probabiltiy with
         """
         self.render_config = render_config
         self.game_config = game_config
@@ -62,4 +63,5 @@ class IdsGameConfig:
         self.reconnaissance_reward = reconnaissance_reward
         self.randomize_visibility = randomize_visibility
         self.visibility_p = visibility_p
+        self.reconnaissance_detection_factor = reconnaissance_detection_factor
 

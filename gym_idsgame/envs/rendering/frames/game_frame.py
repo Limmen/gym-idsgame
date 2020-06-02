@@ -202,7 +202,8 @@ class GameFrame(pyglet.window.Window):
                                     self.game_state.hacked = True
                             else:
                                 detected = self.game_state.simulate_detection(
-                                    self.resource_network.grid[attack_row][attack_col].id, reconnaissance=reconnaissance)
+                                    self.resource_network.grid[attack_row][attack_col].id, reconnaissance=reconnaissance,
+                                reconnaissance_detection_factor=self.idsgame_config.reconnaissance_detection_factor)
                                 if detected:
                                     self.game_state.done = True
                                     self.game_state.detected = True
@@ -268,7 +269,8 @@ class GameFrame(pyglet.window.Window):
                                         self.game_state.done = True
                                         self.game_state.hacked = True
                                 else:
-                                    detected = self.game_state.simulate_detection(node.id, reconnaissance=reconnaissance)
+                                    detected = self.game_state.simulate_detection(node.id, reconnaissance=reconnaissance,
+                                                                                  reconnaissance_detection_factor=self.idsgame_config.reconnaissance_detection_factor)
                                     if detected:
                                         self.game_state.done = True
                                         self.game_state.detected = True

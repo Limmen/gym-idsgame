@@ -60,7 +60,7 @@ def default_config() -> ClientConfig:
                                                 num_episodes=100000000,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
-                                                eval_frequency=175000, attacker=True, defender=False,
+                                                eval_frequency=100, attacker=True, defender=False,
                                                 video_frequency=1001,
                                                 save_dir=default_output_dir() + "/results/data",
                                                 checkpoint_freq=250,
@@ -79,7 +79,7 @@ def default_config() -> ClientConfig:
                                                 eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95,
                                                 cnn_feature_extractor=False, features_dim=512,
                                                 flatten_feature_planes=False, cnn_type=5, vf_coef=0.5, ent_coef=0.001,
-                                                render_attacker_view=True, lr_progress_power_decay=4,
+                                                render_attacker_view=False, lr_progress_power_decay=4,
                                                 lr_progress_decay=True, use_sde=False, sde_sample_freq=4,
                                                 one_hot_obs=False, force_exploration=False, force_exp_p=0.25)
     env_name = "idsgame-minimal_defense-v19"

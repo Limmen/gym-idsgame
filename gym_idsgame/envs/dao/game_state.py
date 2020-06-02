@@ -346,7 +346,7 @@ class GameState():
             return True
         return self.attack_values[attacked_node_id][attack_type] > self.defense_values[attacked_node_id][attack_type]
 
-    def simulate_detection(self, node_id: int, reconnaissance: bool) -> bool:
+    def simulate_detection(self, node_id: int, reconnaissance: bool, reconnaissance_detection_factor : float = 1) -> bool:
         """
         Simulates detection for a unsuccessful attack
 
@@ -355,7 +355,7 @@ class GameState():
         :return: True if the node was detected, otherwise False
         """
         if not reconnaissance:
-            return np.random.rand() < self.defense_det[node_id] / 100
+            return np.random.rand() < (self.defense_det[node_id]/10)*reconnaissance_detection_factor
         else:
             det_prob = self.defense_det[node_id] / 10
             #det_prob = self.defense_det[node_id] / 10
