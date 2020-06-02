@@ -182,6 +182,11 @@ class BaselineEnvWrapper(gym.Env):
         else:
             return 0.0
 
+    def is_reconnaissance(self, action):
+        if self.idsgame_env.local_view_features():
+            action = self.convert_local_attacker_action_to_global(action, self.latest_obs[0])
+        return self.idsgame_env.is_reconnaissance(action)
+
     def games(self):
         return self.num_games
 

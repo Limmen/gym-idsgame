@@ -269,6 +269,7 @@ class PPO(BaseRLModel):
         episode_step = 0
 
         callback.on_rollout_start()
+        force_rec = False
         while n_steps < n_rollout_steps:
             if self.use_sde and self.sde_sample_freq > 0 and n_steps % self.sde_sample_freq == 0:
                 # Sample a new noise matrix
@@ -288,7 +289,8 @@ class PPO(BaseRLModel):
                 obs_tensor_d = th.as_tensor(self._last_obs_d).to(self.device)
                 if self.pg_agent_config.attacker and self.train_attacker:
                     attacker_actions, attacker_values, attacker_log_probs = self.attacker_policy.forward(
-                        obs_tensor_a, self.env.envs[0], device=self.device, attacker=True)
+                        obs_tensor_a, self.env.envs[0], device=self.device, attacker=True, force_rec=force_rec)
+                    force_rec = False
                     attacker_actions = attacker_actions.cpu().numpy()
 
                     if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
@@ -324,6 +326,10 @@ class PPO(BaseRLModel):
 
             joint_actions = np.array([[clipped_attacker_actions, clipped_defender_actions]])
             new_a_obs, new_d_obs, a_rewards, d_rewards, dones, infos = env.step(joint_actions, update_stats=True)
+            #print("infos:{}".format(infos))
+            if self.pg_agent_config.force_exploration and infos[0]["moved"] == True:
+                if np.random.rand() < self.pg_agent_config.force_exp_p:
+                    force_rec = True
 
             if callback.on_step() is False:
                 return False

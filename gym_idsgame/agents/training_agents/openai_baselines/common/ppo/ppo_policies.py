@@ -205,7 +205,8 @@ class PPOPolicy(BasePolicy):
 
     def forward(self, obs: th.Tensor, env : IdsGameEnv,
                 deterministic: bool = False, device: str = "cpu", attacker = True,
-                non_legal_actions=None, wrapper_env: BaselineEnvWrapper = None) -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
+                non_legal_actions=None, wrapper_env: BaselineEnvWrapper = None, force_rec : bool = False) \
+            -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
         """
         Forward pass in all the networks (actor and critic)
 
@@ -231,6 +232,16 @@ class PPOPolicy(BasePolicy):
                         wrapper_env.convert_local_attacker_action_to_global(action, np_obs)), actions))
                 else:
                     non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action), actions))
+                if force_rec:
+                    legal_rec = list(filter(lambda action: env.is_attack_legal(action) and env.is_reconnaissance(action), actions))
+                    if len(legal_rec) > 0:
+                        non_legal_no_rec = list(
+                            filter(lambda action: not env.is_attack_legal(action) or not env.is_reconnaissance(action),
+                                   actions))
+                        # print("force reconnaissance, before force:{}, after:{}".format(
+                        #     len(non_legal_actions), len(non_legal_no_rec)))
+                        non_legal_actions = non_legal_no_rec
+
             else:
                 actions = list(range(env.num_defense_actions))
                 legal_actions = list(filter(lambda action: env.is_defense_legal(action), actions))

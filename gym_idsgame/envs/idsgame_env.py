@@ -113,6 +113,7 @@ class IdsGameEnv(gym.Env, ABC):
         trajectory.append(self.state)
         reward = (0,0)
         info = {}
+        info["moved"] = False
         self.state.attack_events = []
         self.state.defense_events = []
 
@@ -167,6 +168,7 @@ class IdsGameEnv(gym.Env, ABC):
             # 6. Update state based on attack outcome
             if attack_successful:
                 if not reconnaissance:
+                    info["moved"] = True
                     self.past_positions.append(target_pos)
                     self.state.attacker_pos = target_pos
                     self.hacked_nodes.append(target_node_id)
@@ -549,6 +551,16 @@ class IdsGameEnv(gym.Env, ABC):
         :return: True if the environment uses local view observations
         """
         return self.idsgame_config.local_view_observations
+
+    def is_reconnaissance(self, action):
+        server_id, server_pos, attack_type, reconnaissance = util.interpret_attack_action(action, self.idsgame_config.game_config)
+        return reconnaissance
+        # if server_id not in self.state.reconnaissance_actions:
+        #     #print("server_id:{}, rec actions:{}".format(server_id, self.state.reconnaissance_actions))
+        #     return reconnaissance
+        # else:
+        #     #print("no rec needed")
+        #     return False
 
     @abstractmethod
     def get_attacker_action(self, action) -> Union[int, Union[int, int], int]:
