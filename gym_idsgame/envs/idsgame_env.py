@@ -242,7 +242,9 @@ class IdsGameEnv(gym.Env, ABC):
                             det_val = self.idsgame_config.game_config.det_val,
                             vulnerability_val = self.idsgame_config.game_config.vulnerabilitiy_val,
                             num_vulnerabilities_per_layer=self.idsgame_config.game_config.num_vulnerabilities_per_layer,
-                            num_vulnerabilities_per_node=self.idsgame_config.game_config.num_vulnerabilities_per_node)
+                            num_vulnerabilities_per_node=self.idsgame_config.game_config.num_vulnerabilities_per_node,
+                            randomize_visibility=self.idsgame_config.randomize_visibility,
+                            visibility_p=self.idsgame_config.visibility_p)
         self.a_cumulative_reward = 0
         self.d_cumulative_reward = 0
         if self.idsgame_config.randomize_starting_position:
@@ -486,7 +488,7 @@ class IdsGameEnv(gym.Env, ABC):
             if attack_row < self.furthest_hack:
                 self.furthest_hack = attack_row
                 extra_reward = 0
-                if self.idsgame_config.extra_reconnaisasnce_reward:
+                if self.idsgame_config.extra_reconnaissance_reward:
                     for rec_act in self.past_reconnaissance_activities:
                         node_id, rec_type = rec_act
                         server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
@@ -4086,7 +4088,8 @@ class IdsGameRandomDefenseV19Env(AttackerEnv):
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
             game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
-                                          vulnerability_val=1, num_vulnerabilities_per_layer=2)
+                                          vulnerability_val=1, num_vulnerabilities_per_layer=2,
+                                          randomize_visibility=True, visibility_p=0.25)
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
@@ -4103,6 +4106,9 @@ class IdsGameRandomDefenseV19Env(AttackerEnv):
             idsgame_config.local_view_observations = True
             idsgame_config.reconnaissance_bool_features = True
             idsgame_config.reconnaissance_actions = True
+            idsgame_config.reconnaissance_reward = True
+            idsgame_config.randomize_visibility = True
+            idsgame_config.visibility_p = 0.25
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
 
 
@@ -4131,7 +4137,8 @@ class IdsGameMinimalDefenseV19Env(AttackerEnv):
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
             game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
-                                          vulnerability_val=1, num_vulnerabilities_per_layer=2)
+                                          vulnerability_val=1, num_vulnerabilities_per_layer=2,
+                                          randomize_visibility=True, visibility_p=0.25)
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
@@ -4148,6 +4155,9 @@ class IdsGameMinimalDefenseV19Env(AttackerEnv):
             idsgame_config.local_view_observations = True
             idsgame_config.reconnaissance_bool_features = True
             idsgame_config.reconnaissance_actions = True
+            idsgame_config.reconnaissance_reward = True
+            idsgame_config.randomize_visibility = True
+            idsgame_config.visibility_p = 0.25
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
 
 
@@ -4176,7 +4186,8 @@ class IdsGameRandomAttackV19Env(DefenderEnv):
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
             game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
-                                          vulnerability_val=1, num_vulnerabilities_per_layer=2)
+                                          vulnerability_val=1, num_vulnerabilities_per_layer=2,
+                                          randomize_visibility=True, visibility_p=0.25)
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
@@ -4193,6 +4204,9 @@ class IdsGameRandomAttackV19Env(DefenderEnv):
             idsgame_config.local_view_observations = True
             idsgame_config.reconnaissance_bool_features = True
             idsgame_config.reconnaissance_actions = True
+            idsgame_config.reconnaissance_reward = True
+            idsgame_config.randomize_visibility = True
+            idsgame_config.visibility_p = 0.25
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
 
 
@@ -4221,7 +4235,8 @@ class IdsGameMaximalAttackV19Env(DefenderEnv):
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
             game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
-                                          vulnerability_val=1, num_vulnerabilities_per_layer=2)
+                                          vulnerability_val=1, num_vulnerabilities_per_layer=2,
+                                          randomize_visibility=True, visibility_p=0.25)
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
@@ -4238,6 +4253,9 @@ class IdsGameMaximalAttackV19Env(DefenderEnv):
             idsgame_config.reconnaissance_bool_features = True
             idsgame_config.local_view_observations = True
             idsgame_config.reconnaissance_actions = True
+            idsgame_config.reconnaissance_reward = True
+            idsgame_config.randomize_visibility = True
+            idsgame_config.visibility_p = 0.25
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
 
 
@@ -4266,7 +4284,8 @@ class IdsGameV19Env(AttackDefenseEnv):
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
             game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
-                                          vulnerability_val=1, num_vulnerabilities_per_layer=2)
+                                          vulnerability_val=1, num_vulnerabilities_per_layer=2,
+                                          randomize_visibility=True, visibility_p=0.25)
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
@@ -4282,4 +4301,7 @@ class IdsGameV19Env(AttackDefenseEnv):
             idsgame_config.reconnaissance_bool_features = True
             idsgame_config.local_view_observations = True
             idsgame_config.reconnaissance_actions = True
+            idsgame_config.reconnaissance_reward = True
+            idsgame_config.randomize_visibility = True
+            idsgame_config.visibility_p = 0.25
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)

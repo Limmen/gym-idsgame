@@ -95,8 +95,9 @@ class GameConfig():
         self.initial_state = GameState.load(initial_state_path)
 
     def set_initial_state(self, defense_val=2, attack_val=0,
-                  num_vulnerabilities_per_node=1, det_val=2, vulnerability_val=0,
-                          num_vulnerabilities_per_layer=None):
+                          num_vulnerabilities_per_node=1, det_val=2, vulnerability_val=0,
+                          num_vulnerabilities_per_layer=None, randomize_visibility : bool = False,
+                          visibility_p : float = 0.5):
         """
         Utility function for setting the initial game state
 
@@ -107,6 +108,8 @@ class GameConfig():
         :param vulnerability_val: defense value for defense types that are vulnerable
         :param num_vulnerabilities_per_layer: number of vulnerabilities per layer
         :param min_random_val: minimum val when randomizing the state
+        :param randomize_state: boolean flag whether to create the state randomly
+        :param randomize_visibility: boolean flag whether to randomize visibility for partially observed envs
         :return:
         """
         if num_vulnerabilities_per_layer is None:
@@ -121,7 +124,9 @@ class GameConfig():
                                      attack_val=attack_val, num_vulnerabilities_per_node=num_vulnerabilities_per_node,
                                      det_val=det_val, vulnerability_val=vulnerability_val,
                                      network_config=self.network_config,
-                                     num_vulnerabilities_per_layer=num_vulnerabilities_per_layer)
+                                     num_vulnerabilities_per_layer=num_vulnerabilities_per_layer,
+                                     randomize_visibility=randomize_visibility,
+                                     visibility_p=visibility_p)
 
     def get_attacker_observation_space(self) -> gym.spaces.Box:
         """

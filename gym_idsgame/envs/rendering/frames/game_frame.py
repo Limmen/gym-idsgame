@@ -191,7 +191,7 @@ class GameFrame(pyglet.window.Window):
                                     attack_node_id, attack_type, self.idsgame_config.game_config.network_config)
                             else:
                                 # 6. Visualize reconnaissance
-                                node.visualize_reconnaissance()
+                                self.resource_network.grid[attack_row][attack_col].visualize_reconnaissance()
 
                             # 8. Update game state based on the outcome of the attack
                             self.game_state.game_step += 1
@@ -553,7 +553,9 @@ class GameFrame(pyglet.window.Window):
                                  vulnerability_val=self.idsgame_config.game_config.vulnerabilitiy_val,
                                  num_vulnerabilities_per_layer=
                                  self.idsgame_config.game_config.num_vulnerabilities_per_layer,
-                                 num_vulnerabilities_per_node=self.idsgame_config.game_config.num_vulnerabilities_per_node
+                                 num_vulnerabilities_per_node=self.idsgame_config.game_config.num_vulnerabilities_per_node,
+                                 randomize_visibility=self.idsgame_config.randomize_visibility,
+                                 visibility_p=self.idsgame_config.visibility_p
                                  )
         if self.idsgame_config.randomize_starting_position:
             self.game_state.randomize_attacker_position(self.idsgame_config.game_config.network_config)

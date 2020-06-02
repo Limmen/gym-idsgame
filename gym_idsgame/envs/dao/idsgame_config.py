@@ -15,7 +15,9 @@ class IdsGameConfig:
                  save_trajectories :bool = False, save_attack_stats : bool = False,
                  randomize_env : bool = False, local_view_observations : bool = False,
                  reconnaissance_actions : bool = False, randomize_starting_position : bool = False,
-                 reconnaissance_bool_features : bool = False, extra_reconnaisasnce_reward : bool = False):
+                 reconnaissance_bool_features : bool = False, extra_reconnaissance_reward : bool = False,
+                 reconnaissance_reward : bool = False, randomize_visibility : bool = True,
+                 visibility_p : float = 0.5):
         """
         Constructor, initializes the config
 
@@ -33,8 +35,11 @@ class IdsGameConfig:
         :param randomize_starting_position: if true, the starting position of the attacker is randomized
         :param reconnaissance_bool_features: boolean flag whether to include boolean features that indicate if
                                              reconnaissance have been done for a certain defense type
-        :param extra_reconnaisasnce_reward: boolean flag whether to give the agent extra reward when doing
+        :param extra_reconnaissance_reward: boolean flag whether to give the agent extra reward when doing
                                             "informed hacks" as opposed to guessing
+        :param reconnaissance_reward: whether to give a reward for reconnaissance actions when new info is found
+        :param randomize_visibility: whether to randomize visibilty during training (for partailly observed envs only)
+        :param visibility_p: when randomizing visibility, set to visible with this probability
         """
         self.render_config = render_config
         self.game_config = game_config
@@ -53,4 +58,8 @@ class IdsGameConfig:
         self.reconnaissance_actions = reconnaissance_actions
         self.randomize_starting_position = randomize_starting_position
         self.reconnaissance_bool_features = reconnaissance_bool_features
-        self.extra_reconnaisasnce_reward = extra_reconnaisasnce_reward
+        self.extra_reconnaissance_reward = extra_reconnaissance_reward
+        self.reconnaissance_reward = reconnaissance_reward
+        self.randomize_visibility = randomize_visibility
+        self.visibility_p = visibility_p
+

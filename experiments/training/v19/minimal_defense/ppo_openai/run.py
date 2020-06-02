@@ -81,15 +81,7 @@ def default_config() -> ClientConfig:
                                                 flatten_feature_planes=False, cnn_type=5, vf_coef=0.5, ent_coef=0.00,
                                                 render_attacker_view=True, lr_progress_power_decay=4,
                                                 lr_progress_decay=True, use_sde=False, sde_sample_freq=4,
-                                                one_hot_obs=False)
-    # input_dim_attacker = (3, 3, 5),
-    # output_dim_attacker = (5 * 2) * 3,
-    # input_dim_defender = (3, 3, 5),
-    # output_dim_defender = 6 * 3,
-    # input_dim_attacker = ((5 * 2 + 1) * 3),
-    # output_dim_attacker = (5 * 2) * 3,
-    # input_dim_defender = ((5 + 1) * 3),
-    # output_dim_defender = 6 * 3,
+                                                one_hot_obs=False, force_exploration=False, force_exp_p=0.25)
     env_name = "idsgame-minimal_defense-v19"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.PPO_OPENAI_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,

@@ -79,7 +79,8 @@ class GameState():
         self.max_random_v_val = max_random_v_val
 
     def default_state(self, node_list: List[int], attacker_pos: Union[int, int], num_attack_types: int,
-                      network_config: NetworkConfig, randomize_state : bool = False) -> None:
+                      network_config: NetworkConfig, randomize_state : bool = False,
+                      randomize_visibility : bool = False, visibility_p : float = 0.5) -> None:
         """
         Creates a default state
 
@@ -89,10 +90,13 @@ class GameState():
         :param num_attack_types: the number of attack types
         :param network_config: network config
         :param randomize_state: boolean flag whether to create the state randomly
+        :param randomize_state: boolean flag whether to create the state randomly
+        :param randomize_visibility: boolean flag whether to randomize visibility for partially observed envs
         :return: None
         """
         self.set_state(node_list, num_attack_types, network_config=network_config,
-                       num_vulnerabilities_per_layer=network_config.num_cols, randomize_state=randomize_state)
+                       num_vulnerabilities_per_layer=network_config.num_cols, randomize_state=randomize_state,
+                       randomize_visibility=randomize_visibility, visibility_p=visibility_p)
         self.attacker_pos = attacker_pos
         self.game_step = 0
         self.attacker_cumulative_reward = 0
@@ -110,7 +114,8 @@ class GameState():
     def set_state(self, node_list : List, num_attack_types : int, defense_val :int = 2, attack_val :int = 0,
                   num_vulnerabilities_per_node : int = 1, det_val : int = 2, vulnerability_val: int = 0,
                   num_vulnerabilities_per_layer : int = 1,
-                  network_config : NetworkConfig = None, randomize_state : bool = False):
+                  network_config : NetworkConfig = None, randomize_state : bool = False,
+                  randomize_visibility : bool = False, visibility_p : float = 0.5):
         """
         Sets the state
 
@@ -124,6 +129,7 @@ class GameState():
         :param num_vulnerabilities_per_layer: number of vulnerabilities per layer
         :param network_config: network configuration
         :param randomize_state: boolean flag whether to create the state randomly
+        :param randomize_visibility: boolean flag whether to randomize visibility for partially observed envs
         :return: None
         """
         num_nodes = len(node_list)
@@ -170,13 +176,12 @@ class GameState():
                 for vuln_id in vulnerabilities:
                     defense_values[node_id][vuln_id] = v_val  # vulnerability (lower defense)
 
-        if randomize_state:
+        if randomize_visibility:
             for node_id in range(len(reconnaissance_state)):
-                if np.random.rand() < 0.5:
+                if np.random.rand() < visibility_p:
                     reconnaissance_state[node_id] = defense_values[node_id]
                     self.reconnaissance_actions.append(node_id)
-                # for attack_id in range(reconnaissance_state.shape[1]):
-                #     if np.random.rand() < 0.2:
+
         self.attack_values = attack_values.astype(np.int32)
         self.defense_values = defense_values.astype(np.int32)
         self.defense_det = det_values.astype(np.int32)
@@ -187,7 +192,8 @@ class GameState():
                  update_stats = True, randomize_state : bool = False, network_config : NetworkConfig = None,
                  num_attack_types : int = None, defense_val : int = None, attack_val : int = None,
                  det_val : int = None, vulnerability_val : int = None,
-                 num_vulnerabilities_per_layer : int = None, num_vulnerabilities_per_node : int = None) -> None:
+                 num_vulnerabilities_per_layer : int = None, num_vulnerabilities_per_node : int = None,
+                 randomize_visibility : bool = False, visibility_p : float = 0.5) -> None:
         """
         Updates the current state for a new game
 
@@ -202,6 +208,8 @@ class GameState():
         :param det_val: detection value per node
         :param vulnerability_val: defense value for defense types that are vulnerable
         :param num_vulnerabilities_per_layer: number of vulnerabilities per layer
+        :param randomize_state: boolean flag whether to create the state randomly
+        :param randomize_visibility: boolean flag whether to randomize visibility for partially observed envs
         :return: None
         """
         if update_stats:
@@ -229,7 +237,8 @@ class GameState():
                            num_vulnerabilities_per_layer=num_vulnerabilities_per_layer, randomize_state=randomize_state,
                            defense_val=defense_val,
                            attack_val=attack_val, num_vulnerabilities_per_node=num_vulnerabilities_per_node,
-                           det_val=det_val, vulnerability_val=vulnerability_val)
+                           det_val=det_val, vulnerability_val=vulnerability_val,
+                           randomize_visibility=randomize_visibility, visibility_p=visibility_p)
         self.detected = False
         self.hacked = False
         self.reconnaissance_actions = []
@@ -291,9 +300,9 @@ class GameState():
         :param network_config: NetworkConfig
         :return: reward
         """
-        reward = 0*constants.GAME_CONFIG.POSITIVE_REWARD \
+        reward = -0.5*constants.GAME_CONFIG.POSITIVE_REWARD \
             if (self.reconnaissance_state[node_id] == self.defense_values[node_id]).all() \
-            else 0*constants.GAME_CONFIG.POSITIVE_REWARD
+            else 0.5*constants.GAME_CONFIG.POSITIVE_REWARD
         # self.reconnaissance_state[node_id][attack_type] = self.defense_values[node_id][attack_type]
         self.reconnaissance_state[node_id] = self.defense_values[node_id]
         self.reconnaissance_actions.append(node_id)
