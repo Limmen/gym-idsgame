@@ -290,7 +290,7 @@ class GameState():
                     self.attack_values[node_id][attack_type] > self.reconnaissance_state[node_id][attack_type]:
                 self.reconnaissance_state[node_id][attack_type] = self.attack_values[node_id][attack_type]
 
-    def reconnaissance(self, node_id: int, attack_type: int) -> int:
+    def reconnaissance(self, node_id: int, attack_type: int, reconnaissance_reward : bool = False) -> int:
         """
         Performs a reconnaissance activity for the attacker
 
@@ -300,10 +300,12 @@ class GameState():
         :param network_config: NetworkConfig
         :return: reward
         """
-        reward = -0.5*constants.GAME_CONFIG.POSITIVE_REWARD \
-            if (self.reconnaissance_state[node_id] == self.defense_values[node_id]).all() \
-            else 0.5*constants.GAME_CONFIG.POSITIVE_REWARD
-        # self.reconnaissance_state[node_id][attack_type] = self.defense_values[node_id][attack_type]
+        if reconnaissance_reward:
+            reward = -0.5 * constants.GAME_CONFIG.POSITIVE_REWARD \
+                if (self.reconnaissance_state[node_id] == self.defense_values[node_id]).all() \
+                else 0.5 * constants.GAME_CONFIG.POSITIVE_REWARD
+        else:
+            reward = 0
         self.reconnaissance_state[node_id] = self.defense_values[node_id]
         self.reconnaissance_actions.append(node_id)
         return reward
@@ -353,7 +355,7 @@ class GameState():
         :return: True if the node was detected, otherwise False
         """
         if not reconnaissance:
-            return np.random.rand() < self.defense_det[node_id] / 10
+            return np.random.rand() < self.defense_det[node_id] / 100
         else:
             det_prob = self.defense_det[node_id] / 10
             #det_prob = self.defense_det[node_id] / 10

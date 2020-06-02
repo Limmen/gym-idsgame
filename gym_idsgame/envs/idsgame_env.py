@@ -150,7 +150,7 @@ class IdsGameEnv(gym.Env, ABC):
                                   self.idsgame_config.game_config.network_config,
                                   reconnaissaince_enabled=self.idsgame_config.reconnaissance_actions)
             else:
-                rec_reward = self.state.reconnaissance(target_node_id, attack_type)
+                rec_reward = self.state.reconnaissance(target_node_id, attack_type, reconnaissance_reward=self.idsgame_config.reconnaissance_reward)
                 self.past_reconnaissance_activities.append((target_node_id, attack_type))
                 reward = (rec_reward, 0)
 

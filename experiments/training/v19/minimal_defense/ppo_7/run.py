@@ -51,7 +51,7 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.00003, epsilon=1, render=False,
+    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.0001, epsilon=1, render=False,
                                                 alpha_defender=0.0001,
                                                 eval_sleep=0.9,
                                                 min_epsilon=0.01, eval_episodes=1000, train_log_frequency=1,
@@ -68,7 +68,7 @@ def default_config() -> ClientConfig:
                                                 output_dim_attacker=(4 + 1) * 4,
                                                 input_dim_defender=((4 + 1) * 4),
                                                 output_dim_defender=5 * 3,
-                                                hidden_dim=32,
+                                                hidden_dim=64,
                                                 num_hidden_layers=2, batch_size=2000,
                                                 gpu=False, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
@@ -78,10 +78,18 @@ def default_config() -> ClientConfig:
                                                 lstm_seq_length=4, num_lstm_layers=2, optimization_iterations=10,
                                                 eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95,
                                                 cnn_feature_extractor=False, features_dim=512,
-                                                flatten_feature_planes=False, cnn_type=5, vf_coef=0.5, ent_coef=0.001,
+                                                flatten_feature_planes=False, cnn_type=5, vf_coef=0.5, ent_coef=0.005,
                                                 render_attacker_view=True, lr_progress_power_decay=4,
                                                 lr_progress_decay=True, use_sde=False, sde_sample_freq=4,
-                                                one_hot_obs=False, force_exploration=False, force_exp_p=0.25)
+                                                one_hot_obs=False, force_exploration=True, force_exp_p=0.2)
+    # input_dim_attacker = (3, 3, 5),
+    # output_dim_attacker = (5 * 2) * 3,
+    # input_dim_defender = (3, 3, 5),
+    # output_dim_defender = 6 * 3,
+    # input_dim_attacker = ((5 * 2 + 1) * 3),
+    # output_dim_attacker = (5 * 2) * 3,
+    # input_dim_defender = ((5 + 1) * 3),
+    # output_dim_defender = 6 * 3,
     env_name = "idsgame-minimal_defense-v19"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.PPO_OPENAI_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,

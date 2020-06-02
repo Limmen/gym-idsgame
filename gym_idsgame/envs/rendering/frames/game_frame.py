@@ -170,7 +170,7 @@ class GameFrame(pyglet.window.Window):
                                                        self.idsgame_config.game_config.network_config,
                                                        reconnaissaince_enabled=self.idsgame_config.reconnaissance_actions)
                             else:
-                                self.game_state.reconnaissance(attack_node_id, attack_type)
+                                self.game_state.reconnaissance(attack_node_id, attack_type, reconnaissance_reward=self.idsgame_config.reconnaissance_reward)
 
                             # 4. Visualize defense
                             self.resource_network.grid[node.row][node.col].visualize_defense(detect=detect)
@@ -237,7 +237,7 @@ class GameFrame(pyglet.window.Window):
                                 else:
                                     attack_type = self.game_state.attack_defense_type - \
                                                   self.idsgame_config.game_config.num_attack_types
-                                    self.game_state.reconnaissance(node.id, attack_type)
+                                    self.game_state.reconnaissance(node.id, attack_type, reconnaissance_reward=self.idsgame_config.reconnaissance_reward)
 
                                 # 5. Visualize defense
                                 self.resource_network.grid[defense_row][defense_col].visualize_defense(detect)
