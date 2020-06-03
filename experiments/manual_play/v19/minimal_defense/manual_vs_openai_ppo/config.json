@@ -16,7 +16,7 @@
         "alternating_optimization": false,
         "alternating_period": 15000,
         "attacker": true,
-        "attacker_load_path": "/Users/kimham/workspace/rl/gym-idsgame/experiments/manual_play/v19/minimal_defense/manual_vs_openai_ppo/1591164917.874881_attacker_policy_network.zip",
+        "attacker_load_path": "/Users/kimham/workspace/rl/gym-idsgame/experiments/manual_play/v19/minimal_defense/manual_vs_openai_ppo/v2/1591198325.148321_attacker_policy_network.zip",
         "baselines_in_pool": false,
         "batch_size": 2000,
         "checkpoint_freq": 5000,

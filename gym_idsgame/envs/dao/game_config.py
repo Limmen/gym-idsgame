@@ -73,7 +73,7 @@ class GameConfig():
                                            min_random_d_val=min_random_d_val, max_value=self.max_value,
                                            max_random_v_val=self.max_random_v_val)
             self.initial_state.default_state(self.network_config.node_list, self.network_config.start_pos,
-                                             self.num_attack_types, network_config=self.network_config)
+                                             self.num_attack_types, network_config=self.network_config,)
         self.dense_rewards = dense_rewards
 
     def set_attack_actions(self, local_view : bool = False):

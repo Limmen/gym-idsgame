@@ -537,6 +537,8 @@ class BaseRLModel(ABC):
         model.__dict__.update(kwargs)
         if not hasattr(model, "_setup_model") and len(params) > 0:
             raise NotImplementedError(f"{cls} has no ``_setup_model()`` method")
+        model.device = device
+        model.pg_agent_config.gpu = pg_agent_config.gpu
         model._setup_model()
 
         # put state_dicts back in place

@@ -148,7 +148,7 @@ class IdsGameEnv(gym.Env, ABC):
                 # 4. Attack
                 self.state.attack(target_node_id, attack_type, self.idsgame_config.game_config.max_value,
                                   self.idsgame_config.game_config.network_config,
-                                  reconnaissaince_enabled=self.idsgame_config.reconnaissance_actions)
+                                  reconnaissance_enabled=self.idsgame_config.reconnaissance_actions)
             else:
                 rec_reward = self.state.reconnaissance(target_node_id, attack_type, reconnaissance_reward=self.idsgame_config.reconnaissance_reward)
                 self.past_reconnaissance_activities.append((target_node_id, attack_type))
@@ -4284,9 +4284,9 @@ class IdsGameV19Env(AttackDefenseEnv):
         """
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
-                                     min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
+                                     min_random_a_val=0, min_random_d_val=7, min_random_det_val=1)
             game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
-                                          vulnerability_val=1, num_vulnerabilities_per_layer=2,
+                                          vulnerability_val=1, num_vulnerabilities_per_layer=1,
                                           randomize_visibility=True, visibility_p=0.25)
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
@@ -4299,11 +4299,11 @@ class IdsGameV19Env(AttackDefenseEnv):
             idsgame_config = IdsGameConfig(game_config=game_config)
             idsgame_config.render_config.caption = "idsgame-v19"
             idsgame_config.randomize_env = True
-            idsgame_config.randomize_starting_position = True
+            idsgame_config.randomize_starting_position = False
             idsgame_config.reconnaissance_bool_features = True
             idsgame_config.local_view_observations = True
             idsgame_config.reconnaissance_actions = True
             idsgame_config.reconnaissance_reward = True
-            idsgame_config.randomize_visibility = True
+            idsgame_config.randomize_visibility = False
             idsgame_config.visibility_p = 0.25
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)

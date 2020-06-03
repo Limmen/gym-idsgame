@@ -168,7 +168,7 @@ class GameFrame(pyglet.window.Window):
                                 self.game_state.attack(attack_node_id, attack_type,
                                                        self.idsgame_config.game_config.max_value,
                                                        self.idsgame_config.game_config.network_config,
-                                                       reconnaissaince_enabled=self.idsgame_config.reconnaissance_actions)
+                                                       reconnaissance_enabled=self.idsgame_config.reconnaissance_actions)
                             else:
                                 self.game_state.reconnaissance(attack_node_id, attack_type, reconnaissance_reward=self.idsgame_config.reconnaissance_reward)
 
@@ -234,7 +234,7 @@ class GameFrame(pyglet.window.Window):
                                     self.game_state.attack(node.id, self.game_state.attack_defense_type,
                                                            self.idsgame_config.game_config.max_value,
                                                            self.idsgame_config.game_config.network_config,
-                                                           reconnaissaince_enabled=self.idsgame_config.reconnaissance_actions)
+                                                           reconnaissance_enabled=self.idsgame_config.reconnaissance_actions)
                                 else:
                                     attack_type = self.game_state.attack_defense_type - \
                                                   self.idsgame_config.game_config.num_attack_types
