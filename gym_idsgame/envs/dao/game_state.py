@@ -181,7 +181,6 @@ class GameState():
                 if np.random.rand() < visibility_p:
                     reconnaissance_state[node_id] = defense_values[node_id]
                     self.reconnaissance_actions.append(node_id)
-
         self.attack_values = attack_values.astype(np.int32)
         self.defense_values = defense_values.astype(np.int32)
         self.defense_det = det_values.astype(np.int32)
@@ -226,6 +225,7 @@ class GameState():
         self.game_step = 0
         self.attack_events = []
         self.defense_events = []
+        self.reconnaissance_actions = []
         self.attacker_pos = init_state.attacker_pos
         if not randomize_state:
             self.attack_values = np.copy(init_state.attack_values)
@@ -241,7 +241,6 @@ class GameState():
                            randomize_visibility=randomize_visibility, visibility_p=visibility_p)
         self.detected = False
         self.hacked = False
-        self.reconnaissance_actions = []
 
     def copy(self) -> "GameState":
         """
@@ -436,13 +435,21 @@ class GameState():
                         reconaissance_bool = [0]
                         if node_id in self.reconnaissance_actions:
                             reconaissance_bool = [1]
-                        attack_observation[node_id] = np.append(np.append(np.append(self.attack_values[node_id], 1),
+                        attack_observation[node_id] = np.append(np.append(np.append(self.attack_values[node_id], 0),
                                                                           self.reconnaissance_state[node_id]),
                                                                 reconaissance_bool)
                 elif reconnaissance:
-                    attack_values = np.zeros((self.attack_values.shape[1]))
-                    attack_observation[node_id] = np.append(np.append(attack_values, 0),
-                                                            self.reconnaissance_state[node_id])
+                    if not reconnaissance_bool_features:
+                        attack_values = np.zeros((self.attack_values.shape[1]))
+                        attack_observation[node_id] = np.append(np.append(attack_values, 0),
+                                                                self.reconnaissance_state[node_id])
+                    else:
+                        reconaissance_bool = [0]
+                        if node_id in self.reconnaissance_actions:
+                            reconaissance_bool = [1]
+                        attack_values = np.zeros((self.attack_values.shape[1]))
+                        attack_observation[node_id] = np.append(np.append(np.append(attack_values, 0),
+                                                                self.reconnaissance_state[node_id]), reconaissance_bool)
 
         if local_view:
             # sort by row then col

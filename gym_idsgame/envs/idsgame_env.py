@@ -4153,12 +4153,12 @@ class IdsGameMinimalDefenseV19Env(AttackerEnv):
             idsgame_config.render_config.caption = "idsgame-minimal_defense-v19"
             idsgame_config.randomize_env = True
             idsgame_config.randomize_starting_position = True
-            idsgame_config.local_view_observations = True
+            idsgame_config.local_view_observations = False
             idsgame_config.reconnaissance_bool_features = True
             idsgame_config.reconnaissance_actions = True
             idsgame_config.reconnaissance_reward = True
             idsgame_config.randomize_visibility = True
-            idsgame_config.visibility_p = 0.25
+            idsgame_config.visibility_p = 0.5
             idsgame_config.reconnaissance_detection_factor = 1
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
 

@@ -327,7 +327,7 @@ class BaselineEnvWrapper(gym.Env):
                     for idx, row in enumerate(temp):
                         t = row.tolist()
                         t.append(a_pos[idx])
-                        if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                        if self.idsgame_env.fully_observed():
                             t.append(det_values[idx])
                         features.append(t)
                 else:
