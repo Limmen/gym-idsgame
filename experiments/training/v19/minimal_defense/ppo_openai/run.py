@@ -51,19 +51,19 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.0001, epsilon=1, render=False,
+    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.00003, epsilon=1, render=False,
                                                 alpha_defender=0.0001,
                                                 eval_sleep=0.9,
-                                                min_epsilon=0.01, eval_episodes=3, train_log_frequency=1,
+                                                min_epsilon=0.01, eval_episodes=1000, train_log_frequency=1,
                                                 epsilon_decay=0.9999, video=True, eval_log_frequency=500,
                                                 video_fps=5, video_dir=default_output_dir() + "/results/videos",
                                                 num_episodes=100000000,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
-                                                eval_frequency=25000, attacker=True, defender=False,
-                                                video_frequency=1,
+                                                eval_frequency=175000, attacker=True, defender=False,
+                                                video_frequency=1001,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=75,
+                                                checkpoint_freq=250,
                                                 input_dim_attacker=((4 + 2) * 4),
                                                 output_dim_attacker=(4 + 1) * 4,
                                                 input_dim_defender=((4 + 1) * 4),
@@ -78,10 +78,10 @@ def default_config() -> ClientConfig:
                                                 lstm_seq_length=4, num_lstm_layers=2, optimization_iterations=10,
                                                 eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95,
                                                 cnn_feature_extractor=False, features_dim=512,
-                                                flatten_feature_planes=False, cnn_type=5, vf_coef=0.5, ent_coef=0.001,
+                                                flatten_feature_planes=False, cnn_type=5, vf_coef=0.5, ent_coef=0.00,
                                                 render_attacker_view=True, lr_progress_power_decay=4,
                                                 lr_progress_decay=True, use_sde=False, sde_sample_freq=4,
-                                                one_hot_obs=False, force_exploration=False, force_exp_p=0.2)
+                                                one_hot_obs=False)
     env_name = "idsgame-minimal_defense-v19"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.PPO_OPENAI_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
