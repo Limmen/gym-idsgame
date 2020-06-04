@@ -27,7 +27,7 @@
         "critic_loss_fn": "MSE",
         "defender": true,
         "defender_load_path": null,
-        "ent_coef": 0.001,
+        "ent_coef": 0.0,
         "eps_clip": 0.2,
         "epsilon": 1,
         "epsilon_decay": 0.9999,

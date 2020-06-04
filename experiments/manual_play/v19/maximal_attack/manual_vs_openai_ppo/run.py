@@ -55,7 +55,7 @@ def default_config() -> ClientConfig:
                                                 eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95,
                                                 cnn_feature_extractor=False, features_dim=512,
                                                 flatten_feature_planes=False,
-                                                defender_load_path="/Users/kimham/workspace/rl/gym-idsgame/experiments/manual_play/v19/maximal_attack/manual_vs_openai_ppo/1591257617.7232072_defender_policy_network.zip")
+                                                defender_load_path="/Users/kimham/workspace/rl/gym-idsgame/experiments/manual_play/v19/maximal_attack/manual_vs_openai_ppo/1591287607.838063_defender_policy_network.zip")
     client_config = ClientConfig(env_name=env_name, defender_type=AgentType.PPO_OPENAI_AGENT.value,
                                  mode=RunnerMode.MANUAL_ATTACKER.value, output_dir=default_output_dir(),
                                  title="ManualAttacker vs OpenAI PPO", pg_agent_config=pg_agent_config,

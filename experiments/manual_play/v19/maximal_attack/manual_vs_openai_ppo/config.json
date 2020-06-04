@@ -26,7 +26,7 @@
         "cnn_type": 0,
         "critic_loss_fn": "MSE",
         "defender": true,
-        "defender_load_path": "/Users/kimham/workspace/rl/gym-idsgame/experiments/manual_play/v19/maximal_attack/manual_vs_openai_ppo/1591257617.7232072_defender_policy_network.zip",
+        "defender_load_path": "/Users/kimham/workspace/rl/gym-idsgame/experiments/manual_play/v19/maximal_attack/manual_vs_openai_ppo/1591287607.838063_defender_policy_network.zip",
         "ent_coef": 0.0,
         "eps_clip": 0.2,
         "epsilon": 1,

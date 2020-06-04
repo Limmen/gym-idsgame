@@ -78,7 +78,7 @@ def default_config() -> ClientConfig:
                                                 lstm_seq_length=4, num_lstm_layers=2, optimization_iterations=10,
                                                 eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95,
                                                 cnn_feature_extractor=False, features_dim=512,
-                                                flatten_feature_planes=False, cnn_type=5, vf_coef=0.5, ent_coef=0.001,
+                                                flatten_feature_planes=False, cnn_type=5, vf_coef=0.5, ent_coef=0.00,
                                                 render_attacker_view=False, lr_progress_power_decay=4,
                                                 lr_progress_decay=True, use_sde=False, sde_sample_freq=4,
                                                 one_hot_obs=False)

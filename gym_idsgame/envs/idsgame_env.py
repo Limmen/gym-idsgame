@@ -436,7 +436,8 @@ class IdsGameEnv(gym.Env, ABC):
             bonus = 1 if self.num_failed_attacks == 0 else 1 / self.num_failed_attacks
             #return bonus + constants.GAME_CONFIG.POSITIVE_REWARD, defender_reward
             #return bonus + constants.GAME_CONFIG.POSITIVE_REWARD, -constants.GAME_CONFIG.POSITIVE_REWARD
-            return bonus + constants.GAME_CONFIG.POSITIVE_REWARD, -len(self.hacked_nodes)
+            return bonus + constants.GAME_CONFIG.POSITIVE_REWARD, -constants.GAME_CONFIG.POSITIVE_REWARD
+            #return bonus + constants.GAME_CONFIG.POSITIVE_REWARD, -len(self.hacked_nodes)
 
     def get_detect_reward(self, target_node_id : int, attack_type : int, detection_value) -> Union[int, int]:
         """
@@ -467,7 +468,8 @@ class IdsGameEnv(gym.Env, ABC):
             #return 0*constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
             #return -1 * constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
             #return -constants.GAME_CONFIG.POSITIVE_REWARD, defender_reward
-            return -constants.GAME_CONFIG.POSITIVE_REWARD,(self.idsgame_config.game_config.num_nodes - len(self.hacked_nodes))
+            return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
+            #return -constants.GAME_CONFIG.POSITIVE_REWARD,(self.idsgame_config.game_config.num_nodes - len(self.hacked_nodes))
 
     def get_successful_attack_reward(self, attack_type : int) -> Union[int, int]:
         """
@@ -4241,10 +4243,10 @@ class IdsGameMaximalAttackV19Env(DefenderEnv):
         """
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
-                                     min_random_a_val=0, min_random_d_val=3, min_random_det_val=1,
+                                     min_random_a_val=0, min_random_d_val=7, min_random_det_val=1,
                                      reconnaissance_actions=True)
             game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
-                                          vulnerability_val=1, num_vulnerabilities_per_layer=2,
+                                          vulnerability_val=1, num_vulnerabilities_per_layer=1,
                                           randomize_visibility=True, visibility_p=0.25)
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
