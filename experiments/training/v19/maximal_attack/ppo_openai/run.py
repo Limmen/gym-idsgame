@@ -79,11 +79,11 @@ def default_config() -> ClientConfig:
                                                 eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95,
                                                 cnn_feature_extractor=False, features_dim=512,
                                                 flatten_feature_planes=False, cnn_type=5, vf_coef=0.5, ent_coef=0.00,
-                                                render_attacker_view=True, lr_progress_power_decay=4,
+                                                render_attacker_view=False, lr_progress_power_decay=4,
                                                 lr_progress_decay=True, use_sde=False, sde_sample_freq=4,
                                                 one_hot_obs=False)
     env_name = "idsgame-maximal_attack-v19"
-    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.PPO_OPENAI_AGENT.value,
+    client_config = ClientConfig(env_name=env_name,
                                  defender_type=AgentType.PPO_OPENAI_AGENT.value,
                                  mode=RunnerMode.TRAIN_DEFENDER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),

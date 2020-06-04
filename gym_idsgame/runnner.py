@@ -128,7 +128,7 @@ class Runner:
             defender = ActorCriticAgent(env, config.pg_agent_config)
         elif config.defender_type == AgentType.PPO_AGENT.value:
             defender =  PPOAgent(env, config.pg_agent_config)
-        elif config.attacker_type == AgentType.PPO_OPENAI_AGENT.value:
+        elif config.defender_type == AgentType.PPO_OPENAI_AGENT.value:
             wrapper_env = BaselineEnvWrapper(config.env_name, idsgame_config=config.idsgame_config,
                                              save_dir=config.output_dir + "/results/data/" + str(config.random_seed),
                                              initial_state_path=config.initial_state_path,

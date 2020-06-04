@@ -409,21 +409,21 @@ class IdsGameEnv(gym.Env, ABC):
         elif self.idsgame_config.game_config.dense_rewards and not self.idsgame_config.game_config.dense_rewards_v2:
             return 100*constants.GAME_CONFIG.POSITIVE_REWARD, -100*constants.GAME_CONFIG.POSITIVE_REWARD
         else:
-            # detection_actions = 0
-            # for defense in self.defenses:
-            #     if defense[2]:
-            #         detection_actions += 1
-            # unblocked_attacks = 0
-            # for defense in self.defenses:
-            #     blocked = False
-            #     for attack in self.attacks:
-            #         if defense[0] == attack[0] and defense[1] == attack[1] and defense[3] < attack[2]:
-            #             blocked = True
-            #     if not blocked:
-            #         unblocked_attacks += 1
-            # norm_factor = self.state.game_step if self.state.game_step > 0 else 1
-            # reward = -((unblocked_attacks)/norm_factor)
-            # #print("reward:{}".format(reward))
+            detection_actions = 0
+            for defense in self.defenses:
+                if defense[2]:
+                    detection_actions += 1
+            unblocked_attacks = 0
+            for defense in self.defenses:
+                blocked = False
+                for attack in self.attacks:
+                    if defense[0] == attack[0] and defense[1] == attack[1] and defense[3] < attack[2]:
+                        blocked = True
+                if not blocked:
+                    unblocked_attacks += 1
+            norm_factor = self.state.game_step if self.state.game_step > 0 else 1
+            defender_reward = -((unblocked_attacks)/norm_factor)
+            #print("defender reward:{}".format(defender_reward))
 
             # extra_reward = 0
             # if self.idsgame_config.extra_reconnaisasnce_reward:
@@ -434,7 +434,8 @@ class IdsGameEnv(gym.Env, ABC):
             #             extra_reward = 1
             # return extra_reward + 1 * constants.GAME_CONFIG.POSITIVE_REWARD, -constants.GAME_CONFIG.POSITIVE_REWARD
             bonus = 1 if self.num_failed_attacks == 0 else 1 / self.num_failed_attacks
-            return bonus + constants.GAME_CONFIG.POSITIVE_REWARD, -len(self.hacked_nodes)
+            return bonus + constants.GAME_CONFIG.POSITIVE_REWARD, defender_reward
+            #return bonus + constants.GAME_CONFIG.POSITIVE_REWARD, -len(self.hacked_nodes)
 
     def get_detect_reward(self, target_node_id : int, attack_type : int, detection_value) -> Union[int, int]:
         """
@@ -451,20 +452,21 @@ class IdsGameEnv(gym.Env, ABC):
             for defense in self.defenses:
                 if defense[2] and defense[0] == target_node_id:
                     added_detection += 1
-            # detection_ratio = added_detection/((detection_value+1))
-            # blocked_attacks = 0
-            # for defense in self.defenses:
-            #     blocked = False
-            #     for attack in self.attacks:
-            #         if defense[0] == attack[0] and defense[1] == attack[1] and defense[3] < attack[2]:
-            #             blocked = True
-            #     if blocked:
-            #         blocked_attacks += 1
-            # norm_factor = self.state.game_step if self.state.game_step > 0 else 1
-            # reward = (blocked_attacks)/norm_factor
+            detection_ratio = added_detection/((detection_value+1))
+            blocked_attacks = 0
+            for defense in self.defenses:
+                blocked = False
+                for attack in self.attacks:
+                    if defense[0] == attack[0] and defense[1] == attack[1] and defense[3] < attack[2]:
+                        blocked = True
+                if blocked:
+                    blocked_attacks += 1
+            norm_factor = self.state.game_step if self.state.game_step > 0 else 1
+            defender_reward = (blocked_attacks)/norm_factor
             #return 0*constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
             #return -1 * constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
-            return -constants.GAME_CONFIG.POSITIVE_REWARD,(self.idsgame_config.game_config.num_nodes - len(self.hacked_nodes))
+            return -constants.GAME_CONFIG.POSITIVE_REWARD, defender_reward
+            #return -constants.GAME_CONFIG.POSITIVE_REWARD,(self.idsgame_config.game_config.num_nodes - len(self.hacked_nodes))
 
     def get_successful_attack_reward(self, attack_type : int) -> Union[int, int]:
         """
@@ -4143,9 +4145,9 @@ class IdsGameMinimalDefenseV19Env(AttackerEnv):
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
-            game_config.network_config.relative_neighbor_positions = [(-1, 0), (-1, -1), (1, 0), (-1, 1)]
-            game_config.network_config.max_neighbors = len(game_config.network_config.relative_neighbor_positions)
-            game_config.set_attack_actions(local_view=True)
+            #game_config.network_config.relative_neighbor_positions = [(-1, 0), (-1, -1), (1, 0), (-1, 1)]
+            #game_config.network_config.max_neighbors = len(game_config.network_config.relative_neighbor_positions)
+            #game_config.set_attack_actions(local_view=True)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             defender_agent = DefendMinimalValueBotAgent(game_config)
@@ -4153,7 +4155,7 @@ class IdsGameMinimalDefenseV19Env(AttackerEnv):
             idsgame_config.render_config.caption = "idsgame-minimal_defense-v19"
             idsgame_config.randomize_env = True
             idsgame_config.randomize_starting_position = True
-            idsgame_config.local_view_observations = True
+            #idsgame_config.local_view_observations = True
             idsgame_config.reconnaissance_bool_features = True
             idsgame_config.reconnaissance_actions = True
             idsgame_config.reconnaissance_reward = True

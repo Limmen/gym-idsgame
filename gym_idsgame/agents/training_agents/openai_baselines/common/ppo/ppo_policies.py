@@ -293,11 +293,11 @@ class PPOPolicy(BasePolicy):
         action_probs_1 = mean_actions.clone()
         if non_legal_actions is not None and len(non_legal_actions) > 0:
             if len(action_probs_1.shape) == 1:
-                action_probs_1[non_legal_actions] = 0.00000000000001 # Don't set to zero due to invalid distribution errors
-                #action_probs_1[non_legal_actions] = 0.0
+                #action_probs_1[non_legal_actions] = 0.00000000000001 # Don't set to zero due to invalid distribution errors
+                action_probs_1[non_legal_actions] = 0.0
             elif len(action_probs_1.shape) == 2:
-                action_probs_1[:, non_legal_actions] = 0.00000000000001  # Don't set to zero due to invalid distribution errors
-                #action_probs_1[:,non_legal_actions] = 0.0
+                #action_probs_1[:, non_legal_actions] = 0.00000000000001  # Don't set to zero due to invalid distribution errors
+                action_probs_1[:,non_legal_actions] = 0.0
             else:
                 raise AssertionError("Invalid shape of action probabilties")
         action_probs_1 = action_probs_1.to(device)

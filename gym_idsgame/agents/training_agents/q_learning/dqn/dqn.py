@@ -685,3 +685,234 @@ class DQNAgent(QAgent):
                 torch.save(self.defender_q_network.state_dict(), path)
         else:
             self.config.logger.warning("Save path not defined, not saving Q-networks to disk")
+
+
+    def update_state(self, attacker_obs: np.ndarray = None, defender_obs: np.ndarray = None,
+                     state: np.ndarray = None, attacker: bool = True) -> np.ndarray:
+        """
+        Update approximative Markov state
+
+        :param attacker_obs: attacker obs
+        :param defender_obs: defender observation
+        :param state: current state
+        :param attacker: boolean flag whether it is attacker or not
+        :return: new state
+        """
+        if attacker and self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+            #if not self.idsgame_env.local_view_features():
+            a_obs_len = self.idsgame_env.idsgame_config.game_config.num_attack_types + 1
+            defender_obs = attacker_obs[:, a_obs_len:a_obs_len+self.idsgame_env.idsgame_config.game_config.num_attack_types]
+            if self.idsgame_env.idsgame_config.reconnaissance_bool_features:
+                d_bool_features = attacker_obs[:, a_obs_len+self.idsgame_env.idsgame_config.game_config.num_attack_types:]
+            attacker_obs = attacker_obs[:, 0:a_obs_len]
+            # else:
+            #     a_obs_len = self.idsgame_env.idsgame_config.game_config.num_attack_types + 1
+            #     defender_obs = attacker_obs[:,
+            #                    a_obs_len:a_obs_len + self.idsgame_env.idsgame_config.game_config.num_attack_types]
+            #     if self.idsgame_env.idsgame_config.reconnaissance_bool_features:
+            #         d_bool_features = attacker_obs[:,
+            #                           a_obs_len + self.idsgame_env.idsgame_config.game_config.num_attack_types:]
+            #     attacker_obs = attacker_obs[:, 0:a_obs_len]
+
+        if not attacker and self.idsgame_env.local_view_features():
+            attacker_obs = self.idsgame_env.state.get_attacker_observation(
+                self.idsgame_env.idsgame_config.game_config.network_config,
+                local_view=False,
+                reconnaissance=self.idsgame_env.idsgame_config.reconnaissance_actions)
+
+        # Zero mean
+        if self.config.dqn_config.zero_mean_features:
+            if not self.idsgame_env.local_view_features() or not attacker:
+                attacker_obs_1 = attacker_obs[:, 0:-1]
+            else:
+                attacker_obs_1 = attacker_obs[:, 0:-2]
+            zero_mean_attacker_features = []
+            for idx, row in enumerate(attacker_obs_1):
+                mean = np.mean(row)
+                if mean != 0:
+                    t = row - mean
+                else:
+                    t = row
+                if np.isnan(t).any():
+                    t = attacker_obs[idx]
+                else:
+                    t = t.tolist()
+                    if not self.idsgame_env.local_view_features() or not attacker:
+                        t.append(attacker_obs[idx][-1])
+                    else:
+                        t.append(attacker_obs[idx][-2])
+                        t.append(attacker_obs[idx][-1])
+                zero_mean_attacker_features.append(t)
+
+            defender_obs_1 = defender_obs[:, 0:-1]
+            zero_mean_defender_features = []
+            for idx, row in enumerate(defender_obs_1):
+                mean = np.mean(row)
+                if mean != 0:
+                    t = row - mean
+                else:
+                    t = row
+                if np.isnan(t).any():
+                    t = defender_obs[idx]
+                else:
+                    t = t.tolist()
+                    t.append(defender_obs[idx][-1])
+                zero_mean_defender_features.append(t)
+
+            attacker_obs = np.array(zero_mean_attacker_features)
+            defender_obs = np.array(zero_mean_defender_features)
+
+        # Normalize
+        if self.config.dqn_config.normalize_features:
+            if not self.idsgame_env.local_view_features() or not attacker:
+                attacker_obs_1 = attacker_obs[:, 0:-1] / np.linalg.norm(attacker_obs[:, 0:-1])
+            else:
+                attacker_obs_1 = attacker_obs[:, 0:-2] / np.linalg.norm(attacker_obs[:, 0:-2])
+            normalized_attacker_features = []
+            for idx, row in enumerate(attacker_obs_1):
+                if np.isnan(attacker_obs_1).any():
+                    t = attacker_obs[idx]
+                else:
+                    t = row.tolist()
+                    if not self.idsgame_env.local_view_features() or not attacker:
+                        t.append(attacker_obs[idx][-1])
+                    else:
+                        t.append(attacker_obs[idx][-2])
+                        t.append(attacker_obs[idx][-1])
+                normalized_attacker_features.append(t)
+
+            if attacker and self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                defender_obs_1 = defender_obs[:, 0:-1] / np.linalg.norm(defender_obs[:, 0:-1])
+            else:
+                defender_obs_1 = defender_obs / np.linalg.norm(defender_obs)
+            normalized_defender_features = []
+            for idx, row in enumerate(defender_obs_1):
+                if np.isnan(defender_obs_1).any():
+                    t = defender_obs[idx]
+                else:
+                    if attacker and self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                        t = row.tolist()
+                        t.append(defender_obs[idx][-1])
+                    else:
+                        t = row
+
+                normalized_defender_features.append(t)
+
+            attacker_obs = np.array(normalized_attacker_features)
+            defender_obs = np.array(normalized_defender_features)
+
+        if self.idsgame_env.local_view_features() and attacker:
+            if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                neighbor_defense_attributes = np.zeros((attacker_obs.shape[0], defender_obs.shape[1]))
+                for node in range(attacker_obs.shape[0]):
+                    id = int(attacker_obs[node][-1])
+                    neighbor_defense_attributes[node] = defender_obs[id]
+            else:
+                neighbor_defense_attributes = defender_obs
+
+        if self.idsgame_env.fully_observed() or \
+                (self.idsgame_env.idsgame_config.game_config.reconnaissance_actions and attacker):
+            if self.config.dqn_config.merged_ad_features:
+                if not self.idsgame_env.local_view_features() or not attacker:
+                    a_pos = attacker_obs[:, -1]
+                    if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                        det_values = defender_obs[:, -1]
+                        temp = defender_obs[:, 0:-1] - attacker_obs[:, 0:-1]
+                    else:
+                        temp = defender_obs[:, 0:] - attacker_obs[:, 0:-1]
+                    features = []
+                    for idx, row in enumerate(temp):
+                        t = row.tolist()
+                        t.append(a_pos[idx])
+                        if self.idsgame_env.fully_observed():
+                            t.append(det_values[idx])
+                        features.append(t)
+                else:
+                    node_ids = attacker_obs[:, -1]
+                    if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                        det_values = neighbor_defense_attributes[:, -1]
+                    if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                        temp = neighbor_defense_attributes[:, 0:-1] - attacker_obs[:, 0:-1]
+                    else:
+                        temp = np.full(neighbor_defense_attributes.shape, -1)
+                        for i in range(len(neighbor_defense_attributes)):
+                            if np.sum(neighbor_defense_attributes[i]) > 0:
+                                temp[i] = neighbor_defense_attributes[i] - attacker_obs[i, 0:-1]
+                    features = []
+                    for idx, row in enumerate(temp):
+                        t = row.tolist()
+                        t.append(node_ids[idx])
+                        #t.append(node_reachable[idx])
+                        if not self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+                            t.append(det_values[idx])
+                        features.append(t)
+                features = np.array(features)
+                if self.idsgame_env.idsgame_config.reconnaissance_bool_features:
+                    f = np.zeros((features.shape[0], features.shape[1] + d_bool_features.shape[1]))
+                    for i in range(features.shape[0]):
+                        f[i] = np.append(features[i], d_bool_features[i])
+                    features = f
+                if self.config.dqn_config.state_length == 1:
+                    return features
+                if len(state) == 0:
+                    s = np.array([features] * self.config.dqn_config.state_length)
+                    return s
+                state = np.append(state[1:], np.array([features]), axis=0)
+                return state
+            else:
+                if not self.idsgame_env.local_view_features() or not attacker:
+                    if self.idsgame_env.idsgame_config.game_config.reconnaissance_actions and attacker:
+                        combined_features = []
+                        for idx, row in enumerate(attacker_obs):
+                            combined_row = np.append(row, defender_obs[idx])
+                            combined_features.append(combined_row)
+                        if self.idsgame_env.idsgame_config.reconnaissance_bool_features:
+                            combined_features = np.array(combined_features)
+                            f = np.zeros(
+                                (combined_features.shape[0], combined_features.shape[1] + d_bool_features.shape[1]))
+                            for i in range(combined_features.shape[0]):
+                                f[i] = np.append(combined_features[i], d_bool_features[i])
+                            combined_features = f
+                        return np.array(combined_features)
+
+                    return np.append(attacker_obs, defender_obs)
+                else:
+                    if self.idsgame_env.idsgame_config.reconnaissance_bool_features:
+                        f = np.zeros((attacker_obs.shape[0],
+                                      attacker_obs.shape[1] + neighbor_defense_attributes.shape[1] +
+                                      d_bool_features.shape[1]))
+                        for i in range(f.shape[0]):
+                            f[i] = np.append(np.append(attacker_obs[i], neighbor_defense_attributes[i]),
+                                             d_bool_features[i])
+                    else:
+                        f = np.zeros((attacker_obs.shape[0],
+                                      attacker_obs.shape[1] + neighbor_defense_attributes.shape[1]))
+                        for i in range(f.shape[0]):
+                            f[i] = np.append(attacker_obs[i], neighbor_defense_attributes[i])
+                if self.config.dqn_config.state_length == 1:
+                    return f
+                if len(state) == 0:
+                    s = np.array([f] * self.config.dqn_config.state_length)
+                    return s
+                # if not self.idsgame_env.local_view_features() or not attacker:
+                #     temp = np.append(attacker_obs, defender_obs)
+                # else:
+                #     temp = np.append(attacker_obs, neighbor_defense_attributes)
+                state = np.append(state[1:], np.array([f]), axis=0)
+            return state
+        else:
+            if self.config.dqn_config.state_length == 1:
+                if attacker:
+                    return np.array(attacker_obs)
+                else:
+                    return np.array(defender_obs)
+            if len(state) == 0:
+                if attacker:
+                    return np.array([attacker_obs] * self.config.dqn_config.state_length)
+                else:
+                    return np.array([defender_obs] * self.config.dqn_config.state_length)
+            if attacker:
+                state = np.append(state[1:], np.array([attacker_obs]), axis=0)
+            else:
+                state = np.append(state[1:], np.array([defender_obs]), axis=0)
+            return state
