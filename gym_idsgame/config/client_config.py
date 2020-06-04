@@ -18,7 +18,7 @@ class ClientConfig:
                  output_dir:str = None, simulation_config: SimulationConfig = None, title = None,
                  idsgame_config : IdsGameConfig = None, initial_state_path: str = None, run_many :bool = False,
                  random_seeds : list = None, random_seed = 0, hp_tuning_config : HpTuningConfig = None,
-                 hp_tuning : bool = False, bot_attacker = False):
+                 hp_tuning : bool = False, bot_attacker = False, bot_defender = False):
         """
         Class constructor, initializes the DTO
 
@@ -39,6 +39,7 @@ class ClientConfig:
         :param hp_tuning: boolean flag, if true runs hyperparameter tuning, otherwise run regular experiment
         :param pg_agent_config: policy gradient agent config
         :param bot_attacker: boolean flag whether the attacker should be an external bot agent
+        :param bot_defender: boolean flag whether the defender should be an external bot agent
         """
         self.env_name = env_name
         self.attacker_type = attacker_type
@@ -58,3 +59,4 @@ class ClientConfig:
         self.hp_tuning = hp_tuning
         self.pg_agent_config = pg_agent_config
         self.bot_attacker = bot_attacker
+        self.bot_defender = bot_defender

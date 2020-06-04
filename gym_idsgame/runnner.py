@@ -22,6 +22,7 @@ from gym_idsgame.agents.training_agents.policy_gradient.actor_critic.actor_criti
 from gym_idsgame.agents.training_agents.policy_gradient.ppo.ppo import PPOAgent
 from gym_idsgame.agents.training_agents.openai_baselines.ppo.ppo import OpenAiPPOAgent
 from gym_idsgame.agents.training_agents.openai_baselines.ppo.ppo_attacker_bot_agent import PPOBaselineAttackerBotAgent
+from gym_idsgame.agents.training_agents.openai_baselines.ppo.ppo_defender_bot_agent import PPOBaselineDefenderBotAgent
 from gym_idsgame.agents.training_agents.train_agent import TrainAgent
 from gym_idsgame.agents.bot_agents.bot_agent import BotAgent
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
@@ -234,7 +235,7 @@ class Runner:
     @staticmethod
     def manual_play_attacker(config: ClientConfig) -> IdsGameEnv:
         """
-        Starts an experiment with a manual attacker player against some bot
+        Starts an experiment with a manual defender player against some bot
 
         :param config: configuration of the experiment
         :return: the created environment
@@ -243,9 +244,31 @@ class Runner:
                                    save_dir=config.output_dir + "/results/data", initial_state_path = config.initial_state_path)
         if config.title is not None:
             env.idsgame_config.render_config.title = config.title
-        if not issubclass(type(env), AttackerEnv):
-            raise AssertionError("Manual attacker play is only supported for attacker-envs")
+        if not config.bot_defender:
+            if not issubclass(type(env), AttackerEnv):
+                raise AssertionError("Manual attacker play is only supported for defender-envs")
         env.idsgame_config.game_config.manual_attacker = True
+        if config.bot_defender:
+            defender : BotAgent = None
+            if config.defender_type == AgentType.TABULAR_Q_AGENT.value:
+                if config.q_agent_config is None or config.q_agent_config.defender_load_path is None:
+                    raise ValueError("To run a simulation with a tabular Q-agent, the path to the saved "
+                                     "Q-table must be specified")
+                defender = TabularQAttackerBotAgent(env.idsgame_config.game_config,
+                                                    config.q_agent_config.defender_load_path)
+            elif config.defender_type == AgentType.RANDOM.value:
+                defender = RandomDefenseBotAgent(env.idsgame_config.game_config)
+            elif config.defender_type == AgentType.DEFEND_MINIMAL_VALUE.value:
+                defender = DefendMinimalValueBotAgent(env.idsgame_config.game_config)
+            elif config.defender_type == AgentType.PPO_OPENAI_AGENT.value:
+                if config.pg_agent_config is None or config.pg_agent_config.defender_load_path is None:
+                    raise ValueError("To run a simulation with a pretrained OpenAIPPO agent, the path to the saved "
+                                     "model must be specified")
+                defender = PPOBaselineDefenderBotAgent(config.pg_agent_config, env.idsgame_config.game_config,
+                                                    config.pg_agent_config.defender_load_path, env=env)
+            else:
+                raise AssertionError("Defender type not recognized: {}".format(config.defender_type))
+            env.idsgame_config.defender_agent = defender
         ManualAttackAgent(env.idsgame_config)
         return env
 
