@@ -108,3 +108,7 @@ class DQNConfig:
             writer.writerow(["lr_exp_decay", str(self.lr_exp_decay)])
             writer.writerow(["lr_decay_rate", str(self.lr_decay_rate)])
             writer.writerow(["hidden_activation", str(self.hidden_activation)])
+            writer.writerow(["state_length", str(self.state_length)])
+            writer.writerow(["merged_ad_features", str(self.merged_ad_features)])
+            writer.writerow(["normalize_features", str(self.normalize_features)])
+            writer.writerow(["zero_mean_features", str(self.zero_mean_features)])
