@@ -287,7 +287,7 @@ class GameState():
         if reconnaissance_enabled:
             if network_config.node_list[node_id] != NodeType.START and \
                     self.attack_values[node_id][attack_type] > self.reconnaissance_state[node_id][attack_type]:
-                self.reconnaissance_state[node_id][attack_type] = self.defense_values[node_id][attack_type]
+                self.reconnaissance_state[node_id][attack_type] = self.attack_values[node_id][attack_type]
 
     def reconnaissance(self, node_id: int, attack_type: int, reconnaissance_reward : bool = False) -> int:
         """
