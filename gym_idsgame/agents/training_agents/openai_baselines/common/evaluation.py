@@ -137,6 +137,18 @@ def evaluate_policy(model, env, n_eval_episodes=10, deterministic=True,
             env.envs[0].generate_gif(pg_agent_config.gif_dir + "episode_" + str(train_episode) + "_"
                                   + time_str + ".gif", pg_agent_config.video_fps)
 
+            # Reset LSTM state
+            model.attacker_policy.mlp_extractor.lstm_hidden = (th.zeros(pg_agent_config.num_lstm_layers, 1,
+                                                                       pg_agent_config.lstm_hidden_dim),
+                                                              th.zeros(pg_agent_config.num_lstm_layers, 1,
+                                                                       pg_agent_config.lstm_hidden_dim))
+            # Reset LSTM state
+            model.defender_policy.mlp_extractor.lstm_hidden = (
+                th.zeros(pg_agent_config.num_lstm_layers, 1,
+                         pg_agent_config.lstm_hidden_dim),
+                th.zeros(pg_agent_config.num_lstm_layers, 1,
+                         pg_agent_config.lstm_hidden_dim))
+
 
     # Log average eval statistics
     if model.num_eval_hacks > 0:

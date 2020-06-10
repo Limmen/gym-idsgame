@@ -39,7 +39,13 @@ class PolicyGradientAgentConfig:
                  lr_progress_power_decay : int = 1, use_sde : bool = False, sde_sample_freq : int = 4,
                  seq_cnn : bool = False, baselines_in_pool : bool = False, one_hot_obs : bool = False,
                  grid_image_obs : bool = False, force_exploration : bool = False, force_exp_p :float = 0.05,
-                 lstm_core : bool = False, lstm_hidden_dim : int = 64
+                 lstm_core : bool = False, lstm_hidden_dim : int = 64, pi_hidden_layers : int = 2,
+                 pi_hidden_dim :int = 64, vf_hidden_layers : int = 2, vf_hidden_dim : int = 64,
+                 multi_channel_obs : bool = False,
+                 channel_1_layers : int = 2, channel_1_dim : int = 64, channel_1_input_dim : int = 4,
+                 channel_2_layers: int = 2, channel_2_dim: int = 64, channel_2_input_dim : int = 4,
+                 channel_3_layers: int = 2, channel_3_dim: int = 64, channel_3_input_dim : int = 4,
+                 channel_4_layers: int = 2, channel_4_dim: int = 64, channel_4_input_dim : int = 4
                  ):
         """
         Initialize environment and hyperparameters
@@ -203,6 +209,23 @@ class PolicyGradientAgentConfig:
         self.force_exp_p = force_exp_p
         self.lstm_core =lstm_core
         self.lstm_hidden_dim = lstm_hidden_dim
+        self.pi_hidden_layers = pi_hidden_layers
+        self.pi_hidden_dim = pi_hidden_dim
+        self.vf_hidden_layers = vf_hidden_layers
+        self.vf_hidden_dim = vf_hidden_dim
+        self.multi_channel_obs = multi_channel_obs
+        self.channel_1_layers = channel_1_layers
+        self.channel_1_dim = channel_1_dim
+        self.channel_1_input_dim = channel_1_input_dim
+        self.channel_2_layers = channel_2_layers
+        self.channel_2_dim = channel_2_dim
+        self.channel_2_input_dim = channel_2_input_dim
+        self.channel_3_layers = channel_3_layers
+        self.channel_3_dim = channel_3_dim
+        self.channel_3_input_dim = channel_3_input_dim
+        self.channel_4_layers = channel_4_layers
+        self.channel_4_dim = channel_4_dim
+        self.channel_4_input_dim = channel_4_input_dim
 
 
     def to_str(self) -> str:

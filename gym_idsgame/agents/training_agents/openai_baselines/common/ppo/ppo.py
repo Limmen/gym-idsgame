@@ -18,7 +18,8 @@ import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 from gym_idsgame.agents.training_agents.openai_baselines.common.base_class import BaseRLModel
 from gym_idsgame.agents.training_agents.openai_baselines.common.type_aliases import GymEnv, MaybeCallback
-from gym_idsgame.agents.training_agents.openai_baselines.common.buffers import RolloutBuffer, RolloutBufferRecurrent
+from gym_idsgame.agents.training_agents.openai_baselines.common.buffers import RolloutBuffer, RolloutBufferRecurrent, \
+    RolloutBufferRecurrentMultiHead
 from gym_idsgame.agents.training_agents.openai_baselines.common.utils import get_schedule_fn
 
 from gym_idsgame.agents.training_agents.openai_baselines.common.vec_env.base_vec_env import VecEnv
@@ -165,7 +166,8 @@ class PPO(BaseRLModel):
     def _setup_model(self) -> None:
         self._setup_lr_schedule()
         self.set_random_seed(self.seed)
-        if not self.pg_agent_config.lstm_core:
+
+        if not self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
             self.attacker_rollout_buffer = RolloutBuffer(self.n_steps, self.attacker_observation_space,
                                                          self.attacker_action_space, self.device,
                                                          gamma=self.gamma, gae_lambda=self.gae_lambda,
@@ -174,7 +176,7 @@ class PPO(BaseRLModel):
                                                          self.defender_action_space, self.device,
                                                          gamma=self.gamma, gae_lambda=self.gae_lambda,
                                                          n_envs=self.n_envs)
-        else:
+        elif self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
             self.attacker_rollout_buffer = RolloutBufferRecurrent(self.n_steps, self.attacker_observation_space,
                                                          self.attacker_action_space, self.device,
                                                          gamma=self.gamma, gae_lambda=self.gae_lambda,
@@ -183,6 +185,18 @@ class PPO(BaseRLModel):
                                                          self.defender_action_space, self.device,
                                                          gamma=self.gamma, gae_lambda=self.gae_lambda,
                                                          n_envs=self.n_envs, pg_agent_config=self.pg_agent_config)
+        else:
+            self.attacker_rollout_buffer = RolloutBufferRecurrentMultiHead(self.n_steps, self.attacker_observation_space,
+                                                                  self.attacker_action_space, self.device,
+                                                                  gamma=self.gamma, gae_lambda=self.gae_lambda,
+                                                                  n_envs=self.n_envs,
+                                                                  pg_agent_config=self.pg_agent_config)
+            self.defender_rollout_buffer = RolloutBufferRecurrentMultiHead(self.n_steps, self.defender_observation_space,
+                                                                  self.defender_action_space, self.device,
+                                                                  gamma=self.gamma, gae_lambda=self.gae_lambda,
+                                                                  n_envs=self.n_envs,
+                                                                  pg_agent_config=self.pg_agent_config)
+
         if not self.pg_agent_config.cnn_feature_extractor:
             feature_extractor_class = FlattenExtractor
         else:
@@ -252,8 +266,13 @@ class PPO(BaseRLModel):
                          attacker_rollout_buffer: RolloutBuffer,
                          defender_rollout_buffer: RolloutBuffer,
                          n_rollout_steps: int = 256) -> Union[bool, List, List, List]:
-
-        assert self._last_obs_a is not None, "No previous attacker observation was provided"
+        if not self.pg_agent_config.multi_channel_obs:
+            assert self._last_obs_a is not None, "No previous attacker observation was provided"
+        else:
+            assert self._last_obs_a_a is not None, "No previous attacker observation was provided"
+            assert self._last_obs_a_d is not None, "No previous attacker observation was provided"
+            assert self._last_obs_a_p is not None, "No previous attacker observation was provided"
+            assert self._last_obs_a_r is not None, "No previous attacker observation was provided"
         assert self._last_obs_d is not None, "No previous defender observation was provided"
         n_steps = 0
         if self.pg_agent_config.attacker:
@@ -295,11 +314,24 @@ class PPO(BaseRLModel):
                 defender_actions = [0]
 
                 # Convert to pytorch tensor
-                obs_tensor_a = th.as_tensor(self._last_obs_a).to(self.device)
-                obs_tensor_d = th.as_tensor(self._last_obs_d).to(self.device)
+                if not self.pg_agent_config.multi_channel_obs:
+                    obs_tensor_a = th.as_tensor(self._last_obs_a).to(self.device)
+                    obs_tensor_d = th.as_tensor(self._last_obs_d).to(self.device)
+                else:
+                    obs_tensor_a_a = th.as_tensor(self._last_obs_a_a).to(self.device)
+                    obs_tensor_a_d = th.as_tensor(self._last_obs_a_d).to(self.device)
+                    obs_tensor_a_p = th.as_tensor(self._last_obs_a_p).to(self.device)
+                    obs_tensor_a_r = th.as_tensor(self._last_obs_a_r).to(self.device)
+
+                    obs_tensor_d = th.as_tensor(self._last_obs_d[0]).to(self.device)
                 if self.pg_agent_config.attacker and self.train_attacker:
-                    attacker_actions, attacker_values, attacker_log_probs, lstm_state = self.attacker_policy.forward(
-                        obs_tensor_a, self.env.envs[0], device=self.device, attacker=True, force_rec=force_rec)
+                    if not self.pg_agent_config.multi_channel_obs:
+                        attacker_actions, attacker_values, attacker_log_probs, lstm_state = self.attacker_policy.forward(
+                            obs_tensor_a, self.env.envs[0], device=self.device, attacker=True, force_rec=force_rec)
+                    else:
+                        attacker_actions, attacker_values, attacker_log_probs, lstm_state = self.attacker_policy.forward(
+                            (obs_tensor_a_a, obs_tensor_a_d, obs_tensor_a_p, obs_tensor_a_p), self.env.envs[0],
+                            device=self.device, attacker=True, force_rec=force_rec)
                     force_rec = False
                     attacker_actions = attacker_actions.cpu().numpy()
 
@@ -319,8 +351,13 @@ class PPO(BaseRLModel):
 
                     if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
                         if isinstance(self.attacker_opponent, PPOPolicy):
-                            attacker_actions, attacker_values, attacker_log_probs, lstm_state = self.attacker_opponent.forward(
-                                obs_tensor_a, self.env.envs[0], device=self.device, attacker=True)
+                            if not self.pg_agent_config.multi_channel_obs:
+                                attacker_actions, attacker_values, attacker_log_probs, lstm_state = self.attacker_opponent.forward(
+                                    obs_tensor_a, self.env.envs[0], device=self.device, attacker=True)
+                            else:
+                                attacker_actions, attacker_values, attacker_log_probs, lstm_state = self.attacker_opponent.forward(
+                                    (obs_tensor_a_a, obs_tensor_a_d, obs_tensor_a_p, obs_tensor_a_p),
+                                    self.env.envs[0], device=self.device, attacker=True)
                             attacker_actions = attacker_actions.cpu().numpy()
                         else:
                             action = self.attacker_opponent.action(self.env.envs[0].idsgame_env.state)
@@ -363,35 +400,57 @@ class PPO(BaseRLModel):
             if self.pg_agent_config.attacker:
                 if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
                     if self.train_attacker:
-                        if not self.pg_agent_config.lstm_core:
+                        if not self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
                             attacker_rollout_buffer.add(self._last_obs_a, attacker_actions, a_rewards, dones, attacker_values, attacker_log_probs)
-                        else:
+                        elif self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
                             attacker_rollout_buffer.add(self._last_obs_a, attacker_actions, a_rewards, dones, attacker_values, attacker_log_probs, lstm_state)
+                        else:
+                            attacker_rollout_buffer.add(self._last_obs_a_a, self._last_obs_a_d, self._last_obs_a_p,
+                                                        self._last_obs_a_r,
+                                                        attacker_actions, a_rewards, dones,
+                                                        attacker_values, attacker_log_probs, lstm_state)
                 else:
-                    if not self.pg_agent_config.lstm_core:
+                    if not self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
                         attacker_rollout_buffer.add(self._last_obs_a, attacker_actions, a_rewards, dones, attacker_values,
                                                     attacker_log_probs)
-                    else:
+                    elif self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
                         attacker_rollout_buffer.add(self._last_obs_a, attacker_actions, a_rewards, dones,
+                                                    attacker_values, attacker_log_probs, lstm_state)
+                    else:
+                        attacker_rollout_buffer.add(self._last_obs_a_a, self._last_obs_a_d,
+                                                    self._last_obs_a_p, self._last_obs_a_r,
+                                                    attacker_actions, a_rewards, dones,
                                                     attacker_values, attacker_log_probs, lstm_state)
             if self.pg_agent_config.defender:
                 if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
                     if self.train_defender:
-                        if not self.pg_agent_config.lstm_core:
+                        if not self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
                             defender_rollout_buffer.add(self._last_obs_d, defender_actions, d_rewards, dones, defender_values,
                                                         defender_log_probs)
-                        else:
+                        elif self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
                             defender_rollout_buffer.add(self._last_obs_d, defender_actions, d_rewards, dones,
                                                         defender_values, defender_log_probs, lstm_state)
+                        else:
+                            raise AssertionError("not implemented")
                 else:
-                    if not self.pg_agent_config.lstm_core:
+                    if not self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
                         defender_rollout_buffer.add(self._last_obs_d, defender_actions, d_rewards, dones, defender_values,
                                                     defender_log_probs)
-                    else:
+                    elif self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
                         defender_rollout_buffer.add(self._last_obs_d, defender_actions, d_rewards, dones,
                                                     defender_values, defender_log_probs, lstm_state)
-            self._last_obs_a = new_a_obs
-            self._last_obs_d = new_d_obs
+                    else:
+                        raise AssertionError("not implemented")
+            if not self.pg_agent_config.multi_channel_obs:
+                self._last_obs_a = new_a_obs
+                self._last_obs_d = new_d_obs
+            else:
+                self._last_obs_a_a = new_a_obs[0]
+                self._last_obs_a_d = new_a_obs[1]
+                self._last_obs_a_p = new_a_obs[2]
+                self._last_obs_a_r = new_a_obs[3]
+
+                self._last_obs_d = new_d_obs[0]
 
             if dones:
                 # Record episode metrics
@@ -506,21 +565,33 @@ class PPO(BaseRLModel):
                         self.defender_policy.reset_noise(batch_size)
 
                 if attacker and self.train_attacker:
-                    if not self.pg_agent_config.lstm_core:
+                    if not self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
                         values, log_prob, entropy = self.attacker_policy.evaluate_actions(
                             rollout_data.observations, actions, self.env.envs[0], attacker=True)
-                    else:
+                    elif self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
                         values, log_prob, entropy = self.attacker_policy.evaluate_actions(
                             rollout_data.observations, actions, self.env.envs[0], attacker=True,
                             states=(rollout_data.h_states, rollout_data.c_states), masks=rollout_data.dones)
+                    else:
+                        values, log_prob, entropy = self.attacker_policy.evaluate_actions(
+                            (rollout_data.observations_1, rollout_data.observations_2, rollout_data.observations_3,
+                             rollout_data.observations_4),
+                            actions, self.env.envs[0], attacker=True,
+                            states=(rollout_data.h_states, rollout_data.c_states), masks=rollout_data.dones)
                 else:
-                    if not self.pg_agent_config.lstm_core:
+                    if not self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
                         values, log_prob, entropy = self.defender_policy.evaluate_actions(
                             rollout_data.observations, actions, self.env.envs[0], attacker=False)
-                    else:
+                    elif self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
                         values, log_prob, entropy = self.defender_policy.evaluate_actions(
                             rollout_data.observations, actions, self.env.envs[0], attacker=False,
                         states=(rollout_data.h_states, rollout_data.c_states), masks=rollout_data.dones)
+                    else:
+                        values, log_prob, entropy = self.defender_policy.evaluate_actions(
+                            (rollout_data.observations_1, rollout_data.observations_2, rollout_data.observations_3,
+                             rollout_data.observations_4),
+                            actions, self.env.envs[0], attacker=False,
+                            states=(rollout_data.h_states, rollout_data.c_states), masks=rollout_data.dones)
                 values = values.flatten()
                 # Normalize advantage
                 advantages = rollout_data.advantages

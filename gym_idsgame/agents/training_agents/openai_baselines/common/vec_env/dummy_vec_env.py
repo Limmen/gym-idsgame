@@ -102,16 +102,19 @@ class DummyVecEnv(VecEnv):
             return super().render(*args, **kwargs)
 
     def _save_obs(self, env_idx, a_obs, d_obs):
-        for key in self.attacker_keys:
-            if key is None:
-                self.buf_a_obs[key][env_idx] = a_obs
-            else:
-                self.buf_a_obs[key][env_idx] = a_obs[key]
-        for key in self.defender_keys:
-            if key is None:
-                self.buf_d_obs[key][env_idx] = d_obs
-            else:
-                self.buf_d_obs[key][env_idx] = d_obs[key]
+        pass
+        # for key in self.attacker_keys:
+        #     if key is None:
+        #         # print("buf_a_obs:{}".format(self.buf_a_obs))
+        #         # print("a_obs:{}".format(a_obs))
+        #         self.buf_a_obs[key][env_idx] = a_obs
+        #     else:
+        #         self.buf_a_obs[key][env_idx] = a_obs[key]
+        # for key in self.defender_keys:
+        #     if key is None:
+        #         self.buf_d_obs[key][env_idx] = d_obs
+        #     else:
+        #         self.buf_d_obs[key][env_idx] = d_obs[key]
 
     def _obs_from_buf(self):
         return dict_to_obs(self.attacker_observation_space, copy_obs_dict(self.buf_a_obs))

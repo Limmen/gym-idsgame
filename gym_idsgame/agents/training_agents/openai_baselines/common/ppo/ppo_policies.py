@@ -214,10 +214,22 @@ class PPOPolicy(BasePolicy):
         :param deterministic: (bool) Whether to sample or use deterministic actions
         :return: (Tuple[th.Tensor, th.Tensor, th.Tensor]) action, value and log probability of the action
         """
-        latent_pi, latent_vf, latent_sde, lstm_state = self._get_latent(obs.to(device))
+        if self.pg_agent_config.multi_channel_obs:
+            c_1_f, c_2_f, c_3_f, c_4_f = obs
+            c_1_f = c_1_f.to(device)
+            c_2_f = c_2_f.to(device)
+            c_3_f = c_3_f.to(device)
+            c_4_f = c_4_f.to(device)
+            latent_pi, latent_vf, latent_sde, lstm_state = self._get_latent(None, channel_1_features=c_1_f,
+                                                                            channel_2_features=c_2_f,
+                                                                            channel_3_features=c_3_f,
+                                                                            channel_4_features=c_4_f)
+        else:
+            latent_pi, latent_vf, latent_sde, lstm_state = self._get_latent(obs.to(device))
         # Evaluate the values for the given observations
         values = self.value_net(latent_vf)
-        np_obs = obs.cpu().numpy()
+        if wrapper_env is not None:
+            np_obs = obs.cpu().numpy()
         # Masking
         if non_legal_actions is None:
             if attacker:
@@ -255,7 +267,9 @@ class PPOPolicy(BasePolicy):
         log_prob = distribution.log_prob(actions)
         return actions, values, log_prob, lstm_state
 
-    def _get_latent(self, obs: th.Tensor, lstm_state = None, masks = None) -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
+    def _get_latent(self, obs: th.Tensor, lstm_state = None, masks = None,
+                    channel_1_features=None,
+                    channel_2_features=None, channel_3_features=None, channel_4_features=None) -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
         """
         Get the latent code (i.e., activations of the last layer of each network)
         for the different networks.
@@ -265,8 +279,15 @@ class PPOPolicy(BasePolicy):
             for the actor, the value function and for gSDE function
         """
         # Preprocess the observation if needed
-        features = self.extract_features(obs)
-        latent_pi, latent_vf, lstm_state = self.mlp_extractor(features, lstm_state = lstm_state, masks = masks)
+        if not self.pg_agent_config.multi_channel_obs:
+            features = self.extract_features(obs)
+        else:
+            features = obs
+        latent_pi, latent_vf, lstm_state = self.mlp_extractor(features, lstm_state = lstm_state, masks = masks,
+                                                              channel_1_features = channel_1_features,
+                                                              channel_2_features = channel_2_features,
+                                                              channel_3_features = channel_3_features,
+                                                              channel_4_features = channel_4_features)
 
         # Features for sde
         latent_sde = latent_pi
@@ -329,7 +350,17 @@ class PPOPolicy(BasePolicy):
         :param deterministic: (bool) Whether to use stochastic or deterministic actions
         :return: (th.Tensor) Taken action according to the policy
         """
-        latent_pi, _, latent_sde, lstm_state = self._get_latent(observation)
+        if self.pg_agent_config.multi_channel_obs:
+            c_1_f, c_2_f, c_3_f, c_4_f = observation
+            # c_1_f = c_1_f.to(device)
+            # c_2_f = c_2_f.to(device)
+            # c_3_f = c_3_f.to(device)
+            # c_4_f = c_4_f.to(device)
+            latent_pi, _, latent_sde, lstm_state = self._get_latent(observation, channel_1_features=c_1_f,
+                                                                    channel_2_features=c_2_f,
+                                                                    channel_3_features=c_3_f, channel_4_features=c_4_f)
+        else:
+            latent_pi, _, latent_sde, lstm_state = self._get_latent(observation)
 
         # Masking
         if attacker:
@@ -363,7 +394,15 @@ class PPOPolicy(BasePolicy):
         :return: (th.Tensor, th.Tensor, th.Tensor) estimated value, log likelihood of taking those actions
             and entropy of the action distribution.
         """
-        latent_pi, latent_vf, latent_sde, lstm_state = self._get_latent(obs, lstm_state=states, masks=masks)
+        if self.pg_agent_config.multi_channel_obs:
+            c_1_f, c_2_f, c_3_f, c_4_f = obs
+            latent_pi, latent_vf, latent_sde, lstm_state = self._get_latent(obs, lstm_state=states, masks=masks,
+                                                                            channel_1_features=c_1_f,
+                                                                            channel_2_features=c_2_f,
+                                                                            channel_3_features=c_3_f,
+                                                                            channel_4_features=c_4_f)
+        else:
+            latent_pi, latent_vf, latent_sde, lstm_state = self._get_latent(obs, lstm_state=states, masks=masks)
 
         # Masking
         if attacker:

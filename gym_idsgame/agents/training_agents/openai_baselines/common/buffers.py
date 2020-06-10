@@ -6,7 +6,8 @@ from gym import spaces
 
 from stable_baselines3.common.vec_env import VecNormalize
 from stable_baselines3.common.preprocessing import get_action_dim, get_obs_shape
-from gym_idsgame.agents.training_agents.openai_baselines.common.type_aliases import RolloutBufferSamples, ReplayBufferSamples, RolloutBufferSamplesRecurrent
+from gym_idsgame.agents.training_agents.openai_baselines.common.type_aliases import RolloutBufferSamples, \
+    ReplayBufferSamples, RolloutBufferSamplesRecurrent, RolloutBufferSamplesRecurrentMultiHead
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
 
 class BaseBuffer(object):
@@ -481,3 +482,168 @@ class RolloutBufferRecurrent(BaseBuffer):
                 self.dones[batch_inds]
                 )
         return RolloutBufferSamplesRecurrent(*tuple(map(self.to_torch, data)))
+
+
+class RolloutBufferRecurrentMultiHead(BaseBuffer):
+    """
+    Rollout buffer used in on-policy algorithms like A2C/PPO.
+
+    :param buffer_size: (int) Max number of element in the buffer
+    :param observation_space: (spaces.Space) Observation space
+    :param action_space: (spaces.Space) Action space
+    :param device: (th.device)
+    :param gae_lambda: (float) Factor for trade-off of bias vs variance for Generalized Advantage Estimator
+        Equivalent to classic advantage when set to 1.
+    :param gamma: (float) Discount factor
+    :param n_envs: (int) Number of parallel environments
+    """
+
+    def __init__(self,
+                 buffer_size: int,
+                 observation_space: spaces.Space,
+                 action_space: spaces.Space,
+                 device: Union[th.device, str] = 'cpu',
+                 gae_lambda: float = 1,
+                 gamma: float = 0.99,
+                 n_envs: int = 1,
+                 pg_agent_config : PolicyGradientAgentConfig = None):
+
+        super(RolloutBufferRecurrentMultiHead, self).__init__(buffer_size, observation_space,
+                                            action_space, device, n_envs=n_envs)
+        self.pg_agent_config = pg_agent_config
+        self.gae_lambda = gae_lambda
+        self.gamma = gamma
+        self.observations_1, self.observations_2, self.observations_3, self.observations_4, self.actions, self.rewards, \
+        self.advantages = None, None, None, None, None, None, None
+        self.returns, self.dones, self.values, self.log_probs, self.h_states, self.c_states = None, None, None, None, None, None
+        self.generator_ready = False
+        self.reset()
+
+    def reset(self) -> None:
+        self.observations_1 = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.channel_1_input_dim), dtype=np.float32)
+        self.observations_2 = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.channel_2_input_dim), dtype=np.float32)
+        self.observations_3 = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.channel_3_input_dim), dtype=np.float32)
+        self.observations_4 = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.channel_4_input_dim), dtype=np.float32)
+        self.actions = np.zeros((self.buffer_size, self.n_envs, self.action_dim), dtype=np.float32)
+        self.rewards = np.zeros((self.buffer_size, self.n_envs), dtype=np.float32)
+        self.returns = np.zeros((self.buffer_size, self.n_envs), dtype=np.float32)
+        self.dones = np.zeros((self.buffer_size, self.n_envs), dtype=np.float32)
+        self.values = np.zeros((self.buffer_size, self.n_envs), dtype=np.float32)
+        self.log_probs = np.zeros((self.buffer_size, self.n_envs), dtype=np.float32)
+        self.advantages = np.zeros((self.buffer_size, self.n_envs), dtype=np.float32)
+        self.h_states = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.num_lstm_layers, 1,
+                                  self.pg_agent_config.lstm_hidden_dim), dtype=np.float32)
+        self.c_states = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.num_lstm_layers, 1,
+                                  self.pg_agent_config.lstm_hidden_dim), dtype=np.float32)
+        self.generator_ready = False
+        super(RolloutBufferRecurrentMultiHead, self).reset()
+
+    def compute_returns_and_advantage(self,
+                                      last_value: th.Tensor,
+                                      dones: np.ndarray) -> None:
+        """
+        Post-processing step: compute the returns (sum of discounted rewards)
+        and GAE advantage.
+        Adapted from Stable-Baselines PPO2.
+
+        Uses Generalized Advantage Estimation (https://arxiv.org/abs/1506.02438)
+        to compute the advantage. To obtain vanilla advantage (A(s) = R - V(S))
+        where R is the discounted reward with value bootstrap,
+        set ``gae_lambda=1.0`` during initialization.
+
+        :param last_value: (th.Tensor)
+        :param dones: (np.ndarray)
+
+        """
+        # convert to numpy
+        last_value = last_value.clone().cpu().numpy().flatten()
+
+        last_gae_lam = 0
+        for step in reversed(range(self.buffer_size)):
+            if step == self.buffer_size - 1:
+                next_non_terminal = 1.0 - dones
+                next_value = last_value
+            else:
+                next_non_terminal = 1.0 - self.dones[step + 1]
+                next_value = self.values[step + 1]
+            delta = self.rewards[step] + self.gamma * next_value * next_non_terminal - self.values[step]
+            last_gae_lam = delta + self.gamma * self.gae_lambda * next_non_terminal * last_gae_lam
+            self.advantages[step] = last_gae_lam
+        self.returns = self.advantages + self.values
+
+    def add(self,
+            obs_1: np.ndarray,
+            obs_2: np.ndarray,
+            obs_3: np.ndarray,
+            obs_4: np.ndarray,
+            action: np.ndarray,
+            reward: np.ndarray,
+            done: np.ndarray,
+            value: th.Tensor,
+            log_prob: th.Tensor,
+            state: th.Tensor) -> None:
+        """
+        :param obs: (np.ndarray) Observation
+        :param action: (np.ndarray) Action
+        :param reward: (np.ndarray)
+        :param done: (np.ndarray) End of episode signal.
+        :param value: (th.Tensor) estimated value of the current state
+            following the current policy.
+        :param log_prob: (th.Tensor) log probability of the action
+            following the current policy.
+        """
+        if len(log_prob.shape) == 0:
+            # Reshape 0-d tensor to avoid error
+            log_prob = log_prob.reshape(-1, 1)
+
+        self.observations_1[self.pos] = np.array(obs_1).copy()
+        self.observations_2[self.pos] = np.array(obs_2).copy()
+        self.observations_3[self.pos] = np.array(obs_3).copy()
+        self.observations_4[self.pos] = np.array(obs_4).copy()
+        self.actions[self.pos] = np.array(action).copy()
+        self.rewards[self.pos] = np.array(reward).copy()
+        self.dones[self.pos] = np.array(done).copy()
+        self.values[self.pos] = value.clone().cpu().numpy().flatten()
+        self.log_probs[self.pos] = log_prob.clone().cpu().numpy()
+        self.h_states[self.pos] = state[0].clone().cpu().numpy()
+        self.c_states[self.pos] = state[1].clone().cpu().numpy()
+        self.pos += 1
+        if self.pos == self.buffer_size:
+            self.full = True
+
+    def get(self, batch_size: Optional[int] = None) -> Generator[RolloutBufferSamplesRecurrentMultiHead, None, None]:
+        assert self.full, ''
+        indices = np.random.permutation(self.buffer_size * self.n_envs)
+        # Prepare the data
+        if not self.generator_ready:
+            for tensor in ['observations_1', 'observations_2', 'observations_3', 'observations_4',
+                           'actions', 'values',
+                           'log_probs', 'advantages', 'returns', 'h_states', 'c_states', 'dones']:
+                self.__dict__[tensor] = self.swap_and_flatten(self.__dict__[tensor])
+            self.generator_ready = True
+
+        # Return everything, don't create minibatches
+        if batch_size is None:
+            batch_size = self.buffer_size * self.n_envs
+
+        start_idx = 0
+        while start_idx < self.buffer_size * self.n_envs:
+            yield self._get_samples(indices[start_idx:start_idx + batch_size])
+            start_idx += batch_size
+
+    def _get_samples(self, batch_inds: np.ndarray,
+                     env: Optional[VecNormalize] = None) -> RolloutBufferSamplesRecurrentMultiHead:
+        data = (self.observations_1[batch_inds],
+                self.observations_2[batch_inds],
+                self.observations_3[batch_inds],
+                self.observations_4[batch_inds],
+                self.actions[batch_inds],
+                self.values[batch_inds].flatten(),
+                self.log_probs[batch_inds].flatten(),
+                self.advantages[batch_inds].flatten(),
+                self.returns[batch_inds].flatten(),
+                self.h_states[batch_inds],
+                self.c_states[batch_inds],
+                self.dones[batch_inds]
+                )
+        return RolloutBufferSamplesRecurrentMultiHead(*tuple(map(self.to_torch, data)))

@@ -107,6 +107,10 @@ class BaseRLModel(ABC):
         self.lr_schedule_d = None  # type: Optional[Callable]
         self._last_obs_a = None  # type: Optional[np.ndarray]
         self._last_obs_d = None  # type: Optional[np.ndarray]
+        self._last_obs_a_a = None
+        self._last_obs_a_d = None
+        self._last_obs_a_p = None
+        self._last_obs_a_r = None
         # When using VecNormalize:
         self._last_original_obs = None  # type: Optional[np.ndarray]
         self._episode_num = 0
@@ -704,15 +708,33 @@ class BaseRLModel(ABC):
             self._episode_num = 0
 
         # Avoid resetting the environment when calling ``.learn()`` consecutive times
-        if reset_num_timesteps or self._last_obs_a is None:
-            obs = self.env.reset()
-            a_obs = obs[0]
-            d_obs = obs[1]
-            self._last_obs_a = a_obs
-            self._last_obs_d = d_obs
-            # Retrieve unnormalized observation for saving into the buffer
-            if self._vec_normalize_env is not None:
-                self._last_original_obs = self._vec_normalize_env.get_original_obs()
+        if not self.pg_agent_config.multi_channel_obs:
+            if reset_num_timesteps or self._last_obs_a is None:
+                obs = self.env.reset()
+                a_obs = obs[0]
+                d_obs = obs[1]
+                self._last_obs_a = a_obs
+                self._last_obs_d = d_obs
+                # Retrieve unnormalized observation for saving into the buffer
+                if self._vec_normalize_env is not None:
+                    self._last_original_obs = self._vec_normalize_env.get_original_obs()
+        else:
+            if reset_num_timesteps or self._last_obs_a_a is None:
+                obs = self.env.reset()
+                a_obs = obs[0]
+                a_obs_a = a_obs[0]
+                a_obs_d = a_obs[1]
+                a_obs_p = a_obs[2]
+                a_obs_r = a_obs[3]
+                d_obs = obs[1]
+                self._last_obs_a_a = a_obs_a
+                self._last_obs_a_d = a_obs_d
+                self._last_obs_a_p = a_obs_p
+                self._last_obs_a_r = a_obs_r
+                self._last_obs_d = d_obs
+                # Retrieve unnormalized observation for saving into the buffer
+                if self._vec_normalize_env is not None:
+                    self._last_original_obs = self._vec_normalize_env.get_original_obs()
 
         if eval_env is not None and self.seed is not None:
             eval_env.seed(self.seed)

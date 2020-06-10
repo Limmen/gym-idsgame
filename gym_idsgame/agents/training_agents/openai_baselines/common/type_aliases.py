@@ -39,6 +39,21 @@ class RolloutBufferSamplesRecurrent(NamedTuple):
     dones: th.Tensor
 
 
+class RolloutBufferSamplesRecurrentMultiHead(NamedTuple):
+    observations_1: th.Tensor
+    observations_2: th.Tensor
+    observations_3: th.Tensor
+    observations_4: th.Tensor
+    actions: th.Tensor
+    old_values: th.Tensor
+    old_log_prob: th.Tensor
+    advantages: th.Tensor
+    returns: th.Tensor
+    h_states: th.Tensor
+    c_states: th.Tensor
+    dones: th.Tensor
+
+
 class ReplayBufferSamples(NamedTuple):
     observations: th.Tensor
     actions: th.Tensor

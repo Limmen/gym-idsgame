@@ -34,8 +34,16 @@ class OpenAiPPOAgent(PolicyGradientAgent):
         self.env.idsgame_env.idsgame_config.render_config.attacker_view = self.config.render_attacker_view
         # Custom MLP policy
         net_arch = []
+        pi_arch = []
+        vf_arch = []
         for l in range(self.config.num_hidden_layers):
             net_arch.append(self.config.hidden_dim)
+        for l in range(self.config.pi_hidden_layers):
+            pi_arch.append(self.config.pi_hidden_dim)
+        for l in range(self.config.vf_hidden_layers):
+            vf_arch.append(self.config.vf_hidden_dim)
+        net_dict = {"pi": pi_arch, "vf": vf_arch,}
+        net_arch.append(net_dict)
         policy_kwargs = dict(activation_fn=self.get_hidden_activation(), net_arch=net_arch)
         device = "cpu" if not self.config.gpu else "cuda:" + str(self.config.gpu_id)
         policy = "MlpPolicy"

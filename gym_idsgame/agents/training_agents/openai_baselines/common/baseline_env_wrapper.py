@@ -28,6 +28,9 @@ class BaselineEnvWrapper(gym.Env):
         self.defender_action_space = self.idsgame_env.defender_action_space
         attacker_obs_shape = self.pg_agent_config.input_dim_attacker
         defender_obs_shape = self.pg_agent_config.input_dim_defender
+        if self.pg_agent_config.multi_channel_obs:
+            attacker_obs_shape = 4
+            defender_obs_shape = 4
         if type(attacker_obs_shape) != tuple:
             attacker_obs_shape = (attacker_obs_shape,)
         if type(defender_obs_shape) != tuple:
@@ -86,6 +89,9 @@ class BaselineEnvWrapper(gym.Env):
             attacker_state = self.image_grid_obs(attacker_obs=obs_prime_attacker, defender_obs=obs_prime_defender, attacker=True)
             #defender_state = self.image_grid_obs(attacker_obs= obs_prime_attacker, defender_obs=obs_prime_defender, attacker=False)
             return [attacker_state, attacker_state], [attacker_reward, defender_reward], done, info
+        elif self.pg_agent_config.multi_channel_obs:
+            attacker_state = self.multi_channel_obs(attacker_obs=obs_prime_attacker, defender_obs=obs_prime_defender, attacker=True)
+            return [attacker_state, attacker_state], [attacker_reward, defender_reward], done, info
         else:
             attacker_state = self.update_state(attacker_obs=obs_prime_attacker, defender_obs=obs_prime_defender, state=self.attacker_state,
                                                attacker=True)
@@ -127,6 +133,9 @@ class BaselineEnvWrapper(gym.Env):
         elif self.pg_agent_config.grid_image_obs:
             attacker_state = self.image_grid_obs(attacker_obs=obs_attacker, defender_obs=obs_defender, attacker=True)
             #defender_state = self.image_grid_obs(attacker_obs=obs_attacker, defender_obs=obs_defender, attacker=False)
+            return [attacker_state, attacker_state]
+        elif self.pg_agent_config.multi_channel_obs:
+            attacker_state = self.multi_channel_obs(attacker_obs=obs_attacker, defender_obs=obs_defender, attacker=True)
             return [attacker_state, attacker_state]
         else:
             attacker_state = self.update_state(attacker_obs=obs_attacker, defender_obs=obs_defender, state=self.attacker_state,
@@ -736,4 +745,21 @@ class BaselineEnvWrapper(gym.Env):
         #plt.show()
         #raise AssertionError("test")
         return data
+
+    def multi_channel_obs(self, attacker_obs, defender_obs, attacker=True):
+        if attacker and self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
+            #if not self.idsgame_env.local_view_features():
+            a_obs_len = self.idsgame_env.idsgame_config.game_config.num_attack_types + 1
+            defender_obs = attacker_obs[:, a_obs_len:a_obs_len+self.idsgame_env.idsgame_config.game_config.num_attack_types]
+            if self.idsgame_env.idsgame_config.reconnaissance_bool_features:
+                d_bool_features = attacker_obs[:, a_obs_len+self.idsgame_env.idsgame_config.game_config.num_attack_types:]
+            attacker_obs = attacker_obs[:, 0:a_obs_len]
+            node_pos_obs = attacker_obs[:, -1]
+            attacker_obs = attacker_obs[:, 0:-1]
+        # print("attacker obs:{}".format(attacker_obs.shape))
+        # print("defender obs:{}".format(defender_obs.shape))
+        # print("reconnaissance obs:{}".format(d_bool_features.shape))
+        # print("node position obs:{}".format(node_pos_obs.shape))
+        # raise AssertionError("test")
+        return np.array([attacker_obs.flatten(), defender_obs.flatten(), node_pos_obs.flatten(), d_bool_features.flatten()])
 
