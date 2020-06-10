@@ -71,8 +71,17 @@ def evaluate_policy(model, env, n_eval_episodes=10, deterministic=True,
 
             # Get attacker and defender actions
             if pg_agent_config.attacker:
-                a_obs = th.tensor(a_obs).to(device=model.device)
-                res = model.predict(a_obs, deterministic=False, attacker = True)
+                if pg_agent_config.multi_channel_obs:
+                    a_obs_a = th.Tensor(a_obs[0]).to(device=model.device)
+                    a_obs_d = th.Tensor(a_obs[1]).to(device=model.device)
+                    a_obs_p = th.Tensor(a_obs[2]).to(device=model.device)
+                    a_obs_r = th.Tensor(a_obs[3]).to(device=model.device)
+                    res = model.predict(a_obs, deterministic=False, attacker=True,
+                                        channel_1_features=a_obs_a, channel_2_features = a_obs_d,
+                                        channel_3_features = a_obs_p, channel_4_features = a_obs_r)
+                else:
+                    a_obs = th.tensor(a_obs).to(device=model.device)
+                    res = model.predict(a_obs, deterministic=False, attacker = True)
                 attacker_action = np.array([res.cpu().numpy()])
 
             if pg_agent_config.defender:

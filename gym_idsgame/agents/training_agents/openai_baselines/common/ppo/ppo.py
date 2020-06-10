@@ -242,7 +242,10 @@ class PPO(BaseRLModel):
     def predict(self, observation: np.ndarray,
                 state: Optional[np.ndarray] = None,
                 mask: Optional[np.ndarray] = None,
-                deterministic: bool = False, attacker = True) -> Tuple[np.ndarray, Optional[np.ndarray]]:
+                deterministic: bool = False, attacker = True,
+                channel_1_features=None, channel_2_features=None,
+                channel_3_features=None, channel_4_features=None
+                ) -> Tuple[np.ndarray, Optional[np.ndarray]]:
         """
         Get the model's action(s) from an observation
 
@@ -255,10 +258,16 @@ class PPO(BaseRLModel):
         """
         if attacker:
             return self.attacker_policy._predict(observation, self.env.envs[0], deterministic, device=self.device,
-                                                 attacker=True)
+                                                 attacker=True, channel_1_features=channel_1_features,
+                                                 channel_2_features=channel_2_features,
+                                                 channel_3_features=channel_3_features,
+                                                 channel_4_features=channel_4_features)
         else:
             return self.defender_policy._predict(observation, self.env.envs[0], deterministic, device=self.device,
-                                                 attacker=False)
+                                                 attacker=False, channel_1_features=channel_1_features,
+                                                 channel_2_features=channel_2_features,
+                                                 channel_3_features=channel_3_features,
+                                                 channel_4_features=channel_4_features)
 
     def collect_rollouts(self,
                          env: VecEnv,

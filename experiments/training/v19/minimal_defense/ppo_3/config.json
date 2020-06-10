@@ -45,7 +45,7 @@
         "epsilon_decay": 0.9999,
         "eval_episodes": 1000,
         "eval_epsilon": 0.0,
-        "eval_frequency": 175000,
+        "eval_frequency": 75000,
         "eval_log_frequency": 500,
         "eval_render": false,
         "eval_sleep": 0.9,

@@ -316,11 +316,11 @@ class PPOPolicy(BasePolicy):
         action_probs_1 = mean_actions.clone()
         if non_legal_actions is not None and len(non_legal_actions) > 0:
             if len(action_probs_1.shape) == 1:
-                #action_probs_1[non_legal_actions] = 0.00000000000001 # Don't set to zero due to invalid distribution errors
-                action_probs_1[non_legal_actions] = 0.0
+                action_probs_1[non_legal_actions] = 0.00000000000001 # Don't set to zero due to invalid distribution errors
+                #action_probs_1[non_legal_actions] = 0.0
             elif len(action_probs_1.shape) == 2:
-                #action_probs_1[:, non_legal_actions] = 0.00000000000001  # Don't set to zero due to invalid distribution errors
-                action_probs_1[:,non_legal_actions] = 0.0
+                action_probs_1[:, non_legal_actions] = 0.00000000000001  # Don't set to zero due to invalid distribution errors
+                #action_probs_1[:,non_legal_actions] = 0.0
             else:
                 raise AssertionError("Invalid shape of action probabilties")
         action_probs_1 = action_probs_1.to(device)
@@ -342,7 +342,10 @@ class PPOPolicy(BasePolicy):
             raise ValueError('Invalid action distribution')
 
     def _predict(self, observation: th.Tensor, env : IdsGameEnv, deterministic: bool = False,
-                  device : str = "cpu", attacker = True, wrapper_env : BaselineEnvWrapper = None) -> th.Tensor:
+                  device : str = "cpu", attacker = True, wrapper_env : BaselineEnvWrapper = None,
+                 channel_1_features=None,
+                 channel_2_features=None, channel_3_features=None, channel_4_features=None
+                 ) -> th.Tensor:
         """
         Get the action according to the policy for a given observation.
 
@@ -350,17 +353,10 @@ class PPOPolicy(BasePolicy):
         :param deterministic: (bool) Whether to use stochastic or deterministic actions
         :return: (th.Tensor) Taken action according to the policy
         """
-        if self.pg_agent_config.multi_channel_obs:
-            c_1_f, c_2_f, c_3_f, c_4_f = observation
-            # c_1_f = c_1_f.to(device)
-            # c_2_f = c_2_f.to(device)
-            # c_3_f = c_3_f.to(device)
-            # c_4_f = c_4_f.to(device)
-            latent_pi, _, latent_sde, lstm_state = self._get_latent(observation, channel_1_features=c_1_f,
-                                                                    channel_2_features=c_2_f,
-                                                                    channel_3_features=c_3_f, channel_4_features=c_4_f)
-        else:
-            latent_pi, _, latent_sde, lstm_state = self._get_latent(observation)
+        latent_pi, _, latent_sde, lstm_state = self._get_latent(observation, channel_1_features=channel_1_features,
+                                                                channel_2_features=channel_2_features,
+                                                                channel_3_features=channel_3_features,
+                                                                channel_4_features=channel_4_features)
 
         # Masking
         if attacker:
