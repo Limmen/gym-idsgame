@@ -634,8 +634,6 @@ class MlpExtractor(nn.Module):
             self.shared_net = nn.Sequential(*shared_net).to(device)
         else:
             self.core_lstm = self.core_lstm.to(device)
-            self.lstm_hidden[0] = self.lstm_hidden[0].to(device)
-            self.lstm_hidden[1] = self.lstm_hidden[1].to(device)
         self.policy_net = nn.Sequential(*policy_net).to(device)
         self.value_net = nn.Sequential(*value_net).to(device)
 
