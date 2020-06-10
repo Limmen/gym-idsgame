@@ -569,20 +569,33 @@ class MlpExtractor(nn.Module):
                  device: Union[th.device, str] = 'auto',
                  pg_agent_config: PolicyGradientAgentConfig = None):
         super(MlpExtractor, self).__init__()
+        self.pg_agent_config = pg_agent_config
         device = get_device(device, pg_agent_config)
         shared_net, policy_net, value_net = [], [], []
         policy_only_layers = []  # Layer sizes of the network that only belongs to the policy network
         value_only_layers = []  # Layer sizes of the network that only belongs to the value network
         last_layer_dim_shared = feature_dim
 
+        if self.pg_agent_config.lstm_core:
+            self.core_lstm = th.nn.LSTM(input_size=last_layer_dim_shared,
+                                        hidden_size=self.pg_agent_config.lstm_hidden_dim,
+                                        num_layers=self.pg_agent_config.num_lstm_layers)
+            # initialize the hidden state.
+            self.lstm_hidden = (th.zeros(self.pg_agent_config.num_lstm_layers, 1,
+                                         self.pg_agent_config.lstm_hidden_dim),
+                                th.zeros(self.pg_agent_config.num_lstm_layers, 1,
+                                         self.pg_agent_config.lstm_hidden_dim))
+            last_layer_dim_shared = self.pg_agent_config.lstm_hidden_dim
+
+
         # Iterate through the shared layers and build the shared parts of the network
         for idx, layer in enumerate(net_arch):
             if isinstance(layer, int):  # Check that this is a shared layer
-                layer_size = layer
-                # TODO: give layer a meaningful name
-                shared_net.append(nn.Linear(last_layer_dim_shared, layer_size))
-                shared_net.append(activation_fn())
-                last_layer_dim_shared = layer_size
+                if not self.pg_agent_config.lstm_core:
+                    layer_size = layer
+                    shared_net.append(nn.Linear(last_layer_dim_shared, layer_size))
+                    shared_net.append(activation_fn())
+                    last_layer_dim_shared = layer_size
             else:
                 assert isinstance(layer, dict), "Error: the net_arch list can only contain ints and dicts"
                 if 'pi' in layer:
@@ -617,14 +630,48 @@ class MlpExtractor(nn.Module):
 
         # Create networks
         # If the list of layers is empty, the network will just act as an Identity module
-        self.shared_net = nn.Sequential(*shared_net).to(device)
+        if not self.pg_agent_config.lstm_core:
+            self.shared_net = nn.Sequential(*shared_net).to(device)
+        else:
+            self.core_lstm.to(device)
         self.policy_net = nn.Sequential(*policy_net).to(device)
         self.value_net = nn.Sequential(*value_net).to(device)
 
-    def forward(self, features: th.Tensor) -> Tuple[th.Tensor, th.Tensor]:
+    def forward(self, features: th.Tensor, lstm_state = None, masks = None) -> Tuple[th.Tensor, th.Tensor]:
         """
         :return: (th.Tensor, th.Tensor) latent_policy, latent_value of the specified network.
             If all layers are shared, then ``latent_policy == latent_value``
         """
-        shared_latent = self.shared_net(features)
-        return self.policy_net(shared_latent), self.value_net(shared_latent)
+        if not self.pg_agent_config.lstm_core:
+            shared_latent = self.shared_net(features)
+            return self.policy_net(shared_latent), self.value_net(shared_latent), None
+        else:
+            if lstm_state is None:
+                if len(features.shape) == 1:
+                    lstm_input_latent = features.reshape(1, 1, features.shape[0])
+                elif len(features.shape) == 2:
+                    lstm_input_latent = features.reshape(1, features.shape[0], features.shape[1])
+                lstm_latent, lstm_state = self.core_lstm(lstm_input_latent, self.lstm_hidden)
+                self.lstm_hidden = lstm_state
+            else:
+                outputs = []
+                h_states = lstm_state[0][0]
+                c_states = lstm_state[1][0]
+                hiddden_state = (h_states, c_states)
+                for i in range(len(masks)):
+                    latent_input = features[i]
+                    latent_input = latent_input.reshape(1, 1, features.shape[1])
+                    if masks[0] == 1:
+                        hiddden_state = (
+                            th.zeros(self.pg_agent_config.num_lstm_layers, 1,
+                                     self.pg_agent_config.lstm_hidden_dim),
+                            th.zeros(self.pg_agent_config.num_lstm_layers, 1,
+                                     self.pg_agent_config.lstm_hidden_dim))
+                    lstm_latent, hidden_state = self.core_lstm(latent_input, hiddden_state)
+                    outputs.append(lstm_latent)
+
+                x = th.cat(outputs, dim=0)
+                x = x.reshape((x.shape[0], x.shape[2]))
+                lstm_latent = x
+
+            return self.policy_net(lstm_latent), self.value_net(lstm_latent), lstm_state

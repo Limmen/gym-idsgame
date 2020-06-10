@@ -38,7 +38,8 @@ class PolicyGradientAgentConfig:
                  vf_coef: float = 0.5, render_attacker_view : bool = False, lr_progress_decay : bool = False,
                  lr_progress_power_decay : int = 1, use_sde : bool = False, sde_sample_freq : int = 4,
                  seq_cnn : bool = False, baselines_in_pool : bool = False, one_hot_obs : bool = False,
-                 grid_image_obs : bool = False, force_exploration : bool = False, force_exp_p :float = 0.05
+                 grid_image_obs : bool = False, force_exploration : bool = False, force_exp_p :float = 0.05,
+                 lstm_core : bool = False, lstm_hidden_dim : int = 64
                  ):
         """
         Initialize environment and hyperparameters
@@ -200,6 +201,8 @@ class PolicyGradientAgentConfig:
         self.grid_image_obs = grid_image_obs
         self.force_exploration = force_exploration
         self.force_exp_p = force_exp_p
+        self.lstm_core =lstm_core
+        self.lstm_hidden_dim = lstm_hidden_dim
 
 
     def to_str(self) -> str:
