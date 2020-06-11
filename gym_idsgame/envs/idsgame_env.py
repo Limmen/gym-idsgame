@@ -476,10 +476,10 @@ class IdsGameEnv(gym.Env, ABC):
             #return 0*constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
             #return -1 * constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
             #return -constants.GAME_CONFIG.POSITIVE_REWARD, defender_reward
-            min_at = self.state.min_attack_type(target_node_id)
-            if target_node_id in self.state.reconnaissance_actions and min_at == attack_type:
-                #print("min_at3")
-                return 0, constants.GAME_CONFIG.POSITIVE_REWARD
+            # min_at = self.state.min_attack_type(target_node_id)
+            # if target_node_id in self.state.reconnaissance_actions and min_at == attack_type:
+            #     #print("min_at3")
+            #     return 0, constants.GAME_CONFIG.POSITIVE_REWARD
             return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
             #else:
                 #return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
