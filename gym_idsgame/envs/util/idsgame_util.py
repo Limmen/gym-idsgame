@@ -123,6 +123,7 @@ def interpret_attack_action(action: int, game_config: GameConfig) -> Union[int, 
     reconnaissance = attack_type >= game_config.num_attack_types
     if reconnaissance:
         attack_type = attack_type - game_config.num_attack_types
+    #print("server:{},pos:{},a_type:{},rec:{}".format(server_id, server_pos, attack_type, reconnaissance))
     return server_id, server_pos, attack_type, reconnaissance
 
 def interpret_defense_action(action: int, game_config: GameConfig) -> Union[int, Union[int, int], int]:

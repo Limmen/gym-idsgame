@@ -410,11 +410,14 @@ class IdsGameEnv(gym.Env, ABC):
             return 100*constants.GAME_CONFIG.POSITIVE_REWARD, -100*constants.GAME_CONFIG.POSITIVE_REWARD
         else:
             if np.argmin(self.state.defense_values[node_id]) == attack_type:
-                #print("positive reward, attacked node:{}, attacktype:{}, defense_values:{}".format(node_id, attack_type,
-                #                                                                                   self.state.defense_values))
-                return constants.GAME_CONFIG.POSITIVE_REWARD, 0
+                for rec_act in self.past_reconnaissance_activities:
+                    node_id, rec_type = rec_act
+                    server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
+                    if node_id == server_id:
+                        return constants.GAME_CONFIG.POSITIVE_REWARD, 0
+                return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
             else:
-                return 0,0
+                return -constants.GAME_CONFIG.POSITIVE_REWARD,0
             # detection_actions = 0
             # for defense in self.defenses:
             #     if defense[2]:
@@ -475,7 +478,12 @@ class IdsGameEnv(gym.Env, ABC):
             #return -1 * constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
             #return -constants.GAME_CONFIG.POSITIVE_REWARD, defender_reward
             if np.argmin(self.state.defense_values[target_node_id]) == attack_type:
-                return 0, constants.GAME_CONFIG.POSITIVE_REWARD
+                for rec_act in self.past_reconnaissance_activities:
+                    node_id, rec_type = rec_act
+                    server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
+                    if node_id == server_id:
+                        return 0, constants.GAME_CONFIG.POSITIVE_REWARD
+                return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
             else:
                 return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
             #return -constants.GAME_CONFIG.POSITIVE_REWARD,(self.idsgame_config.game_config.num_nodes - len(self.hacked_nodes))
@@ -500,10 +508,15 @@ class IdsGameEnv(gym.Env, ABC):
         else:
             attack_row, attack_col = self.state.attacker_pos
             if np.argmin(self.state.defense_values[node_id]) == attack_type:
-                #print("positive reward, attacked node:{}, attacktype:{}, defense_values:{}".format(node_id, attack_type, self.state.defense_values))
-                return constants.GAME_CONFIG.POSITIVE_REWARD, 0
+                for rec_act in self.past_reconnaissance_activities:
+                    node_id, rec_type = rec_act
+                    server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
+                    if node_id == server_id:
+                        return constants.GAME_CONFIG.POSITIVE_REWARD, 0
+                return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
+                #return constants.GAME_CONFIG.POSITIVE_REWARD, 0
             else:
-                return 0,0
+                return -constants.GAME_CONFIG.POSITIVE_REWARD,0
             # bonus = 1 if self.num_failed_attacks == 0 else 1/self.num_failed_attacks
             # if attack_row < self.furthest_hack:
             #     self.furthest_hack = attack_row
@@ -4166,7 +4179,7 @@ class IdsGameMinimalDefenseV19Env(AttackerEnv):
                                      reconnaissance_actions=True)
             game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
                                           vulnerability_val=1, num_vulnerabilities_per_layer=2,
-                                          randomize_visibility=True, visibility_p=0.0)
+                                          randomize_visibility=True, visibility_p=0.15)
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
@@ -4179,17 +4192,17 @@ class IdsGameMinimalDefenseV19Env(AttackerEnv):
             idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
             idsgame_config.render_config.caption = "idsgame-minimal_defense-v19"
             idsgame_config.randomize_env = True
-            #idsgame_config.randomize_starting_position = True
-            idsgame_config.randomize_starting_position = False
+            idsgame_config.randomize_starting_position = True
+            #idsgame_config.randomize_starting_position = False
             #idsgame_config.local_view_observations = True
             idsgame_config.local_view_observations = False
             idsgame_config.reconnaissance_bool_features = True
             idsgame_config.reconnaissance_actions = True
             #idsgame_config.reconnaissance_reward = True
-            idsgame_config.reconnaissance_reward = False
+            #idsgame_config.reconnaissance_reward = True
             idsgame_config.randomize_visibility = True
             #idsgame_config.visibility_p = 0.25
-            idsgame_config.visibility_p = 0.0
+            idsgame_config.visibility_p = 0.15
             idsgame_config.reconnaissance_detection_factor = 1
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
 

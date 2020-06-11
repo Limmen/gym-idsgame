@@ -51,7 +51,7 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.000008, epsilon=1, render=False,
+    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.00005, epsilon=1, render=False,
                                                 alpha_defender=0.0001,
                                                 eval_sleep=0.9,
                                                 min_epsilon=0.01, eval_episodes=1000, train_log_frequency=1,
@@ -60,7 +60,7 @@ def default_config() -> ClientConfig:
                                                 num_episodes=100000000,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
-                                                eval_frequency=175000, attacker=True, defender=False,
+                                                eval_frequency=55000, attacker=True, defender=False,
                                                 video_frequency=1001,
                                                 save_dir=default_output_dir() + "/results/data",
                                                 checkpoint_freq=250,
@@ -79,7 +79,7 @@ def default_config() -> ClientConfig:
                                                 lstm_seq_length=4, num_lstm_layers=2, optimization_iterations=10,
                                                 eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95,
                                                 cnn_feature_extractor=False, features_dim=512,
-                                                flatten_feature_planes=False, cnn_type=5, vf_coef=0.5, ent_coef=0.00,
+                                                flatten_feature_planes=False, cnn_type=5, vf_coef=0.5, ent_coef=0.001,
                                                 render_attacker_view=True, lr_progress_power_decay=4,
                                                 lr_progress_decay=True, use_sde=False, sde_sample_freq=4,
                                                 one_hot_obs=False, lstm_core=True, lstm_hidden_dim=64,
