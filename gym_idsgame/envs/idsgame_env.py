@@ -474,7 +474,10 @@ class IdsGameEnv(gym.Env, ABC):
             #return 0*constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
             #return -1 * constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
             #return -constants.GAME_CONFIG.POSITIVE_REWARD, defender_reward
-            return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
+            if np.argmin(self.state.defense_values[target_node_id]) == attack_type:
+                return 0, constants.GAME_CONFIG.POSITIVE_REWARD
+            else:
+                return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
             #return -constants.GAME_CONFIG.POSITIVE_REWARD,(self.idsgame_config.game_config.num_nodes - len(self.hacked_nodes))
 
     def get_successful_attack_reward(self, attack_type : int, node_id : int) -> Union[int, int]:
@@ -4163,7 +4166,7 @@ class IdsGameMinimalDefenseV19Env(AttackerEnv):
                                      reconnaissance_actions=True)
             game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
                                           vulnerability_val=1, num_vulnerabilities_per_layer=2,
-                                          randomize_visibility=True, visibility_p=0.25)
+                                          randomize_visibility=True, visibility_p=0.0)
             game_config.dense_rewards_v2 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
@@ -4185,7 +4188,8 @@ class IdsGameMinimalDefenseV19Env(AttackerEnv):
             #idsgame_config.reconnaissance_reward = True
             idsgame_config.reconnaissance_reward = False
             idsgame_config.randomize_visibility = True
-            idsgame_config.visibility_p = 0.25
+            #idsgame_config.visibility_p = 0.25
+            idsgame_config.visibility_p = 0.0
             idsgame_config.reconnaissance_detection_factor = 1
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
 
