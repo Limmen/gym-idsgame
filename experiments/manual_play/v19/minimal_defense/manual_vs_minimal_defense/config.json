@@ -1,6 +1,7 @@
 {
     "attacker_type": 3,
     "bot_attacker": false,
+    "bot_defender": false,
     "defender_type": 1,
     "env_name": "idsgame-minimal_defense-v19",
     "hp_tuning": false,
