@@ -51,7 +51,7 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.0001, epsilon=1, render=False,
+    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.00001, epsilon=1, render=False,
                                                 alpha_defender=0.0001,
                                                 eval_sleep=0.9,
                                                 min_epsilon=0.01, eval_episodes=1000, train_log_frequency=1,
@@ -60,7 +60,7 @@ def default_config() -> ClientConfig:
                                                 num_episodes=100000000,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
-                                                eval_frequency=175000, attacker=True, defender=False,
+                                                eval_frequency=55000, attacker=True, defender=False,
                                                 video_frequency=1001,
                                                 save_dir=default_output_dir() + "/results/data",
                                                 checkpoint_freq=250,
@@ -70,7 +70,7 @@ def default_config() -> ClientConfig:
                                                 output_dim_defender=5 * 4,
                                                 hidden_dim=32, num_hidden_layers=2,
                                                 pi_hidden_layers= 2, pi_hidden_dim=2, vf_hidden_layers=2, vf_hidden_dim=2,
-                                                batch_size=500,
+                                                batch_size=3000,
                                                 gpu=False, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,

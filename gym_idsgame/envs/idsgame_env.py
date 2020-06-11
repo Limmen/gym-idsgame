@@ -4179,8 +4179,8 @@ class IdsGameMinimalDefenseV19Env(AttackerEnv):
             idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
             idsgame_config.render_config.caption = "idsgame-minimal_defense-v19"
             idsgame_config.randomize_env = True
-            idsgame_config.randomize_starting_position = True
-            #idsgame_config.randomize_starting_position = False
+            #idsgame_config.randomize_starting_position = True
+            idsgame_config.randomize_starting_position = False
             #idsgame_config.local_view_observations = True
             idsgame_config.local_view_observations = False
             idsgame_config.reconnaissance_bool_features = True
