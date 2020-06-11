@@ -409,15 +409,16 @@ class IdsGameEnv(gym.Env, ABC):
         elif self.idsgame_config.game_config.dense_rewards and not self.idsgame_config.game_config.dense_rewards_v2:
             return 100*constants.GAME_CONFIG.POSITIVE_REWARD, -100*constants.GAME_CONFIG.POSITIVE_REWARD
         else:
-            if np.argmin(self.state.defense_values[node_id]) == attack_type:
-                for rec_act in self.past_reconnaissance_activities:
-                    node_id, rec_type = rec_act
-                    server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
-                    if node_id == server_id:
+            #if np.argmin(self.state.defense_values[node_id]) == attack_type:
+            for rec_act in self.past_reconnaissance_activities:
+                node_id, rec_type = rec_act
+                server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
+                if node_id == server_id:
+                    if np.argmin(self.state.reconnaissance_state[node_id]) == attack_type:
                         return constants.GAME_CONFIG.POSITIVE_REWARD, 0
-                return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
-            else:
-                return -constants.GAME_CONFIG.POSITIVE_REWARD,0
+            return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
+            # else:
+            #     return -constants.GAME_CONFIG.POSITIVE_REWARD,0
             # detection_actions = 0
             # for defense in self.defenses:
             #     if defense[2]:
@@ -477,15 +478,15 @@ class IdsGameEnv(gym.Env, ABC):
             #return 0*constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
             #return -1 * constants.GAME_CONFIG.POSITIVE_REWARD, added_detection
             #return -constants.GAME_CONFIG.POSITIVE_REWARD, defender_reward
-            if np.argmin(self.state.defense_values[target_node_id]) == attack_type:
-                for rec_act in self.past_reconnaissance_activities:
-                    node_id, rec_type = rec_act
-                    server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
-                    if node_id == server_id:
+            for rec_act in self.past_reconnaissance_activities:
+                node_id, rec_type = rec_act
+                server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
+                if node_id == server_id:
+                    if np.argmin(self.state.reconnaissance_state[target_node_id]) == attack_type:
                         return 0, constants.GAME_CONFIG.POSITIVE_REWARD
-                return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
-            else:
-                return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
+            return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
+            #else:
+                #return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
             #return -constants.GAME_CONFIG.POSITIVE_REWARD,(self.idsgame_config.game_config.num_nodes - len(self.hacked_nodes))
 
     def get_successful_attack_reward(self, attack_type : int, node_id : int) -> Union[int, int]:
@@ -507,16 +508,16 @@ class IdsGameEnv(gym.Env, ABC):
             return 0,0
         else:
             attack_row, attack_col = self.state.attacker_pos
-            if np.argmin(self.state.defense_values[node_id]) == attack_type:
-                for rec_act in self.past_reconnaissance_activities:
-                    node_id, rec_type = rec_act
-                    server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
-                    if node_id == server_id:
+            for rec_act in self.past_reconnaissance_activities:
+                node_id, rec_type = rec_act
+                server_id = self.idsgame_config.game_config.network_config.get_node_id(self.state.attacker_pos)
+                if node_id == server_id:
+                    if np.argmin(self.state.reconnaissance_state[node_id]) == attack_type:
                         return constants.GAME_CONFIG.POSITIVE_REWARD, 0
-                return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
+            return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
                 #return constants.GAME_CONFIG.POSITIVE_REWARD, 0
-            else:
-                return -constants.GAME_CONFIG.POSITIVE_REWARD,0
+            # else:
+            #     return -constants.GAME_CONFIG.POSITIVE_REWARD,0
             # bonus = 1 if self.num_failed_attacks == 0 else 1/self.num_failed_attacks
             # if attack_row < self.furthest_hack:
             #     self.furthest_hack = attack_row

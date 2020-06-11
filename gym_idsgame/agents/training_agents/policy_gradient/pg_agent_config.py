@@ -45,7 +45,8 @@ class PolicyGradientAgentConfig:
                  channel_1_layers : int = 2, channel_1_dim : int = 64, channel_1_input_dim : int = 4,
                  channel_2_layers: int = 2, channel_2_dim: int = 64, channel_2_input_dim : int = 4,
                  channel_3_layers: int = 2, channel_3_dim: int = 64, channel_3_input_dim : int = 4,
-                 channel_4_layers: int = 2, channel_4_dim: int = 64, channel_4_input_dim : int = 4
+                 channel_4_layers: int = 2, channel_4_dim: int = 64, channel_4_input_dim : int = 4,
+                 mini_batch_size : int = 64
                  ):
         """
         Initialize environment and hyperparameters
@@ -226,6 +227,7 @@ class PolicyGradientAgentConfig:
         self.channel_4_layers = channel_4_layers
         self.channel_4_dim = channel_4_dim
         self.channel_4_input_dim = channel_4_input_dim
+        self.mini_batch_size = mini_batch_size
 
 
     def to_str(self) -> str:

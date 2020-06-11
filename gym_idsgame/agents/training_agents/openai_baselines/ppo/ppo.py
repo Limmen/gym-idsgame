@@ -57,6 +57,7 @@ class OpenAiPPOAgent(PolicyGradientAgent):
             self.config.alpha_attacker = lr_decay_func
 
         model = PPO(policy, self.env,
+                    batch_size=self.config.mini_batch_size,
                     learning_rate=self.linear_schedule,
                     n_steps=self.config.batch_size,
                     n_epochs=self.config.optimization_iterations,
