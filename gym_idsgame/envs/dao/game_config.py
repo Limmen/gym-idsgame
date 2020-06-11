@@ -15,7 +15,7 @@ class GameConfig():
                  initial_state: GameState = None, manual_defender: bool = False, initial_state_path :str = None,
                  dense_rewards = False, min_random_a_val :int = 0, min_random_d_val :int = 0,
                  min_random_det_val :int = 0, dense_rewards_v2 = False, reconnaissance_actions : bool = False,
-                 max_random_v_val : int = 1):
+                 max_random_v_val : int = 1, dense_rewards_v3 = False):
         """
         Class constructor, initializes the DTO
 
@@ -60,6 +60,7 @@ class GameConfig():
         self.num_vulnerabilities_per_node = 1
         self.det_val = 2
         self.dense_rewards_v2 = dense_rewards_v2
+        self.dense_rewards_v3 = dense_rewards_v3
         self.vulnerabilitiy_val = 0
         self.max_random_v_val = max_random_v_val
         self.num_vulnerabilities_per_layer = None

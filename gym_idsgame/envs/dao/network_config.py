@@ -219,3 +219,13 @@ class NetworkConfig:
                 if self.graph_layout[i][j] != NodeType.EMPTY.value:
                     count += 1
         raise ValueError("Invalid node position")
+
+
+    def get_row_ids(self, row):
+        ids = []
+        count = 0
+        for j in range(self.num_cols):
+            if self.graph_layout[row][j] != NodeType.EMPTY.value:
+                ids.append(count)
+                count += 1
+        return ids

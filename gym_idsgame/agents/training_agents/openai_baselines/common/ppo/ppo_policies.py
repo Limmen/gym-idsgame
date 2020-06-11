@@ -304,32 +304,33 @@ class PPOPolicy(BasePolicy):
         :param latent_sde: (Optional[th.Tensor]) Latent code for the gSDE exploration function
         :return: (Distribution) Action distribution
         """
-        if len(latent_pi.shape) == 2:
-            mean_actions = th.nn.functional.softmax(self.action_net(latent_pi), dim=1).squeeze()
-        elif len(latent_pi.shape) == 1:
-            mean_actions = th.nn.functional.softmax(self.action_net(latent_pi), dim=0).squeeze()
-        elif len(latent_pi.shape) == 3:
-            mean_actions = th.nn.functional.softmax(self.action_net(latent_pi.squeeze()), dim=0).squeeze()
-        else:
-            raise AssertionError("Shape not recognized: {}".format(latent_pi.shape))
-        mean_actions = mean_actions.to(device)
-        action_probs_1 = mean_actions.clone()
-        if non_legal_actions is not None and len(non_legal_actions) > 0:
-            if len(action_probs_1.shape) == 1:
-                action_probs_1[non_legal_actions] = 0.00000000000001 # Don't set to zero due to invalid distribution errors
-                #action_probs_1[non_legal_actions] = 0.0
-            elif len(action_probs_1.shape) == 2:
-                action_probs_1[:, non_legal_actions] = 0.00000000000001  # Don't set to zero due to invalid distribution errors
-                #action_probs_1[:,non_legal_actions] = 0.0
-            else:
-                raise AssertionError("Invalid shape of action probabilties")
-        action_probs_1 = action_probs_1.to(device)
+        mean_actions = self.action_net(latent_pi)
+        # if len(latent_pi.shape) == 2:
+        #     mean_actions = th.nn.functional.softmax(self.action_net(latent_pi), dim=1).squeeze()
+        # elif len(latent_pi.shape) == 1:
+        #     mean_actions = th.nn.functional.softmax(self.action_net(latent_pi), dim=0).squeeze()
+        # elif len(latent_pi.shape) == 3:
+        #     mean_actions = th.nn.functional.softmax(self.action_net(latent_pi.squeeze()), dim=0).squeeze()
+        # else:
+        #     raise AssertionError("Shape not recognized: {}".format(latent_pi.shape))
+        # mean_actions = mean_actions.to(device)
+        # action_probs_1 = mean_actions.clone()
+        # if non_legal_actions is not None and len(non_legal_actions) > 0:
+        #     if len(action_probs_1.shape) == 1:
+        #         action_probs_1[non_legal_actions] = 0.00000000000001 # Don't set to zero due to invalid distribution errors
+        #         #action_probs_1[non_legal_actions] = 0.0
+        #     elif len(action_probs_1.shape) == 2:
+        #         action_probs_1[:, non_legal_actions] = 0.00000000000001  # Don't set to zero due to invalid distribution errors
+        #         #action_probs_1[:,non_legal_actions] = 0.0
+        #     else:
+        #         raise AssertionError("Invalid shape of action probabilties")
+        # action_probs_1 = action_probs_1.to(device)
 
         if isinstance(self.action_dist, DiagGaussianDistribution):
             return self.action_dist.proba_distribution(mean_actions, self.log_std)
         elif isinstance(self.action_dist, CategoricalDistribution):
             # Here mean_actions are the logits before the softmax
-            return self.action_dist.proba_distribution(action_logits=action_probs_1)
+            return self.action_dist.proba_distribution(action_logits=mean_actions)
         elif isinstance(self.action_dist, MultiCategoricalDistribution):
             # Here mean_actions are the flattened logits
             return self.action_dist.proba_distribution(action_logits=mean_actions)
