@@ -92,6 +92,7 @@ class IdsGameEnv(gym.Env, ABC):
         self.attacks = []
         self.hacked_nodes = []
         self.num_failed_attacks = 0
+        self.failed_attacks = {}
 
     # -------- API ------------
     def step(self, action: int) -> Union[np.ndarray, int, bool, dict]:
@@ -181,6 +182,10 @@ class IdsGameEnv(gym.Env, ABC):
                 self.num_failed_attacks = 0
             else:
                 self.num_failed_attacks += 1
+                if (target_node_id, attack_type) in self.failed_attacks:
+                    self.failed_attacks[(target_node_id, attack_type)] = self.failed_attacks[(target_node_id, attack_type)] + 1
+                else:
+                    self.failed_attacks[(target_node_id, attack_type)] = 1
                 self.past_positions.append(self.state.attacker_pos)
                 detected = self.state.simulate_detection(target_node_id, reconnaissance=reconnaissance,
                                                          reconnaissance_detection_factor=self.idsgame_config.reconnaissance_detection_factor)
@@ -231,6 +236,7 @@ class IdsGameEnv(gym.Env, ABC):
         self.past_moves = []
         self.past_positions = []
         self.past_reconnaissance_activities = []
+        self.failed_attacks = {}
         self.furthest_hack = self.idsgame_config.game_config.network_config.num_rows-1
         self.steps_beyond_done = None
         self.state.new_game(self.idsgame_config.game_config.initial_state, self.a_cumulative_reward,
@@ -412,7 +418,16 @@ class IdsGameEnv(gym.Env, ABC):
             #if np.argmin(self.state.defense_values[node_id]) == attack_type:
             min_ats = self.state.min_attack_type(node_id)
             if node_id in self.state.reconnaissance_actions and attack_type in min_ats:
-                return constants.GAME_CONFIG.POSITIVE_REWARD, 0
+                num_good_attacks = 1
+                if (node_id, attack_type) in self.failed_attacks:
+                    num_good_attacks = self.failed_attacks[(node_id, attack_type)] +1
+                num_bad_attacks = 0
+                for k in self.failed_attacks:
+                    n_id, at = k
+                    if not n_id == node_id:
+                        num_bad_attacks = num_bad_attacks + 1
+                reward = max(num_good_attacks - num_bad_attacks, 0)
+                return reward, 0
             return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
             # else:
             #     return -constants.GAME_CONFIG.POSITIVE_REWARD,0
@@ -509,7 +524,16 @@ class IdsGameEnv(gym.Env, ABC):
             # print("bool1:{},bool2:{}".format(node_id in self.state.reconnaissance_actions, min_at == attack_type))
             #print("bool2:{}".format(min_at == attack_type))
             if node_id in self.state.reconnaissance_actions and attack_type in min_ats:
-                return constants.GAME_CONFIG.POSITIVE_REWARD, 0
+                num_good_attacks = 1
+                if (node_id, attack_type) in self.failed_attacks:
+                    num_good_attacks = self.failed_attacks[(node_id, attack_type)] + 1
+                num_bad_attacks = 0
+                for k in self.failed_attacks:
+                    n_id, at = k
+                    if not n_id == node_id:
+                        num_bad_attacks = num_bad_attacks + 1
+                reward = max(num_good_attacks - num_bad_attacks, 0)
+                return reward, 0
             return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
                 #return constants.GAME_CONFIG.POSITIVE_REWARD, 0
             # else:

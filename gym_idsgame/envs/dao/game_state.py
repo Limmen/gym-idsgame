@@ -291,12 +291,15 @@ class GameState():
 
     def min_attack_type(self, node):
         min_val = float('inf')
+        for at in range(self.reconnaissance_state.shape[1]):
+            val = self.reconnaissance_state[node][at]
+            if val <= min_val:
+                min_val = val
         min_ats = []
         for at in range(self.reconnaissance_state.shape[1]):
             val = self.reconnaissance_state[node][at]
             if val <= min_val:
                 min_ats.append(at)
-                min_val = val
         return min_ats
 
 
