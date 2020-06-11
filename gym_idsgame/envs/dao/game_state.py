@@ -294,7 +294,7 @@ class GameState():
         min_ats = []
         for at in range(self.reconnaissance_state.shape[1]):
             val = self.reconnaissance_state[node][at]
-            if val < min_val:
+            if val <= min_val:
                 min_ats.append(at)
                 min_val = val
         return min_ats
