@@ -622,6 +622,9 @@ class MlpExtractor(nn.Module):
                                     th.zeros(self.pg_agent_config.num_lstm_layers, 1,
                                              self.pg_agent_config.lstm_hidden_dim))
                 last_layer_dim_shared = self.pg_agent_config.lstm_hidden_dim
+            else:
+                last_layer_dim_shared = self.pg_agent_config.channel_1_dim + self.pg_agent_config.channel_2_dim + \
+                                        self.pg_agent_config.channel_3_dim + self.pg_agent_config.channel_4_dim
         else:
             if self.pg_agent_config.lstm_core:
                 self.core_lstm = th.nn.LSTM(input_size=last_layer_dim_shared,
