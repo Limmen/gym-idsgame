@@ -410,9 +410,8 @@ class IdsGameEnv(gym.Env, ABC):
             return 100*constants.GAME_CONFIG.POSITIVE_REWARD, -100*constants.GAME_CONFIG.POSITIVE_REWARD
         else:
             #if np.argmin(self.state.defense_values[node_id]) == attack_type:
-            min_at = self.state.min_attack_type(node_id)
-            if node_id in self.state.reconnaissance_actions and min_at == attack_type:
-                #print("min_at2")
+            min_ats = self.state.min_attack_type(node_id)
+            if node_id in self.state.reconnaissance_actions and attack_type in min_ats:
                 return constants.GAME_CONFIG.POSITIVE_REWARD, 0
             return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
             # else:
@@ -504,12 +503,12 @@ class IdsGameEnv(gym.Env, ABC):
             return 0,0
         else:
             attack_row, attack_col = self.state.attacker_pos
-            min_at = self.state.min_attack_type(node_id)
+            #min_at = self.state.min_attack_type(node_id)
+            min_ats = self.state.min_attack_type(node_id)
             # print("successful attack, min_at:{}, attack_Type:{}, rec:{}, node_id:{}, attack values:{}, rec:{}".format(min_at, attack_type, self.state.reconnaissance_actions, node_id, self.state.attack_values, self.state.reconnaissance_state))
             # print("bool1:{},bool2:{}".format(node_id in self.state.reconnaissance_actions, min_at == attack_type))
             #print("bool2:{}".format(min_at == attack_type))
-            if node_id in self.state.reconnaissance_actions and min_at == attack_type:
-                #print("min_at1")
+            if node_id in self.state.reconnaissance_actions and attack_type in min_ats:
                 return constants.GAME_CONFIG.POSITIVE_REWARD, 0
             return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
                 #return constants.GAME_CONFIG.POSITIVE_REWARD, 0

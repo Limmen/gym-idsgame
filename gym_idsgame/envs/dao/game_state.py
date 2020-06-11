@@ -290,14 +290,14 @@ class GameState():
                 self.reconnaissance_state[node_id][attack_type] = self.attack_values[node_id][attack_type]
 
     def min_attack_type(self, node):
-        min_at = 0
         min_val = float('inf')
+        min_ats = []
         for at in range(self.reconnaissance_state.shape[1]):
             val = self.reconnaissance_state[node][at]
             if val < min_val:
-                min_at = at
+                min_ats.append(at)
                 min_val = val
-        return min_at
+        return min_ats
 
 
     def reconnaissance(self, node_id: int, attack_type: int, reconnaissance_reward : bool = False) -> int:
