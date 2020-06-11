@@ -76,6 +76,7 @@
         "max_gradient_norm": 0.5,
         "merged_ad_features": true,
         "min_epsilon": 0.01,
+        "mini_batch_size": 32,
         "multi_channel_obs": false,
         "normalize_features": false,
         "num_episodes": 100000000,

@@ -87,7 +87,8 @@ def default_config() -> ClientConfig:
                                                 channel_1_dim=32, channel_1_layers=2, channel_1_input_dim=16,
                                                 channel_2_dim=32, channel_2_layers=2, channel_2_input_dim=16,
                                                 channel_3_dim=32, channel_3_layers=2, channel_3_input_dim=4,
-                                                channel_4_dim=32, channel_4_layers=2, channel_4_input_dim=4)
+                                                channel_4_dim=32, channel_4_layers=2, channel_4_input_dim=4,
+                                                mini_batch_size=32)
     env_name = "idsgame-minimal_defense-v19"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.PPO_OPENAI_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
