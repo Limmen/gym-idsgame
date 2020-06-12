@@ -35,7 +35,7 @@
         "channel_4_dim": 32,
         "channel_4_input_dim": 4,
         "channel_4_layers": 2,
-        "checkpoint_freq": 250,
+        "checkpoint_freq": 150,
         "clip_gradient": false,
         "cnn_feature_extractor": false,
         "cnn_type": 5,

@@ -63,7 +63,7 @@ def default_config() -> ClientConfig:
                                                 eval_frequency=55000, attacker=True, defender=False,
                                                 video_frequency=1001,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=250,
+                                                checkpoint_freq=150,
                                                 input_dim_attacker=((4 + 2) * 4),
                                                 output_dim_attacker=(4 + 1) * 4,
                                                 input_dim_defender=((4 + 1) * 4),

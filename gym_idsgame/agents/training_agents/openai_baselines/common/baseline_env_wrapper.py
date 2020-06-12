@@ -162,7 +162,7 @@ class BaselineEnvWrapper(gym.Env):
         attacker_action = target_id * (num_attack_types+1) + attack_type
         return attacker_action
 
-    def is_attack_legal(self, attack_action: int, node : False) -> bool:
+    def is_attack_legal(self, attack_action: int, node  :bool = False) -> bool:
         """
         Check if a given attack is legal or not.
 

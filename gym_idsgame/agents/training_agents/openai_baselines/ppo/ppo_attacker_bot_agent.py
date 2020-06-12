@@ -62,28 +62,58 @@ class PPOBaselineAttackerBotAgent(BotAgent):
             defender_obs = game_state.get_defender_observation(self.game_config.network_config)
             attacker_state = self.update_state(attacker_obs=attacker_obs, defender_obs=defender_obs, state=[],
                                                attacker=True)
-            actions = list(range(self.idsgame_env.num_attack_actions))
-            non_legal_actions = list(filter(lambda action: not self.is_attack_legal(action, attacker_obs, game_state), actions))
-            obs_tensor_a = torch.as_tensor(attacker_state.flatten()).to(self.device)
-            attacker_actions, attacker_values, attacker_log_probs = self.model.attacker_policy.forward(
-                obs_tensor_a, self.idsgame_env, device=self.device, attacker=True, non_legal_actions=non_legal_actions)
+            if not self.config.ar_policy:
+                actions = list(range(self.idsgame_env.num_attack_actions))
+                non_legal_actions = list(filter(lambda action: not self.is_attack_legal(action, attacker_obs, game_state), actions))
+                obs_tensor_a = torch.as_tensor(attacker_state.flatten()).to(self.device)
+                attacker_actions, attacker_values, attacker_log_probs = self.model.attacker_policy.forward(
+                    obs_tensor_a, self.idsgame_env, device=self.device, attacker=True, non_legal_actions=non_legal_actions)
+                attacker_action = attacker_actions.cpu().numpy()[0]
+            else:
+                actions = list(range(self.config.node_net_output_dim))
+                non_legal_actions = list(filter(lambda action: not self.is_attack_legal(action, attacker_obs, game_state, node=True), actions))
+                obs_tensor_a = torch.as_tensor(attacker_state.flatten()).to(self.device)
+                attacker_node_actions, attacker_node_values, attacker_node_log_probs, attacker_node_lstm_state = self.model.attacker_node_policy.forward(
+                    obs_tensor_a, self.idsgame_env, device=self.device, attacker=True, non_legal_actions=non_legal_actions)
+                attacker_node_actions = attacker_node_actions.cpu().numpy()
+                node = attacker_node_actions[0]
+                obs_tensor_a_1 = obs_tensor_a.reshape(self.idsgame_env.idsgame_config.game_config.num_nodes, self.config.at_net_input_dim)
+                obs_tensor_a_at = obs_tensor_a_1[node]
+                attacker_at_actions, attacker_at_values, attacker_at_log_probs, attacker_at_lstm_state = self.model.attacker_at_policy.forward(
+                    obs_tensor_a_at, self.idsgame_env, device=self.device, attacker=True, non_legal_actions = [])
+                attacker_at_actions = attacker_at_actions.cpu().numpy()
+                attack_id = util.get_attack_action_id(node, attacker_at_actions[0], self.idsgame_env.idsgame_config.game_config)
+                attacker_action = attack_id
         except Exception as e:
             print(str(e))
             traceback.print_exc()
 
         if self.idsgame_env.local_view_features():
-            attack = self.convert_local_attacker_action_to_global(attacker_actions.item(), attacker_obs)
+            attack = self.convert_local_attacker_action_to_global(attacker_action, attacker_obs)
             return attack
         else:
-            return attacker_actions.item()
+            return attacker_action
 
-    def is_attack_legal(self, action, obs, game_state):
-        if self.idsgame_env.local_view_features():
-            action = self.convert_local_attacker_action_to_global(action, obs)
-            if action == -1:
-                return False
-        return util.is_attack_id_legal(action, self.game_config,
-                                game_state.attacker_pos, game_state, [])
+    def is_attack_legal(self, action, obs, game_state, node :bool= False) -> bool:
+        """
+        Check if a given attack is legal or not.
+
+        :param attack_action: the attack to verify
+        :return: True if legal otherwise False
+        """
+        if not self.config.ar_policy:
+            if self.idsgame_env.local_view_features():
+                action = self.convert_local_attacker_action_to_global(action, obs)
+                if action == -1:
+                    return False
+            return util.is_attack_id_legal(action, self.game_config,
+                                    game_state.attacker_pos, game_state, [])
+        else:
+            if node:
+                return util.is_node_attack_legal(action, game_state.attacker_pos,
+                                                 self.game_config.network_config)
+            else:
+                return True
 
     def convert_local_attacker_action_to_global(self, action_id, attacker_obs):
         num_attack_types = self.idsgame_env.idsgame_config.game_config.num_attack_types
