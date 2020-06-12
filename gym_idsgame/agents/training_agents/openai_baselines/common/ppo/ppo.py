@@ -505,7 +505,7 @@ class PPO(BaseRLModel):
                                                         attacker_actions, a_rewards, dones,
                                                         attacker_values, attacker_log_probs, lstm_state)
                     else:
-                        attacker_rollout_buffer.add(self._last_obs_a, obs_tensor_a_at, attacker_node_actions, a_rewards, dones,
+                        attacker_rollout_buffer.add(self._last_obs_a, obs_tensor_a_at.cpu(), attacker_node_actions, a_rewards, dones,
                                                     attacker_node_values, attacker_node_log_probs, attacker_at_actions,
                                                     attacker_at_log_probs, attacker_at_values)
             if self.pg_agent_config.defender:
