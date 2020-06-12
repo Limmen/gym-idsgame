@@ -102,6 +102,8 @@ class BaseRLModel(ABC):
         self.start_time = None
         self.attacker_policy = None
         self.defender_policy = None
+        self.attacker_node_policy = None
+        self.attacker_at_policy = None
         self.learning_rate = learning_rate
         self.lr_schedule_a = None  # type: Optional[Callable]
         self.lr_schedule_d = None  # type: Optional[Callable]
@@ -466,7 +468,10 @@ class BaseRLModel(ABC):
             name of the variables with state dicts to save, name of additional torch tensors,
         """
         if attacker:
-            state_dicts = ["attacker_policy"]
+            if not self.pg_agent_config.ar_policy:
+                state_dicts = ["attacker_policy"]
+            else:
+                state_dicts = ["attacker_node_policy", "attacker_at_policy"]
         else:
             state_dicts = ["defender_policy"]
         return state_dicts, []

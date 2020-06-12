@@ -70,7 +70,9 @@ class PPOPolicy(BasePolicy):
                  normalize_images: bool = False,
                  optimizer_class: Type[th.optim.Optimizer] = th.optim.Adam,
                  optimizer_kwargs: Optional[Dict[str, Any]] = None,
-                 pg_agent_config : PolicyGradientAgentConfig = None):
+                 pg_agent_config : PolicyGradientAgentConfig = None,
+                 node_net : bool = False,
+                 at_net : bool = False):
 
         if optimizer_kwargs is None:
             optimizer_kwargs = {}
@@ -83,7 +85,9 @@ class PPOPolicy(BasePolicy):
                                         features_extractor_kwargs,
                                         optimizer_class=optimizer_class,
                                         optimizer_kwargs=optimizer_kwargs,
-                                        squash_output=squash_output)
+                                        squash_output=squash_output,
+                                        at_net=at_net,
+                                        node_net=node_net)
 
         # Default network architecture, from stable-baselines
         if net_arch is None:
@@ -91,7 +95,6 @@ class PPOPolicy(BasePolicy):
                 net_arch = [dict(pi=[64, 64], vf=[64, 64])]
             else:
                 net_arch = []
-
         self.net_arch = net_arch
         self.activation_fn = activation_fn
         self.ortho_init = ortho_init
@@ -99,6 +102,13 @@ class PPOPolicy(BasePolicy):
         self.features_extractor = features_extractor_class(self.pg_agent_config, self.observation_space,
                                                            **self.features_extractor_kwargs)
         self.features_dim = self.features_extractor.features_dim
+        if at_net:
+            self.features_dim = self.pg_agent_config.at_net_input_dim
+        if node_net:
+            self.features_dim = self.pg_agent_config.node_net_input_dim
+
+        self.node_net = node_net
+        self.at_net = at_net
 
         self.normalize_images = normalize_images
         self.log_std_init = log_std_init
@@ -116,6 +126,11 @@ class PPOPolicy(BasePolicy):
         self.sde_net_arch = sde_net_arch
         self.use_sde = use_sde
         self.dist_kwargs = dist_kwargs
+
+        if node_net:
+            action_space = gym.spaces.Discrete(self.pg_agent_config.node_net_output_dim)
+        if at_net:
+            action_space = gym.spaces.Discrete(self.pg_agent_config.at_net_output_dim)
 
         # Action distribution
         self.action_dist = make_proba_distribution(action_space, use_sde=use_sde, dist_kwargs=dist_kwargs)
@@ -233,26 +248,32 @@ class PPOPolicy(BasePolicy):
         # Masking
         if non_legal_actions is None:
             if attacker:
-                actions = list(range(env.num_attack_actions))
-                if wrapper_env is not None:
-                    legal_actions = list(filter(lambda action: env.is_attack_legal(
-                        wrapper_env.convert_local_attacker_action_to_global(action, np_obs)), actions))
+                if self.pg_agent_config.ar_policy:
+                    actions = list(range(self.pg_agent_config.node_net_output_dim))
+                    legal_actions = list(
+                        filter(lambda action: env.is_attack_legal(action, node=self.node_net), actions))
+                    non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action, node=self.node_net), actions))
                 else:
-                    legal_actions = list(filter(lambda action: env.is_attack_legal(action), actions))
-                if wrapper_env is not None:
-                    non_legal_actions = list(filter(lambda action: not env.is_attack_legal(
-                        wrapper_env.convert_local_attacker_action_to_global(action, np_obs)), actions))
-                else:
-                    non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action), actions))
-                if force_rec:
-                    legal_rec = list(filter(lambda action: env.is_attack_legal(action) and env.is_reconnaissance(action), actions))
-                    if len(legal_rec) > 0:
-                        non_legal_no_rec = list(
-                            filter(lambda action: not env.is_attack_legal(action) or not env.is_reconnaissance(action),
-                                   actions))
-                        # print("force reconnaissance, before force:{}, after:{}".format(
-                        #     len(non_legal_actions), len(non_legal_no_rec)))
-                        non_legal_actions = non_legal_no_rec
+                    actions = list(range(env.num_attack_actions))
+                    if wrapper_env is not None:
+                        legal_actions = list(filter(lambda action: env.is_attack_legal(
+                            wrapper_env.convert_local_attacker_action_to_global(action, np_obs), node=self.node_net), actions))
+                    else:
+                        legal_actions = list(filter(lambda action: env.is_attack_legal(action, node=self.node_net), actions))
+                    if wrapper_env is not None:
+                        non_legal_actions = list(filter(lambda action: not env.is_attack_legal(
+                            wrapper_env.convert_local_attacker_action_to_global(action, np_obs), node=self.node_net), actions))
+                    else:
+                        non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action, node=self.node_net), actions))
+                    if force_rec:
+                        legal_rec = list(filter(lambda action: env.is_attack_legal(action, node=self.node_net) and env.is_reconnaissance(action), actions))
+                        if len(legal_rec) > 0:
+                            non_legal_no_rec = list(
+                                filter(lambda action: not env.is_attack_legal(action, node=self.node_net) or not env.is_reconnaissance(action),
+                                       actions))
+                            # print("force reconnaissance, before force:{}, after:{}".format(
+                            #     len(non_legal_actions), len(non_legal_no_rec)))
+                            non_legal_actions = non_legal_no_rec
 
             else:
                 actions = list(range(env.num_defense_actions))
@@ -305,6 +326,7 @@ class PPOPolicy(BasePolicy):
         :return: (Distribution) Action distribution
         """
         #mean_actions = self.action_net(latent_pi)
+
         if len(latent_pi.shape) == 2:
             mean_actions = th.nn.functional.softmax(self.action_net(latent_pi), dim=1).squeeze()
         elif len(latent_pi.shape) == 1:
@@ -317,11 +339,11 @@ class PPOPolicy(BasePolicy):
         action_probs_1 = mean_actions.clone()
         if non_legal_actions is not None and len(non_legal_actions) > 0:
             if len(action_probs_1.shape) == 1:
-                action_probs_1[non_legal_actions] = 0.00000000000001 # Don't set to zero due to invalid distribution errors
-                #action_probs_1[non_legal_actions] = 0.0
+                #action_probs_1[non_legal_actions] = 0.00000000000001 # Don't set to zero due to invalid distribution errors
+                action_probs_1[non_legal_actions] = 0.0
             elif len(action_probs_1.shape) == 2:
-                action_probs_1[:, non_legal_actions] = 0.00000000000001  # Don't set to zero due to invalid distribution errors
-                #action_probs_1[:,non_legal_actions] = 0.0
+                #action_probs_1[:, non_legal_actions] = 0.00000000000001  # Don't set to zero due to invalid distribution errors
+                action_probs_1[:,non_legal_actions] = 0.0
             else:
                 raise AssertionError("Invalid shape of action probabilties")
         action_probs_1 = action_probs_1.to(device)
@@ -361,15 +383,22 @@ class PPOPolicy(BasePolicy):
 
         # Masking
         if attacker:
-            actions = list(range(env.num_attack_actions))
-            if wrapper_env is not None:
-                legal_actions = list(filter(lambda action: env.is_attack_legal(wrapper_env.convert_local_attacker_action_to_global(action, observation)), actions))
+            if self.pg_agent_config.ar_policy:
+                actions = list(range(self.pg_agent_config.node_net_output_dim))
+                legal_actions = list(
+                    filter(lambda action: env.is_attack_legal(action, node=self.node_net), actions))
+                non_legal_actions = list(
+                    filter(lambda action: not env.is_attack_legal(action, node=self.node_net), actions))
             else:
-                legal_actions = list(filter(lambda action: env.is_attack_legal(action), actions))
-            if wrapper_env is not None:
-                non_legal_actions = list(filter(lambda action: not env.is_attack_legal(wrapper_env.convert_local_attacker_action_to_global(action, observation)), actions))
-            else:
-                non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action), actions))
+                actions = list(range(env.num_attack_actions))
+                if wrapper_env is not None:
+                    legal_actions = list(filter(lambda action: env.is_attack_legal(wrapper_env.convert_local_attacker_action_to_global(action, observation), node=self.node_net), actions))
+                else:
+                    legal_actions = list(filter(lambda action: env.is_attack_legal(action, node=self.node_net), actions))
+                if wrapper_env is not None:
+                    non_legal_actions = list(filter(lambda action: not env.is_attack_legal(wrapper_env.convert_local_attacker_action_to_global(action, observation), node=self.node_net), actions))
+                else:
+                    non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action, node=self.node_net), actions))
         else:
             actions = list(range(env.num_defense_actions))
             legal_actions = list(filter(lambda action: env.is_defense_legal(action), actions))
@@ -403,17 +432,24 @@ class PPOPolicy(BasePolicy):
 
         # Masking
         if attacker:
-            all_actions = list(range(env.num_attack_actions))
-            if wrapper_env is not None:
-                legal_actions = list(filter(lambda action: env.is_attack_legal(
-                    wrapper_env.convert_local_attacker_action_to_global(action, obs)), actions))
+            if self.pg_agent_config.ar_policy:
+                all_actions = list(range(self.pg_agent_config.node_net_output_dim))
+                legal_actions = list(
+                    filter(lambda action: env.is_attack_legal(action, node=self.node_net), all_actions))
+                non_legal_actions = list(
+                    filter(lambda action: not env.is_attack_legal(action, node=self.node_net), all_actions))
             else:
-                legal_actions = list(filter(lambda action: env.is_attack_legal(action), actions))
-            if wrapper_env is not None:
-                non_legal_actions = list(filter(lambda action: not env.is_attack_legal(
-                    wrapper_env.convert_local_attacker_action_to_global(action, obs)), actions))
-            else:
-                non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action), actions))
+                all_actions = list(range(env.num_attack_actions))
+                if wrapper_env is not None:
+                    legal_actions = list(filter(lambda action: env.is_attack_legal(
+                        wrapper_env.convert_local_attacker_action_to_global(action, obs), node=self.node_net), actions))
+                else:
+                    legal_actions = list(filter(lambda action: env.is_attack_legal(action, node=self.node_net), actions))
+                if wrapper_env is not None:
+                    non_legal_actions = list(filter(lambda action: not env.is_attack_legal(
+                        wrapper_env.convert_local_attacker_action_to_global(action, obs), node=self.node_net), actions))
+                else:
+                    non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action, node=self.node_net), actions))
         else:
             all_actions = list(range(env.num_defense_actions))
             legal_actions = list(filter(lambda action: env.is_defense_legal(action), all_actions))

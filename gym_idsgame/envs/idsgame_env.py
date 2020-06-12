@@ -192,7 +192,7 @@ class IdsGameEnv(gym.Env, ABC):
                 if detected:
                     self.state.done = True
                     self.state.detected = True
-                    reward = self.get_detect_reward(target_node_id,  attack_type, self.state.defense_det[target_node_id])
+                    reward = self.get_detect_reward(target_node_id,  attack_type, self.state.defense_det[target_node_id], reconnaissance)
                 # else:
                 #     if not reconnaissance:
                 #         reward = self.get_blocked_attack_reward(target_node_id, attack_type)
@@ -426,14 +426,14 @@ class IdsGameEnv(gym.Env, ABC):
                     n_id, at = k
                     if not n_id == node_id:
                         num_bad_attacks = num_bad_attacks + 1
-                reward = max(num_good_attacks - num_bad_attacks, 0)
+                reward = max(num_good_attacks - math.pow(num_bad_attacks, 2), 0)
                 return reward, 0
             return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
         else:
             bonus = 1 if self.num_failed_attacks == 0 else 1 / self.num_failed_attacks
             return bonus + constants.GAME_CONFIG.POSITIVE_REWARD, -len(self.hacked_nodes)
 
-    def get_detect_reward(self, target_node_id : int, attack_type : int, detection_value) -> Union[int, int]:
+    def get_detect_reward(self, target_node_id : int, attack_type : int, detection_value, reconnaissance : bool) -> Union[int, int]:
         """
         Returns the attacker and defender reward in the case when the attacker was detected.
 
@@ -441,8 +441,16 @@ class IdsGameEnv(gym.Env, ABC):
         """
         if not self.idsgame_config.game_config.dense_rewards and not self.idsgame_config.game_config.dense_rewards_v2:
             return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
-        elif self.idsgame_config.game_config.dense_rewards and not self.idsgame_config.game_config.dense_rewards_v2:
+        elif self.idsgame_config.game_config.dense_rewards and self.idsgame_config.game_config.dense_rewards_v2:
             return -100*constants.GAME_CONFIG.POSITIVE_REWARD, 100*constants.GAME_CONFIG.POSITIVE_REWARD
+        elif self.idsgame_config.game_config.dense_rewards_v3:
+            attack_row, attack_col = self.state.attacker_pos
+            row_ids = self.idsgame_config.game_config.network_config.get_row_ids(attack_row)
+            min_ats = self.state.min_attack_type(target_node_id, row_ids)
+            if not reconnaissance and target_node_id in self.state.reconnaissance_actions and attack_type in min_ats:
+                return 0, constants.GAME_CONFIG.POSITIVE_REWARD
+            else:
+                return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
         else:
             added_detection = 0
             for defense in self.defenses:
@@ -502,7 +510,7 @@ class IdsGameEnv(gym.Env, ABC):
                     n_id, at = k
                     if not n_id == node_id:
                         num_bad_attacks = num_bad_attacks + 1
-                reward = max(num_good_attacks - num_bad_attacks, 0)
+                reward = max(num_good_attacks - math.pow(num_bad_attacks, 2), 0)
                 return reward, 0
             return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
         else:

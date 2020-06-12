@@ -162,19 +162,26 @@ class BaselineEnvWrapper(gym.Env):
         attacker_action = target_id * (num_attack_types+1) + attack_type
         return attacker_action
 
-    def is_attack_legal(self, attack_action: int) -> bool:
+    def is_attack_legal(self, attack_action: int, node : False) -> bool:
         """
         Check if a given attack is legal or not.
 
         :param attack_action: the attack to verify
         :return: True if legal otherwise False
         """
-        if self.idsgame_env.local_view_features():
-            #attacker_obs, _ = self.idsgame_env.get_observation()
-            attack_action = self.convert_local_attacker_action_to_global(attack_action, self.latest_obs[0])
-            if attack_action == -1:
-                return False
-        return self.idsgame_env.is_attack_legal(attack_action)
+        if not self.pg_agent_config.ar_policy:
+            if self.idsgame_env.local_view_features():
+                #attacker_obs, _ = self.idsgame_env.get_observation()
+                attack_action = self.convert_local_attacker_action_to_global(attack_action, self.latest_obs[0])
+                if attack_action == -1:
+                    return False
+            return self.idsgame_env.is_attack_legal(attack_action)
+        else:
+            if node:
+                return util.is_node_attack_legal(attack_action, self.idsgame_env.state.attacker_pos, self.idsgame_env.idsgame_config.game_config.network_config)
+            else:
+                return True
+
 
     def is_defense_legal(self, defense_action: int) -> bool:
         """

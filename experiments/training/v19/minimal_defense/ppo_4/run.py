@@ -68,8 +68,8 @@ def default_config() -> ClientConfig:
                                                 output_dim_attacker=(4 + 1) * 4,
                                                 input_dim_defender=((4 + 1) * 4),
                                                 output_dim_defender=5 * 4,
-                                                hidden_dim=32, num_hidden_layers=2,
-                                                pi_hidden_layers=1, pi_hidden_dim=32, vf_hidden_layers=1, vf_hidden_dim=32,
+                                                hidden_dim=64, num_hidden_layers=2,
+                                                pi_hidden_layers=1, pi_hidden_dim=64, vf_hidden_layers=1, vf_hidden_dim=64,
                                                 batch_size=2000,
                                                 gpu=False, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
@@ -88,7 +88,8 @@ def default_config() -> ClientConfig:
                                                 channel_2_dim=32, channel_2_layers=2, channel_2_input_dim=16,
                                                 channel_3_dim=32, channel_3_layers=2, channel_3_input_dim=4,
                                                 channel_4_dim=32, channel_4_layers=2, channel_4_input_dim=4,
-                                                mini_batch_size=64)
+                                                mini_batch_size=64, ar_policy=True, node_net_input_dim=((4 + 2) * 4),
+                                                at_net_input_dim=(4+2), at_net_output_dim=(4+1), node_net_output_dim=4)
     env_name = "idsgame-minimal_defense-v19"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.PPO_OPENAI_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,

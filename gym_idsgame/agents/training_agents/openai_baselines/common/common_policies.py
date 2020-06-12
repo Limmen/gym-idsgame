@@ -180,13 +180,17 @@ class BasePolicy(nn.Module):
                  normalize_images: bool = False,
                  optimizer_class: Type[th.optim.Optimizer] = th.optim.Adam,
                  optimizer_kwargs: Optional[Dict[str, Any]] = None,
-                 squash_output: bool = False):
+                 squash_output: bool = False,
+                 node_net : bool = False,
+                 at_net : bool = False):
         super(BasePolicy, self).__init__()
         if optimizer_kwargs is None:
             optimizer_kwargs = {}
 
         if features_extractor_kwargs is None:
             features_extractor_kwargs = {}
+        self.node_net = node_net
+        self.at_net = at_net
         self.pg_agent_config = pg_agent_config
         self.observation_space = observation_space
         self.action_space = action_space

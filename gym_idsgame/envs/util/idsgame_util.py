@@ -79,6 +79,43 @@ def is_attack_legal(target_pos: Union[int, int], attacker_pos: Union[int, int], 
     return network_config.adjacency_matrix[attacker_adjacency_matrix_id][target_adjacency_matrix_id] == int(1)
 
 
+def is_node_attack_legal(target_node : int, attacker_pos : Union[int, int], network_config : NetworkConfig) -> bool:
+    target_pos = network_config.get_node_pos(target_node)
+
+    target_row, target_col = target_pos
+    attacker_row, attacker_col = attacker_pos
+
+    attacker_adjacency_matrix_id = attacker_row * network_config.num_cols + attacker_col
+    target_adjacency_matrix_id = target_row * network_config.num_cols + target_col
+
+    return network_config.adjacency_matrix[attacker_adjacency_matrix_id][target_adjacency_matrix_id] == int(1)
+
+def is_attack_legal(target_pos: Union[int, int], attacker_pos: Union[int, int], network_config: NetworkConfig,
+                    past_positions: List[int] = None) -> bool:
+    """
+    Checks whether an attack is legal. That is, can the attacker reach the target node from its current
+    position in 1 step given the network configuration?
+
+    :param attacker_pos: the position of the attacker
+    :param target_pos: the position of the target node
+    :param network_config: the network configuration
+    :param past_positions: if not None, used to check whether the agent is in a periodic policy, e.g. a circle.
+    :return: True if the attack is legal, otherwise False
+    """
+    if target_pos == attacker_pos:
+        return False
+    target_row, target_col = target_pos
+    attacker_row, attacker_col = attacker_pos
+    if target_row > attacker_row:
+        return False
+    # if past_positions is not None and len(past_positions) >=2:
+    #     if target_pos in past_positions[-3:]:
+    #         return False
+    attacker_adjacency_matrix_id = attacker_row * network_config.num_cols + attacker_col
+    target_adjacency_matrix_id = target_row * network_config.num_cols + target_col
+    return network_config.adjacency_matrix[attacker_adjacency_matrix_id][target_adjacency_matrix_id] == int(1)
+
+
 def is_attack_id_legal(attack_id: int, game_config: GameConfig, attacker_pos: Union[int, int], game_state : GameState,
                        past_positions: List[int] = None, past_reconnaissance_activities: List = None) -> bool:
     """
@@ -152,7 +189,7 @@ def get_attack_action_id(server_id, attack_type, game_config: GameConfig):
     if not game_config.reconnaissance_actions:
         action_id = server_id * game_config.num_attack_types + attack_type
     else:
-        action_id = server_id * (game_config.num_attack_types*2) + attack_type
+        action_id = server_id * (game_config.num_attack_types+1) + attack_type
     return action_id
 
 

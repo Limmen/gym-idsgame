@@ -82,7 +82,10 @@ def evaluate_policy(model, env, n_eval_episodes=10, deterministic=True,
                 else:
                     a_obs = th.tensor(a_obs).to(device=model.device)
                     res = model.predict(a_obs, deterministic=False, attacker = True)
-                attacker_action = np.array([res.cpu().numpy()])
+                if not pg_agent_config.ar_policy:
+                    attacker_action = np.array([res.cpu().numpy()])
+                else:
+                    attacker_action = np.array([res])
 
             if pg_agent_config.defender:
                 d_obs = th.tensor(d_obs).to(device=model.device)
@@ -147,10 +150,21 @@ def evaluate_policy(model, env, n_eval_episodes=10, deterministic=True,
                                   + time_str + ".gif", pg_agent_config.video_fps)
 
             # Reset LSTM state
-            model.attacker_policy.mlp_extractor.lstm_hidden = (th.zeros(pg_agent_config.num_lstm_layers, 1,
-                                                                       pg_agent_config.lstm_hidden_dim),
-                                                              th.zeros(pg_agent_config.num_lstm_layers, 1,
-                                                                       pg_agent_config.lstm_hidden_dim))
+            if not pg_agent_config.ar_policy:
+                model.attacker_policy.mlp_extractor.lstm_hidden = (th.zeros(pg_agent_config.num_lstm_layers, 1,
+                                                                           pg_agent_config.lstm_hidden_dim),
+                                                                  th.zeros(pg_agent_config.num_lstm_layers, 1,
+                                                                           pg_agent_config.lstm_hidden_dim))
+            else:
+                model.attacker_node_policy.mlp_extractor.lstm_hidden = (th.zeros(pg_agent_config.num_lstm_layers, 1,
+                                                                            pg_agent_config.lstm_hidden_dim),
+                                                                   th.zeros(pg_agent_config.num_lstm_layers, 1,
+                                                                            pg_agent_config.lstm_hidden_dim))
+                model.attacker_at_policy.mlp_extractor.lstm_hidden = (
+                th.zeros(pg_agent_config.num_lstm_layers, 1,
+                         pg_agent_config.lstm_hidden_dim),
+                th.zeros(pg_agent_config.num_lstm_layers, 1,
+                         pg_agent_config.lstm_hidden_dim))
             # Reset LSTM state
             model.defender_policy.mlp_extractor.lstm_hidden = (
                 th.zeros(pg_agent_config.num_lstm_layers, 1,

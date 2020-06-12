@@ -67,3 +67,18 @@ class RolloutReturn(NamedTuple):
     episode_timesteps: int
     n_episodes: int
     continue_training: bool
+
+
+class RolloutBufferSamplesAR(NamedTuple):
+    node_observations: th.Tensor
+    node_actions: th.Tensor
+    node_old_values: th.Tensor
+    node_old_log_prob: th.Tensor
+    node_advantages: th.Tensor
+    node_returns: th.Tensor
+    at_actions: th.Tensor
+    at_old_log_prob: th.Tensor
+    at_observations: th.Tensor
+    at_old_values: th.Tensor
+    at_returns: th.Tensor
+    at_advantages: th.Tensor
