@@ -51,7 +51,7 @@ def default_config() -> ClientConfig:
     """
     :return: Default configuration for the experiment
     """
-    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.00008, epsilon=1, render=False,
+    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.0001, epsilon=1, render=False,
                                                 alpha_defender=0.0001,
                                                 eval_sleep=0.9,
                                                 min_epsilon=0.01, eval_episodes=1000, train_log_frequency=1,
@@ -69,7 +69,7 @@ def default_config() -> ClientConfig:
                                                 input_dim_defender=((4 + 1) * 4),
                                                 output_dim_defender=5 * 4,
                                                 hidden_dim=32, num_hidden_layers=2,
-                                                pi_hidden_layers= 2, pi_hidden_dim=32, vf_hidden_layers=2, vf_hidden_dim=32,
+                                                pi_hidden_layers=1, pi_hidden_dim=32, vf_hidden_layers=1, vf_hidden_dim=32,
                                                 batch_size=2000,
                                                 gpu=False, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",

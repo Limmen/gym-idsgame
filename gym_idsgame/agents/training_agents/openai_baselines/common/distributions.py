@@ -264,7 +264,7 @@ class CategoricalDistribution(Distribution):
         return action_logits
 
     def proba_distribution(self, action_logits: th.Tensor) -> 'CategoricalDistribution':
-        self.distribution = Categorical(logits=action_logits)
+        self.distribution = Categorical(probs=action_logits)
         return self
 
     def mode(self) -> th.Tensor:

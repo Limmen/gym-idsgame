@@ -4173,9 +4173,9 @@ class IdsGameMinimalDefenseV19Env(AttackerEnv):
             game_config.dense_rewards_v3 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
-            game_config.network_config.relative_neighbor_positions = [(-1, 0), (-1, -1), (1, 0), (-1, 1)]
-            game_config.network_config.max_neighbors = len(game_config.network_config.relative_neighbor_positions)
-            game_config.set_attack_actions(local_view=True)
+            #game_config.network_config.relative_neighbor_positions = [(-1, 0), (-1, -1), (1, 0), (-1, 1)]
+            #game_config.network_config.max_neighbors = len(game_config.network_config.relative_neighbor_positions)
+            #game_config.set_attack_actions(local_view=False)
             if initial_state_path is not None:
                 game_config.set_load_initial_state(initial_state_path)
             defender_agent = DefendMinimalValueBotAgent(game_config)
@@ -4184,8 +4184,8 @@ class IdsGameMinimalDefenseV19Env(AttackerEnv):
             idsgame_config.randomize_env = True
             idsgame_config.randomize_starting_position = True
             #idsgame_config.randomize_starting_position = False
-            idsgame_config.local_view_observations = True
-            #idsgame_config.local_view_observations = False
+            #idsgame_config.local_view_observations = True
+            idsgame_config.local_view_observations = False
             idsgame_config.reconnaissance_bool_features = True
             idsgame_config.reconnaissance_actions = True
             #idsgame_config.reconnaissance_reward = True
