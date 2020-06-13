@@ -973,10 +973,12 @@ class RolloutBufferARRecurrent(BaseBuffer):
         self.at_values[self.pos] = at_value.clone().cpu().numpy().flatten()
         self.node_log_probs[self.pos] = node_log_prob.clone().cpu().numpy()
         self.at_log_probs[self.pos] = at_log_prob.clone().cpu().numpy()
-        self.node_h_states[self.pos] = node_state[0].clone().cpu().numpy()
-        self.node_c_states[self.pos] = node_state[1].clone().cpu().numpy()
-        self.at_h_states[self.pos] = at_state[0].clone().cpu().numpy()
-        self.at_c_states[self.pos] = at_state[1].clone().cpu().numpy()
+        if node_state is not None:
+            self.node_h_states[self.pos] = node_state[0].clone().cpu().numpy()
+            self.node_c_states[self.pos] = node_state[1].clone().cpu().numpy()
+        if at_state is not None:
+            self.at_h_states[self.pos] = at_state[0].clone().cpu().numpy()
+            self.at_c_states[self.pos] = at_state[1].clone().cpu().numpy()
         self.pos += 1
         if self.pos == self.buffer_size:
             self.full = True
