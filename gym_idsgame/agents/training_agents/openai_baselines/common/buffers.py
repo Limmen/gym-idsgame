@@ -672,11 +672,13 @@ class RolloutBufferAR(BaseBuffer):
                  gae_lambda: float = 1,
                  gamma: float = 0.99,
                  n_envs: int = 1,
-                 pg_agent_config : PolicyGradientAgentConfig = None,):
+                 pg_agent_config : PolicyGradientAgentConfig = None,
+                 attacker : bool = False):
 
         super(RolloutBufferAR, self).__init__(buffer_size, observation_space,
                                             action_space, device, n_envs=n_envs)
         self.pg_agent_config = pg_agent_config
+        self.attacker = attacker
         self.gae_lambda = gae_lambda
         self.gamma = gamma
         self.node_observations, self.at_observations, self.node_actions, self.at_actions, self.rewards, \
@@ -686,8 +688,12 @@ class RolloutBufferAR(BaseBuffer):
         self.reset()
 
     def reset(self) -> None:
-        self.node_observations = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.node_net_input_dim), dtype=np.float32)
-        self.at_observations = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.at_net_input_dim), dtype=np.float32)
+        if self.attacker:
+            self.node_observations = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.attacker_node_net_input_dim), dtype=np.float32)
+            self.at_observations = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.attacker_at_net_input_dim), dtype=np.float32)
+        else:
+            self.node_observations = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.defender_node_net_input_dim), dtype=np.float32)
+            self.at_observations = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.defender_at_net_input_dim), dtype=np.float32)
         self.node_actions = np.zeros((self.buffer_size, self.n_envs, self.action_dim), dtype=np.float32)
         self.at_actions = np.zeros((self.buffer_size, self.n_envs, self.action_dim), dtype=np.float32)
         self.rewards = np.zeros((self.buffer_size, self.n_envs), dtype=np.float32)
@@ -849,11 +855,13 @@ class RolloutBufferARRecurrent(BaseBuffer):
                  gae_lambda: float = 1,
                  gamma: float = 0.99,
                  n_envs: int = 1,
-                 pg_agent_config : PolicyGradientAgentConfig = None,):
+                 pg_agent_config : PolicyGradientAgentConfig = None,
+                 attacker:bool = False):
 
         super(RolloutBufferARRecurrent, self).__init__(buffer_size, observation_space,
                                             action_space, device, n_envs=n_envs)
         self.pg_agent_config = pg_agent_config
+        self.attacker = attacker
         self.gae_lambda = gae_lambda
         self.gamma = gamma
         self.node_observations, self.at_observations, self.node_actions, self.at_actions, self.rewards, \
@@ -865,8 +873,16 @@ class RolloutBufferARRecurrent(BaseBuffer):
         self.reset()
 
     def reset(self) -> None:
-        self.node_observations = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.node_net_input_dim), dtype=np.float32)
-        self.at_observations = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.at_net_input_dim), dtype=np.float32)
+        if self.attacker:
+            self.node_observations = np.zeros(
+                (self.buffer_size, self.n_envs, self.pg_agent_config.attacker_node_net_input_dim), dtype=np.float32)
+            self.at_observations = np.zeros(
+                (self.buffer_size, self.n_envs, self.pg_agent_config.attacker_at_net_input_dim), dtype=np.float32)
+        else:
+            self.node_observations = np.zeros(
+                (self.buffer_size, self.n_envs, self.pg_agent_config.defender_node_net_input_dim), dtype=np.float32)
+            self.at_observations = np.zeros(
+                (self.buffer_size, self.n_envs, self.pg_agent_config.defender_at_net_input_dim), dtype=np.float32)
         self.node_actions = np.zeros((self.buffer_size, self.n_envs, self.action_dim), dtype=np.float32)
         self.at_actions = np.zeros((self.buffer_size, self.n_envs, self.action_dim), dtype=np.float32)
         self.rewards = np.zeros((self.buffer_size, self.n_envs), dtype=np.float32)
@@ -1070,7 +1086,7 @@ class RolloutBufferARRecurrentMultiHead(BaseBuffer):
         self.node_observations_2 = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.channel_2_input_dim),dtype=np.float32)
         self.node_observations_3 = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.channel_3_input_dim),dtype=np.float32)
         self.node_observations_4 = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.channel_4_input_dim),dtype=np.float32)
-        self.at_observations = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.at_net_input_dim), dtype=np.float32)
+        self.at_observations = np.zeros((self.buffer_size, self.n_envs, self.pg_agent_config.attacker_at_net_input_dim), dtype=np.float32)
         self.node_actions = np.zeros((self.buffer_size, self.n_envs, self.action_dim), dtype=np.float32)
         self.at_actions = np.zeros((self.buffer_size, self.n_envs, self.action_dim), dtype=np.float32)
         self.rewards = np.zeros((self.buffer_size, self.n_envs), dtype=np.float32)

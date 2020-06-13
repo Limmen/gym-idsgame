@@ -70,14 +70,14 @@ class PPOBaselineAttackerBotAgent(BotAgent):
                     obs_tensor_a, self.idsgame_env, device=self.device, attacker=True, non_legal_actions=non_legal_actions)
                 attacker_action = attacker_actions.cpu().numpy()[0]
             else:
-                actions = list(range(self.config.node_net_output_dim))
+                actions = list(range(self.config.attacker_node_net_output_dim))
                 non_legal_actions = list(filter(lambda action: not self.is_attack_legal(action, attacker_obs, game_state, node=True), actions))
                 obs_tensor_a = torch.as_tensor(attacker_state.flatten()).to(self.device)
                 attacker_node_actions, attacker_node_values, attacker_node_log_probs, attacker_node_lstm_state = self.model.attacker_node_policy.forward(
                     obs_tensor_a, self.idsgame_env, device=self.device, attacker=True, non_legal_actions=non_legal_actions)
                 attacker_node_actions = attacker_node_actions.cpu().numpy()
                 node = attacker_node_actions[0]
-                obs_tensor_a_1 = obs_tensor_a.reshape(self.idsgame_env.idsgame_config.game_config.num_nodes, self.config.at_net_input_dim)
+                obs_tensor_a_1 = obs_tensor_a.reshape(self.idsgame_env.idsgame_config.game_config.num_nodes, self.config.attacker_at_net_input_dim)
                 obs_tensor_a_at = obs_tensor_a_1[node]
                 attacker_at_actions, attacker_at_values, attacker_at_log_probs, attacker_at_lstm_state = self.model.attacker_at_policy.forward(
                     obs_tensor_a_at, self.idsgame_env, device=self.device, attacker=True, non_legal_actions = [])

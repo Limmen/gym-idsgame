@@ -91,7 +91,10 @@ def evaluate_policy(model, env, n_eval_episodes=10, deterministic=True,
             if pg_agent_config.defender:
                 d_obs = th.tensor(d_obs).to(device=model.device)
                 res = model.predict(d_obs, deterministic=False, attacker = False)
-                defender_action = np.array([res.cpu().numpy()])
+                if not pg_agent_config.ar_policy:
+                    defender_action = np.array([res.cpu().numpy()])
+                else:
+                    defender_action = np.array([res])
 
             # Take a step in the environment
             joint_action = np.array([[attacker_action, defender_action]])
@@ -156,6 +159,11 @@ def evaluate_policy(model, env, n_eval_episodes=10, deterministic=True,
                                                                            pg_agent_config.lstm_hidden_dim),
                                                                   th.zeros(pg_agent_config.num_lstm_layers, 1,
                                                                            pg_agent_config.lstm_hidden_dim))
+                model.defender_policy.mlp_extractor.lstm_hidden = (
+                    th.zeros(pg_agent_config.num_lstm_layers, 1,
+                             pg_agent_config.lstm_hidden_dim),
+                    th.zeros(pg_agent_config.num_lstm_layers, 1,
+                             pg_agent_config.lstm_hidden_dim))
             else:
                 model.attacker_node_policy.mlp_extractor.lstm_hidden = (th.zeros(pg_agent_config.num_lstm_layers, 1,
                                                                             pg_agent_config.lstm_hidden_dim),
@@ -166,15 +174,19 @@ def evaluate_policy(model, env, n_eval_episodes=10, deterministic=True,
                          pg_agent_config.lstm_hidden_dim),
                 th.zeros(pg_agent_config.num_lstm_layers, 1,
                          pg_agent_config.lstm_hidden_dim))
-            # Reset LSTM state
-            model.defender_policy.mlp_extractor.lstm_hidden = (
-                th.zeros(pg_agent_config.num_lstm_layers, 1,
-                         pg_agent_config.lstm_hidden_dim),
-                th.zeros(pg_agent_config.num_lstm_layers, 1,
-                         pg_agent_config.lstm_hidden_dim))
+
+                model.defender_node_policy.mlp_extractor.lstm_hidden = (th.zeros(pg_agent_config.num_lstm_layers, 1,
+                                                                                 pg_agent_config.lstm_hidden_dim),
+                                                                        th.zeros(pg_agent_config.num_lstm_layers, 1,
+                                                                                 pg_agent_config.lstm_hidden_dim))
+                model.defender_at_policy.mlp_extractor.lstm_hidden = (
+                    th.zeros(pg_agent_config.num_lstm_layers, 1,
+                             pg_agent_config.lstm_hidden_dim),
+                    th.zeros(pg_agent_config.num_lstm_layers, 1,
+                             pg_agent_config.lstm_hidden_dim))
 
 
-    # Log average eval statistics
+                # Log average eval statistics
     if model.num_eval_hacks > 0:
         model.eval_hack_probability = float(model.num_eval_hacks) / float(model.num_eval_games)
     if model.num_eval_games_total > 0:

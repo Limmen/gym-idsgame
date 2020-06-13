@@ -56,9 +56,9 @@ def default_config() -> ClientConfig:
                                                 cnn_feature_extractor=False, features_dim=512,
                                                 flatten_feature_planes=False,
                                                 attacker_load_path="/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v19/minimal_defense/manual_vs_openai_ppo/1592052172.443187_attacker_node_at_policy_network.zip",
-                                                ar_policy=True, node_net_input_dim=((4 + 2) * 4),
-                                                at_net_input_dim=(4 + 2), at_net_output_dim=(4 + 1),
-                                                node_net_output_dim=4)
+                                                ar_policy=True, attacker_node_input_dim=((4 + 2) * 4),
+                                                attacker_at_net_input_dim=(4 + 2), attacker_at_net_output_dim=(4 + 1),
+                                                attacker_node_net_output_dim=4)
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.PPO_OPENAI_AGENT.value,
                                  mode=RunnerMode.MANUAL_DEFENDER.value, output_dir=default_output_dir(),
                                  title="OpenAI PPO vs ManualDefender", pg_agent_config=pg_agent_config,

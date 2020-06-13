@@ -89,11 +89,11 @@ def default_config() -> ClientConfig:
                                                 channel_3_dim=64, channel_3_layers=1, channel_3_input_dim=4,
                                                 channel_4_dim=64, channel_4_layers=1, channel_4_input_dim=4,
                                                 mini_batch_size=64,
-                                                ar_policy=True, node_net_input_dim=((4 + 2) * 4),
-                                                at_net_input_dim=(4 + 2), at_net_output_dim=(4 + 1),
-                                                node_net_output_dim=4,
-                                                node_net_multi_channel=False, at_net_multi_channel=False,
-                                                node_net_lstm_core=True, at_net_lstm_core=False)
+                                                ar_policy=True, attacker_node_input_dim=((4 + 2) * 4),
+                                                attacker_at_net_input_dim=(4 + 2), attacker_at_net_output_dim=(4 + 1),
+                                                attacker_node_net_output_dim=4,
+                                                attacker_node_net_multi_channel=False, attacker_at_net_multi_channel=False,
+                                                attacker_node_net_lstm_core=True, attacker_at_net_lstm_core=False)
     env_name = "idsgame-minimal_defense-v19"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.PPO_OPENAI_AGENT.value,
                                  mode=RunnerMode.TRAIN_ATTACKER.value,

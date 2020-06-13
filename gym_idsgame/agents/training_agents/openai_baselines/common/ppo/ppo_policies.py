@@ -72,7 +72,8 @@ class PPOPolicy(BasePolicy):
                  optimizer_kwargs: Optional[Dict[str, Any]] = None,
                  pg_agent_config : PolicyGradientAgentConfig = None,
                  node_net : bool = False,
-                 at_net : bool = False):
+                 at_net : bool = False,
+                 attacker : bool = False):
 
         if optimizer_kwargs is None:
             optimizer_kwargs = {}
@@ -103,9 +104,15 @@ class PPOPolicy(BasePolicy):
                                                            **self.features_extractor_kwargs)
         self.features_dim = self.features_extractor.features_dim
         if at_net:
-            self.features_dim = self.pg_agent_config.at_net_input_dim
+            if attacker:
+                self.features_dim = self.pg_agent_config.attacker_at_net_input_dim
+            else:
+                self.features_dim = self.pg_agent_config.defender_at_net_input_dim
         if node_net:
-            self.features_dim = self.pg_agent_config.node_net_input_dim
+            if attacker:
+                self.features_dim = self.pg_agent_config.attacker_node_net_input_dim
+            else:
+                self.features_dim = self.pg_agent_config.defender_node_net_input_dim
 
         self.node_net = node_net
         self.at_net = at_net
@@ -128,9 +135,15 @@ class PPOPolicy(BasePolicy):
         self.dist_kwargs = dist_kwargs
 
         if node_net:
-            action_space = gym.spaces.Discrete(self.pg_agent_config.node_net_output_dim)
+            if attacker:
+                action_space = gym.spaces.Discrete(self.pg_agent_config.attacker_node_net_output_dim)
+            else:
+                action_space = gym.spaces.Discrete(self.pg_agent_config.defender_node_net_output_dim)
         if at_net:
-            action_space = gym.spaces.Discrete(self.pg_agent_config.at_net_output_dim)
+            if attacker:
+                action_space = gym.spaces.Discrete(self.pg_agent_config.attacker_at_net_output_dim)
+            else:
+                action_space = gym.spaces.Discrete(self.pg_agent_config.defender_at_net_output_dim)
 
         # Action distribution
         self.action_dist = make_proba_distribution(action_space, use_sde=use_sde, dist_kwargs=dist_kwargs)
@@ -231,7 +244,7 @@ class PPOPolicy(BasePolicy):
         :return: (Tuple[th.Tensor, th.Tensor, th.Tensor]) action, value and log probability of the action
         """
         if (self.pg_agent_config.multi_channel_obs and not self.pg_agent_config.ar_policy) or  \
-                (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.node_net_multi_channel):
+                (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.attacker_node_net_multi_channel):
             c_1_f, c_2_f, c_3_f, c_4_f = obs
             c_1_f = c_1_f.to(device)
             c_2_f = c_2_f.to(device)
@@ -251,9 +264,7 @@ class PPOPolicy(BasePolicy):
         if non_legal_actions is None:
             if attacker:
                 if self.pg_agent_config.ar_policy:
-                    actions = list(range(self.pg_agent_config.node_net_output_dim))
-                    legal_actions = list(
-                        filter(lambda action: env.is_attack_legal(action, node=self.node_net), actions))
+                    actions = list(range(self.pg_agent_config.attacker_node_net_output_dim))
                     non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action, node=self.node_net), actions))
                 else:
                     actions = list(range(env.num_attack_actions))
@@ -278,9 +289,13 @@ class PPOPolicy(BasePolicy):
                             non_legal_actions = non_legal_no_rec
 
             else:
-                actions = list(range(env.num_defense_actions))
-                legal_actions = list(filter(lambda action: env.is_defense_legal(action), actions))
-                non_legal_actions = list(filter(lambda action: not env.is_defense_legal(action), actions))
+                if self.pg_agent_config.ar_policy:
+                    actions = list(range(self.pg_agent_config.defender_node_net_output_dim))
+                    non_legal_actions = list(
+                        filter(lambda action: not env.is_defense_legal(action, node=self.node_net), actions))
+                else:
+                    actions = list(range(env.num_defense_actions))
+                    non_legal_actions = list(filter(lambda action: not env.is_defense_legal(action), actions))
 
         distribution = self. _get_action_dist_from_latent(latent_pi, latent_sde=latent_sde, device=device,
                                                          non_legal_actions=non_legal_actions)
@@ -386,7 +401,7 @@ class PPOPolicy(BasePolicy):
         # Masking
         if attacker:
             if self.pg_agent_config.ar_policy:
-                actions = list(range(self.pg_agent_config.node_net_output_dim))
+                actions = list(range(self.pg_agent_config.attacker_node_net_output_dim))
                 legal_actions = list(
                     filter(lambda action: env.is_attack_legal(action, node=self.node_net), actions))
                 non_legal_actions = list(
@@ -423,7 +438,7 @@ class PPOPolicy(BasePolicy):
             and entropy of the action distribution.
         """
         if (self.pg_agent_config.multi_channel_obs and not self.pg_agent_config.ar_policy) or \
-                (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.node_net_multi_channel):
+                (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.attacker_node_net_multi_channel):
             c_1_f, c_2_f, c_3_f, c_4_f = obs
             latent_pi, latent_vf, latent_sde, lstm_state = self._get_latent(obs, lstm_state=states, masks=masks,
                                                                             channel_1_features=c_1_f,
@@ -436,7 +451,7 @@ class PPOPolicy(BasePolicy):
         # Masking
         if attacker:
             if self.pg_agent_config.ar_policy:
-                all_actions = list(range(self.pg_agent_config.node_net_output_dim))
+                all_actions = list(range(self.pg_agent_config.attacker_node_net_output_dim))
                 legal_actions = list(
                     filter(lambda action: env.is_attack_legal(action, node=self.node_net), all_actions))
                 non_legal_actions = list(

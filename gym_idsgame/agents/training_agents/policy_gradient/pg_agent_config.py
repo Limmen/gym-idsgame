@@ -46,10 +46,14 @@ class PolicyGradientAgentConfig:
                  channel_2_layers: int = 2, channel_2_dim: int = 64, channel_2_input_dim : int = 4,
                  channel_3_layers: int = 2, channel_3_dim: int = 64, channel_3_input_dim : int = 4,
                  channel_4_layers: int = 2, channel_4_dim: int = 64, channel_4_input_dim : int = 4,
-                 mini_batch_size : int = 64, ar_policy : bool = False, node_net_input_dim : int = 64,
-                 at_net_input_dim : int = 64, node_net_output_dim = 4, at_net_output_dim = 4,
-                 node_net_multi_channel : bool = False, at_net_multi_channel : bool = False,
-                 node_net_lstm_core : bool = False, at_net_lstm_core : bool = False
+                 mini_batch_size : int = 64, ar_policy : bool = False, attacker_node_input_dim : int = 64,
+                 attacker_at_net_input_dim : int = 64, attacker_node_net_output_dim = 4, attacker_at_net_output_dim = 4,
+                 attacker_node_net_multi_channel : bool = False, attacker_at_net_multi_channel : bool = False,
+                 attacker_node_net_lstm_core : bool = False, attacker_at_net_lstm_core : bool = False,
+                 defender_node_input_dim: int = 64,
+                 defender_at_net_input_dim: int = 64, defender_node_net_output_dim=4, defender_at_net_output_dim=4,
+                 defender_node_net_multi_channel: bool = False, defender_at_net_multi_channel: bool = False,
+                 defender_node_net_lstm_core: bool = False, defender_at_net_lstm_core: bool = False
                  ):
         """
         Initialize environment and hyperparameters
@@ -232,14 +236,22 @@ class PolicyGradientAgentConfig:
         self.channel_4_input_dim = channel_4_input_dim
         self.mini_batch_size = mini_batch_size
         self.ar_policy = ar_policy
-        self.at_net_input_dim = at_net_input_dim
-        self.node_net_input_dim = node_net_input_dim
-        self.node_net_output_dim = node_net_output_dim
-        self.at_net_output_dim = at_net_output_dim
-        self.node_net_multi_channel = node_net_multi_channel
-        self.at_net_multi_channel = at_net_multi_channel
-        self.node_net_lstm_core = node_net_lstm_core
-        self.at_net_lstm_core = at_net_lstm_core
+        self.attacker_at_net_input_dim = attacker_at_net_input_dim
+        self.attacker_node_net_input_dim = attacker_node_input_dim
+        self.attacker_node_net_output_dim = attacker_node_net_output_dim
+        self.attacker_at_net_output_dim = attacker_at_net_output_dim
+        self.attacker_node_net_multi_channel = attacker_node_net_multi_channel
+        self.attacker_at_net_multi_channel = attacker_at_net_multi_channel
+        self.attacker_node_net_lstm_core = attacker_node_net_lstm_core
+        self.attacker_at_net_lstm_core = attacker_at_net_lstm_core
+        self.defender_at_net_input_dim = defender_at_net_input_dim
+        self.defender_node_net_input_dim = defender_node_input_dim
+        self.defender_node_net_output_dim = defender_node_net_output_dim
+        self.defender_at_net_output_dim = defender_at_net_output_dim
+        self.defender_node_net_multi_channel = defender_node_net_multi_channel
+        self.defender_at_net_multi_channel = defender_at_net_multi_channel
+        self.defender_node_net_lstm_core = defender_node_net_lstm_core
+        self.defender_at_net_lstm_core = defender_at_net_lstm_core
 
 
     def to_str(self) -> str:

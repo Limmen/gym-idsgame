@@ -183,14 +183,20 @@ class BaselineEnvWrapper(gym.Env):
                 return True
 
 
-    def is_defense_legal(self, defense_action: int) -> bool:
+    def is_defense_legal(self, defense_action: int, node  :bool = False) -> bool:
         """
         Check if a given defense is legal or not.
 
         :param defense_action: the defense action to verify
         :return: True if legal otherwise False
         """
-        return self.idsgame_env.is_defense_legal(defense_action)
+        if not self.pg_agent_config.ar_policy:
+            return self.idsgame_env.is_defense_legal(defense_action)
+        else:
+            if node:
+                return util.is_node_defense_legal(defense_action, self.idsgame_env.idsgame_config.game_config.network_config)
+            else:
+                return True
 
     def hack_probability(self):
         if self.num_games > 0:

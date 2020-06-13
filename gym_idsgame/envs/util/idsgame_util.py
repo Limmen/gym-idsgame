@@ -90,6 +90,13 @@ def is_node_attack_legal(target_node : int, attacker_pos : Union[int, int], netw
 
     return network_config.adjacency_matrix[attacker_adjacency_matrix_id][target_adjacency_matrix_id] == int(1)
 
+
+def is_node_defense_legal(target_node : int, network_config : NetworkConfig) -> bool:
+    if (network_config.node_list[target_node] == NodeType.SERVER.value
+            or network_config.node_list[target_node] == NodeType.DATA.value):
+        return True
+    return False
+
 def is_attack_legal(target_pos: Union[int, int], attacker_pos: Union[int, int], network_config: NetworkConfig,
                     past_positions: List[int] = None) -> bool:
     """

@@ -593,8 +593,8 @@ class MlpExtractor(nn.Module):
         last_layer_dim_shared = feature_dim
 
         if (not self.pg_agent_config.ar_policy and self.pg_agent_config.multi_channel_obs) or \
-            (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.node_net_multi_channel) or \
-                (self.pg_agent_config.ar_policy and self.at_net and self.pg_agent_config.at_net_multi_channel):
+            (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.attacker_node_net_multi_channel) or \
+                (self.pg_agent_config.ar_policy and self.at_net and self.pg_agent_config.attacker_at_net_multi_channel):
             attack_encoder_net = []
             last_layer_dim_attack_encoder = self.pg_agent_config.channel_1_input_dim
             for i in range(self.pg_agent_config.channel_1_layers):
@@ -633,8 +633,8 @@ class MlpExtractor(nn.Module):
             self.rec_encoder = nn.Sequential(*rec_encoder_net).to(device)
 
             if (not self.pg_agent_config.ar_policy and self.pg_agent_config.lstm_core) or \
-                    (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.node_net_lstm_core) or \
-                    (self.pg_agent_config.ar_policy and self.at_net and self.pg_agent_config.at_net_lstm_core):
+                    (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.attacker_node_net_lstm_core) or \
+                    (self.pg_agent_config.ar_policy and self.at_net and self.pg_agent_config.attacker_at_net_lstm_core):
                 self.core_lstm = th.nn.LSTM(input_size=(self.pg_agent_config.channel_1_dim +
                                                        self.pg_agent_config.channel_2_dim +
                                                        self.pg_agent_config.channel_3_dim +
@@ -652,8 +652,8 @@ class MlpExtractor(nn.Module):
                                         self.pg_agent_config.channel_3_dim + self.pg_agent_config.channel_4_dim
         else:
             if (not self.pg_agent_config.ar_policy and self.pg_agent_config.lstm_core) or \
-                    (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.node_net_lstm_core) or \
-                    (self.pg_agent_config.ar_policy and self.at_net and self.pg_agent_config.at_net_lstm_core):
+                    (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.attacker_node_net_lstm_core) or \
+                    (self.pg_agent_config.ar_policy and self.at_net and self.pg_agent_config.attacker_at_net_lstm_core):
                 self.core_lstm = th.nn.LSTM(input_size=last_layer_dim_shared,
                                             hidden_size=self.pg_agent_config.lstm_hidden_dim,
                                             num_layers=self.pg_agent_config.num_lstm_layers)
@@ -707,13 +707,13 @@ class MlpExtractor(nn.Module):
         # Create networks
         # If the list of layers is empty, the network will just act as an Identity module
         if not self.pg_agent_config.lstm_core or \
-                (self.pg_agent_config.ar_policy and self.node_net and not self.pg_agent_config.node_net_lstm_core) or \
-                (self.pg_agent_config.ar_policy and self.at_net and not self.pg_agent_config.at_net_lstm_core):
+                (self.pg_agent_config.ar_policy and self.node_net and not self.pg_agent_config.attacker_node_net_lstm_core) or \
+                (self.pg_agent_config.ar_policy and self.at_net and not self.pg_agent_config.attacker_at_net_lstm_core):
             self.shared_net = nn.Sequential(*shared_net).to(device)
         else:
             if not self.pg_agent_config.ar_policy or \
-                (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.node_net_lstm_core) or \
-                (self.pg_agent_config.ar_policy and self.at_net and self.pg_agent_config.at_net_lstm_core):
+                (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.attacker_node_net_lstm_core) or \
+                (self.pg_agent_config.ar_policy and self.at_net and self.pg_agent_config.attacker_at_net_lstm_core):
                 self.core_lstm = self.core_lstm.to(device)
         self.policy_net = nn.Sequential(*policy_net).to(device)
         self.value_net = nn.Sequential(*value_net).to(device)
@@ -725,7 +725,7 @@ class MlpExtractor(nn.Module):
             If all layers are shared, then ``latent_policy == latent_value``
         """
         if (self.pg_agent_config.multi_channel_obs and not self.pg_agent_config.ar_policy) or \
-                (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.node_net_multi_channel):
+                (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.attacker_node_net_multi_channel):
             channel_1_latent = self.attack_encoder(channel_1_features.float())
             channel_2_latent = self.defense_encoder(channel_2_features.float())
             channel_3_latent = self.position_encoder(channel_3_features.float())
@@ -737,8 +737,8 @@ class MlpExtractor(nn.Module):
             else:
                 raise AssertionError("Do not recognize the shape")
         if not self.pg_agent_config.lstm_core or \
-                (self.pg_agent_config.ar_policy and self.node_net and not self.pg_agent_config.node_net_lstm_core) or \
-                (self.pg_agent_config.ar_policy and self.at_net and not self.pg_agent_config.at_net_lstm_core):
+                (self.pg_agent_config.ar_policy and self.node_net and not self.pg_agent_config.attacker_node_net_lstm_core) or \
+                (self.pg_agent_config.ar_policy and self.at_net and not self.pg_agent_config.attacker_at_net_lstm_core):
             shared_latent = self.shared_net(features)
             return self.policy_net(shared_latent), self.value_net(shared_latent), None
         else:

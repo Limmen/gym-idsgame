@@ -414,6 +414,16 @@ class IdsGameEnv(gym.Env, ABC):
                 and not self.idsgame_config.game_config.dense_rewards_v3:
             return constants.GAME_CONFIG.POSITIVE_REWARD, -constants.GAME_CONFIG.POSITIVE_REWARD
         elif self.idsgame_config.game_config.dense_rewards_v3:
+            missed_defense = 0
+            for defense in self.defenses:
+                match = False
+                for attack in self.attacks:
+                    if attack[0] == defense[0] and defense[2]:
+                        match = True
+                    elif attack[0] == defense[0] and defense[1] == attack[1]:
+                        match = True
+                if not match:
+                    missed_defense += 1
             attack_row, attack_col = self.state.attacker_pos
             row_ids = self.idsgame_config.game_config.network_config.get_row_ids(attack_row)
             min_ats = self.state.min_attack_type(node_id, row_ids)
@@ -427,8 +437,8 @@ class IdsGameEnv(gym.Env, ABC):
                     if not n_id == node_id:
                         num_bad_attacks = num_bad_attacks + 1
                 reward = max(num_good_attacks - math.pow(num_bad_attacks, 2), 0)
-                return reward, 0
-            return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
+                return reward, -(constants.GAME_CONFIG.POSITIVE_REWARD + missed_defense)
+            return -constants.GAME_CONFIG.POSITIVE_REWARD, -(constants.GAME_CONFIG.POSITIVE_REWARD + missed_defense)
         else:
             bonus = 1 if self.num_failed_attacks == 0 else 1 / self.num_failed_attacks
             return bonus + constants.GAME_CONFIG.POSITIVE_REWARD, -len(self.hacked_nodes)
@@ -439,7 +449,8 @@ class IdsGameEnv(gym.Env, ABC):
 
         :return: (attacker_reward, defender_reward)
         """
-        if not self.idsgame_config.game_config.dense_rewards and not self.idsgame_config.game_config.dense_rewards_v2:
+        if not self.idsgame_config.game_config.dense_rewards and not self.idsgame_config.game_config.dense_rewards_v2 \
+                and not self.idsgame_config.game_config.dense_rewards_v3:
             return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
         elif self.idsgame_config.game_config.dense_rewards and self.idsgame_config.game_config.dense_rewards_v2:
             return -100*constants.GAME_CONFIG.POSITIVE_REWARD, 100*constants.GAME_CONFIG.POSITIVE_REWARD
@@ -447,10 +458,17 @@ class IdsGameEnv(gym.Env, ABC):
             attack_row, attack_col = self.state.attacker_pos
             row_ids = self.idsgame_config.game_config.network_config.get_row_ids(attack_row)
             min_ats = self.state.min_attack_type(target_node_id, row_ids)
+
+            added_defense = 0
+            for defense in self.defenses:
+                if defense[2] and defense[0] == target_node_id:
+                    added_defense += 1
+                elif defense[1] == attack_type and defense[0] == target_node_id:
+                    added_defense += 1
             if not reconnaissance and target_node_id in self.state.reconnaissance_actions and attack_type in min_ats:
-                return 0, constants.GAME_CONFIG.POSITIVE_REWARD
+                return 0, 1+added_defense
             else:
-                return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
+                return -constants.GAME_CONFIG.POSITIVE_REWARD, 1+added_defense
         else:
             added_detection = 0
             for defense in self.defenses:
