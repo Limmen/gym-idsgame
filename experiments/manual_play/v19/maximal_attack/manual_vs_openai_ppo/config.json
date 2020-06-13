@@ -51,7 +51,7 @@
         "defender_at_net_lstm_core": false,
         "defender_at_net_multi_channel": false,
         "defender_at_net_output_dim": 5,
-        "defender_load_path": "/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v19/maximal_attack/manual_vs_openai_ppo/1592076145.2132297_defender_node_policy_network.zip",
+        "defender_load_path": "/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v19/maximal_attack/manual_vs_openai_ppo/1592081690.896147_defender_node_policy_network.zip",
         "defender_node_net_input_dim": 20,
         "defender_node_net_lstm_core": false,
         "defender_node_net_multi_channel": false,

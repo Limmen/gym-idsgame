@@ -72,7 +72,7 @@ def default_config() -> ClientConfig:
                                                 defender_node_input_dim=((4 + 1) * 4),
                                                 defender_at_net_input_dim=(4 + 1),
                                                 defender_node_net_output_dim=4, defender_at_net_output_dim=5,
-                                                defender_load_path="/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v19/maximal_attack/manual_vs_openai_ppo/1592076145.2132297_defender_node_policy_network.zip")
+                                                defender_load_path="/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v19/maximal_attack/manual_vs_openai_ppo/1592081690.896147_defender_node_policy_network.zip")
     client_config = ClientConfig(env_name=env_name, defender_type=AgentType.PPO_OPENAI_AGENT.value,
                                  mode=RunnerMode.MANUAL_ATTACKER.value, output_dir=default_output_dir(),
                                  title="ManualAttacker vs OpenAI PPO", pg_agent_config=pg_agent_config,

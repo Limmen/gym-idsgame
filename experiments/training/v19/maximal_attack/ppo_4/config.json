@@ -12,7 +12,7 @@
     "mode": 1,
     "output_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v19/maximal_attack/ppo_4",
     "pg_agent_config": {
-        "alpha_attacker": 0.0001,
+        "alpha_attacker": 0.0008,
         "alpha_defender": 0.0001,
         "alternating_optimization": false,
         "alternating_period": 15000,

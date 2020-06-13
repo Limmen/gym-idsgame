@@ -437,8 +437,12 @@ class IdsGameEnv(gym.Env, ABC):
                     if not n_id == node_id:
                         num_bad_attacks = num_bad_attacks + 1
                 reward = max(num_good_attacks - math.pow(num_bad_attacks, 2), 0)
-                return reward, -(constants.GAME_CONFIG.POSITIVE_REWARD+missed_defense)
-            return -constants.GAME_CONFIG.POSITIVE_REWARD, -(constants.GAME_CONFIG.POSITIVE_REWARD+missed_defense)
+                return reward, -(self.idsgame_config.game_config.max_value - self.state.defense_values[node_id][attack_type])
+                #return reward, -constants.GAME_CONFIG.POSITIVE_REWARD
+                #return reward, -(constants.GAME_CONFIG.POSITIVE_REWARD+missed_defense)
+            return -constants.GAME_CONFIG.POSITIVE_REWARD, -(self.idsgame_config.game_config.max_value - self.state.defense_values[node_id][attack_type])
+            #return -constants.GAME_CONFIG.POSITIVE_REWARD, -constants.GAME_CONFIG.POSITIVE_REWARD
+            #return -constants.GAME_CONFIG.POSITIVE_REWARD, -(constants.GAME_CONFIG.POSITIVE_REWARD+missed_defense)
         else:
             bonus = 1 if self.num_failed_attacks == 0 else 1 / self.num_failed_attacks
             return bonus + constants.GAME_CONFIG.POSITIVE_REWARD, -len(self.hacked_nodes)
@@ -477,11 +481,13 @@ class IdsGameEnv(gym.Env, ABC):
                 if not defense[2] and defense[1] == attack_type and defense[0] == target_node_id:
                     added_defense += 1
             if not reconnaissance and target_node_id in self.state.reconnaissance_actions and attack_type in min_ats:
-                #return 0, 0
-                return 0, (added_defense-missed_defense)
+                #return 0, -missed_defense
+                return 0, 0
+                #return 0, (added_defense-missed_defense)
             else:
-                #return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
-                return -constants.GAME_CONFIG.POSITIVE_REWARD, (added_defense-missed_defense)
+                #return -constants.GAME_CONFIG.POSITIVE_REWARD, -missed_defense
+                return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
+                #return -constants.GAME_CONFIG.POSITIVE_REWARD, (added_defense-missed_defense)
         else:
             added_detection = 0
             for defense in self.defenses:

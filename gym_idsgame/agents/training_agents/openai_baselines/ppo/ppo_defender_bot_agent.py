@@ -116,7 +116,6 @@ class PPOBaselineDefenderBotAgent(BotAgent):
                                                   self.idsgame_env.idsgame_config.game_config.max_value)
             else:
                 if obs is not None:
-                    print("obs:{}".format(obs))
                     if obs[defense_action] >= self.idsgame_env.idsgame_config.game_config.max_value:
                         return False
                 return True
