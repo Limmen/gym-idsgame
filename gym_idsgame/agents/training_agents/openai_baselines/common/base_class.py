@@ -731,7 +731,9 @@ class BaseRLModel(ABC):
                 a_obs_d = a_obs[1]
                 a_obs_p = a_obs[2]
                 a_obs_r = a_obs[3]
+                a_obs = a_obs[4]
                 d_obs = obs[1]
+                self._last_obs_a = a_obs
                 self._last_obs_a_a = a_obs_a
                 self._last_obs_a_d = a_obs_d
                 self._last_obs_a_p = a_obs_p

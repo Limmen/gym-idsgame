@@ -76,7 +76,8 @@ def evaluate_policy(model, env, n_eval_episodes=10, deterministic=True,
                     a_obs_d = th.Tensor(a_obs[1]).to(device=model.device)
                     a_obs_p = th.Tensor(a_obs[2]).to(device=model.device)
                     a_obs_r = th.Tensor(a_obs[3]).to(device=model.device)
-                    res = model.predict(a_obs, deterministic=False, attacker=True,
+                    a_obs_0 = th.Tensor(a_obs[4]).to(device=model.device)
+                    res = model.predict(a_obs_0, deterministic=False, attacker=True,
                                         channel_1_features=a_obs_a, channel_2_features = a_obs_d,
                                         channel_3_features = a_obs_p, channel_4_features = a_obs_r)
                 else:

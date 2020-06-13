@@ -21,12 +21,15 @@ class BaseFeaturesExtractor(nn.Module):
     :param features_dim: (int) Number of features extracted.
     """
 
-    def __init__(self, pg_agent_config : PolicyGradientAgentConfig, observation_space: gym.Space, features_dim: int = 0):
+    def __init__(self, pg_agent_config : PolicyGradientAgentConfig, observation_space: gym.Space, features_dim: int = 0,
+                 node_net : bool = False, at_net : bool = False):
         super(BaseFeaturesExtractor, self).__init__()
         assert features_dim > 0
         self._observation_space = observation_space
         self._features_dim = features_dim
         self.pg_agent_config = pg_agent_config
+        self.node_net = node_net
+        self.at_net = at_net
 
     @property
     def features_dim(self) -> int:
@@ -44,8 +47,11 @@ class FlattenExtractor(BaseFeaturesExtractor):
     :param observation_space: (gym.Space)
     """
 
-    def __init__(self, pg_agent_config : PolicyGradientAgentConfig, observation_space: gym.Space):
-        super(FlattenExtractor, self).__init__(pg_agent_config, observation_space, get_flattened_obs_dim(observation_space))
+    def __init__(self, pg_agent_config : PolicyGradientAgentConfig, observation_space: gym.Space,
+                 node_net : bool = False, at_net : bool = False):
+        super(FlattenExtractor, self).__init__(pg_agent_config, observation_space,
+                                               get_flattened_obs_dim(observation_space), at_net=at_net,
+                                               node_net=node_net)
         self.flatten = nn.Flatten()
 
     def forward(self, observations: th.Tensor) -> th.Tensor:
@@ -65,8 +71,9 @@ class NatureCNN(BaseFeaturesExtractor):
     """
 
     def __init__(self, pg_agent_config : PolicyGradientAgentConfig, observation_space: gym.spaces.Box,
-                 features_dim: int = 512):
-        super(NatureCNN, self).__init__(pg_agent_config, observation_space, pg_agent_config.features_dim)
+                 features_dim: int = 512, node_net : bool = False, at_net : bool = False):
+        super(NatureCNN, self).__init__(pg_agent_config, observation_space, pg_agent_config.features_dim,
+                                        at_net=at_net, node_net=node_net)
 
         n_input_channels = observation_space.shape[0]
         if pg_agent_config.cnn_type == 0:
@@ -571,49 +578,63 @@ class MlpExtractor(nn.Module):
                  net_arch: List[Union[int, Dict[str, List[int]]]],
                  activation_fn: Type[nn.Module],
                  device: Union[th.device, str] = 'auto',
-                 pg_agent_config: PolicyGradientAgentConfig = None):
+                 pg_agent_config: PolicyGradientAgentConfig = None,
+                 at_net :bool = False,
+                 node_net :bool = False
+                 ):
         super(MlpExtractor, self).__init__()
         self.pg_agent_config = pg_agent_config
+        self.at_net = at_net
+        self.node_net = node_net
         device = get_device(device, pg_agent_config)
         shared_net, policy_net, value_net = [], [], []
         policy_only_layers = []  # Layer sizes of the network that only belongs to the policy network
         value_only_layers = []  # Layer sizes of the network that only belongs to the value network
         last_layer_dim_shared = feature_dim
 
-        if self.pg_agent_config.multi_channel_obs:
-            self.attack_encoder = th.nn.Sequential(
-                th.nn.Linear(self.pg_agent_config.channel_1_input_dim, self.pg_agent_config.channel_1_dim),
-                th.nn.ReLU(),
-                th.nn.Linear(self.pg_agent_config.channel_1_dim, self.pg_agent_config.channel_1_dim),
-                th.nn.ReLU(),
-                th.nn.Linear(self.pg_agent_config.channel_1_dim, self.pg_agent_config.channel_1_dim),
-            )
+        if (not self.pg_agent_config.ar_policy and self.pg_agent_config.multi_channel_obs) or \
+            (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.node_net_multi_channel) or \
+                (self.pg_agent_config.ar_policy and self.at_net and self.pg_agent_config.at_net_multi_channel):
+            attack_encoder_net = []
+            last_layer_dim_attack_encoder = self.pg_agent_config.channel_1_input_dim
+            for i in range(self.pg_agent_config.channel_1_layers):
+                attack_encoder_net.append(nn.Linear(last_layer_dim_attack_encoder, self.pg_agent_config.channel_1_dim))
+                attack_encoder_net.append(activation_fn())
+                last_layer_dim_attack_encoder = self.pg_agent_config.channel_1_dim
+            attack_encoder_net.append(nn.Linear(last_layer_dim_attack_encoder, self.pg_agent_config.channel_1_dim))
+            self.attack_encoder = nn.Sequential(*attack_encoder_net).to(device)
 
-            self.defense_encoder = th.nn.Sequential(
-                th.nn.Linear(self.pg_agent_config.channel_2_input_dim, self.pg_agent_config.channel_2_dim),
-                th.nn.ReLU(),
-                th.nn.Linear(self.pg_agent_config.channel_2_dim, self.pg_agent_config.channel_2_dim),
-                th.nn.ReLU(),
-                th.nn.Linear(self.pg_agent_config.channel_2_dim, self.pg_agent_config.channel_2_dim),
-            )
+            defense_encoder_net = []
+            last_layer_dim_defense_encoder = self.pg_agent_config.channel_2_input_dim
+            for i in range(self.pg_agent_config.channel_2_layers):
+                defense_encoder_net.append(nn.Linear(last_layer_dim_defense_encoder, self.pg_agent_config.channel_2_dim))
+                defense_encoder_net.append(activation_fn())
+                last_layer_dim_defense_encoder = self.pg_agent_config.channel_2_dim
+            defense_encoder_net.append(nn.Linear(last_layer_dim_defense_encoder, self.pg_agent_config.channel_2_dim))
+            self.defense_encoder = nn.Sequential(*defense_encoder_net).to(device)
 
-            self.position_encoder = th.nn.Sequential(
-                th.nn.Linear(self.pg_agent_config.channel_3_input_dim, self.pg_agent_config.channel_3_dim),
-                th.nn.ReLU(),
-                th.nn.Linear(self.pg_agent_config.channel_3_dim, self.pg_agent_config.channel_3_dim),
-                th.nn.ReLU(),
-                th.nn.Linear(self.pg_agent_config.channel_3_dim, self.pg_agent_config.channel_3_dim),
-            )
+            position_encoder_net = []
+            last_layer_dim_position_encoder = self.pg_agent_config.channel_3_input_dim
+            for i in range(self.pg_agent_config.channel_3_layers):
+                position_encoder_net.append(nn.Linear(last_layer_dim_position_encoder, self.pg_agent_config.channel_3_dim))
+                position_encoder_net.append(activation_fn())
+                last_layer_dim_position_encoder = self.pg_agent_config.channel_3_dim
+            position_encoder_net.append(nn.Linear(last_layer_dim_position_encoder, self.pg_agent_config.channel_3_dim))
+            self.position_encoder = nn.Sequential(*position_encoder_net).to(device)
 
-            self.rec_encoder = th.nn.Sequential(
-                th.nn.Linear(self.pg_agent_config.channel_4_input_dim, self.pg_agent_config.channel_4_dim),
-                th.nn.ReLU(),
-                th.nn.Linear(self.pg_agent_config.channel_4_dim, self.pg_agent_config.channel_4_dim),
-                th.nn.ReLU(),
-                th.nn.Linear(self.pg_agent_config.channel_4_dim, self.pg_agent_config.channel_4_dim),
-            )
+            rec_encoder_net = []
+            last_layer_dim_rec_encoder = self.pg_agent_config.channel_4_input_dim
+            for i in range(self.pg_agent_config.channel_4_layers):
+                rec_encoder_net.append(
+                    nn.Linear(last_layer_dim_rec_encoder, self.pg_agent_config.channel_4_dim))
+                rec_encoder_net.append(activation_fn())
+                last_layer_dim_rec_encoder = self.pg_agent_config.channel_4_dim
+            rec_encoder_net.append(nn.Linear(last_layer_dim_rec_encoder, self.pg_agent_config.channel_4_dim))
+            self.rec_encoder = nn.Sequential(*rec_encoder_net).to(device)
 
-            if self.pg_agent_config.lstm_core:
+            if (not self.pg_agent_config.ar_policy and self.pg_agent_config.lstm_core) or \
+                    (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.node_net_lstm_core) or \
+                    (self.pg_agent_config.ar_policy and self.at_net and self.pg_agent_config.at_net_lstm_core):
                 self.core_lstm = th.nn.LSTM(input_size=(self.pg_agent_config.channel_1_dim +
                                                        self.pg_agent_config.channel_2_dim +
                                                        self.pg_agent_config.channel_3_dim +
@@ -630,7 +651,9 @@ class MlpExtractor(nn.Module):
                 last_layer_dim_shared = self.pg_agent_config.channel_1_dim + self.pg_agent_config.channel_2_dim + \
                                         self.pg_agent_config.channel_3_dim + self.pg_agent_config.channel_4_dim
         else:
-            if self.pg_agent_config.lstm_core:
+            if (not self.pg_agent_config.ar_policy and self.pg_agent_config.lstm_core) or \
+                    (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.node_net_lstm_core) or \
+                    (self.pg_agent_config.ar_policy and self.at_net and self.pg_agent_config.at_net_lstm_core):
                 self.core_lstm = th.nn.LSTM(input_size=last_layer_dim_shared,
                                             hidden_size=self.pg_agent_config.lstm_hidden_dim,
                                             num_layers=self.pg_agent_config.num_lstm_layers)
@@ -640,7 +663,6 @@ class MlpExtractor(nn.Module):
                                     th.zeros(self.pg_agent_config.num_lstm_layers, 1,
                                              self.pg_agent_config.lstm_hidden_dim))
                 last_layer_dim_shared = self.pg_agent_config.lstm_hidden_dim
-
 
         # Iterate through the shared layers and build the shared parts of the network
         for idx, layer in enumerate(net_arch):
@@ -684,10 +706,15 @@ class MlpExtractor(nn.Module):
 
         # Create networks
         # If the list of layers is empty, the network will just act as an Identity module
-        if not self.pg_agent_config.lstm_core:
+        if not self.pg_agent_config.lstm_core or \
+                (self.pg_agent_config.ar_policy and self.node_net and not self.pg_agent_config.node_net_lstm_core) or \
+                (self.pg_agent_config.ar_policy and self.at_net and not self.pg_agent_config.at_net_lstm_core):
             self.shared_net = nn.Sequential(*shared_net).to(device)
         else:
-            self.core_lstm = self.core_lstm.to(device)
+            if not self.pg_agent_config.ar_policy or \
+                (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.node_net_lstm_core) or \
+                (self.pg_agent_config.ar_policy and self.at_net and self.pg_agent_config.at_net_lstm_core):
+                self.core_lstm = self.core_lstm.to(device)
         self.policy_net = nn.Sequential(*policy_net).to(device)
         self.value_net = nn.Sequential(*value_net).to(device)
 
@@ -697,20 +724,21 @@ class MlpExtractor(nn.Module):
         :return: (th.Tensor, th.Tensor) latent_policy, latent_value of the specified network.
             If all layers are shared, then ``latent_policy == latent_value``
         """
-        if self.pg_agent_config.multi_channel_obs:
+        if (self.pg_agent_config.multi_channel_obs and not self.pg_agent_config.ar_policy) or \
+                (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.node_net_multi_channel):
             channel_1_latent = self.attack_encoder(channel_1_features.float())
             channel_2_latent = self.defense_encoder(channel_2_features.float())
             channel_3_latent = self.position_encoder(channel_3_features.float())
             channel_4_latent = self.rec_encoder(channel_4_features.float())
-            # print("channel 1 shape:{},2:{},3:{},4:{}".format(channel_1_latent.shape, channel_2_latent.shape,
-            #                                                  channel_3_latent.shape, channel_4_latent.shape))
             if len(channel_1_latent.shape) == 1:
                 features = th.cat([channel_1_latent, channel_2_latent, channel_3_latent, channel_4_latent], dim=0)
             elif len(channel_1_latent.shape) == 2:
                 features = th.cat([channel_1_latent, channel_2_latent, channel_3_latent, channel_4_latent], dim=1)
             else:
                 raise AssertionError("Do not recognize the shape")
-        if not self.pg_agent_config.lstm_core:
+        if not self.pg_agent_config.lstm_core or \
+                (self.pg_agent_config.ar_policy and self.node_net and not self.pg_agent_config.node_net_lstm_core) or \
+                (self.pg_agent_config.ar_policy and self.at_net and not self.pg_agent_config.at_net_lstm_core):
             shared_latent = self.shared_net(features)
             return self.policy_net(shared_latent), self.value_net(shared_latent), None
         else:

@@ -754,6 +754,8 @@ class BaselineEnvWrapper(gym.Env):
         return data
 
     def multi_channel_obs(self, attacker_obs, defender_obs, attacker=True):
+        attacker_state_0 = self.update_state(attacker_obs=attacker_obs, defender_obs=defender_obs,
+                                             state=self.attacker_state, attacker=True)
         if attacker and self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
             #if not self.idsgame_env.local_view_features():
             a_obs_len = self.idsgame_env.idsgame_config.game_config.num_attack_types + 1
@@ -768,5 +770,5 @@ class BaselineEnvWrapper(gym.Env):
         # print("reconnaissance obs:{}".format(d_bool_features.shape))
         # print("node position obs:{}".format(node_pos_obs.shape))
         # raise AssertionError("test")
-        return np.array([attacker_obs.flatten(), defender_obs.flatten(), node_pos_obs.flatten(), d_bool_features.flatten()])
+        return np.array([attacker_obs.flatten(), defender_obs.flatten(), node_pos_obs.flatten(), d_bool_features.flatten(), attacker_state_0.flatten()])
 

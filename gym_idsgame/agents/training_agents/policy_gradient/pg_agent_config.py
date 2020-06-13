@@ -47,7 +47,9 @@ class PolicyGradientAgentConfig:
                  channel_3_layers: int = 2, channel_3_dim: int = 64, channel_3_input_dim : int = 4,
                  channel_4_layers: int = 2, channel_4_dim: int = 64, channel_4_input_dim : int = 4,
                  mini_batch_size : int = 64, ar_policy : bool = False, node_net_input_dim : int = 64,
-                 at_net_input_dim : int = 64, node_net_output_dim = 4, at_net_output_dim = 4
+                 at_net_input_dim : int = 64, node_net_output_dim = 4, at_net_output_dim = 4,
+                 node_net_multi_channel : bool = False, at_net_multi_channel : bool = False,
+                 node_net_lstm_core : bool = False, at_net_lstm_core : bool = False
                  ):
         """
         Initialize environment and hyperparameters
@@ -234,6 +236,10 @@ class PolicyGradientAgentConfig:
         self.node_net_input_dim = node_net_input_dim
         self.node_net_output_dim = node_net_output_dim
         self.at_net_output_dim = at_net_output_dim
+        self.node_net_multi_channel = node_net_multi_channel
+        self.at_net_multi_channel = at_net_multi_channel
+        self.node_net_lstm_core = node_net_lstm_core
+        self.at_net_lstm_core = at_net_lstm_core
 
 
     def to_str(self) -> str:

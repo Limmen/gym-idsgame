@@ -178,7 +178,8 @@ class PPOPolicy(BasePolicy):
         """
         self.mlp_extractor = MlpExtractor(self.features_dim, net_arch=self.net_arch,
                                           activation_fn=self.activation_fn, device=self.device,
-                                          pg_agent_config=self.pg_agent_config)
+                                          pg_agent_config=self.pg_agent_config,
+                                          at_net=self.at_net, node_net=self.node_net)
 
         latent_dim_pi = self.mlp_extractor.latent_dim_pi
 
@@ -229,7 +230,8 @@ class PPOPolicy(BasePolicy):
         :param deterministic: (bool) Whether to sample or use deterministic actions
         :return: (Tuple[th.Tensor, th.Tensor, th.Tensor]) action, value and log probability of the action
         """
-        if self.pg_agent_config.multi_channel_obs:
+        if (self.pg_agent_config.multi_channel_obs and not self.pg_agent_config.ar_policy) or  \
+                (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.node_net_multi_channel):
             c_1_f, c_2_f, c_3_f, c_4_f = obs
             c_1_f = c_1_f.to(device)
             c_2_f = c_2_f.to(device)
@@ -420,7 +422,8 @@ class PPOPolicy(BasePolicy):
         :return: (th.Tensor, th.Tensor, th.Tensor) estimated value, log likelihood of taking those actions
             and entropy of the action distribution.
         """
-        if self.pg_agent_config.multi_channel_obs:
+        if (self.pg_agent_config.multi_channel_obs and not self.pg_agent_config.ar_policy) or \
+                (self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.node_net_multi_channel):
             c_1_f, c_2_f, c_3_f, c_4_f = obs
             latent_pi, latent_vf, latent_sde, lstm_state = self._get_latent(obs, lstm_state=states, masks=masks,
                                                                             channel_1_features=c_1_f,

@@ -102,3 +102,25 @@ class RolloutBufferSamplesARRecurrent(NamedTuple):
     dones: th.Tensor
     at_h_states: th.Tensor
     at_c_states: th.Tensor
+
+class RolloutBufferSamplesARRecurrentMultiHead(NamedTuple):
+    node_observations_1: th.Tensor
+    node_observations_2: th.Tensor
+    node_observations_3: th.Tensor
+    node_observations_4: th.Tensor
+    node_actions: th.Tensor
+    node_old_values: th.Tensor
+    node_old_log_prob: th.Tensor
+    node_advantages: th.Tensor
+    node_returns: th.Tensor
+    at_actions: th.Tensor
+    at_old_log_prob: th.Tensor
+    at_observations: th.Tensor
+    at_old_values: th.Tensor
+    at_returns: th.Tensor
+    at_advantages: th.Tensor
+    node_h_states: th.Tensor
+    node_c_states: th.Tensor
+    dones: th.Tensor
+    at_h_states: th.Tensor
+    at_c_states: th.Tensor
