@@ -91,10 +91,15 @@ def is_node_attack_legal(target_node : int, attacker_pos : Union[int, int], netw
     return network_config.adjacency_matrix[attacker_adjacency_matrix_id][target_adjacency_matrix_id] == int(1)
 
 
-def is_node_defense_legal(target_node : int, network_config : NetworkConfig) -> bool:
+def is_node_defense_legal(target_node : int, network_config : NetworkConfig, state : GameState, max_value:int) -> bool:
     if (network_config.node_list[target_node] == NodeType.SERVER.value
             or network_config.node_list[target_node] == NodeType.DATA.value):
-        return True
+        if state.defense_det[target_node] < max_value:
+            return True
+        for i in range(len(state.defense_values[target_node])):
+            if state.defense_values[target_node][i] < max_value:
+                return True
+        return False
     return False
 
 def is_attack_legal(target_pos: Union[int, int], attacker_pos: Union[int, int], network_config: NetworkConfig,

@@ -62,16 +62,64 @@ class PPOBaselineDefenderBotAgent(BotAgent):
             defender_obs = game_state.get_defender_observation(self.game_config.network_config)
             defender_state = self.update_state(attacker_obs=attacker_obs, defender_obs=defender_obs, state=[],
                                                attacker=False)
-            actions = list(range(self.idsgame_env.num_defense_actions))
-            non_legal_actions = list(filter(lambda action: not self.idsgame_env.is_defense_legal(action), actions))
-            obs_tensor_d = torch.as_tensor(defender_state.flatten()).to(self.device)
-            defender_actions, defender_values, defender_log_probs = self.model.defender_policy.forward(
-                obs_tensor_d, self.idsgame_env, device=self.device, attacker=False, non_legal_actions=non_legal_actions)
+            if not self.config.ar_policy:
+                actions = list(range(self.idsgame_env.num_defense_actions))
+                non_legal_actions = list(filter(lambda action: not self.idsgame_env.is_defense_legal(action), actions))
+                obs_tensor_d = torch.as_tensor(defender_state.flatten()).to(self.device)
+                defender_actions, defender_values, defender_log_probs = self.model.defender_policy.forward(
+                    obs_tensor_d, self.idsgame_env, device=self.device, attacker=False, non_legal_actions=non_legal_actions)
+                defender_actions = defender_actions.item()
+            else:
+                actions = list(range(self.config.defender_node_net_output_dim))
+                non_legal_actions = list(
+                    filter(lambda action: not self.is_defense_legal(action, node=True, game_state=game_state), actions))
+                if len(non_legal_actions) == len(actions):
+                    non_legal_actions = []
+                obs_tensor_d = torch.as_tensor(defender_state.flatten()).to(self.device)
+                defender_node_actions, defender_node_values, defender_node_log_probs, defender_node_lstm_state = self.model.defender_node_policy.forward(
+                    obs_tensor_d, self.idsgame_env, device=self.device, attacker=False,
+                    non_legal_actions=non_legal_actions)
+                defender_node_actions = defender_node_actions.cpu().numpy()
+                node = defender_node_actions[0]
+                obs_tensor_d_1 = obs_tensor_d.reshape(self.idsgame_env.idsgame_config.game_config.num_nodes,
+                                                      self.config.defender_at_net_input_dim)
+                obs_tensor_d_at = obs_tensor_d_1[node]
+                actions = list(range(self.config.defender_at_net_output_dim))
+                non_legal_actions = list(
+                    filter(lambda action: not self.is_defense_legal(action, node=False, game_state=game_state, obs=obs_tensor_d_at), actions))
+                if len(non_legal_actions) == len(actions):
+                    non_legal_actions = []
+                defender_at_actions, defender_at_values, defender_at_log_probs, defender_at_lstm_state = self.model.defender_at_policy.forward(
+                    obs_tensor_d_at, self.idsgame_env, device=self.device, attacker=False, non_legal_actions=non_legal_actions)
+                defender_at_actions = defender_at_actions.cpu().numpy()
+                attack_id = util.get_defense_action_id(node, defender_at_actions[0], self.idsgame_env.idsgame_config.game_config)
+                defender_actions = attack_id
         except Exception as e:
             print(str(e))
             traceback.print_exc()
 
-        return defender_actions.item()
+        return defender_actions
+
+    def is_defense_legal(self, defense_action: int, node: bool = False, obs : torch.Tensor = None,
+                         game_state :GameState = None) -> bool:
+        """
+        Check if a given defense is legal or not.
+
+        :param defense_action: the defense action to verify
+        :return: True if legal otherwise False
+        """
+        if not self.config.ar_policy:
+            return self.idsgame_env.is_defense_legal(defense_action)
+        else:
+            if node:
+                return util.is_node_defense_legal(defense_action, self.game_config.network_config, game_state,
+                                                  self.idsgame_env.idsgame_config.game_config.max_value)
+            else:
+                if obs is not None:
+                    print("obs:{}".format(obs))
+                    if obs[defense_action] >= self.idsgame_env.idsgame_config.game_config.max_value:
+                        return False
+                return True
 
     def update_state(self, attacker_obs: np.ndarray = None, defender_obs: np.ndarray = None,
                      state: np.ndarray = None, attacker: bool = True) -> np.ndarray:

@@ -80,7 +80,7 @@ class PPOBaselineAttackerBotAgent(BotAgent):
                 obs_tensor_a_1 = obs_tensor_a.reshape(self.idsgame_env.idsgame_config.game_config.num_nodes, self.config.attacker_at_net_input_dim)
                 obs_tensor_a_at = obs_tensor_a_1[node]
                 attacker_at_actions, attacker_at_values, attacker_at_log_probs, attacker_at_lstm_state = self.model.attacker_at_policy.forward(
-                    obs_tensor_a_at, self.idsgame_env, device=self.device, attacker=True, non_legal_actions = [])
+                    obs_tensor_a_at, self.idsgame_env, device=self.device, attacker=True, non_legal_actions = non_legal_actions)
                 attacker_at_actions = attacker_at_actions.cpu().numpy()
                 attack_id = util.get_attack_action_id(node, attacker_at_actions[0], self.idsgame_env.idsgame_config.game_config)
                 attacker_action = attack_id

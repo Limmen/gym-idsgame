@@ -264,8 +264,13 @@ class PPOPolicy(BasePolicy):
         if non_legal_actions is None:
             if attacker:
                 if self.pg_agent_config.ar_policy:
-                    actions = list(range(self.pg_agent_config.attacker_node_net_output_dim))
+                    if self.node_net:
+                        actions = list(range(self.pg_agent_config.attacker_node_net_output_dim))
+                    else:
+                        actions = list(range(self.pg_agent_config.attacker_at_net_output_dim))
                     non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action, node=self.node_net), actions))
+                    if len(non_legal_actions) == len(actions):
+                        non_legal_actions = []
                 else:
                     actions = list(range(env.num_attack_actions))
                     if wrapper_env is not None:
@@ -292,10 +297,14 @@ class PPOPolicy(BasePolicy):
                 if self.pg_agent_config.ar_policy:
                     actions = list(range(self.pg_agent_config.defender_node_net_output_dim))
                     non_legal_actions = list(
-                        filter(lambda action: not env.is_defense_legal(action, node=self.node_net), actions))
+                        filter(lambda action: not env.is_defense_legal(action, node=self.node_net, obs=obs), actions))
+                    if len(non_legal_actions) == len(actions):
+                        non_legal_actions = []
                 else:
                     actions = list(range(env.num_defense_actions))
                     non_legal_actions = list(filter(lambda action: not env.is_defense_legal(action), actions))
+                    if len(non_legal_actions) == len(actions):
+                        non_legal_actions = []
 
         distribution = self. _get_action_dist_from_latent(latent_pi, latent_sde=latent_sde, device=device,
                                                          non_legal_actions=non_legal_actions)
@@ -401,11 +410,14 @@ class PPOPolicy(BasePolicy):
         # Masking
         if attacker:
             if self.pg_agent_config.ar_policy:
-                actions = list(range(self.pg_agent_config.attacker_node_net_output_dim))
-                legal_actions = list(
-                    filter(lambda action: env.is_attack_legal(action, node=self.node_net), actions))
+                if self.node_net:
+                    actions = list(range(self.pg_agent_config.attacker_node_net_output_dim))
+                else:
+                    actions = list(range(self.pg_agent_config.attacker_at_net_output_dim))
                 non_legal_actions = list(
                     filter(lambda action: not env.is_attack_legal(action, node=self.node_net), actions))
+                if len(non_legal_actions) == len(actions):
+                    non_legal_actions = []
             else:
                 actions = list(range(env.num_attack_actions))
                 if wrapper_env is not None:
@@ -417,9 +429,20 @@ class PPOPolicy(BasePolicy):
                 else:
                     non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action, node=self.node_net), actions))
         else:
-            actions = list(range(env.num_defense_actions))
-            legal_actions = list(filter(lambda action: env.is_defense_legal(action), actions))
-            non_legal_actions = list(filter(lambda action: not env.is_defense_legal(action), actions))
+            if not self.pg_agent_config.ar_policy:
+                actions = list(range(env.num_defense_actions))
+                non_legal_actions = list(filter(lambda action: not env.is_defense_legal(action), actions))
+                if len(non_legal_actions) == len(actions):
+                    non_legal_actions = []
+            else:
+                if self.node_net:
+                    actions = list(range(self.pg_agent_config.defender_node_net_output_dim))
+                else:
+                    actions = list(range(self.pg_agent_config.defender_at_net_output_dim))
+                non_legal_actions = list(
+                    filter(lambda action: not env.is_defense_legal(action, node=self.node_net, obs=observation), actions))
+                if len(non_legal_actions) == len(actions):
+                    non_legal_actions = []
         distribution = self._get_action_dist_from_latent(latent_pi, latent_sde, device=device,
                                                          non_legal_actions=non_legal_actions)
         return distribution.get_actions(deterministic=False)
@@ -448,31 +471,46 @@ class PPOPolicy(BasePolicy):
         else:
             latent_pi, latent_vf, latent_sde, lstm_state = self._get_latent(obs, lstm_state=states, masks=masks)
 
-        # Masking
-        if attacker:
-            if self.pg_agent_config.ar_policy:
-                all_actions = list(range(self.pg_agent_config.attacker_node_net_output_dim))
-                legal_actions = list(
-                    filter(lambda action: env.is_attack_legal(action, node=self.node_net), all_actions))
-                non_legal_actions = list(
-                    filter(lambda action: not env.is_attack_legal(action, node=self.node_net), all_actions))
-            else:
-                all_actions = list(range(env.num_attack_actions))
-                if wrapper_env is not None:
-                    legal_actions = list(filter(lambda action: env.is_attack_legal(
-                        wrapper_env.convert_local_attacker_action_to_global(action, obs), node=self.node_net), actions))
-                else:
-                    legal_actions = list(filter(lambda action: env.is_attack_legal(action, node=self.node_net), actions))
-                if wrapper_env is not None:
-                    non_legal_actions = list(filter(lambda action: not env.is_attack_legal(
-                        wrapper_env.convert_local_attacker_action_to_global(action, obs), node=self.node_net), actions))
-                else:
-                    non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action, node=self.node_net), actions))
-        else:
-            all_actions = list(range(env.num_defense_actions))
-            legal_actions = list(filter(lambda action: env.is_defense_legal(action), all_actions))
-            non_legal_actions = list(filter(lambda action: not env.is_defense_legal(action), all_actions))
-
+        # # Masking
+        # if attacker:
+        #     if self.pg_agent_config.ar_policy:
+        #         if self.node_net:
+        #             all_actions = list(range(self.pg_agent_config.attacker_node_net_output_dim))
+        #         else:
+        #             all_actions = list(range(self.pg_agent_config.attacker_at_net_output_dim))
+        #         non_legal_actions = list(
+        #             filter(lambda action: not env.is_attack_legal(action, node=self.node_net), all_actions))
+        #         if len(non_legal_actions) == len(all_actions):
+        #             non_legal_actions = []
+        #     else:
+        #         all_actions = list(range(env.num_attack_actions))
+        #         if wrapper_env is not None:
+        #             legal_actions = list(filter(lambda action: env.is_attack_legal(
+        #                 wrapper_env.convert_local_attacker_action_to_global(action, obs), node=self.node_net), actions))
+        #         else:
+        #             legal_actions = list(filter(lambda action: env.is_attack_legal(action, node=self.node_net), actions))
+        #         if wrapper_env is not None:
+        #             non_legal_actions = list(filter(lambda action: not env.is_attack_legal(
+        #                 wrapper_env.convert_local_attacker_action_to_global(action, obs), node=self.node_net), actions))
+        #         else:
+        #             non_legal_actions = list(filter(lambda action: not env.is_attack_legal(action, node=self.node_net), actions))
+        # else:
+        #     if not self.pg_agent_config.ar_policy:
+        #         all_actions = list(range(env.num_defense_actions))
+        #         non_legal_actions = list(filter(lambda action: not env.is_defense_legal(action), all_actions))
+        #         if len(non_legal_actions) == len(actions):
+        #             non_legal_actions = []
+        #     else:
+        #         if self.node_net:
+        #             all_actions = list(range(self.pg_agent_config.defender_node_net_output_dim))
+        #         else:
+        #             all_actions = list(range(self.pg_agent_config.defender_at_net_output_dim))
+        #         non_legal_actions = list(
+        #             filter(lambda action: not env.is_defense_legal(action, node=self.node_net, obs=obs),
+        #                    all_actions))
+        #         if len(non_legal_actions) == len(all_actions):
+        #             non_legal_actions = []
+        non_legal_actions = []
         distribution = self._get_action_dist_from_latent(latent_pi, latent_sde, device=self.device,
                                                          non_legal_actions=non_legal_actions)
         log_prob = distribution.log_prob(actions)

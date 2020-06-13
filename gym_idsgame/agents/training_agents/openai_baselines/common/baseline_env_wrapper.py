@@ -4,6 +4,7 @@ A wrapper environment to integrate idsgame-env with the OpenAI baselines library
 import gym
 import numpy as np
 from sklearn import preprocessing
+import torch as th
 import matplotlib.pyplot as plt
 import matplotlib
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
@@ -183,7 +184,7 @@ class BaselineEnvWrapper(gym.Env):
                 return True
 
 
-    def is_defense_legal(self, defense_action: int, node  :bool = False) -> bool:
+    def is_defense_legal(self, defense_action: int, node  :bool = False, obs : th.Tensor = None) -> bool:
         """
         Check if a given defense is legal or not.
 
@@ -194,8 +195,14 @@ class BaselineEnvWrapper(gym.Env):
             return self.idsgame_env.is_defense_legal(defense_action)
         else:
             if node:
-                return util.is_node_defense_legal(defense_action, self.idsgame_env.idsgame_config.game_config.network_config)
+                return util.is_node_defense_legal(defense_action,
+                                                  self.idsgame_env.idsgame_config.game_config.network_config,
+                                                  self.idsgame_env.state,
+                                                  self.idsgame_env.idsgame_config.game_config.max_value)
             else:
+                if obs is not None:
+                    if obs[defense_action] >= self.idsgame_env.idsgame_config.game_config.max_value:
+                        return False
                 return True
 
     def hack_probability(self):
