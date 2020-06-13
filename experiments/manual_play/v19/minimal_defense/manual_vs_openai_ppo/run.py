@@ -55,7 +55,7 @@ def default_config() -> ClientConfig:
                                                 eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95,
                                                 cnn_feature_extractor=False, features_dim=512,
                                                 flatten_feature_planes=False,
-                                                attacker_load_path="/Users/kimham/workspace/rl/gym-idsgame/experiments/manual_play/v19/minimal_defense/manual_vs_openai_ppo/v3/1591979581.639473_attacker_node_at_policy_network.zip",
+                                                attacker_load_path="/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v19/minimal_defense/manual_vs_openai_ppo/1592052172.443187_attacker_node_at_policy_network.zip",
                                                 ar_policy=True, node_net_input_dim=((4 + 2) * 4),
                                                 at_net_input_dim=(4 + 2), at_net_output_dim=(4 + 1),
                                                 node_net_output_dim=4)
