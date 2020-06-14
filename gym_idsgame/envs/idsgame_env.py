@@ -4400,11 +4400,11 @@ class IdsGameRandomDefenseV20Env(AttackerEnv):
         """
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
-                                     min_random_a_val=0, min_random_d_val=7, min_random_det_val=1,
+                                     min_random_a_val=0, min_random_d_val=3, min_random_det_val=1,
                                      reconnaissance_actions=True)
             game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
-                                          vulnerability_val=1, num_vulnerabilities_per_layer=1,
-                                          randomize_visibility=True, visibility_p=0.0)
+                                          vulnerability_val=1, num_vulnerabilities_per_layer=2,
+                                          randomize_visibility=False, visibility_p=0.0)
             game_config.dense_rewards_v3 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
@@ -4448,11 +4448,11 @@ class IdsGameMinimalDefenseV20Env(AttackerEnv):
         """
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
-                                     min_random_a_val=0, min_random_d_val=7, min_random_det_val=1,
+                                     min_random_a_val=0, min_random_d_val=3, min_random_det_val=1,
                                      reconnaissance_actions=True)
             game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
-                                          vulnerability_val=1, num_vulnerabilities_per_layer=1,
-                                          randomize_visibility=True, visibility_p=0.0)
+                                          vulnerability_val=1, num_vulnerabilities_per_layer=2,
+                                          randomize_visibility=False, visibility_p=0.0)
             game_config.dense_rewards_v3 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
@@ -4495,11 +4495,11 @@ class IdsGameRandomAttackV20Env(DefenderEnv):
         """
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
-                                     min_random_a_val=0, min_random_d_val=7, min_random_det_val=1,
+                                     min_random_a_val=0, min_random_d_val=3, min_random_det_val=1,
                                      reconnaissance_actions=True)
             game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
-                                          vulnerability_val=1, num_vulnerabilities_per_layer=1,
-                                          randomize_visibility=True, visibility_p=0.0)
+                                          vulnerability_val=1, num_vulnerabilities_per_layer=2,
+                                          randomize_visibility=False, visibility_p=0.0)
             game_config.dense_rewards_v3 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
@@ -4543,11 +4543,11 @@ class IdsGameMaximalAttackV20Env(DefenderEnv):
         """
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
-                                     min_random_a_val=0, min_random_d_val=7, min_random_det_val=1,
+                                     min_random_a_val=0, min_random_d_val=3, min_random_det_val=1,
                                      reconnaissance_actions=True)
             game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
-                                          vulnerability_val=1, num_vulnerabilities_per_layer=1,
-                                          randomize_visibility=True, visibility_p=0.0)
+                                          vulnerability_val=1, num_vulnerabilities_per_layer=2,
+                                          randomize_visibility=False, visibility_p=0.0)
             game_config.dense_rewards_v3 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
@@ -4591,11 +4591,11 @@ class IdsGameV20Env(AttackDefenseEnv):
         """
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
-                                     min_random_a_val=0, min_random_d_val=7, min_random_det_val=1,
+                                     min_random_a_val=0, min_random_d_val=3, min_random_det_val=1,
                                      reconnaissance_actions=True)
             game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
-                                          vulnerability_val=1, num_vulnerabilities_per_layer=1,
-                                          randomize_visibility=True, visibility_p=0.0)
+                                          vulnerability_val=1, num_vulnerabilities_per_layer=2,
+                                          randomize_visibility=False, visibility_p=0.0)
             game_config.dense_rewards_v3 = True
             game_config.network_config.fully_observed = False
             game_config.reconnaissance_actions = True
