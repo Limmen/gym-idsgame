@@ -35,7 +35,10 @@ class RandomAttackBotAgent(BotAgent):
                                                                                        self.game_config,
                                                                                        game_state.attacker_pos,
                                                                                        game_state), actions))
-            action = np.random.choice(legal_actions)
+            if len(legal_actions) > 0:
+                action = np.random.choice(legal_actions)
+            else:
+                action = np.random.choice(actions)
         else:
             attacker_obs = game_state.get_attacker_observation(
                 self.game_config.network_config, local_view=self.idsgame_env.local_view_features(),
@@ -43,8 +46,12 @@ class RandomAttackBotAgent(BotAgent):
                 reconnaissance_bool_features=self.idsgame_env.idsgame_config.reconnaissance_bool_features)
             legal_actions = list(
                 filter(lambda action: self.is_attack_legal(action, attacker_obs, game_state), actions))
-            action = np.random.choice(legal_actions)
-            action = self.convert_local_attacker_action_to_global(action, attacker_obs)
+            if len(legal_actions) > 0:
+                action = np.random.choice(legal_actions)
+            else:
+                action = np.random.choice(actions)
+            if self.idsgame_env.local_view_features():
+                action = self.convert_local_attacker_action_to_global(action, attacker_obs)
         return action
 
     def is_attack_legal(self, action, obs, game_state):
