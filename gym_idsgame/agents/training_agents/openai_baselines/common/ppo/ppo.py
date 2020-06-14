@@ -515,6 +515,21 @@ class PPO(BaseRLModel):
                             defender_actions, defender_values, defender_log_probs, lstm_state = self.defender_opponent.forward(
                                 obs_tensor_d, self.env.envs[0], device=self.device, attacker=False)
                             defender_actions = defender_actions.cpu().numpy()
+                        elif isinstance(self.defender_opponent, tuple) and isinstance(self.defender_opponent[0], PPOPolicy):
+                            defender_node_actions, defender_node_values, defender_node_log_probs, defender_node_lstm_state = self.defender_opponent[0].forward(
+                                obs_tensor_d, self.env.envs[0], device=self.device, attacker=False)
+                            defender_node_actions = defender_node_actions.cpu().numpy()
+                            node = defender_node_actions[0]
+                            obs_tensor_d_1 = obs_tensor_d.reshape(
+                                self.env.envs[0].idsgame_env.idsgame_config.game_config.num_nodes,
+                                self.pg_agent_config.defender_at_net_input_dim)
+                            obs_tensor_d_at = obs_tensor_d_1[node].float()
+                            defender_at_actions, defender_at_values, defender_at_log_probs, defender_at_lstm_state = self.defender_opponent[1].forward(
+                                obs_tensor_d_at, self.env.envs[0], device=self.device, attacker=False)
+                            defender_at_actions = defender_at_actions.cpu().numpy()
+                            defense_id = idsgame_util.get_defense_action_id(node, defender_at_actions[0], self.env.envs[
+                                0].idsgame_env.idsgame_config.game_config)
+                            defender_actions = np.array([defense_id])
                         else:
                             action = self.defender_opponent.action(self.env.envs[0].idsgame_env.state)
                             defender_actions = np.array([action])
@@ -549,6 +564,27 @@ class PPO(BaseRLModel):
                                     (obs_tensor_a_a, obs_tensor_a_d, obs_tensor_a_p, obs_tensor_a_r),
                                     self.env.envs[0], device=self.device, attacker=True)
                             attacker_actions = attacker_actions.cpu().numpy()
+                        elif isinstance(self.attacker_opponent, tuple) and isinstance(self.attacker_opponent[0], PPOPolicy):
+                            if not self.pg_agent_config.attacker_node_net_multi_channel:
+                                attacker_node_actions, attacker_node_values, attacker_node_log_probs, attacker_node_lstm_state = self.attacker_opponent[0].forward(
+                                    obs_tensor_a, self.env.envs[0], device=self.device, attacker=True,
+                                    force_rec=force_rec)
+                            else:
+                                attacker_node_actions, attacker_node_values, attacker_node_log_probs, attacker_node_lstm_state = self.attacker_opponent[0].forward(
+                                    (obs_tensor_a_a, obs_tensor_a_d, obs_tensor_a_p, obs_tensor_a_r), self.env.envs[0],
+                                    device=self.device, attacker=True, force_rec=force_rec)
+                            attacker_node_actions = attacker_node_actions.cpu().numpy()
+                            node = attacker_node_actions[0]
+                            obs_tensor_a_1 = obs_tensor_a.reshape(
+                                self.env.envs[0].idsgame_env.idsgame_config.game_config.num_nodes,
+                                self.pg_agent_config.attacker_at_net_input_dim)
+                            obs_tensor_a_at = obs_tensor_a_1[node].float()
+                            attacker_at_actions, attacker_at_values, attacker_at_log_probs, attacker_at_lstm_state = self.attacker_opponent[1].forward(
+                                obs_tensor_a_at, self.env.envs[0], device=self.device, attacker=True, force_rec=force_rec)
+                            attacker_at_actions = attacker_at_actions.cpu().numpy()
+                            attack_id = idsgame_util.get_attack_action_id(node, attacker_at_actions[0], self.env.envs[
+                                0].idsgame_env.idsgame_config.game_config)
+                            attacker_actions = np.array([attack_id])
                         else:
                             action = self.attacker_opponent.action(self.env.envs[0].idsgame_env.state)
                             attacker_actions = np.array([action])
@@ -590,15 +626,42 @@ class PPO(BaseRLModel):
             if self.pg_agent_config.attacker:
                 if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
                     if self.train_attacker:
-                        if not self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
-                            attacker_rollout_buffer.add(self._last_obs_a, attacker_actions, a_rewards, dones, attacker_values, attacker_log_probs)
-                        elif self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
-                            attacker_rollout_buffer.add(self._last_obs_a, attacker_actions, a_rewards, dones, attacker_values, attacker_log_probs, lstm_state)
+                        if not self.pg_agent_config.ar_policy:
+                            if not self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
+                                attacker_rollout_buffer.add(self._last_obs_a, attacker_actions, a_rewards, dones, attacker_values, attacker_log_probs)
+                            elif self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
+                                attacker_rollout_buffer.add(self._last_obs_a, attacker_actions, a_rewards, dones, attacker_values, attacker_log_probs, lstm_state)
+                            else:
+                                attacker_rollout_buffer.add(self._last_obs_a_a, self._last_obs_a_d, self._last_obs_a_p,
+                                                            self._last_obs_a_r,
+                                                            attacker_actions, a_rewards, dones,
+                                                            attacker_values, attacker_log_probs, lstm_state)
                         else:
-                            attacker_rollout_buffer.add(self._last_obs_a_a, self._last_obs_a_d, self._last_obs_a_p,
-                                                        self._last_obs_a_r,
-                                                        attacker_actions, a_rewards, dones,
-                                                        attacker_values, attacker_log_probs, lstm_state)
+                            if not self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
+                                attacker_rollout_buffer.add(self._last_obs_a, obs_tensor_a_at.cpu(),
+                                                            attacker_node_actions, a_rewards, dones,
+                                                            attacker_node_values, attacker_node_log_probs,
+                                                            attacker_at_actions,
+                                                            attacker_at_log_probs, attacker_at_values)
+                            elif self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
+                                attacker_rollout_buffer.add(self._last_obs_a, obs_tensor_a_at.cpu(),
+                                                            attacker_node_actions,
+                                                            a_rewards, dones,
+                                                            attacker_node_values, attacker_node_log_probs,
+                                                            attacker_at_actions,
+                                                            attacker_at_log_probs, attacker_at_values,
+                                                            attacker_node_lstm_state,
+                                                            attacker_at_lstm_state)
+                            else:
+                                attacker_rollout_buffer.add(self._last_obs_a_a, self._last_obs_a_d,
+                                                            self._last_obs_a_p, self._last_obs_a_r,
+                                                            obs_tensor_a_at.cpu(), attacker_node_actions,
+                                                            a_rewards, dones,
+                                                            attacker_node_values, attacker_node_log_probs,
+                                                            attacker_at_actions,
+                                                            attacker_at_log_probs, attacker_at_values,
+                                                            attacker_node_lstm_state,
+                                                            attacker_at_lstm_state)
                 else:
                     if not self.pg_agent_config.ar_policy:
                         if not self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
@@ -637,14 +700,21 @@ class PPO(BaseRLModel):
             if self.pg_agent_config.defender:
                 if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
                     if self.train_defender:
-                        if not self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
-                            defender_rollout_buffer.add(self._last_obs_d, defender_actions, d_rewards, dones, defender_values,
-                                                        defender_log_probs)
-                        elif self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
-                            defender_rollout_buffer.add(self._last_obs_d, defender_actions, d_rewards, dones,
-                                                        defender_values, defender_log_probs, lstm_state)
+                        if not self.pg_agent_config.ar_policy:
+                            if not self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
+                                defender_rollout_buffer.add(self._last_obs_d, defender_actions, d_rewards, dones, defender_values,
+                                                            defender_log_probs)
+                            elif self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
+                                defender_rollout_buffer.add(self._last_obs_d, defender_actions, d_rewards, dones,
+                                                            defender_values, defender_log_probs, lstm_state)
+                            else:
+                                raise AssertionError("not implemented")
                         else:
-                            raise AssertionError("not implemented")
+                            defender_rollout_buffer.add(self._last_obs_d, obs_tensor_d_at.cpu(), defender_node_actions,
+                                                        d_rewards, dones,
+                                                        defender_node_values, defender_node_log_probs,
+                                                        defender_at_actions,
+                                                        defender_at_log_probs, defender_at_values)
                 else:
                     if not self.pg_agent_config.ar_policy:
                         if not self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
@@ -739,8 +809,13 @@ class PPO(BaseRLModel):
                 else:
                     attacker_rollout_buffer.compute_returns_and_advantage(attacker_values, dones=dones)
             else:
-                attacker_rollout_buffer.compute_returns_and_advantage(attacker_node_values, dones=dones, node=True)
-                attacker_rollout_buffer.compute_returns_and_advantage(attacker_at_values, dones=dones, node=False)
+                if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
+                    if self.train_attacker:
+                        attacker_rollout_buffer.compute_returns_and_advantage(attacker_node_values, dones=dones, node=True)
+                        attacker_rollout_buffer.compute_returns_and_advantage(attacker_at_values, dones=dones, node=False)
+                else:
+                    attacker_rollout_buffer.compute_returns_and_advantage(attacker_node_values, dones=dones, node=True)
+                    attacker_rollout_buffer.compute_returns_and_advantage(attacker_at_values, dones=dones, node=False)
         if self.pg_agent_config.defender:
             if not self.pg_agent_config.ar_policy:
                 if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
@@ -749,8 +824,13 @@ class PPO(BaseRLModel):
                 else:
                     defender_rollout_buffer.compute_returns_and_advantage(defender_values, dones=dones)
             else:
-                defender_rollout_buffer.compute_returns_and_advantage(defender_node_values, dones=dones, node=True)
-                defender_rollout_buffer.compute_returns_and_advantage(defender_at_values, dones=dones, node=False)
+                if self.pg_agent_config.alternating_optimization and self.pg_agent_config.opponent_pool:
+                    if self.train_defender:
+                        defender_rollout_buffer.compute_returns_and_advantage(defender_node_values, dones=dones, node=True)
+                        defender_rollout_buffer.compute_returns_and_advantage(defender_at_values, dones=dones, node=False)
+                else:
+                    defender_rollout_buffer.compute_returns_and_advantage(defender_node_values, dones=dones, node=True)
+                    defender_rollout_buffer.compute_returns_and_advantage(defender_at_values, dones=dones, node=False)
 
         callback.on_rollout_end()
 
@@ -1248,7 +1328,10 @@ class PPO(BaseRLModel):
         """
         if self.pg_agent_config.opponent_pool and self.pg_agent_config.opponent_pool_config is not None:
             if attacker:
-                model_copy = copy.deepcopy(self.attacker_policy)
+                if not self.pg_agent_config.ar_policy:
+                    model_copy = copy.deepcopy(self.attacker_policy)
+                else:
+                    model_copy = (copy.deepcopy(self.attacker_node_policy), copy.deepcopy(self.attacker_at_policy))
                 if len(self.attacker_pool) >= self.pg_agent_config.opponent_pool_config.pool_maxsize:
                     self.attacker_pool.pop(0)
                 if self.pg_agent_config.opponent_pool_config.quality_scores:
@@ -1261,7 +1344,10 @@ class PPO(BaseRLModel):
                 else:
                     self.attacker_pool.append(model_copy)
             else:
-                model_copy = copy.deepcopy(self.defender_policy)
+                if not self.pg_agent_config.ar_policy:
+                    model_copy = copy.deepcopy(self.defender_policy)
+                else:
+                    model_copy = (copy.deepcopy(self.defender_node_policy), copy.deepcopy(self.defender_at_policy))
                 if len(self.defender_pool) >= self.pg_agent_config.opponent_pool_config.pool_maxsize:
                     self.defender_pool.pop(0)
                 if self.pg_agent_config.opponent_pool_config.quality_scores:

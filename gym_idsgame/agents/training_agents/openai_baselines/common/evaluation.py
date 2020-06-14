@@ -86,7 +86,7 @@ def evaluate_policy(model, env, n_eval_episodes=10, deterministic=True,
                 if not pg_agent_config.ar_policy:
                     attacker_action = np.array([res.cpu().numpy()])
                 else:
-                    attacker_action = np.array([res])
+                    attacker_action = np.array(res)
 
             if pg_agent_config.defender:
                 d_obs = th.tensor(d_obs).to(device=model.device)
@@ -94,8 +94,9 @@ def evaluate_policy(model, env, n_eval_episodes=10, deterministic=True,
                 if not pg_agent_config.ar_policy:
                     defender_action = np.array([res.cpu().numpy()])
                 else:
-                    defender_action = np.array([res])
-
+                    defender_action = np.array(res)
+            # print("attacker_actions:{}".format(attacker_action))
+            # print("defender_actions:{}".format(defender_action))
             # Take a step in the environment
             joint_action = np.array([[attacker_action, defender_action]])
             a_obs, d_obs, a_reward, d_reward, done, _info = env.step(joint_action)
