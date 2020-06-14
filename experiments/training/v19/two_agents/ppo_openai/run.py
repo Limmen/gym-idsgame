@@ -53,7 +53,7 @@ def default_config() -> ClientConfig:
     :return: Default configuration for the experiment
     """
     opponent_pool_config = OpponentPoolConfig(pool_maxsize=100000,
-                                              pool_increment_period=10,
+                                              pool_increment_period=50,
                                               head_to_head_period=1,
                                               quality_scores=True,
                                               quality_score_eta=0.01,
@@ -105,8 +105,8 @@ def default_config() -> ClientConfig:
                                                 defender_at_net_input_dim=(4 + 1),
                                                 defender_node_net_output_dim=4, defender_at_net_output_dim=5,
                                                 opponent_pool_config=opponent_pool_config,
-                                                alternating_optimization=10, opponent_pool=True,
-                                                baselines_in_pool=True, alternating_period=10
+                                                alternating_optimization=50, opponent_pool=True,
+                                                baselines_in_pool=True, alternating_period=50
                                                 )
     env_name = "idsgame-v19"
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.PPO_OPENAI_AGENT.value,

@@ -260,6 +260,15 @@ class PPO(BaseRLModel):
                       features_extractor_kwargs=feature_extractor_kwargs, attacker=False,
                       **self.policy_kwargs)
             self.defender_node_policy = self.defender_node_policy.to(self.device)
+
+            self.defender_node_policy_opponent = PPOPolicy(self.attacker_observation_space, self.attacker_action_space,
+                                                  self.lr_schedule_a, use_sde=self.use_sde, device=self.device,
+                                                  pg_agent_config=self.pg_agent_config, node_net=True, at_net=False,
+                                                  features_extractor_class=feature_extractor_class,
+                                                  features_extractor_kwargs=feature_extractor_kwargs, attacker=False,
+                                                  **self.policy_kwargs)
+            self.defender_node_policy_opponent = self.defender_node_policy_opponent.to(self.device)
+
             feature_extractor_kwargs = {}
             feature_extractor_kwargs["at_net"] = True
             self.defender_at_policy = PPOPolicy(self.attacker_observation_space, self.attacker_action_space,
@@ -269,6 +278,14 @@ class PPO(BaseRLModel):
                                                 features_extractor_kwargs=feature_extractor_kwargs, attacker=False,
                                                   **self.policy_kwargs)
             self.defender_at_policy = self.defender_at_policy.to(self.device)
+
+            self.defender_at_policy_opponent = PPOPolicy(self.attacker_observation_space, self.attacker_action_space,
+                                                self.lr_schedule_a, use_sde=self.use_sde, device=self.device,
+                                                pg_agent_config=self.pg_agent_config, node_net=False, at_net=True,
+                                                features_extractor_class=feature_extractor_class,
+                                                features_extractor_kwargs=feature_extractor_kwargs, attacker=False,
+                                                **self.policy_kwargs)
+            self.defender_at_policy_opponent = self.defender_at_policy_opponent.to(self.device)
 
         if not self.pg_agent_config.ar_policy:
             self.attacker_policy = PPOPolicy(self.attacker_observation_space, self.attacker_action_space,
@@ -287,6 +304,17 @@ class PPO(BaseRLModel):
                                                   attacker=True,
                                              **self.policy_kwargs)
             self.attacker_node_policy = self.attacker_node_policy.to(self.device)
+
+            self.attacker_node_policy_opponent = PPOPolicy(self.attacker_observation_space, self.attacker_action_space,
+                                                  self.lr_schedule_a, use_sde=self.use_sde, device=self.device,
+                                                  pg_agent_config=self.pg_agent_config, node_net=True, at_net=False,
+                                                  features_extractor_class=feature_extractor_class,
+                                                  features_extractor_kwargs=feature_extractor_kwargs,
+                                                  attacker=True,
+                                                  **self.policy_kwargs)
+            self.attacker_node_policy_opponent = self.attacker_node_policy_opponent.to(self.device)
+
+
             feature_extractor_kwargs = {}
             feature_extractor_kwargs["at_net"] = True
             self.attacker_at_policy = PPOPolicy(self.attacker_observation_space, self.attacker_action_space,
@@ -296,6 +324,14 @@ class PPO(BaseRLModel):
                                                 features_extractor_kwargs=feature_extractor_kwargs, attacker=True,
                                                   **self.policy_kwargs)
             self.attacker_at_policy = self.attacker_at_policy.to(self.device)
+
+            self.attacker_at_policy_opponent = PPOPolicy(self.attacker_observation_space, self.attacker_action_space,
+                                                self.lr_schedule_a, use_sde=self.use_sde, device=self.device,
+                                                pg_agent_config=self.pg_agent_config, node_net=False, at_net=True,
+                                                features_extractor_class=feature_extractor_class,
+                                                features_extractor_kwargs=feature_extractor_kwargs, attacker=True,
+                                                **self.policy_kwargs)
+            self.attacker_at_policy_opponent = self.attacker_at_policy_opponent.to(self.device)
 
         self.clip_range = get_schedule_fn(self.clip_range)
         if self.clip_range_vf is not None:
@@ -320,6 +356,7 @@ class PPO(BaseRLModel):
                 self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx][0]
             else:
                 self.attacker_opponent = self.attacker_pool[self.attacker_opponent_idx]
+
 
     def predict(self, observation: np.ndarray,
                 state: Optional[np.ndarray] = None,
@@ -1331,7 +1368,11 @@ class PPO(BaseRLModel):
                 if not self.pg_agent_config.ar_policy:
                     model_copy = copy.deepcopy(self.attacker_policy)
                 else:
-                    model_copy = (copy.deepcopy(self.attacker_node_policy), copy.deepcopy(self.attacker_at_policy))
+                    self.attacker_node_policy_opponent.load_state_dict(self.attacker_node_policy.state_dict())
+                    self.attacker_at_policy_opponent.load_state_dict(self.attacker_at_policy.state_dict())
+                    model_copy = (copy.deepcopy(self.attacker_node_policy_opponent),
+                                  copy.deepcopy(self.attacker_at_policy_opponent))
+                    #model_copy = (copy.deepcopy(self.attacker_node_policy), copy.deepcopy(self.attacker_at_policy))
                 if len(self.attacker_pool) >= self.pg_agent_config.opponent_pool_config.pool_maxsize:
                     self.attacker_pool.pop(0)
                 if self.pg_agent_config.opponent_pool_config.quality_scores:
@@ -1347,7 +1388,11 @@ class PPO(BaseRLModel):
                 if not self.pg_agent_config.ar_policy:
                     model_copy = copy.deepcopy(self.defender_policy)
                 else:
-                    model_copy = (copy.deepcopy(self.defender_node_policy), copy.deepcopy(self.defender_at_policy))
+                    self.defender_node_policy_opponent.load_state_dict(self.defender_node_policy.state_dict())
+                    self.defender_at_policy_opponent.load_state_dict(self.defender_at_policy.state_dict())
+                    model_copy = (copy.deepcopy(self.defender_node_policy_opponent),
+                                  copy.deepcopy(self.defender_at_policy_opponent))
+                    #model_copy = (copy.deepcopy(self.defender_node_policy.state_dict()), copy.deepcopy(self.defender_at_policy.state_dict()))
                 if len(self.defender_pool) >= self.pg_agent_config.opponent_pool_config.pool_maxsize:
                     self.defender_pool.pop(0)
                 if self.pg_agent_config.opponent_pool_config.quality_scores:

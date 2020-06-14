@@ -4373,3 +4373,243 @@ class IdsGameV19Env(AttackDefenseEnv):
             idsgame_config.randomize_visibility = False
             idsgame_config.visibility_p = 0.0
         super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
+
+
+# -------- Version 20 ------------
+
+class IdsGameRandomDefenseV20Env(AttackerEnv):
+    """
+    [AttackerEnv] 1 layer, 1 server per layer, 7 attack-defense-values, random defender
+    [Initial State] Defense: 7, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 1
+    [Rewards] Dense
+    [Version] 20
+    [Observations] partially observed
+    [Environment] Random
+    [Local View] Yes
+    [Attacker Starting Position] Random
+    [Reconnaissance activities] enabled
+    [Reconnaissance bool features] Yes
+    """
+    def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
+        """
+        Initialization of the environment
+
+        :param save_dir: directory to save outputs of the env
+        :param initial_state_path: path to the initial state (if none, use default)
+        :param idsgame_config: configuration of the environment (if not specified a default config is used)
+        """
+        if idsgame_config is None:
+            game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
+                                     min_random_a_val=0, min_random_d_val=7, min_random_det_val=1,
+                                     reconnaissance_actions=True)
+            game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
+                                          vulnerability_val=1, num_vulnerabilities_per_layer=1,
+                                          randomize_visibility=True, visibility_p=0.0)
+            game_config.dense_rewards_v3 = True
+            game_config.network_config.fully_observed = False
+            game_config.reconnaissance_actions = True
+            game_config.set_attack_actions(local_view=False)
+            if initial_state_path is not None:
+                game_config.set_load_initial_state(initial_state_path)
+            defender_agent = RandomDefenseBotAgent(game_config)
+            idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
+            idsgame_config.render_config.caption = "idsgame-random_defense-v20"
+            idsgame_config.randomize_env = True
+            idsgame_config.randomize_starting_position = True
+            idsgame_config.local_view_observations = False
+            idsgame_config.reconnaissance_bool_features = True
+            idsgame_config.reconnaissance_actions = True
+            idsgame_config.reconnaissance_reward = False
+            idsgame_config.randomize_visibility = False
+            idsgame_config.visibility_p = 0.0
+        super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
+
+
+class IdsGameMinimalDefenseV20Env(AttackerEnv):
+    """
+    [AttackerEnv] 1 layer, 1 server per layer, 7 attack-defense-values, defender following the "defend minimal strategy"
+    [Initial State] Defense: 7, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 1
+    [Rewards] Dense
+    [Version] 20
+    [Observations] Partially observed
+    [Environment] Random
+    [Local View] Yes
+    [Attacker Starting Position] Random
+    [Reconnaissance activities] enabled
+    [Reconnaissance bool features] Yes
+    """
+    def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
+        """
+        Initialization of the environment
+
+        :param save_dir: directory to save outputs of the env
+        :param initial_state_path: path to the initial state (if none, use default)
+        :param idsgame_config: configuration of the environment (if not specified a default config is used)
+        """
+        if idsgame_config is None:
+            game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
+                                     min_random_a_val=0, min_random_d_val=7, min_random_det_val=1,
+                                     reconnaissance_actions=True)
+            game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
+                                          vulnerability_val=1, num_vulnerabilities_per_layer=1,
+                                          randomize_visibility=True, visibility_p=0.0)
+            game_config.dense_rewards_v3 = True
+            game_config.network_config.fully_observed = False
+            game_config.reconnaissance_actions = True
+            if initial_state_path is not None:
+                game_config.set_load_initial_state(initial_state_path)
+            defender_agent = DefendMinimalValueBotAgent(game_config)
+            idsgame_config = IdsGameConfig(game_config=game_config, defender_agent=defender_agent)
+            idsgame_config.render_config.caption = "idsgame-minimal_defense-v20"
+            idsgame_config.randomize_env = True
+            idsgame_config.randomize_starting_position = True
+            idsgame_config.local_view_observations = False
+            idsgame_config.reconnaissance_bool_features = True
+            idsgame_config.reconnaissance_actions = True
+            idsgame_config.randomize_visibility = False
+            idsgame_config.visibility_p = 0.0
+            idsgame_config.reconnaissance_detection_factor = 1
+        super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
+
+
+class IdsGameRandomAttackV20Env(DefenderEnv):
+    """
+    [DefenderEnv] 1 layer, 1 server per layer, 7 attack-defense-values
+    [Initial State] Defense: 7, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 1
+    [Rewards] Dense
+    [Version] 20
+    [Observations] partially observed
+    [Environment] Random
+    [Local View] Yes
+    [Attacker Starting Position] Random
+    [Reconnaissance activities] enabled
+    [Reconnaissance bool features] Yes
+    """
+    def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
+        """
+        Initialization of the environment
+
+        :param save_dir: directory to save outputs of the env
+        :param initial_state_path: path to the initial state (if none, use default)
+        :param idsgame_config: configuration of the environment (if not specified a default config is used)
+        """
+        if idsgame_config is None:
+            game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
+                                     min_random_a_val=0, min_random_d_val=7, min_random_det_val=1,
+                                     reconnaissance_actions=True)
+            game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
+                                          vulnerability_val=1, num_vulnerabilities_per_layer=1,
+                                          randomize_visibility=True, visibility_p=0.0)
+            game_config.dense_rewards_v3 = True
+            game_config.network_config.fully_observed = False
+            game_config.reconnaissance_actions = True
+            game_config.set_attack_actions(local_view=False)
+            if initial_state_path is not None:
+                game_config.set_load_initial_state(initial_state_path)
+            attacker_agent = RandomAttackBotAgent(game_config, self)
+            idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
+            idsgame_config.render_config.caption = "idsgame-random_attack-v20"
+            idsgame_config.randomize_env = True
+            idsgame_config.randomize_starting_position = True
+            idsgame_config.local_view_observations = False
+            idsgame_config.reconnaissance_bool_features = True
+            idsgame_config.reconnaissance_actions = True
+            idsgame_config.reconnaissance_reward = False
+            idsgame_config.randomize_visibility = False
+            idsgame_config.visibility_p = 0.0
+        super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
+
+
+class IdsGameMaximalAttackV20Env(DefenderEnv):
+    """
+    [DefenderEnv] 1 layer, 1 server per layer, 7 attack-defense-values
+    [Initial State] Defense: 7, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 1
+    [Rewards] Dense
+    [Version] 20
+    [Observations] partially observed
+    [Environment] Random
+    [Local View] Yes
+    [Attacker Starting Position] Random
+    [Reconnaissance activities] enabled
+    [Reconnaissance bool features] Yes
+    """
+    def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
+        """
+        Initialization of the environment
+
+        :param save_dir: directory to save outputs of the env
+        :param initial_state_path: path to the initial state (if none, use default)
+        :param idsgame_config: configuration of the environment (if not specified a default config is used)
+        """
+        if idsgame_config is None:
+            game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
+                                     min_random_a_val=0, min_random_d_val=7, min_random_det_val=1,
+                                     reconnaissance_actions=True)
+            game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
+                                          vulnerability_val=1, num_vulnerabilities_per_layer=1,
+                                          randomize_visibility=True, visibility_p=0.0)
+            game_config.dense_rewards_v3 = True
+            game_config.network_config.fully_observed = False
+            game_config.reconnaissance_actions = True
+            game_config.set_attack_actions(local_view=False)
+            if initial_state_path is not None:
+                game_config.set_load_initial_state(initial_state_path)
+            attacker_agent = AttackMaximalValueBotAgent(game_config, self)
+            idsgame_config = IdsGameConfig(game_config=game_config, attacker_agent=attacker_agent)
+            idsgame_config.render_config.caption = "idsgame-maximal_attack-v20"
+            idsgame_config.randomize_env = True
+            idsgame_config.randomize_starting_position = True
+            idsgame_config.reconnaissance_bool_features = True
+            idsgame_config.local_view_observations = False
+            idsgame_config.reconnaissance_actions = True
+            idsgame_config.reconnaissance_reward = False
+            idsgame_config.randomize_visibility = False
+            idsgame_config.visibility_p = 0.0
+        super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)
+
+
+class IdsGameV20Env(AttackDefenseEnv):
+    """
+    [AttackDefenseEnv] 1 layer, 1 server per layer, 7 attack-defense-values
+    [Initial State] Defense: 7, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 1
+    [Rewards] Dense
+    [Version] 20
+    [Observations] partially observed
+    [Environment] Random
+    [Local View] Yes
+    [Reconnaissance bool features] Yes
+    [Attacker Starting Position] Random
+    [Reconnaissance activities] enabled
+    """
+    def __init__(self, idsgame_config: IdsGameConfig = None, save_dir: str = None, initial_state_path: str = None):
+        """
+        Initialization of the environment
+
+        :param save_dir: directory to save outputs of the env
+        :param initial_state_path: path to the initial state (if none, use default)
+        :param idsgame_config: configuration of the environment (if not specified a default config is used)
+        """
+        if idsgame_config is None:
+            game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
+                                     min_random_a_val=0, min_random_d_val=7, min_random_det_val=1,
+                                     reconnaissance_actions=True)
+            game_config.set_initial_state(defense_val=9, attack_val=0, num_vulnerabilities_per_node=1, det_val=1,
+                                          vulnerability_val=1, num_vulnerabilities_per_layer=1,
+                                          randomize_visibility=True, visibility_p=0.0)
+            game_config.dense_rewards_v3 = True
+            game_config.network_config.fully_observed = False
+            game_config.reconnaissance_actions = True
+            game_config.set_attack_actions(local_view=False)
+            if initial_state_path is not None:
+                game_config.set_load_initial_state(initial_state_path)
+            idsgame_config = IdsGameConfig(game_config=game_config)
+            idsgame_config.render_config.caption = "idsgame-v19"
+            idsgame_config.randomize_env = True
+            idsgame_config.randomize_starting_position = True
+            idsgame_config.reconnaissance_bool_features = True
+            idsgame_config.local_view_observations = False
+            idsgame_config.reconnaissance_actions = True
+            idsgame_config.reconnaissance_reward = False
+            idsgame_config.randomize_visibility = False
+            idsgame_config.visibility_p = 0.0
+        super().__init__(idsgame_config=idsgame_config, save_dir=save_dir)

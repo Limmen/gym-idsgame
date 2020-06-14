@@ -14,8 +14,8 @@
     "pg_agent_config": {
         "alpha_attacker": 0.0001,
         "alpha_defender": 0.0001,
-        "alternating_optimization": 10,
-        "alternating_period": 10,
+        "alternating_optimization": 1,
+        "alternating_period": 1,
         "ar_policy": true,
         "attacker": true,
         "attacker_at_net_input_dim": 6,
@@ -27,7 +27,7 @@
         "attacker_node_net_lstm_core": false,
         "attacker_node_net_multi_channel": false,
         "attacker_node_net_output_dim": 4,
-        "baselines_in_pool": true,
+        "baselines_in_pool": false,
         "batch_size": 2000,
         "channel_1_dim": 32,
         "channel_1_input_dim": 16,
@@ -104,7 +104,7 @@
         "opponent_pool_config": {
             "head_to_head_period": 1,
             "initial_quality": 1000,
-            "pool_increment_period": 10,
+            "pool_increment_period": 1,
             "pool_maxsize": 100000,
             "pool_prob": 0.5,
             "py/object": "gym_idsgame.agents.training_agents.common.opponent_pool_config.OpponentPoolConfig",
