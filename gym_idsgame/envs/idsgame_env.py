@@ -424,6 +424,13 @@ class IdsGameEnv(gym.Env, ABC):
                         match = True
                 if not match:
                     missed_defense += 1
+            defense_score = util.defense_score(self.state, self.idsgame_config.game_config.network_config,
+                                        self.idsgame_config.game_config)
+            reference_defense_score = util.defense_score(self.idsgame_config.game_config.initial_state,
+                                          self.idsgame_config.game_config.network_config,
+                                          self.idsgame_config.game_config)
+            max_defense_score = self.idsgame_config.game_config.max_value * self.idsgame_config.game_config.network_config.num_rows
+
             attack_row, attack_col = self.state.attacker_pos
             row_ids = self.idsgame_config.game_config.network_config.get_row_ids(attack_row)
             min_ats = self.state.min_attack_type(node_id, row_ids)
@@ -437,12 +444,10 @@ class IdsGameEnv(gym.Env, ABC):
                     if not n_id == node_id:
                         num_bad_attacks = num_bad_attacks + 1
                 reward = max(num_good_attacks - math.pow(num_bad_attacks, 2), 0)
-                return reward, -(self.idsgame_config.game_config.max_value - self.state.defense_values[node_id][attack_type])
-                #return reward, -constants.GAME_CONFIG.POSITIVE_REWARD
-                #return reward, -(constants.GAME_CONFIG.POSITIVE_REWARD+missed_defense)
-            return -constants.GAME_CONFIG.POSITIVE_REWARD, -(self.idsgame_config.game_config.max_value - self.state.defense_values[node_id][attack_type])
-            #return -constants.GAME_CONFIG.POSITIVE_REWARD, -constants.GAME_CONFIG.POSITIVE_REWARD
-            #return -constants.GAME_CONFIG.POSITIVE_REWARD, -(constants.GAME_CONFIG.POSITIVE_REWARD+missed_defense)
+
+                return reward,-((max_defense_score-reference_defense_score)-(defense_score-reference_defense_score))
+
+            return -constants.GAME_CONFIG.POSITIVE_REWARD, -((max_defense_score-reference_defense_score)-(defense_score-reference_defense_score))
         else:
             bonus = 1 if self.num_failed_attacks == 0 else 1 / self.num_failed_attacks
             return bonus + constants.GAME_CONFIG.POSITIVE_REWARD, -len(self.hacked_nodes)
@@ -480,14 +485,15 @@ class IdsGameEnv(gym.Env, ABC):
                 #     added_defense += 1
                 if not defense[2] and defense[1] == attack_type and defense[0] == target_node_id:
                     added_defense += 1
+
+            defense_score = util.defense_score(self.state, self.idsgame_config.game_config.network_config, self.idsgame_config.game_config)
+            reference_defense_score = util.defense_score(self.idsgame_config.game_config.initial_state,
+                                                         self.idsgame_config.game_config.network_config,
+                                                         self.idsgame_config.game_config)
             if not reconnaissance and target_node_id in self.state.reconnaissance_actions and attack_type in min_ats:
-                #return 0, -missed_defense
-                return 0, 0
-                #return 0, (added_defense-missed_defense)
+                return 0, (defense_score-reference_defense_score)
             else:
-                #return -constants.GAME_CONFIG.POSITIVE_REWARD, -missed_defense
-                return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
-                #return -constants.GAME_CONFIG.POSITIVE_REWARD, (added_defense-missed_defense)
+                return -constants.GAME_CONFIG.POSITIVE_REWARD, (defense_score-reference_defense_score)
         else:
             added_detection = 0
             for defense in self.defenses:

@@ -314,3 +314,21 @@ def action_dist_hist(data: np.ndarray,
     data = get_img_from_fig(fig, dpi=100)
     plt.close(fig)
     return data
+
+
+def defense_score(game_sate : GameState, network_config : NetworkConfig, game_config : GameConfig):
+    total_min_def = 0
+    for row in range(network_config.num_rows):
+        min_def = float("inf")
+        for col in range(network_config.num_cols):
+            node_id = network_config.get_node_id((row, col))
+            if (game_config.network_config.node_list[node_id] == NodeType.SERVER.value
+                    or game_config.network_config.node_list[node_id] == NodeType.DATA.value):
+                d = np.min(game_sate.defense_values[node_id])
+                if d < min_def:
+                    min_def = d
+                #print("row:{}, col:{}, node_id:{}, type:{}, min_def:{}".format(row, col, node_id, game_config.network_config.node_list[node_id], min_def))
+        total_min_def = total_min_def + min_def
+        if min_def < game_config.max_value:
+            return total_min_def
+    return total_min_def

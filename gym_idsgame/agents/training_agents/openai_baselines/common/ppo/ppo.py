@@ -1220,20 +1220,20 @@ class PPO(BaseRLModel):
                 if not self.pg_agent_config.ar_policy:
                     path = self.pg_agent_config.save_dir + "/" + time_str + "_attacker_policy_network.zip"
                     self.pg_agent_config.logger.info("Saving attacker policy-network to: {}".format(path))
-                    self.save(path, exclude=["tensorboard_writer", "attacker_pool", "defender_pool"])
+                    self.save(path, exclude=["tensorboard_writer", "attacker_pool", "defender_pool"], attacker=True)
                 else:
                     path = self.pg_agent_config.save_dir + "/" + time_str + "_attacker_node_at_policy_network.zip"
                     self.pg_agent_config.logger.info("Saving attacker node and at policy-network to: {}".format(path))
-                    self.save(path, exclude=["tensorboard_writer", "attacker_pool", "defender_pool"])
+                    self.save(path, exclude=["tensorboard_writer", "attacker_pool", "defender_pool"], attacker=True)
             if self.pg_agent_config.defender:
                 if not self.pg_agent_config.ar_policy:
                     path = self.pg_agent_config.save_dir + "/" + time_str + "_defender_policy_network.zip"
                     self.pg_agent_config.logger.info("Saving defender policy-network to: {}".format(path))
-                    self.save(path, exclude=["tensorboard_writer", "attacker_pool", "defender_pool"])
+                    self.save(path, exclude=["tensorboard_writer", "attacker_pool", "defender_pool"], attacker=False)
                 else:
                     path = self.pg_agent_config.save_dir + "/" + time_str + "_defender_node_policy_network.zip"
                     self.pg_agent_config.logger.info("Saving defender node and at policy-network to: {}".format(path))
-                    self.save(path, exclude=["tensorboard_writer", "attacker_pool", "defender_pool"])
+                    self.save(path, exclude=["tensorboard_writer", "attacker_pool", "defender_pool"], attacker=False)
         else:
             self.pg_agent_config.logger.warning("Save path not defined, not saving policy-networks to disk")
             print("Save path not defined, not saving policy-networks to disk")
