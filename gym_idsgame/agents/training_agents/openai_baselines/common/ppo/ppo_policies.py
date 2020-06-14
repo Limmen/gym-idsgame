@@ -314,6 +314,80 @@ class PPOPolicy(BasePolicy):
         log_prob = distribution.log_prob(actions)
         return actions, values, log_prob, lstm_state
 
+    def get_action_dist(self, obs: th.Tensor, env: IdsGameEnv,
+                device: str = "cpu", attacker=True,
+                        non_legal_actions=None, wrapper_env: BaselineEnvWrapper = None) \
+            -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
+        """
+        Forward pass in all the networks (actor and critic)
+
+        :param obs: (th.Tensor) Observation
+        :return: (Tuple[th.Tensor, th.Tensor, th.Tensor]) action, value and log probability of the action
+        """
+        if (self.pg_agent_config.multi_channel_obs and not self.pg_agent_config.ar_policy) or \
+                (
+                        self.pg_agent_config.ar_policy and self.node_net and self.pg_agent_config.attacker_node_net_multi_channel):
+            c_1_f, c_2_f, c_3_f, c_4_f = obs
+            c_1_f = c_1_f.to(device)
+            c_2_f = c_2_f.to(device)
+            c_3_f = c_3_f.to(device)
+            c_4_f = c_4_f.to(device)
+            latent_pi, latent_vf, latent_sde, lstm_state = self._get_latent(None, channel_1_features=c_1_f,
+                                                                            channel_2_features=c_2_f,
+                                                                            channel_3_features=c_3_f,
+                                                                            channel_4_features=c_4_f)
+        else:
+            latent_pi, latent_vf, latent_sde, lstm_state = self._get_latent(obs.to(device))
+        # Evaluate the values for the given observations
+        values = self.value_net(latent_vf)
+        if wrapper_env is not None:
+            np_obs = obs.cpu().numpy()
+        # Masking
+        if non_legal_actions is None:
+            if attacker:
+                if self.pg_agent_config.ar_policy:
+                    if self.node_net:
+                        actions = list(range(self.pg_agent_config.attacker_node_net_output_dim))
+                    else:
+                        actions = list(range(self.pg_agent_config.attacker_at_net_output_dim))
+                    non_legal_actions = list(
+                        filter(lambda action: not env.is_attack_legal(action, node=self.node_net), actions))
+                    if len(non_legal_actions) == len(actions):
+                        non_legal_actions = []
+                else:
+                    actions = list(range(env.num_attack_actions))
+                    if wrapper_env is not None:
+                        legal_actions = list(filter(lambda action: env.is_attack_legal(
+                            wrapper_env.convert_local_attacker_action_to_global(action, np_obs), node=self.node_net),
+                                                    actions))
+                    else:
+                        legal_actions = list(
+                            filter(lambda action: env.is_attack_legal(action, node=self.node_net), actions))
+                    if wrapper_env is not None:
+                        non_legal_actions = list(filter(lambda action: not env.is_attack_legal(
+                            wrapper_env.convert_local_attacker_action_to_global(action, np_obs), node=self.node_net),
+                                                        actions))
+                    else:
+                        non_legal_actions = list(
+                            filter(lambda action: not env.is_attack_legal(action, node=self.node_net), actions))
+
+            else:
+                if self.pg_agent_config.ar_policy:
+                    actions = list(range(self.pg_agent_config.defender_node_net_output_dim))
+                    non_legal_actions = list(
+                        filter(lambda action: not env.is_defense_legal(action, node=self.node_net, obs=obs), actions))
+                    if len(non_legal_actions) == len(actions):
+                        non_legal_actions = []
+                else:
+                    actions = list(range(env.num_defense_actions))
+                    non_legal_actions = list(filter(lambda action: not env.is_defense_legal(action), actions))
+                    if len(non_legal_actions) == len(actions):
+                        non_legal_actions = []
+
+        action_probs = self._get_action_dist_from_latent(latent_pi, latent_sde=latent_sde, device=device,
+                                                         non_legal_actions=non_legal_actions, get_action_probs=True)
+        return action_probs
+
     def _get_latent(self, obs: th.Tensor, lstm_state = None, masks = None,
                     channel_1_features=None,
                     channel_2_features=None, channel_3_features=None, channel_4_features=None) -> Tuple[th.Tensor, th.Tensor, th.Tensor]:
@@ -343,7 +417,7 @@ class PPOPolicy(BasePolicy):
         return latent_pi, latent_vf, latent_sde, lstm_state
 
     def _get_action_dist_from_latent(self, latent_pi: th.Tensor, latent_sde: Optional[th.Tensor] = None,
-                                     non_legal_actions : List = None, device="cpu") -> Distribution:
+                                     non_legal_actions : List = None, device="cpu", get_action_probs = False) -> Distribution:
         """
         Retrieve action distribution given the latent codes.
 
@@ -373,6 +447,9 @@ class PPOPolicy(BasePolicy):
             else:
                 raise AssertionError("Invalid shape of action probabilties")
         action_probs_1 = action_probs_1.to(device)
+
+        if get_action_probs:
+            return action_probs_1
 
         if isinstance(self.action_dist, DiagGaussianDistribution):
             return self.action_dist.proba_distribution(mean_actions, self.log_std)

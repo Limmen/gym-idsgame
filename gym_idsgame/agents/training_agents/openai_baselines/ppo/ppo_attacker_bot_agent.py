@@ -12,6 +12,7 @@ from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import P
 from gym_idsgame.agents.training_agents.openai_baselines.common.ppo.ppo import PPO
 from gym_idsgame.envs.idsgame_env import IdsGameEnv
 import gym_idsgame.envs.util.idsgame_util as util
+from sklearn.preprocessing import normalize
 
 class PPOBaselineAttackerBotAgent(BotAgent):
     """
@@ -75,12 +76,20 @@ class PPOBaselineAttackerBotAgent(BotAgent):
                 obs_tensor_a = torch.as_tensor(attacker_state.flatten()).to(self.device)
                 attacker_node_actions, attacker_node_values, attacker_node_log_probs, attacker_node_lstm_state = self.model.attacker_node_policy.forward(
                     obs_tensor_a, self.idsgame_env, device=self.device, attacker=True, non_legal_actions=non_legal_actions)
+                attacker_node_probs = self.model.attacker_node_policy.get_action_dist(obs_tensor_a, self.idsgame_env, device=self.device, attacker=True,
+                                                                                      non_legal_actions=non_legal_actions)
                 attacker_node_actions = attacker_node_actions.cpu().numpy()
                 node = attacker_node_actions[0]
                 obs_tensor_a_1 = obs_tensor_a.reshape(self.idsgame_env.idsgame_config.game_config.num_nodes, self.config.attacker_at_net_input_dim)
                 obs_tensor_a_at = obs_tensor_a_1[node]
                 attacker_at_actions, attacker_at_values, attacker_at_log_probs, attacker_at_lstm_state = self.model.attacker_at_policy.forward(
                     obs_tensor_a_at, self.idsgame_env, device=self.device, attacker=True, non_legal_actions = non_legal_actions)
+                attacker_at_probs = self.model.attacker_at_policy.get_action_dist(obs_tensor_a_at, self.idsgame_env,
+                                                                                  device=self.device, attacker=True,
+                                                                                  non_legal_actions=non_legal_actions)
+                # print("attacker node probs:{}".format(attacker_node_probs.detach().cpu().numpy()))
+                # print("attacker at probs:{}".format(attacker_at_probs.detach().cpu().numpy()))
+                self.create_policy_plot(attacker_at_probs.detach().cpu().numpy(), 0, attacker=True)
                 attacker_at_actions = attacker_at_actions.cpu().numpy()
                 attack_id = util.get_attack_action_id(node, attacker_at_actions[0], self.idsgame_env.idsgame_config.game_config)
                 attacker_action = attack_id
@@ -422,3 +431,26 @@ class PPOBaselineAttackerBotAgent(BotAgent):
         # print(feature_frames)
         # raise AssertionError("test")
         return feature_frames
+
+    def create_policy_plot(self, distribution, episode, attacker=True) -> None:
+        """
+        Utility function for creating a density plot of the policy distribution p(a|s) and add to Tensorboard
+
+        :param distribution: the distribution to plot
+        :param episode: the episode when the distribution was recorded
+        :param attacker: boolean flag whether it is the attacker or defender
+        :return: None
+        """
+        #distribution = distribution/np.linalg.norm(distribution, ord=np.inf, axis=0, keepdims=True)
+        distribution /= np.sum(distribution)
+        sample = np.random.choice(list(range(len(distribution))), size=1000, p=distribution)
+        tag = "Attacker"
+        file_suffix = "initial_state_policy_attacker"
+        if not attacker:
+            tag = "Defender"
+            file_suffix = "initial_state_policy_defender"
+        title = tag + " Initial State Policy"
+        data = util.action_dist_hist(sample, title=title, xlabel="Action", ylabel=r"$\mathbb{P}(a|s)$",
+                                             file_name=self.config.save_dir + "/" + file_suffix + "_" + str(episode))
+        # self.tensorboard_writer.add_image(str(episode) + "_initial_state_policy/" + tag,
+        #                                   data, global_step=episode, dataformats="HWC")

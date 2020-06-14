@@ -63,13 +63,10 @@ def default_config() -> ClientConfig:
                                                 eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95,
                                                 cnn_feature_extractor=False, features_dim=512,
                                                 flatten_feature_planes=False,
-                                                attacker_load_path="/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v19/minimal_defense/manual_vs_openai_ppo/1592133054.3698752_attacker_node_at_policy_network.zip",
+                                                attacker_load_path="/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v19/minimal_defense/manual_vs_openai_ppo/v4/1591164917.874881_attacker_policy_network.zip",
                                                 ar_policy=True, attacker_node_input_dim=((4 + 2) * 4),
                                                 attacker_at_net_input_dim=(4 + 2), attacker_at_net_output_dim=(4 + 1),
-                                                attacker_node_net_output_dim=4,
-                                                opponent_pool_config=opponent_pool_config,
-                                                alternating_optimization=50, opponent_pool=False,
-                                                baselines_in_pool=False, alternating_period=50
+                                                attacker_node_net_output_dim=4
                                                 )
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.PPO_OPENAI_AGENT.value,
                                  mode=RunnerMode.MANUAL_DEFENDER.value, output_dir=default_output_dir(),
@@ -100,6 +97,7 @@ if __name__ == '__main__':
         config = util.read_config(args.configpath)
     else:
         config = default_config()
+    util.create_artefact_dirs(config.output_dir, 0)
     Runner.run(config)
 
 

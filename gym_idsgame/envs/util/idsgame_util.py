@@ -309,8 +309,8 @@ def action_dist_hist(data: np.ndarray,
     ax.spines['top'].set_color((.8, .8, .8))
 
     fig.tight_layout()
-    #fig.savefig(file_name + ".png", format="png", dpi=600)
-    #fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
+    fig.savefig(file_name + ".png", format="png", dpi=600)
+    fig.savefig(file_name + ".pdf", format='pdf', dpi=600, bbox_inches='tight', transparent=True)
     data = get_img_from_fig(fig, dpi=100)
     plt.close(fig)
     return data
