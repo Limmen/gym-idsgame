@@ -5,6 +5,7 @@ from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
 from gym_idsgame.runnner import Runner
 from experiments.util import util
+from gym_idsgame.agents.training_agents.common.opponent_pool_config import OpponentPoolConfig
 
 def default_output_dir() -> str:
     """
@@ -27,6 +28,13 @@ def default_config() -> ClientConfig:
     :return: Default configuration for the experiment
     """
     env_name = "idsgame-v19"
+    opponent_pool_config = OpponentPoolConfig(pool_maxsize=100000,
+                                              pool_increment_period=50,
+                                              head_to_head_period=1,
+                                              quality_scores=True,
+                                              quality_score_eta=0.01,
+                                              initial_quality=1000,
+                                              pool_prob=0.5)
     pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.00001, epsilon=1, render=False,
                                                 alpha_defender=0.0001,
                                                 eval_sleep=0.9,
@@ -55,10 +63,14 @@ def default_config() -> ClientConfig:
                                                 eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95,
                                                 cnn_feature_extractor=False, features_dim=512,
                                                 flatten_feature_planes=False,
-                                                attacker_load_path="/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v19/minimal_defense/manual_vs_openai_ppo/1592052172.443187_attacker_node_at_policy_network.zip",
+                                                attacker_load_path="/home/kim/storage/workspace/gym-idsgame/experiments/manual_play/v19/minimal_defense/manual_vs_openai_ppo/1592133054.3698752_attacker_node_at_policy_network.zip",
                                                 ar_policy=True, attacker_node_input_dim=((4 + 2) * 4),
                                                 attacker_at_net_input_dim=(4 + 2), attacker_at_net_output_dim=(4 + 1),
-                                                attacker_node_net_output_dim=4)
+                                                attacker_node_net_output_dim=4,
+                                                opponent_pool_config=opponent_pool_config,
+                                                alternating_optimization=50, opponent_pool=False,
+                                                baselines_in_pool=False, alternating_period=50
+                                                )
     client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.PPO_OPENAI_AGENT.value,
                                  mode=RunnerMode.MANUAL_DEFENDER.value, output_dir=default_output_dir(),
                                  title="OpenAI PPO vs ManualDefender", pg_agent_config=pg_agent_config,
