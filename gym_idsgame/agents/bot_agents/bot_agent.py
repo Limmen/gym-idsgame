@@ -1,7 +1,6 @@
 """
 Abstract bot-agent for the gym-idsgame environment
 """
-from typing import Union
 from abc import abstractmethod
 from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.game_config import GameConfig
