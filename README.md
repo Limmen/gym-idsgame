@@ -34,6 +34,10 @@ If you want to cite the game model, use this bibtex:
 }
 ```
 
+<p align="center">
+<img src="docs/episode_15000.gif" width="600">
+</p>
+
 Table of Contents
 =================
 
