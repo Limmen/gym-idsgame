@@ -68,10 +68,10 @@ def default_config() -> ClientConfig:
                                                 num_episodes=100000000,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
-                                                eval_frequency=55000, attacker=True, defender=True,
+                                                eval_frequency=555000, attacker=True, defender=True,
                                                 video_frequency=1001,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=50,
+                                                checkpoint_freq=100,
                                                 input_dim_attacker=((4 + 2) * 4),
                                                 output_dim_attacker=(4 + 1) * 4,
                                                 input_dim_defender=((4 + 1) * 4),
@@ -114,7 +114,8 @@ def default_config() -> ClientConfig:
                                  mode=RunnerMode.TRAIN_DEFENDER_AND_ATTACKER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),
                                  title="OpenAI-PPO vs OpenAI-PPO",
-                                 run_many=False, random_seeds=[0, 999, 299, 399, 499])
+                                 run_many=False, random_seeds=[0, 999, 299, 399, 499],
+                                 random_seed=499)
     # client_config = hp_tuning_config(client_config)
     return client_config
 
@@ -234,7 +235,7 @@ if __name__ == '__main__':
             print("Error when trying to plot summary: " + str(e))
     else:
         if not config.run_many:
-            run_experiment(args.configpath, 0, args.noconfig)
+            run_experiment(args.configpath, config.random_seed, args.noconfig)
         else:
             train_csv_paths = []
             eval_csv_paths = []

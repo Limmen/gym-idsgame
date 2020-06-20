@@ -127,7 +127,7 @@
         "state_length": 1,
         "tensorboard": true,
         "tensorboard_dir": "/media/kim/HDD/workspace/gym-idsgame/experiments/training/v20/two_agents/actor_critic_2/results/tensorboard",
-        "train_log_frequency": 100,
+        "train_log_frequency": 1,
         "use_sde": false,
         "vf_coef": 0.5,
         "vf_hidden_dim": 64,
