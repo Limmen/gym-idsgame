@@ -8,8 +8,9 @@ from gym_idsgame.agents.dao.agent_type import AgentType
 from gym_idsgame.config.client_config import ClientConfig
 from gym_idsgame.config.hp_tuning_config import HpTuningConfig
 from gym_idsgame.runnner import Runner
-from experiments.util import plotting_util, util, hp_tuning
 from gym_idsgame.agents.training_agents.common.opponent_pool_config import OpponentPoolConfig
+from experiments.util import plotting_util, util, hp_tuning
+
 
 def get_script_path():
     """
@@ -58,17 +59,18 @@ def default_config() -> ClientConfig:
                                               quality_score_eta=0.01,
                                               initial_quality=1000,
                                               pool_prob=0.5)
+
     pg_agent_config = PolicyGradientAgentConfig(gamma=0.999, alpha_attacker=0.0001, alpha_defender=0.0001,
                                                 epsilon=1, render=False, eval_sleep=0.9,
                                                 min_epsilon=0.01, eval_episodes=100, train_log_frequency=100,
                                                 epsilon_decay=0.9999, video=True, eval_log_frequency=1,
                                                 video_fps=5, video_dir=default_output_dir() + "/results/videos",
-                                                num_episodes=450001,
+                                                num_episodes=1350001,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
-                                                eval_frequency=1000, attacker=True, defender=True, video_frequency=101,
+                                                eval_frequency=20000, attacker=True, defender=True, video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=5000,
+                                                checkpoint_freq=100,
                                                 input_dim_attacker=((4 + 2) * 4),
                                                 output_dim_attacker=(4 + 1) * 4,
                                                 input_dim_defender=((4 + 1) * 4),
@@ -77,21 +79,20 @@ def default_config() -> ClientConfig:
                                                 num_hidden_layers=2, batch_size=64,
                                                 gpu=False, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
-                                                optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.99999,
-                                                normalize_features=False, merged_ad_features=True,
-                                                zero_mean_features=False, gpu_id=0,
+                                                optimizer="Adam", lr_exp_decay=True, lr_decay_rate=0.999,
+                                                state_length=1, alternating_optimization=True,
+                                                alternating_period=500, opponent_pool=True,
                                                 opponent_pool_config=opponent_pool_config,
-                                                alternating_optimization=50, opponent_pool=True,
-                                                baselines_in_pool=True, alternating_period=50
-                                                )
+                                                normalize_features=False, merged_ad_features=True,
+                                                zero_mean_features=False)
     env_name = "idsgame-v20"
-    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.REINFORCE_AGENT.value,
-                                 defender_type=AgentType.REINFORCE_AGENT.value,
+    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.ACTOR_CRITIC_AGENT.value,
+                                 defender_type=AgentType.ACTOR_CRITIC_AGENT.value,
                                  mode=RunnerMode.TRAIN_DEFENDER_AND_ATTACKER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),
-                                 title="REINFORCE vs REINFORCE",
+                                 title="Actor-Critic vs Actor-Critic",
                                  run_many=False, random_seeds=[0, 999, 299, 399, 499],
-                                 random_seed=299)
+                                 random_seed=0)
     #client_config = hp_tuning_config(client_config)
     return client_config
 
@@ -157,7 +158,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir, random_seed)
-    logger = util.setup_logger("reinforce_vs_reinforce-v19", config.output_dir + "/results/logs/" +
+    logger = util.setup_logger("actor_critic_vs_random_defense-v13", config.output_dir + "/results/logs/" +
                                str(random_seed) + "/",
                                time_str=time_str)
     config.pg_agent_config.save_dir = default_output_dir() + "/results/data/" + str(random_seed) + "/"
@@ -188,7 +189,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
 # Program entrypoint
 if __name__ == '__main__':
     args = util.parse_args(default_config_path())
-    experiment_title = "REINFORCE vs REINFORCE"
+    experiment_title = "Actor-Critic vs minimal defense"
     if args.configpath is not None and not args.noconfig:
         if not os.path.exists(args.configpath):
             write_default_config()
@@ -211,7 +212,7 @@ if __name__ == '__main__':
             print("Error when trying to plot summary: " + str(e))
     else:
         if not config.run_many:
-            run_experiment(args.configpath, config.random_seed, args.noconfig)
+            run_experiment(args.configpath, 0, args.noconfig)
         else:
             train_csv_paths = []
             eval_csv_paths = []

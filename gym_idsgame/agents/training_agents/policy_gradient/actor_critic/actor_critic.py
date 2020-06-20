@@ -407,7 +407,6 @@ class ActorCriticAgent(PolicyGradientAgent):
 
         # Training
         for iter in range(self.config.num_episodes):
-
             # Batch
             for episode in range(self.config.batch_size):
                 episode_attacker_reward = 0
