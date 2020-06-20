@@ -213,9 +213,19 @@ class PolicyGradientAgent(TrainAgent, ABC):
         :param attacker: boolean flag whether it is attacker or not
         :return: new state
         """
+        if attacker and self.env.idsgame_config.game_config.reconnaissance_actions:
+            a_obs_len = self.env.idsgame_config.game_config.num_attack_types + 1
+            defender_obs = attacker_obs[:,
+                           a_obs_len:a_obs_len + self.env.idsgame_config.game_config.num_attack_types]
+            if self.env.idsgame_config.reconnaissance_bool_features:
+                d_bool_features = attacker_obs[:,
+                                  a_obs_len + self.env.idsgame_config.game_config.num_attack_types:]
+            attacker_obs = attacker_obs[:, 0:a_obs_len]
+
         if not attacker and self.env.local_view_features():
             attacker_obs = self.env.state.get_attacker_observation(
-                self.env.idsgame_config.game_config.network_config, local_view=False,
+                self.env.idsgame_config.game_config.network_config,
+                local_view=False,
                 reconnaissance=self.env.idsgame_config.reconnaissance_actions)
 
         # Zero mean
@@ -271,7 +281,7 @@ class PolicyGradientAgent(TrainAgent, ABC):
                 if np.isnan(attacker_obs_1).any():
                     t = attacker_obs[idx]
                 else:
-                    t = attacker_obs_1.tolist()
+                    t = row.tolist()
                     if not self.env.local_view_features() or not attacker:
                         t.append(attacker_obs[idx][-1])
                     else:
@@ -279,14 +289,20 @@ class PolicyGradientAgent(TrainAgent, ABC):
                         t.append(attacker_obs[idx][-1])
                 normalized_attacker_features.append(t)
 
-            defender_obs_1 = defender_obs[:, 0:-1] / np.linalg.norm(defender_obs[:, 0:-1])
+            if attacker and self.env.idsgame_config.game_config.reconnaissance_actions:
+                defender_obs_1 = defender_obs[:, 0:-1] / np.linalg.norm(defender_obs[:, 0:-1])
+            else:
+                defender_obs_1 = defender_obs / np.linalg.norm(defender_obs)
             normalized_defender_features = []
             for idx, row in enumerate(defender_obs_1):
                 if np.isnan(defender_obs_1).any():
                     t = defender_obs[idx]
                 else:
-                    t = defender_obs_1.tolist()
-                    t.append(defender_obs[idx][-1])
+                    if attacker and self.env.idsgame_config.game_config.reconnaissance_actions:
+                        t = row.tolist()
+                        t.append(defender_obs[idx][-1])
+                    else:
+                        t = row
 
                 normalized_defender_features.append(t)
 
@@ -294,61 +310,103 @@ class PolicyGradientAgent(TrainAgent, ABC):
             defender_obs = np.array(normalized_defender_features)
 
         if self.env.local_view_features() and attacker:
-            neighbor_defense_attributes = np.zeros((attacker_obs.shape[0], defender_obs.shape[1]))
-            for node in range(attacker_obs.shape[0]):
-                if int(attacker_obs[node][-1]) == 1:
-                    id = int(attacker_obs[node][-2])
+            if not self.env.idsgame_config.game_config.reconnaissance_actions:
+                neighbor_defense_attributes = np.zeros((attacker_obs.shape[0], defender_obs.shape[1]))
+                for node in range(attacker_obs.shape[0]):
+                    id = int(attacker_obs[node][-1])
                     neighbor_defense_attributes[node] = defender_obs[id]
+            else:
+                neighbor_defense_attributes = defender_obs
 
-        if self.env.fully_observed():
+        if self.env.fully_observed() or \
+                (self.env.idsgame_config.game_config.reconnaissance_actions and attacker):
             if self.config.merged_ad_features:
                 if not self.env.local_view_features() or not attacker:
                     a_pos = attacker_obs[:, -1]
-                    det_values = defender_obs[:, -1]
-                    temp = defender_obs[:, 0:-1] - attacker_obs[:, 0:-1]
+                    if not self.env.idsgame_config.game_config.reconnaissance_actions:
+                        det_values = defender_obs[:, -1]
+                        temp = defender_obs[:, 0:-1] - attacker_obs[:, 0:-1]
+                    else:
+                        temp = defender_obs[:, 0:] - attacker_obs[:, 0:-1]
                     features = []
                     for idx, row in enumerate(temp):
                         t = row.tolist()
                         t.append(a_pos[idx])
-                        t.append(det_values[idx])
+                        if self.env.fully_observed():
+                            t.append(det_values[idx])
                         features.append(t)
                 else:
-                    node_ids = attacker_obs[:, -2]
-                    node_reachable = attacker_obs[:, -1]
-                    det_values = neighbor_defense_attributes[:, -1]
-                    temp = neighbor_defense_attributes[:, 0:-1] - attacker_obs[:, 0:-2]
+                    node_ids = attacker_obs[:, -1]
+                    if not self.env.idsgame_config.game_config.reconnaissance_actions:
+                        det_values = neighbor_defense_attributes[:, -1]
+                    if not self.env.idsgame_config.game_config.reconnaissance_actions:
+                        temp = neighbor_defense_attributes[:, 0:-1] - attacker_obs[:, 0:-1]
+                    else:
+                        temp = np.full(neighbor_defense_attributes.shape, -1)
+                        for i in range(len(neighbor_defense_attributes)):
+                            if np.sum(neighbor_defense_attributes[i]) > 0:
+                                temp[i] = neighbor_defense_attributes[i] - attacker_obs[i, 0:-1]
                     features = []
                     for idx, row in enumerate(temp):
                         t = row.tolist()
                         t.append(node_ids[idx])
-                        t.append(node_reachable[idx])
-                        t.append(det_values[idx])
+                        # t.append(node_reachable[idx])
+                        if not self.env.idsgame_config.game_config.reconnaissance_actions:
+                            t.append(det_values[idx])
                         features.append(t)
                 features = np.array(features)
+                if self.env.idsgame_config.reconnaissance_bool_features:
+                    f = np.zeros((features.shape[0], features.shape[1] + d_bool_features.shape[1]))
+                    for i in range(features.shape[0]):
+                        f[i] = np.append(features[i], d_bool_features[i])
+                    features = f
                 if self.config.state_length == 1:
                     return features
                 if len(state) == 0:
                     s = np.array([features] * self.config.state_length)
                     return s
                 state = np.append(state[1:], np.array([features]), axis=0)
+                return state
             else:
-                if self.config.state_length == 1:
-                    if not self.env.local_view_features() or not attacker:
-                        return np.append(attacker_obs, defender_obs)
-                    else:
-                        return np.append(attacker_obs, neighbor_defense_attributes)
-                if len(state) == 0:
-                    if not self.env.local_view_features() or not attacker:
-                        temp = np.append(attacker_obs, defender_obs)
-                    else:
-                        temp = np.append(attacker_obs, neighbor_defense_attributes)
-                    s = np.array([temp] * self.config.state_length)
-                    return s
                 if not self.env.local_view_features() or not attacker:
-                    temp = np.append(attacker_obs, defender_obs)
+                    if self.env.idsgame_config.game_config.reconnaissance_actions and attacker:
+                        combined_features = []
+                        for idx, row in enumerate(attacker_obs):
+                            combined_row = np.append(row, defender_obs[idx])
+                            combined_features.append(combined_row)
+                        if self.env.idsgame_config.reconnaissance_bool_features:
+                            combined_features = np.array(combined_features)
+                            f = np.zeros(
+                                (combined_features.shape[0], combined_features.shape[1] + d_bool_features.shape[1]))
+                            for i in range(combined_features.shape[0]):
+                                f[i] = np.append(combined_features[i], d_bool_features[i])
+                            combined_features = f
+                        return np.array(combined_features)
+
+                    return np.append(attacker_obs, defender_obs)
                 else:
-                    temp = np.append(attacker_obs, neighbor_defense_attributes)
-                state = np.append(state[1:], np.array([temp]), axis=0)
+                    if self.env.idsgame_config.reconnaissance_bool_features:
+                        f = np.zeros((attacker_obs.shape[0],
+                                      attacker_obs.shape[1] + neighbor_defense_attributes.shape[1] +
+                                      d_bool_features.shape[1]))
+                        for i in range(f.shape[0]):
+                            f[i] = np.append(np.append(attacker_obs[i], neighbor_defense_attributes[i]),
+                                             d_bool_features[i])
+                    else:
+                        f = np.zeros((attacker_obs.shape[0],
+                                      attacker_obs.shape[1] + neighbor_defense_attributes.shape[1]))
+                        for i in range(f.shape[0]):
+                            f[i] = np.append(attacker_obs[i], neighbor_defense_attributes[i])
+                if self.config.state_length == 1:
+                    return f
+                if len(state) == 0:
+                    s = np.array([f] * self.config.state_length)
+                    return s
+                # if not self.env.local_view_features() or not attacker:
+                #     temp = np.append(attacker_obs, defender_obs)
+                # else:
+                #     temp = np.append(attacker_obs, neighbor_defense_attributes)
+                state = np.append(state[1:], np.array([f]), axis=0)
             return state
         else:
             if self.config.state_length == 1:

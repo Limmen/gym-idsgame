@@ -231,20 +231,11 @@ class BaselineEnvWrapper(gym.Env):
         :return: new state
         """
         if attacker and self.idsgame_env.idsgame_config.game_config.reconnaissance_actions:
-            #if not self.idsgame_env.local_view_features():
             a_obs_len = self.idsgame_env.idsgame_config.game_config.num_attack_types + 1
             defender_obs = attacker_obs[:, a_obs_len:a_obs_len+self.idsgame_env.idsgame_config.game_config.num_attack_types]
             if self.idsgame_env.idsgame_config.reconnaissance_bool_features:
                 d_bool_features = attacker_obs[:, a_obs_len+self.idsgame_env.idsgame_config.game_config.num_attack_types:]
             attacker_obs = attacker_obs[:, 0:a_obs_len]
-            # else:
-            #     a_obs_len = self.idsgame_env.idsgame_config.game_config.num_attack_types + 1
-            #     defender_obs = attacker_obs[:,
-            #                    a_obs_len:a_obs_len + self.idsgame_env.idsgame_config.game_config.num_attack_types]
-            #     if self.idsgame_env.idsgame_config.reconnaissance_bool_features:
-            #         d_bool_features = attacker_obs[:,
-            #                           a_obs_len + self.idsgame_env.idsgame_config.game_config.num_attack_types:]
-            #     attacker_obs = attacker_obs[:, 0:a_obs_len]
 
         if not attacker and self.idsgame_env.local_view_features():
             attacker_obs = self.idsgame_env.state.get_attacker_observation(
