@@ -24,4 +24,5 @@ from gym_idsgame.envs.idsgame_env import IdsGameEnv, IdsGameRandomAttackV0Env, \
     IdsGameMaximalAttackV18Env, IdsGameMinimalDefenseV18Env, IdsGameRandomAttackV18Env, IdsGameRandomDefenseV18Env, \
     IdsGameV18Env, IdsGameMaximalAttackV19Env, IdsGameMinimalDefenseV19Env, IdsGameRandomAttackV19Env, \
     IdsGameRandomDefenseV19Env, IdsGameV19Env, IdsGameMaximalAttackV20Env, IdsGameMinimalDefenseV20Env, \
-    IdsGameRandomAttackV20Env, IdsGameRandomDefenseV20Env, IdsGameV20Env
+    IdsGameRandomAttackV20Env, IdsGameRandomDefenseV20Env, IdsGameV20Env, IdsGameMaximalAttackV21Env, \
+    IdsGameMinimalDefenseV21Env, IdsGameRandomAttackV21Env, IdsGameRandomDefenseV21Env, IdsGameV21Env

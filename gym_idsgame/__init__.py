@@ -1666,3 +1666,85 @@ register(
     entry_point='gym_idsgame.envs:IdsGameV20Env',
     kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
 )
+
+# -------- Version 21 ------------
+
+# [AttackerEnv] 1 layer, 1 server per layer, 7 attack-defense-values, random defender, random defender
+# [Initial State] Defense: 7, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 1
+# [Rewards] Dense
+# [Version] 21
+# [Observations] partially observed
+# [Environment] Random
+# [Attacker Starting Position] Random
+# [Local View] Yes
+# [Reconnaissance activities] enabled
+# [Reconnaissance bool features] Yes
+register(
+    id='idsgame-random_defense-v21',
+    entry_point='gym_idsgame.envs:IdsGameRandomDefenseV21Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [AttackerEnv] 1 layer, 1 server per layer, 7 attack-defense-values, random defender, defender following the "defend minimal strategy"
+# [Initial State] Defense: 7, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 1
+# [Rewards] Dense
+# [Version] 21
+# [Observations] partially observed
+# [Environment] Random
+# [Attacker Starting Position] Random
+# [Local View] Yes
+# [Reconnaissance activities] enabled
+# [Reconnaissance bool features] Yes
+register(
+    id='idsgame-minimal_defense-v21',
+    entry_point='gym_idsgame.envs:IdsGameMinimalDefenseV21Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [DefenseEnv] 1 layer, 1 server per layer, 7 attack-defense-values, random defender, random attacker
+# [Initial State] Defense: 7, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 1
+# [Rewards] Dense
+# [Version] 21
+# [Observations] fully observed
+# [Environment] Random
+# [Attacker Starting Position] Random
+# [Local View] Yes
+# [Reconnaissance activities] enabled
+# [Reconnaissance bool features] Yes
+register(
+    id='idsgame-random_attack-v21',
+    entry_point='gym_idsgame.envs:IdsGameRandomAttackV21Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [DefenseEnv] 1 layer, 1 server per layer, 7 attack-defense-values, random defender, attacker following the "attack maximal strategy"
+# [Initial State] Defense: 7, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 1
+# [Rewards] Dense
+# [Version] 21
+# [Observations] partially observed
+# [Environment] Random
+# [Attacker Starting Position] Random
+# [Local View] Yes
+# [Reconnaissance activities] enabled
+# [Reconnaissance bool features] Yes
+register(
+    id='idsgame-maximal_attack-v21',
+    entry_point='gym_idsgame.envs:IdsGameMaximalAttackV21Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
+
+# [AttackDefenseEnv] 1 layer, 1 server per layer, 7 attack-defense-values, random defender
+# [Initial State] Defense: 7, Attack:0, Num vulnerabilities: 1, Det: 1, Vulnerability value: 1
+# [Rewards] Dense
+# [Version] 21
+# [Observations] partially observed
+# [Environment] Random
+# [Attacker Starting Position] Random
+# [Local View] Yes
+# [Reconnaissance activities] enabled
+# [Reconnaissance bool features] Yes
+register(
+    id='idsgame-v21',
+    entry_point='gym_idsgame.envs:IdsGameV21Env',
+    kwargs={'idsgame_config': None, 'save_dir': None, 'initial_state_path': None}
+)
