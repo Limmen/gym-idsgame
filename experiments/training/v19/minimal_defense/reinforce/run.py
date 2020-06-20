@@ -52,18 +52,21 @@ def default_config() -> ClientConfig:
     :return: Default configuration for the experiment
     """
     pg_agent_config = PolicyGradientAgentConfig(gamma=0.999, alpha_attacker=0.001, epsilon=1, render=False, eval_sleep=0.9,
-                                                min_epsilon=0.01, eval_episodes=100, train_log_frequency=100,
+                                                min_epsilon=0.01, eval_episodes=100, train_log_frequency=1,
                                                 epsilon_decay=0.9999, video=True, eval_log_frequency=1,
                                                 video_fps=5, video_dir=default_output_dir() + "/results/videos",
                                                 num_episodes=10000,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
-                                                eval_frequency=1000, attacker=True, defender=False, video_frequency=101,
+                                                eval_frequency=1000000000, attacker=True, defender=False, video_frequency=101,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=1000, input_dim_attacker=(4 + 2) * 3,
-                                                output_dim_attacker=4 * 3,
-                                                hidden_dim=32,
-                                                num_hidden_layers=1, batch_size=8,
+                                                checkpoint_freq=100,
+                                                input_dim_attacker=((4 + 2) * 4),
+                                                output_dim_attacker=(4 + 1) * 4,
+                                                input_dim_defender=((4 + 1) * 4),
+                                                output_dim_defender=5 * 4,
+                                                hidden_dim=128,
+                                                num_hidden_layers=2, batch_size=64,
                                                 gpu=True, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
@@ -75,7 +78,7 @@ def default_config() -> ClientConfig:
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),
                                  title="REINFORCE vs DefendMinimalDefender",
-                                 run_many=False, random_seeds=[0, 999, 299, 399, 499])
+                                 run_many=False, random_seeds=[0, 999, 299, 399, 499], random_seed=0)
     #client_config = hp_tuning_config(client_config)
     return client_config
 
@@ -195,7 +198,7 @@ if __name__ == '__main__':
             print("Error when trying to plot summary: " + str(e))
     else:
         if not config.run_many:
-            run_experiment(args.configpath, 0, args.noconfig)
+            run_experiment(args.configpath, config.random_seed, args.noconfig)
         else:
             train_csv_paths = []
             eval_csv_paths = []
