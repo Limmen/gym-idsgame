@@ -60,17 +60,16 @@ def default_config() -> ClientConfig:
                                                 num_episodes=100000000,
                                                 eval_render=False, gifs=True,
                                                 gif_dir=default_output_dir() + "/results/gifs",
-                                                eval_frequency=550000000, attacker=False, defender=True,
+                                                eval_frequency=55000, attacker=True, defender=False,
                                                 video_frequency=1001,
                                                 save_dir=default_output_dir() + "/results/data",
-                                                checkpoint_freq=100,
+                                                checkpoint_freq=250,
                                                 input_dim_attacker=((4 + 2) * 4),
                                                 output_dim_attacker=(4 + 1) * 4,
                                                 input_dim_defender=((4 + 1) * 4),
                                                 output_dim_defender=5 * 4,
                                                 hidden_dim=128, num_hidden_layers=2,
-                                                pi_hidden_layers=1, pi_hidden_dim=128, vf_hidden_layers=1,
-                                                vf_hidden_dim=128,
+                                                pi_hidden_layers=1, pi_hidden_dim=128, vf_hidden_layers=1, vf_hidden_dim=128,
                                                 batch_size=2000,
                                                 gpu=False, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
@@ -81,7 +80,7 @@ def default_config() -> ClientConfig:
                                                 eps_clip=0.2, max_gradient_norm=0.5, gae_lambda=0.95,
                                                 cnn_feature_extractor=False, features_dim=512,
                                                 flatten_feature_planes=False, cnn_type=5, vf_coef=0.5, ent_coef=0.001,
-                                                render_attacker_view=False, lr_progress_power_decay=4,
+                                                render_attacker_view=True, lr_progress_power_decay=4,
                                                 lr_progress_decay=True, use_sde=False, sde_sample_freq=4,
                                                 one_hot_obs=False, lstm_core=False, lstm_hidden_dim=32,
                                                 multi_channel_obs=False,
@@ -89,19 +88,14 @@ def default_config() -> ClientConfig:
                                                 channel_2_dim=32, channel_2_layers=2, channel_2_input_dim=16,
                                                 channel_3_dim=32, channel_3_layers=2, channel_3_input_dim=4,
                                                 channel_4_dim=32, channel_4_layers=2, channel_4_input_dim=4,
-                                                mini_batch_size=64, ar_policy=True,
-                                                attacker_node_input_dim=((4 + 2) * 4),
-                                                attacker_at_net_input_dim=(4 + 2), attacker_at_net_output_dim=(4 + 1),
-                                                attacker_node_net_output_dim=4,
-                                                defender_node_input_dim=((4+1)*4), defender_at_net_input_dim=(4+1),
-                                                defender_node_net_output_dim=4, defender_at_net_output_dim=5)
-    env_name = "idsgame-maximal_attack-v20"
-    client_config = ClientConfig(env_name=env_name,
-                                 defender_type=AgentType.PPO_OPENAI_AGENT.value,
-                                 mode=RunnerMode.TRAIN_DEFENDER.value,
+                                                mini_batch_size=64, ar_policy=True, attacker_node_input_dim=((4 + 2) * 4),
+                                                attacker_at_net_input_dim=(4 + 2), attacker_at_net_output_dim=(4 + 1), attacker_node_net_output_dim=4)
+    env_name = "idsgame-minimal_defense-v19"
+    client_config = ClientConfig(env_name=env_name, attacker_type=AgentType.PPO_OPENAI_AGENT.value,
+                                 mode=RunnerMode.TRAIN_ATTACKER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),
-                                 title="AttackMaximalAttacker vs OpenAI-PPO",
-                                 run_many=False, random_seeds=[0, 999, 299, 399, 499], random_seed=999)
+                                 title="OpenAI-PPO vs DefendMinimalDefender",
+                                 run_many=False, random_seeds=[0, 999, 299, 399, 499])
     # client_config = hp_tuning_config(client_config)
     return client_config
 
@@ -167,7 +161,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir, random_seed)
-    logger = util.setup_logger("openai-ppo_vs_maximal_attack-v20", config.output_dir + "/results/logs/" +
+    logger = util.setup_logger("openai-ppo_vs_minimal_defense-v19", config.output_dir + "/results/logs/" +
                                str(random_seed) + "/",
                                time_str=time_str)
     config.pg_agent_config.save_dir = default_output_dir() + "/results/data/" + str(random_seed) + "/"
@@ -198,7 +192,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
 # Program entrypoint
 if __name__ == '__main__':
     args = util.parse_args(default_config_path())
-    experiment_title = "OpenAI-PPO vs minimal defense"
+    experiment_title = "PPO-OpenAI vs minimal defense"
     if args.configpath is not None and not args.noconfig:
         if not os.path.exists(args.configpath):
             write_default_config()
@@ -221,7 +215,7 @@ if __name__ == '__main__':
             print("Error when trying to plot summary: " + str(e))
     else:
         if not config.run_many:
-            run_experiment(args.configpath, config.random_seed, args.noconfig)
+            run_experiment(args.configpath, 0, args.noconfig)
         else:
             train_csv_paths = []
             eval_csv_paths = []
