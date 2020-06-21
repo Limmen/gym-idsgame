@@ -78,7 +78,7 @@ def default_config() -> ClientConfig:
                                  mode=RunnerMode.TRAIN_ATTACKER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),
                                  title="REINFORCE vs DefendMinimalDefender",
-                                 run_many=False, random_seeds=[0, 999, 299, 399, 499], random_seed=0)
+                                 run_many=False, random_seeds=[0, 999, 299, 399, 499], random_seed=499)
     #client_config = hp_tuning_config(client_config)
     return client_config
 

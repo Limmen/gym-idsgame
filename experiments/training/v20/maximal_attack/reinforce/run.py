@@ -67,7 +67,7 @@ def default_config() -> ClientConfig:
                                                 input_dim_defender=((4 + 1) * 4),
                                                 output_dim_defender=5 * 4,
                                                 hidden_dim=128, num_hidden_layers=2,
-                                                batch_size=64,
+                                                batch_size=32,
                                                 gpu=False, tensorboard=True,
                                                 tensorboard_dir=default_output_dir() + "/results/tensorboard",
                                                 optimizer="Adam", lr_exp_decay=False, lr_decay_rate=0.999,
@@ -75,12 +75,12 @@ def default_config() -> ClientConfig:
                                                 zero_mean_features=False, gpu_id=0, lstm_network=False,
                                                 lstm_seq_length=4, num_lstm_layers=2
                                                 )
-    env_name = "idsgame-maximal_attack-v19"
+    env_name = "idsgame-maximal_attack-v20"
     client_config = ClientConfig(env_name=env_name, defender_type=AgentType.REINFORCE_AGENT.value,
                                  mode=RunnerMode.TRAIN_DEFENDER.value,
                                  pg_agent_config=pg_agent_config, output_dir=default_output_dir(),
                                  title="AttackMaximalAttacker vs REINFORCE",
-                                 run_many=False, random_seeds=[0, 999, 299, 399, 499], random_seed=0)
+                                 run_many=False, random_seeds=[0, 999, 299, 399, 499], random_seed=999)
     client_config = hp_tuning_config(client_config)
     return client_config
 
@@ -146,7 +146,7 @@ def run_experiment(configpath: str, random_seed: int, noconfig: bool):
         config = default_config()
     time_str = str(time.time())
     util.create_artefact_dirs(config.output_dir, random_seed)
-    logger = util.setup_logger("maximal_attack_vs_reinforce-v19", config.output_dir + "/results/logs/" +
+    logger = util.setup_logger("maximal_attack_vs_reinforce-v20", config.output_dir + "/results/logs/" +
                                str(random_seed) + "/",
                                time_str=time_str)
     config.pg_agent_config.save_dir = default_output_dir() + "/results/data/" + str(random_seed) + "/"
