@@ -173,11 +173,11 @@ class PPO(BaseRLModel):
                 self.attacker_rollout_buffer = RolloutBuffer(self.n_steps, self.attacker_observation_space,
                                                              self.attacker_action_space, self.device,
                                                              gamma=self.gamma, gae_lambda=self.gae_lambda,
-                                                             n_envs=self.n_envs, attacker=True)
+                                                             n_envs=self.n_envs)
                 self.defender_rollout_buffer = RolloutBuffer(self.n_steps, self.defender_observation_space,
                                                              self.defender_action_space, self.device,
                                                              gamma=self.gamma, gae_lambda=self.gae_lambda,
-                                                             n_envs=self.n_envs, attacker=False)
+                                                             n_envs=self.n_envs)
             elif self.pg_agent_config.lstm_core and not self.pg_agent_config.multi_channel_obs:
                 self.attacker_rollout_buffer = RolloutBufferRecurrent(self.n_steps, self.attacker_observation_space,
                                                              self.attacker_action_space, self.device,
@@ -291,7 +291,7 @@ class PPO(BaseRLModel):
             self.attacker_policy = PPOPolicy(self.attacker_observation_space, self.attacker_action_space,
                                              self.lr_schedule_a, use_sde=self.use_sde, device=self.device,
                                              pg_agent_config=self.pg_agent_config,
-                                             features_extractor_class=feature_extractor_class, attacker=True
+                                             features_extractor_class=feature_extractor_class, attacker=True,
                                              **self.policy_kwargs)
             self.attacker_policy = self.attacker_policy.to(self.device)
         else:
