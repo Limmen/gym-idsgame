@@ -16,7 +16,7 @@
         "alpha_defender": 0.0001,
         "alternating_optimization": 50,
         "alternating_period": 50,
-        "ar_policy": true,
+        "ar_policy": false,
         "attacker": true,
         "attacker_at_net_input_dim": 6,
         "attacker_at_net_lstm_core": false,
