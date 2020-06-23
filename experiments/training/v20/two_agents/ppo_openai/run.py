@@ -59,8 +59,8 @@ def default_config() -> ClientConfig:
                                               quality_score_eta=0.01,
                                               initial_quality=1000,
                                               pool_prob=0.5)
-    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.0001, epsilon=1, render=False,
-                                                alpha_defender=0.0001,
+    pg_agent_config = PolicyGradientAgentConfig(gamma=1, alpha_attacker=0.00001, epsilon=1, render=False,
+                                                alpha_defender=0.00001,
                                                 eval_sleep=0.9,
                                                 min_epsilon=0.01, eval_episodes=1000, train_log_frequency=1,
                                                 epsilon_decay=0.9999, video=True, eval_log_frequency=500,

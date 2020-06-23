@@ -39,13 +39,13 @@ def is_defense_id_legal(defense_id: int, game_config: GameConfig, state : GameSt
     """
     server_id, server_pos, defense_type = interpret_defense_action(defense_id, game_config)
 
-    if defense_type < game_config.num_attack_types:
-        if state.defense_values[server_id][defense_type] >= game_config.max_value:
-            return False
+    # if defense_type < game_config.num_attack_types:
+    #     if state.defense_values[server_id][defense_type] >= game_config.max_value:
+    #         return False
 
-    if defense_type >= game_config.num_attack_types:
-        if state.defense_det[server_id] >= game_config.max_value:
-            return False
+    # if defense_type >= game_config.num_attack_types:
+    #     if state.defense_det[server_id] >= game_config.max_value:
+    #         return False
 
     if (game_config.network_config.node_list[server_id] == NodeType.SERVER.value
         or game_config.network_config.node_list[server_id] == NodeType.DATA.value):
