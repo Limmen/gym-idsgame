@@ -5,7 +5,7 @@ game. The environment extends the abstract model described in (Elderman et al. 2
 two-player Markov game between an attacker agent and a defender agent that face each other in a simulated computer
 network. The reinforcement learning environment exposes an interface to a partially observed Markov decision process
 (POMDP) model of the Markov game. The interface can be used to train, simulate, and evaluate attack- and defend policies against each other.
-Moreover, the repository contains code to reproduce baseline results various reinforcement learning algorithms, including: 
+Moreover, the repository contains code to reproduce baseline results for various reinforcement learning algorithms, including: 
 
 - Tabular Q-learning 
 - Neural-fitted Q-learning using the DQN algorithm.
