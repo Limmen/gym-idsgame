@@ -5,32 +5,42 @@ game. The environment extends the abstract model described in (Elderman et al. 2
 two-player Markov game between an attacker agent and a defender agent that face each other in a simulated computer
 network. The reinforcement learning environment exposes an interface to a partially observed Markov decision process
 (POMDP) model of the Markov game. The interface can be used to train, simulate, and evaluate attack- and defend policies against each other.
-Moreover, the repository contains code to reproduce baseline results for various reinforcement learning algorithms, including: 
+Moreover, the repository contains code to reproduce baseline results for various reinforcement learning algorithms, including:
 
-- Tabular Q-learning 
+- Tabular Q-learning
 - Neural-fitted Q-learning using the DQN algorithm.
 - REINFORCE with baseline
 - Actor-Critic REINFORCE
-- PPO  
+- PPO
 
 Please use this bibtex if you make use of this code in your publications:
 ```
-@misc{gym_idsgame,
-  author = {Kim Hammar},
-  title = {An Abstract Cyber Security Simulation and Markov Game for OpenAI Gym},
-  year = {2020},
-  publisher = {GitHub},
-  journal = {GitHub repository},
-  howpublished = {\url{https://github.com/Limmen/gym-idsgame}},
-}
-```
-If you want to cite the game model, use this bibtex:
-```
-@inproceedings{adv_rl,
-  title={Adversarial Reinforcement Learning in a Cyber Security Simulation},
-  author={Richard Elderman and Leon J. J. Pater and Albert S. Thie and Madalina M. Drugan and Marco Wiering},
-  booktitle={ICAART},
-  year=2017
+@INPROCEEDINGS{Hamm2011:Finding,
+AUTHOR="Kim Hammar and Rolf Stadler",
+TITLE="Finding Effective Security Strategies through Reinforcement Learning and
+{Self-Play}",
+BOOKTITLE="International Conference on Network and Service Management (CNSM 2020)
+(CNSM 2020)",
+ADDRESS="Izmir, Turkey",
+DAYS=1,
+MONTH=nov,
+YEAR=2020,
+KEYWORDS="Network Security; Reinforcement Learning; Markov Security Games",
+ABSTRACT="We present a method to automatically find security strategies for the use
+case of intrusion prevention. Following this method, we model the
+interaction between an attacker and a defender as a Markov game and let
+attack and defense strategies evolve through reinforcement learning and
+self-play without human intervention. Using a simple infrastructure
+configuration, we demonstrate that effective security strategies can emerge
+from self-play. This shows that self-play, which has been applied in other
+domains with great success, can be effective in the context of network
+security. Inspection of the converged policies show that the emerged
+policies reflect common-sense knowledge and are similar to strategies of
+humans. Moreover, we address known challenges of reinforcement learning in
+this domain and present an approach that uses function approximation, an
+opponent pool, and an autoregressive policy representation. Through
+evaluations we show that our method is superior to two baseline methods but
+that policy convergence in self-play remains a challenge."
 }
 ```
 
@@ -41,14 +51,14 @@ If you want to cite the game model, use this bibtex:
 Table of Contents
 =================
 
-   * [Design](#Design)   
+   * [Design](#Design)
    * [Included Environments](#Included-Environments)
-   * [Requirements](#Requirements)      
-   * [Installation](#Installation)   
+   * [Requirements](#Requirements)
+   * [Installation](#Installation)
    * [Usage](#Usage)
    * [Manual Play](#Manual-Play)
    * [Baseline Experiments](#Baseline-Experiments)
-   * [Future Work](#Future-Work)         
+   * [Future Work](#Future-Work)
    * [Author & Maintainer](#Author-&-Maintainer)
    * [Copyright and license](#copyright-and-license)
 
@@ -61,11 +71,11 @@ Table of Contents
 ## Included Environments
 
 A rich set of configurations of the Markov game are registered as openAI gym environments.
-The environments are specified and implemented in `gym_idsgame/envs/idsgame_env.py` see also `gym_idsgame/__init__.py`. 
+The environments are specified and implemented in `gym_idsgame/envs/idsgame_env.py` see also `gym_idsgame/__init__.py`.
 
-## `minimal_defense` 
+## `minimal_defense`
 
-This is an environment where the agent is supposed to play the attacker in the Markov game and the defender is following the `defend_minimal` baseline defense policy. 
+This is an environment where the agent is supposed to play the attacker in the Markov game and the defender is following the `defend_minimal` baseline defense policy.
 The `defend_minimal` policy entails that the defender will always defend the attribute with the minimal value out of all of its neighbors.
 
 Registered configurations:
@@ -92,7 +102,7 @@ Registered configurations:
 - `idsgame-minimal_defense-v19`
 - `idsgame-minimal_defense-v20`
 
-## `maximal_attack` 
+## `maximal_attack`
 
 This is an environment where the agent is supposed to play the defender and the attacker is following the `attack_maximal` baseline attack policy.
 The `attack_maximal` policy entails that the attacker will always attack the attribute with the maximum value out of all of its neighbors.
@@ -119,11 +129,11 @@ Registered configurations:
 - `idsgame-maximal_attack-v17`
 - `idsgame-maximal_attack-v18`
 - `idsgame-maximal_attack-v19`
-- `idsgame-maximal_attack-v20` 
+- `idsgame-maximal_attack-v20`
 
 ## `random_attack`
 
-This is an environment where the agent is supposed to play as the defender and the attacker is following a random baseline attack policy.  
+This is an environment where the agent is supposed to play as the defender and the attacker is following a random baseline attack policy.
 
 Registered configurations:
 
@@ -147,7 +157,7 @@ Registered configurations:
 - `idsgame-random_attack-v17`
 - `idsgame-random_attack-v18`
 - `idsgame-random_attack-v19`
-- `idsgame-random_attack-v20` 
+- `idsgame-random_attack-v20`
 
 ## `random_defense`
 
@@ -175,7 +185,7 @@ Registered configurations:
 - `idsgame-random_defense-v17`
 - `idsgame-random_defense-v18`
 - `idsgame-random_defense-v19`
-- `idsgame-random_defense-v20` 
+- `idsgame-random_defense-v20`
 
 ## `two_agents`
 
@@ -204,7 +214,7 @@ Registered configurations:
 - `idsgame-v17`
 - `idsgame-v18`
 - `idsgame-v19`
-- `idsgame-v20` 
+- `idsgame-v20`
 
 ## Requirements
 - Python 3.5+
@@ -334,7 +344,7 @@ make tensorboard
 
 ### Fetch Baseline Experiment Results
 
-By default when cloning the repo the experiment results are not included, to fetch the experiment results, 
+By default when cloning the repo the experiment results are not included, to fetch the experiment results,
 install and setup `git-lfs` then run:
 ```bash
 git lfs fetch --all
