@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='gym_idsgame',
-      version='1.0.0',
+      version='1.0.1',
       install_requires=['gym', 'pyglet', 'numpy', 'torch'],
       author='Kim Hammar',
       author_email='hammar.kim@gmail.com',
