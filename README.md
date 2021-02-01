@@ -13,7 +13,7 @@ Moreover, the repository contains code to reproduce baseline results for various
 - Actor-Critic REINFORCE
 - PPO
 
-Please use this bibtex if you make use of this code in your publications:
+Please use this bibtex if you make use of this code in your publications (paper: https://arxiv.org/abs/2009.08120):
 ```
 @INPROCEEDINGS{Hamm2011:Finding,
 AUTHOR="Kim Hammar and Rolf Stadler",
@@ -230,7 +230,7 @@ Registered configurations:
 
 ```bash
 # install from pip
-pip install gym-idsgame==1.0.0
+pip install gym-idsgame==1.0.12
 # local install from source
 $ pip install -e gym-idsgame
 # force upgrade deps
