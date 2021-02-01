@@ -12,15 +12,11 @@ import math
 import itertools
 from abc import ABC, abstractmethod
 from gym_idsgame.envs.dao.game_config import GameConfig
-from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
-from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
-from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
-from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
 from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.dao.network_config import NetworkConfig
-import gym_idsgame.envs.util.idsgame_util as util
 from gym_idsgame.envs.constants import constants
+#import gym_idsgame.envs.util.idsgame_util as util
 
 class IdsGameEnv(gym.Env, ABC):
     """
@@ -50,10 +46,11 @@ class IdsGameEnv(gym.Env, ABC):
         :param save_dir: directory to save outputs, e.g. initial state
         :param initial_state_path: path to the initial state (if none, use default)
         """
+        import gym_idsgame.envs.util.idsgame_util as util
         if idsgame_config is None:
             idsgame_config = IdsGameConfig(initial_state_path=initial_state_path)
         self.save_dir = save_dir
-        util.validate_config(idsgame_config)
+        self.validate_config(idsgame_config)
         self.idsgame_config: IdsGameConfig = idsgame_config
         self.state: GameState = self.idsgame_config.game_config.initial_state.copy()
         self.observation_space = self.idsgame_config.game_config.get_attacker_observation_space()
@@ -109,6 +106,7 @@ class IdsGameEnv(gym.Env, ABC):
             done (bool): whether the episode has ended, in which case further step() calls will return undefined results
             info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)
         """
+        import gym_idsgame.envs.util.idsgame_util as util
         # Initialization
         trajectory = []
         trajectory.append(self.state)
@@ -338,6 +336,7 @@ class IdsGameEnv(gym.Env, ABC):
         :param attack_action: the attack to verify
         :return: True if legal otherwise False
         """
+        import gym_idsgame.envs.util.idsgame_util as util
         return util.is_attack_id_legal(attack_action, self.idsgame_config.game_config, self.state.attacker_pos,
                                        self.state, self.past_positions,
                                        past_reconnaissance_activities = self.past_reconnaissance_activities)
@@ -349,6 +348,7 @@ class IdsGameEnv(gym.Env, ABC):
         :param defense_action: the defense action to verify
         :return: True if legal otherwise False
         """
+        import gym_idsgame.envs.util.idsgame_util as util
         return util.is_defense_id_legal(defense_action, self.idsgame_config.game_config, self.state)
 
     def save_initial_state(self) -> None:
@@ -410,6 +410,7 @@ class IdsGameEnv(gym.Env, ABC):
 
         :return: (attacker_reward, defender_reward)
         """
+        import gym_idsgame.envs.util.idsgame_util as util
         if not self.idsgame_config.game_config.dense_rewards and not self.idsgame_config.game_config.dense_rewards_v2 \
                 and not self.idsgame_config.game_config.dense_rewards_v3:
             return constants.GAME_CONFIG.POSITIVE_REWARD, -constants.GAME_CONFIG.POSITIVE_REWARD
@@ -458,6 +459,7 @@ class IdsGameEnv(gym.Env, ABC):
 
         :return: (attacker_reward, defender_reward)
         """
+        import gym_idsgame.envs.util.idsgame_util as util
         if not self.idsgame_config.game_config.dense_rewards and not self.idsgame_config.game_config.dense_rewards_v2 \
                 and not self.idsgame_config.game_config.dense_rewards_v3:
             return -constants.GAME_CONFIG.POSITIVE_REWARD, constants.GAME_CONFIG.POSITIVE_REWARD
@@ -573,6 +575,20 @@ class IdsGameEnv(gym.Env, ABC):
                 return -constants.GAME_CONFIG.POSITIVE_REWARD, 0
             return 0, 0
 
+    def validate_config(self, idsgame_config: IdsGameConfig) -> None:
+        """
+        Validates the configuration for the environment
+
+        :param idsgame_config: the config to validate
+        :return: None
+        """
+        if idsgame_config.game_config.num_layers < 0:
+            raise AssertionError("The number of layers cannot be less than 0")
+        if idsgame_config.game_config.num_attack_types < 1:
+            raise AssertionError("The number of attack types cannot be less than 1")
+        if idsgame_config.game_config.max_value < 1:
+            raise AssertionError("The max attack/defense value cannot be less than 1")
+
     def get_blocked_attack_reward(self, target_node_id : int, attack_type : int) -> Union[int, int]:
         """
         Returns the reward for the attacker and defender after a blocked attack on some server in
@@ -629,6 +645,7 @@ class IdsGameEnv(gym.Env, ABC):
         return self.idsgame_config.local_view_observations
 
     def is_reconnaissance(self, action):
+        import gym_idsgame.envs.util.idsgame_util as util
         server_id, server_pos, attack_type, reconnaissance = util.interpret_attack_action(action, self.idsgame_config.game_config)
         return reconnaissance
         # if server_id not in self.state.reconnaissance_actions:
@@ -704,10 +721,12 @@ class AttackerEnv(IdsGameEnv, ABC):
         self.observation_space = self.idsgame_config.game_config.get_attacker_observation_space()
 
     def get_attacker_action(self, action) -> Union[int, Union[int, int], int]:
+        import gym_idsgame.envs.util.idsgame_util as util
         attacker_action, _ = action
         return util.interpret_attack_action(attacker_action, self.idsgame_config.game_config)
 
     def get_defender_action(self, action) -> Union[Union[int, int], int, int]:
+        import gym_idsgame.envs.util.idsgame_util as util
         defend_id = self.idsgame_config.defender_agent.action(self.state)
         defend_node_id, defend_node_pos, defend_type = util.interpret_defense_action(
             defend_id, self.idsgame_config.game_config)
@@ -737,10 +756,12 @@ class DefenderEnv(IdsGameEnv, ABC):
         self.observation_space = self.idsgame_config.game_config.get_defender_observation_space()
 
     def get_defender_action(self, action) -> Union[int, Union[int, int], int]:
+        import gym_idsgame.envs.util.idsgame_util as util
         _, defender_action = action
         return util.interpret_defense_action(defender_action, self.idsgame_config.game_config)
 
     def get_attacker_action(self, action) -> Union[Union[int, int], int, int, bool]:
+        import gym_idsgame.envs.util.idsgame_util as util
         attack_id = self.idsgame_config.attacker_agent.action(self.state)
         attack_node_id, attack_node_pos, attack_type, reconnaissance = util.interpret_attack_action(attack_id, self.idsgame_config.game_config)
         return attack_node_id, attack_node_pos, attack_type, reconnaissance
@@ -766,10 +787,12 @@ class AttackDefenseEnv(IdsGameEnv, ABC):
 
     def get_defender_action(self, action: Union[int, int]) -> Union[int, Union[int, int], int]:
         _, defender_action = action
+        import gym_idsgame.envs.util.idsgame_util as util
         return util.interpret_defense_action(defender_action, self.idsgame_config.game_config)
 
     def get_attacker_action(self, action: Union[int, int]) -> Union[Union[int, int], int, int]:
         attacker_action, _ = action
+        import gym_idsgame.envs.util.idsgame_util as util
         return util.interpret_attack_action(attacker_action, self.idsgame_config.game_config)
 
 # -------- Concrete envs ------------
@@ -796,6 +819,7 @@ class IdsGameRandomDefenseV0Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -828,6 +852,7 @@ class IdsGameMinimalDefenseV0Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -860,6 +885,7 @@ class IdsGameRandomAttackV0Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -892,6 +918,7 @@ class IdsGameMaximalAttackV0Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -958,6 +985,7 @@ class IdsGameRandomDefenseV1Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=4, det_val=3,
@@ -990,6 +1018,7 @@ class IdsGameMinimalDefenseV1Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=4, det_val=3,
@@ -1022,6 +1051,7 @@ class IdsGameRandomAttackV1Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=4, det_val=3,
@@ -1054,6 +1084,7 @@ class IdsGameMaximalAttackV1Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=4, attack_val=0, num_vulnerabilities_per_node=4, det_val=3,
@@ -1119,6 +1150,7 @@ class IdsGameRandomDefenseV2Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1151,6 +1183,7 @@ class IdsGameMinimalDefenseV2Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1183,6 +1216,7 @@ class IdsGameRandomAttackV2Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1215,6 +1249,7 @@ class IdsGameMaximalAttackV2Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1280,6 +1315,7 @@ class IdsGameRandomDefenseV3Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1312,6 +1348,7 @@ class IdsGameMinimalDefenseV3Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1344,6 +1381,7 @@ class IdsGameRandomAttackV3Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1376,6 +1414,7 @@ class IdsGameMaximalAttackV3Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1441,6 +1480,7 @@ class IdsGameRandomDefenseV4Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1473,6 +1513,7 @@ class IdsGameMinimalDefenseV4Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1505,6 +1546,7 @@ class IdsGameRandomAttackV4Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1537,6 +1579,7 @@ class IdsGameMaximalAttackV4Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1601,6 +1644,7 @@ class IdsGameRandomDefenseV5Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1636,6 +1680,7 @@ class IdsGameMinimalDefenseV5Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1670,6 +1715,7 @@ class IdsGameRandomAttackV5Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1705,6 +1751,7 @@ class IdsGameMaximalAttackV5Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1773,6 +1820,7 @@ class IdsGameRandomDefenseV6Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1809,6 +1857,7 @@ class IdsGameMinimalDefenseV6Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1844,6 +1893,7 @@ class IdsGameRandomAttackV6Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1880,6 +1930,7 @@ class IdsGameMaximalAttackV6Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=4, num_servers_per_layer=5, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1951,6 +2002,7 @@ class IdsGameRandomDefenseV7Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -1984,6 +2036,7 @@ class IdsGameMinimalDefenseV7Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -2017,6 +2070,7 @@ class IdsGameRandomAttackV7Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -2050,6 +2104,7 @@ class IdsGameMaximalAttackV7Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=2, num_servers_per_layer=3, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -2117,6 +2172,7 @@ class IdsGameRandomDefenseV8Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -2150,6 +2206,7 @@ class IdsGameMinimalDefenseV8Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -2183,6 +2240,7 @@ class IdsGameRandomAttackV8Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -2216,6 +2274,7 @@ class IdsGameMaximalAttackV8Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -2283,6 +2342,7 @@ class IdsGameRandomDefenseV9Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -2316,6 +2376,7 @@ class IdsGameMinimalDefenseV9Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -2349,6 +2410,7 @@ class IdsGameRandomAttackV9Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -2382,6 +2444,7 @@ class IdsGameMaximalAttackV9Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -2449,6 +2512,7 @@ class IdsGameRandomDefenseV10Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -2483,6 +2547,7 @@ class IdsGameMinimalDefenseV10Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -2517,6 +2582,7 @@ class IdsGameRandomAttackV10Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -2551,6 +2617,7 @@ class IdsGameMaximalAttackV10Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=10, max_value=9)
             game_config.set_initial_state(defense_val=2, attack_val=0, num_vulnerabilities_per_node=1, det_val=2,
@@ -2619,6 +2686,7 @@ class IdsGameRandomDefenseV11Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=0, num_servers_per_layer=1, num_attack_types=2, max_value=2)
             game_config.set_initial_state(defense_val=0, attack_val=0, num_vulnerabilities_per_node=0, det_val=1,
@@ -2653,6 +2721,7 @@ class IdsGameMinimalDefenseV11Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=0, num_servers_per_layer=1, num_attack_types=2, max_value=2)
             game_config.set_initial_state(defense_val=0, attack_val=0, num_vulnerabilities_per_node=0, det_val=1,
@@ -2687,6 +2756,7 @@ class IdsGameRandomAttackV11Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=0, num_servers_per_layer=1, num_attack_types=2, max_value=2)
             game_config.set_initial_state(defense_val=0, attack_val=0, num_vulnerabilities_per_node=0, det_val=1,
@@ -2721,6 +2791,7 @@ class IdsGameMaximalAttackV11Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=0, num_servers_per_layer=1, num_attack_types=2, max_value=2)
             game_config.set_initial_state(defense_val=0, attack_val=0, num_vulnerabilities_per_node=0, det_val=1,
@@ -2790,6 +2861,7 @@ class IdsGameRandomDefenseV12Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=0, num_servers_per_layer=1, num_attack_types=2, max_value=2)
             game_config.set_initial_state(defense_val=1, attack_val=1, num_vulnerabilities_per_node=0, det_val=1,
@@ -2826,6 +2898,7 @@ class IdsGameMinimalDefenseV12Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=0, num_servers_per_layer=1, num_attack_types=2, max_value=2)
             game_config.set_initial_state(defense_val=1, attack_val=1, num_vulnerabilities_per_node=0, det_val=1,
@@ -2862,6 +2935,7 @@ class IdsGameRandomAttackV12Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=0, num_servers_per_layer=1, num_attack_types=2, max_value=2)
             game_config.set_initial_state(defense_val=1, attack_val=1, num_vulnerabilities_per_node=0, det_val=1,
@@ -2898,6 +2972,7 @@ class IdsGameMaximalAttackV12Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=0, num_servers_per_layer=1, num_attack_types=2, max_value=2)
             game_config.set_initial_state(defense_val=1, attack_val=1, num_vulnerabilities_per_node=0, det_val=1,
@@ -2970,6 +3045,7 @@ class IdsGameRandomDefenseV13Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=0, num_servers_per_layer=1, num_attack_types=2, max_value=1)
             game_config.set_initial_state(defense_val=0, attack_val=0, num_vulnerabilities_per_node=0, det_val=10,
@@ -3004,6 +3080,7 @@ class IdsGameMinimalDefenseV13Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=0, num_servers_per_layer=1, num_attack_types=2, max_value=1)
             game_config.set_initial_state(defense_val=0, attack_val=0, num_vulnerabilities_per_node=0, det_val=10,
@@ -3038,6 +3115,7 @@ class IdsGameRandomAttackV13Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=0, num_servers_per_layer=1, num_attack_types=2, max_value=1)
             game_config.set_initial_state(defense_val=0, attack_val=0, num_vulnerabilities_per_node=0, det_val=10,
@@ -3072,6 +3150,7 @@ class IdsGameMaximalAttackV13Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=0, num_servers_per_layer=1, num_attack_types=2, max_value=1)
             game_config.set_initial_state(defense_val=0, attack_val=0, num_vulnerabilities_per_node=0, det_val=10,
@@ -3142,6 +3221,7 @@ class IdsGameRandomDefenseV14Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
@@ -3181,6 +3261,7 @@ class IdsGameMinimalDefenseV14Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
@@ -3220,6 +3301,7 @@ class IdsGameRandomAttackV14Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
@@ -3259,6 +3341,7 @@ class IdsGameMaximalAttackV14Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
@@ -3339,6 +3422,7 @@ class IdsGameRandomDefenseV15Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=10,
                                      min_random_a_val=0, min_random_d_val=2, min_random_det_val=1)
@@ -3378,6 +3462,7 @@ class IdsGameMinimalDefenseV15Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=10,
                                      min_random_a_val=0, min_random_d_val=2, min_random_det_val=1)
@@ -3417,6 +3502,7 @@ class IdsGameRandomAttackV15Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=10,
                                      min_random_a_val=0, min_random_d_val=2, min_random_det_val=1)
@@ -3456,6 +3542,7 @@ class IdsGameMaximalAttackV15Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=10, max_value=10,
                                      min_random_a_val=0, min_random_d_val=2, min_random_det_val=1)
@@ -3535,6 +3622,7 @@ class IdsGameRandomDefenseV16Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
@@ -3575,6 +3663,7 @@ class IdsGameMinimalDefenseV16Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
@@ -3615,6 +3704,7 @@ class IdsGameRandomAttackV16Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
@@ -3655,6 +3745,7 @@ class IdsGameMaximalAttackV16Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
                                      min_random_a_val=0, min_random_d_val=1, min_random_det_val=1)
@@ -3736,6 +3827,7 @@ class IdsGameRandomDefenseV17Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
@@ -3775,6 +3867,7 @@ class IdsGameMinimalDefenseV17Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
@@ -3814,6 +3907,7 @@ class IdsGameRandomAttackV17Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1)
@@ -3853,6 +3947,7 @@ class IdsGameMaximalAttackV17Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=4,
                                      min_random_a_val=0, min_random_d_val=1, min_random_det_val=1)
@@ -3931,6 +4026,7 @@ class IdsGameRandomDefenseV18Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=7,
                                      min_random_a_val=0, min_random_d_val=7, min_random_det_val=1)
@@ -3976,6 +4072,7 @@ class IdsGameMinimalDefenseV18Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=7,
                                      min_random_a_val=0, min_random_d_val=7, min_random_det_val=1,
@@ -4022,6 +4119,7 @@ class IdsGameRandomAttackV18Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=7,
                                      min_random_a_val=0, min_random_d_val=7, min_random_det_val=1)
@@ -4067,6 +4165,7 @@ class IdsGameMaximalAttackV18Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=1, num_attack_types=4, max_value=7,
                                      min_random_a_val=0, min_random_d_val=7, min_random_det_val=1)
@@ -4158,6 +4257,7 @@ class IdsGameRandomDefenseV19Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
                                      min_random_a_val=0, min_random_d_val=7, min_random_det_val=1,
@@ -4206,6 +4306,7 @@ class IdsGameMinimalDefenseV19Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
                                      min_random_a_val=0, min_random_d_val=7, min_random_det_val=1,
@@ -4253,6 +4354,7 @@ class IdsGameRandomAttackV19Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
                                      min_random_a_val=0, min_random_d_val=7, min_random_det_val=1,
@@ -4301,6 +4403,7 @@ class IdsGameMaximalAttackV19Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
                                      min_random_a_val=0, min_random_d_val=7, min_random_det_val=1,
@@ -4398,6 +4501,7 @@ class IdsGameRandomDefenseV20Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1,
@@ -4446,6 +4550,7 @@ class IdsGameMinimalDefenseV20Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1,
@@ -4493,6 +4598,7 @@ class IdsGameRandomAttackV20Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1,
@@ -4541,6 +4647,7 @@ class IdsGameMaximalAttackV20Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
                                      min_random_a_val=0, min_random_d_val=3, min_random_det_val=1,
@@ -4638,6 +4745,7 @@ class IdsGameRandomDefenseV21Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_defense_bot_agent import RandomDefenseBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
                                      min_random_a_val=0, min_random_d_val=1, min_random_det_val=1,
@@ -4686,6 +4794,7 @@ class IdsGameMinimalDefenseV21Env(AttackerEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.defend_minimal_value_bot_agent import DefendMinimalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
                                      min_random_a_val=0, min_random_d_val=1, min_random_det_val=1,
@@ -4733,6 +4842,7 @@ class IdsGameRandomAttackV21Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.random_attack_bot_agent import RandomAttackBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
                                      min_random_a_val=0, min_random_d_val=1, min_random_det_val=1,
@@ -4781,6 +4891,7 @@ class IdsGameMaximalAttackV21Env(DefenderEnv):
         :param initial_state_path: path to the initial state (if none, use default)
         :param idsgame_config: configuration of the environment (if not specified a default config is used)
         """
+        from gym_idsgame.agents.bot_agents.attack_maximal_value_bot_agent import AttackMaximalValueBotAgent
         if idsgame_config is None:
             game_config = GameConfig(num_layers=1, num_servers_per_layer=2, num_attack_types=4, max_value=9,
                                      min_random_a_val=0, min_random_d_val=1, min_random_det_val=1,

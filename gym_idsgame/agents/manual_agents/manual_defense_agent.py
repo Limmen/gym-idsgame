@@ -2,7 +2,7 @@
 Manual defender agent
 """
 from gym_idsgame.agents.agent import Agent
-from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
+#from gym_idsgame.envs.dao.idsgame_config import IdsGameConfig
 from gym_idsgame.envs.rendering.viewer import Viewer
 
 class ManualDefenseAgent(Agent):
@@ -10,7 +10,7 @@ class ManualDefenseAgent(Agent):
     Class representing a manual defender agent, controlled in the GUI by keyboard and mouse
     """
 
-    def __init__(self, idsgame_config: IdsGameConfig):
+    def __init__(self, idsgame_config):
         """
         Sets up the GUI with the manual defender
 

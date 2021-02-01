@@ -1,0 +1,2 @@
+include gym_idsgame/envs/rendering/frames/resources/*.png
+include envs/rendering/frames/resources/*.png

@@ -6,9 +6,7 @@ import numpy as np
 from gym_idsgame.agents.bot_agents.bot_agent import BotAgent
 from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.game_config import GameConfig
-from gym_idsgame.envs.util import idsgame_util
 from gym_idsgame.envs.dao.node_type import NodeType
-import gym_idsgame.envs.util.idsgame_util as util
 
 class AttackMaximalValueBotAgent(BotAgent):
     """
@@ -37,6 +35,7 @@ class AttackMaximalValueBotAgent(BotAgent):
             return self.rec_action(game_state)
 
     def rec_action(self, game_state: GameState) -> int:
+        import gym_idsgame.envs.util.idsgame_util as util
         attacker_obs = game_state.get_attacker_observation(
             self.game_config.network_config, local_view=self.idsgame_env.local_view_features(),
             reconnaissance=self.game_config.reconnaissance_actions,
@@ -69,6 +68,7 @@ class AttackMaximalValueBotAgent(BotAgent):
         return min_action_id
 
     def is_attack_legal(self, action, obs, game_state):
+        import gym_idsgame.envs.util.idsgame_util as util
         if self.idsgame_env.local_view_features():
             action = self.convert_local_attacker_action_to_global(action, obs)
             if action == -1:
@@ -93,8 +93,9 @@ class AttackMaximalValueBotAgent(BotAgent):
         :param game_state: the game state
         :return: action_id
         """
+        import gym_idsgame.envs.util.idsgame_util as util
         actions = list(range(self.game_config.num_attack_actions))
-        legal_actions = list(filter(lambda action: idsgame_util.is_attack_id_legal(action, self.game_config,
+        legal_actions = list(filter(lambda action: util.is_attack_id_legal(action, self.game_config,
                                                                                    game_state.attacker_pos,
                                                                                    game_state), actions))
         attacker_row, attacker_col = game_state.attacker_pos
@@ -103,7 +104,7 @@ class AttackMaximalValueBotAgent(BotAgent):
         for id, node in enumerate(self.game_config.network_config.node_list):
             if node == NodeType.SERVER.value or node == NodeType.DATA.value:
                 max_idx = np.argmax(game_state.attack_values[id])
-                action_id = idsgame_util.get_attack_action_id(id, max_idx, self.game_config)
+                action_id = util.get_attack_action_id(id, max_idx, self.game_config)
                 node_row, node_col = self.game_config.network_config.get_node_pos(id)
                 if game_state.attack_values[id][max_idx] > max_node_value and action_id in legal_actions and \
                         node_row < attacker_row:

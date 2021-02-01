@@ -6,7 +6,6 @@ import numpy as np
 from gym_idsgame.agents.bot_agents.bot_agent import BotAgent
 from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.game_config import GameConfig
-from gym_idsgame.envs.util import idsgame_util
 from gym_idsgame.envs.dao.node_type import NodeType
 
 class DefendMinimalValueBotAgent(BotAgent):
@@ -29,6 +28,7 @@ class DefendMinimalValueBotAgent(BotAgent):
         :param game_state: the game state
         :return: action_id
         """
+        from gym_idsgame.envs.util import idsgame_util
         actions = list(range(self.game_config.num_defense_actions))
         legal_actions = list(filter(lambda action: idsgame_util.is_defense_id_legal(action, self.game_config,
                                                                                     game_state), actions))
