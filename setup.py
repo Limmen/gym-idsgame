@@ -1,7 +1,7 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name='gym_idsgame',
-      version='1.0.1',
+      version='1.0.2',
       install_requires=['gym', 'pyglet', 'numpy', 'torch'],
       author='Kim Hammar',
       author_email='hammar.kim@gmail.com',
@@ -10,6 +10,7 @@ setup(name='gym_idsgame',
       keywords='Cyber Security, Intrusion Detection, Markov Games, Reinforcement Learning, Q-learning',
       url='https://github.com/Limmen/gym-idsgame',
       download_url='https://github.com/Limmen/gym-idsgame/archive/1.0.0.tar.gz',
+      packages=find_packages(),
       classifiers=[
           'Development Status :: 3 - Alpha',
           'Intended Audience :: Developers',
