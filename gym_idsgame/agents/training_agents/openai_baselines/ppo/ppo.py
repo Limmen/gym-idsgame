@@ -87,6 +87,8 @@ class OpenAiPPOAgent(PolicyGradientAgent):
             eval_env = IdsGameMonitor(self.env, self.config.video_dir + "/" + time_str, force=True,
                                       video_frequency=self.config.video_frequency, openai_baseline=True)
             eval_env.metadata["video.frames_per_second"] = self.config.video_fps
+        
+        else: eval_env = None
 
         model.learn(total_timesteps=self.config.num_episodes,
                     log_interval=self.config.train_log_frequency,
