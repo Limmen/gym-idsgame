@@ -48,6 +48,7 @@ that policy convergence in self-play remains a challenge."
 
 - [CNSM20](https://ieeexplore.ieee.org/document/9269092)
 - [CNSM21](http://dl.ifip.org/db/conf/cnsm/cnsm2021/1570732932.pdf)
+- [TNSM Preprint Submission](https://arxiv.org/abs/2111.00289)
 
 <p align="center">
 <img src="docs/episode_15000.gif" width="600">
