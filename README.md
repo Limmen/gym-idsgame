@@ -48,11 +48,17 @@ that policy convergence in self-play remains a challenge."
 
 - [CNSM20](https://ieeexplore.ieee.org/document/9269092)
 - [CNSM21](http://dl.ifip.org/db/conf/cnsm/cnsm2021/1570732932.pdf)
-- [TNSM Preprint Submission](https://arxiv.org/abs/2111.00289)
+- [TNSM22](https://arxiv.org/abs/2111.00289)
+- [NOMS22](https://limmen.dev/assets/papers/NOMS22_Demo_Policy_Examination_System_Hammar_Stadler_28_Jan_2022.pdf)
 
 <p align="center">
 <img src="docs/episode_15000.gif" width="600">
 </p>
+
+## See also
+
+- [awesome-rl-for-cybersecurity](https://github.com/Limmen/awesome-rl-for-cybersecurity)
+- [gym-optimal-intrusion-response](https://github.com/Limmen/gym-optimal-intrusion-response)
 
 Table of Contents
 =================
