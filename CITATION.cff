@@ -1,15 +1,11 @@
-# YAML 1.2
----
 authors:
-  -
-    affiliation: "KTH Royal Institute of Technology"
-    family-names: Hammar
-    given-names: Kim
-  -
-    affiliation: "KTH Royal Institute of Technology"
-    family-names: Stadler
-    given-names: Rolf
-cff-version: "1.1.0"
+- affiliation: "KTH Royal Institute of Technology"
+  family-names: Hammar
+  given-names: Kim
+- affiliation: "KTH Royal Institute of Technology"
+  family-names: Stadler
+  given-names: Rolf
+cff-version: 1.2.0
 keywords:
   - "reinforcement learning"
   - "cyber security"
