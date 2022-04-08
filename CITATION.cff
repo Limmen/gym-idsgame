@@ -1,0 +1,20 @@
+# YAML 1.2
+---
+authors:
+  -
+    affiliation: "KTH Royal Institute of Technology"
+    family-names: Hammar
+    given-names: Kim
+  -
+    affiliation: "KTH Royal Institute of Technology"
+    family-names: Stadler
+    given-names: Rolf
+cff-version: "1.1.0"
+keywords:
+  - "reinforcement learning"
+  - "cyber security"
+  - "intrusion prevention"
+message: "If you use this software, please cite it using these metadata."
+repository-code: "https://github.com/Limmen/gym-idsgame"
+title: "Finding Effective Security Strategies through Reinforcement Learning and Self-Play"
+...
