@@ -49,7 +49,9 @@ that policy convergence in self-play remains a challenge."
 - [CNSM20](https://ieeexplore.ieee.org/document/9269092)
 - [CNSM21](http://dl.ifip.org/db/conf/cnsm/cnsm2021/1570732932.pdf)
 - [TNSM22](https://arxiv.org/abs/2111.00289)
-- [NOMS22](https://limmen.dev/assets/papers/NOMS22_Demo_Policy_Examination_System_Hammar_Stadler_28_Jan_2022.pdf)
+- [NOMS22](https://ieeexplore.ieee.org/document/9789707)
+- [ICML22](https://limmen.dev/assets/papers/icml_ml4cyber_Hammar_Stadler_final_24_june_2022.pdf)
+- [CNSM22](https://limmen.dev/assets/papers/CNSM22_preprint_8_sep_Hammar_Stadler.pdf)
 
 <p align="center">
 <img src="docs/episode_15000.gif" width="600">

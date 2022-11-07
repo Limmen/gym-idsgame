@@ -50,7 +50,7 @@ class BaseCallback(ABC):
         """
         self.model = model
         self.training_env = model.get_env()
-        self.logger = Logger.CURRENT
+        # self.logger = Logger.CURRENT
         self._init_callback()
 
     def _init_callback(self) -> None:
