@@ -1,7 +1,7 @@
 """
 Game-specific configuration for the gym-idsgame environment
 """
-import gym
+import gymnasium as gym
 import numpy as np
 from gym_idsgame.envs.dao.game_state import GameState
 from gym_idsgame.envs.dao.network_config import NetworkConfig
@@ -139,8 +139,8 @@ class GameConfig():
             high_row = np.array([self.max_value] * (self.num_attack_types + 1))
             low = np.zeros((self.num_nodes, self.num_attack_types + 1))
         else:
-            high_row = np.array([self.max_value] * (self.num_attack_types*2 + 1))
-            low = np.zeros((self.num_nodes, self.num_attack_types*2 + 1))
+            high_row = np.array([self.max_value] * (self.num_attack_types*2 + 2))
+            low = np.zeros((self.num_nodes, self.num_attack_types*2 + 2))
         high = np.array([high_row] * self.num_nodes)
         observation_space = gym.spaces.Box(low=low, high=high, dtype=np.int32)
         return observation_space

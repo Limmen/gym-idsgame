@@ -1,5 +1,5 @@
 import os
-import gym
+import gymnasium as gym
 import sys
 from gym_idsgame.agents.manual_agents.manual_defense_agent import ManualDefenseAgent
 

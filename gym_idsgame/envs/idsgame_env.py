@@ -3,7 +3,7 @@ RL environment for an intrusion detection Markov game
 """
 from typing import Union
 import numpy as np
-import gym
+import gymnasium as gym
 import os
 import time
 import pickle
@@ -54,6 +54,7 @@ class IdsGameEnv(gym.Env, ABC):
         self.idsgame_config: IdsGameConfig = idsgame_config
         self.state: GameState = self.idsgame_config.game_config.initial_state.copy()
         self.observation_space = self.idsgame_config.game_config.get_attacker_observation_space()
+        self.action_space = self.idsgame_config.game_config.get_action_space(defender=False)
         self.attacker_action_space = self.idsgame_config.game_config.get_action_space(defender=False)
         self.defender_action_space = self.idsgame_config.game_config.get_action_space(defender=True)
         self.viewer = None
@@ -117,8 +118,8 @@ class IdsGameEnv(gym.Env, ABC):
         self.state.defense_events = []
 
         if self.state.game_step > constants.GAME_CONFIG.MAX_GAME_STEPS:
-            return self.get_observation(), (100*constants.GAME_CONFIG.NEGATIVE_REWARD,
-                                            100*constants.GAME_CONFIG.NEGATIVE_REWARD), True, info
+            return self.get_observation()[0], (100*constants.GAME_CONFIG.NEGATIVE_REWARD,
+                                            100*constants.GAME_CONFIG.NEGATIVE_REWARD), True, True, info
 
         attack_action, defense_action = action
 
@@ -222,9 +223,9 @@ class IdsGameEnv(gym.Env, ABC):
         trajectory.append(self.state)
         if self.idsgame_config.save_trajectories:
             self.game_trajectories.append(trajectory)
-        return observation, reward, self.state.done, info
+        return observation[0], reward, self.state.done, self.state.done, info
 
-    def reset(self, update_stats = False) -> np.ndarray:
+    def reset(self, seed: int = 0, update_stats = False) -> np.ndarray:
         """
         Resets the environment and returns the initial state
 
@@ -262,7 +263,7 @@ class IdsGameEnv(gym.Env, ABC):
         self.attacks = []
         self.hacked_nodes = []
         self.num_failed_attacks = 0
-        return observation
+        return observation[0], {}
 
     def restart(self) -> np.ndarray:
         """
@@ -272,7 +273,7 @@ class IdsGameEnv(gym.Env, ABC):
         """
         obs = self.reset()
         self.state.restart()
-        return obs
+        return obs[0], {}
 
     def render(self, mode: str ='human'):
         """

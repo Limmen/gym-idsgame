@@ -1,7 +1,7 @@
 from typing import Optional, List, Tuple, Callable, Union, Dict, Type, Any
 from functools import partial
 
-import gym
+import gymnasium as gym
 import torch as th
 import torch.nn as nn
 import numpy as np

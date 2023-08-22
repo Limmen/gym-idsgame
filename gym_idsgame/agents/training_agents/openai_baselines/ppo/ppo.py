@@ -4,7 +4,7 @@ An agent for the IDSGameEnv that uses the PPO Policy Gradient algorithm from Ope
 import time
 import torch
 import math
-from gym_idsgame.envs.rendering.video.idsgame_monitor import IdsGameMonitor
+# from gym_idsgame.envs.rendering.video.idsgame_monitor import IdsGameMonitor
 from gym_idsgame.agents.training_agents.openai_baselines.common.baseline_env_wrapper import BaselineEnvWrapper
 from gym_idsgame.agents.dao.experiment_result import ExperimentResult
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent import PolicyGradientAgent
@@ -84,8 +84,9 @@ class OpenAiPPOAgent(PolicyGradientAgent):
             if self.config.video_dir is None:
                 raise AssertionError("Video is set to True but no video_dir is provided, please specify "
                                      "the video_dir argument")
-            eval_env = IdsGameMonitor(self.env, self.config.video_dir + "/" + time_str, force=True,
-                                      video_frequency=self.config.video_frequency, openai_baseline=True)
+            eval_env = self.env
+            # eval_env = IdsGameMonitor(self.env, self.config.video_dir + "/" + time_str, force=True,
+            #                           video_frequency=self.config.video_frequency, openai_baseline=True)
             eval_env.metadata["video.frames_per_second"] = self.config.video_fps
         
         else: eval_env = None

@@ -10,7 +10,6 @@ except ImportError as e:
     But if you really just want to install all Gym dependencies and not have to think about it,
     'pip install -e .[all]' or 'pip install gym[all]' will do it.
     ''')
-
 try:
     from pyglet.gl import *
 except ImportError as e:
@@ -84,7 +83,6 @@ class Viewer():
         self.isopen = False
         self.gameframe.close()
         print("Window closed, exiting")
-        sys.exit(0)
 
     def close(self) -> None:
         """

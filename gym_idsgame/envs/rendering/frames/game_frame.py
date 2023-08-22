@@ -144,7 +144,8 @@ class GameFrame(pyglet.window.Window):
                                 self.game_state.game_step += 1
                                 return
 
-                    if node.x < x < (node.x + node.width) and node.y < y < (node.y + node.height):
+                    if (node.node_type != NodeType.START and
+                            node.x < x < (node.x + node.width) and node.y < y < (node.y + node.height)):
 
                         # Manual Defender
                         if self.idsgame_config.game_config.manual_defender:
@@ -285,7 +286,7 @@ class GameFrame(pyglet.window.Window):
         :return: None
         """
         if self.idsgame_config.game_config.manual_attacker or self.idsgame_config.game_config.manual_defender:
-            if symbol == pyglet.window.key._1:
+            if symbol == pyglet.window.key._1 or int(symbol) == 49:
                 if self.idsgame_config.game_config.manual_attacker:
                     cond = self.idsgame_config.game_config.num_attack_types > 1
                     if self.idsgame_config.reconnaissance_actions:
@@ -295,7 +296,7 @@ class GameFrame(pyglet.window.Window):
                 elif  self.idsgame_config.game_config.manual_defender:
                     if self.idsgame_config.game_config.num_attack_types > 1:
                         self.game_state.attack_defense_type = 1
-            elif symbol == pyglet.window.key._2:
+            elif symbol == pyglet.window.key._2 or int(symbol) == 50:
                 if self.idsgame_config.game_config.manual_attacker:
                     cond = self.idsgame_config.game_config.num_attack_types  > 2
                     if self.idsgame_config.reconnaissance_actions:
@@ -305,17 +306,17 @@ class GameFrame(pyglet.window.Window):
                 elif self.idsgame_config.game_config.manual_defender:
                     if self.idsgame_config.game_config.num_attack_types > 2:
                         self.game_state.attack_defense_type = 2
-            elif symbol == pyglet.window.key._3:
+            elif symbol == pyglet.window.key._3 or int(symbol) == 51:
                 if self.idsgame_config.game_config.manual_attacker:
                     cond = self.idsgame_config.game_config.num_attack_types  > 3
                     if self.idsgame_config.reconnaissance_actions:
                         cond = (self.idsgame_config.game_config.num_attack_types + 1) > 3
                     if cond:
                         self.game_state.attack_defense_type = 3
-                elif self.idsgame_config.game_config.manual_defender:
+                elif self.idsgame_config.game_config.manual_defender or int(symbol) == 53:
                     if self.idsgame_config.game_config.num_attack_types > 3:
                         self.game_state.attack_defense_type = 3
-            elif symbol == pyglet.window.key._4:
+            elif symbol == pyglet.window.key._4 or int(symbol) == 52:
                 if self.idsgame_config.game_config.manual_attacker:
                     cond = self.idsgame_config.game_config.num_attack_types//self.idsgame_config.game_config.num_nodes > 4
                     if self.idsgame_config.reconnaissance_actions:
@@ -325,7 +326,7 @@ class GameFrame(pyglet.window.Window):
                 elif self.idsgame_config.game_config.manual_defender:
                     if self.idsgame_config.game_config.num_attack_types > 4:
                         self.game_state.attack_defense_type = 4
-            elif symbol == pyglet.window.key._5:
+            elif symbol == pyglet.window.key._5 or int(symbol) == 53:
                 if self.idsgame_config.game_config.manual_attacker:
                     cond = self.idsgame_config.game_config.num_attack_types  > 5
                     if self.idsgame_config.reconnaissance_actions:
@@ -335,7 +336,7 @@ class GameFrame(pyglet.window.Window):
                 elif self.idsgame_config.game_config.manual_defender:
                     if self.idsgame_config.game_config.num_attack_types > 5:
                         self.game_state.attack_defense_type = 5
-            elif symbol == pyglet.window.key._6:
+            elif symbol == pyglet.window.key._6 or int(symbol) == 54:
                 if self.idsgame_config.game_config.manual_attacker:
                     cond = self.idsgame_config.game_config.num_attack_types  > 6
                     if self.idsgame_config.reconnaissance_actions:
@@ -345,7 +346,7 @@ class GameFrame(pyglet.window.Window):
                 elif self.idsgame_config.game_config.manual_defender:
                     if self.idsgame_config.game_config.num_attack_types > 6:
                         self.game_state.attack_defense_type = 6
-            elif symbol == pyglet.window.key._7:
+            elif symbol == pyglet.window.key._7 or int(symbol) == 55:
                 if self.idsgame_config.game_config.manual_attacker:
                     cond = self.idsgame_config.game_config.num_attack_types  > 7
                     if self.idsgame_config.reconnaissance_actions:
@@ -355,7 +356,7 @@ class GameFrame(pyglet.window.Window):
                 elif self.idsgame_config.game_config.manual_defender:
                     if self.idsgame_config.game_config.num_attack_types > 7:
                         self.game_state.attack_defense_type = 7
-            elif symbol == pyglet.window.key._8:
+            elif symbol == pyglet.window.key._8 or int(symbol) == 56:
                 if self.idsgame_config.game_config.manual_attacker:
                     cond = self.idsgame_config.game_config.num_attack_types  > 8
                     if self.idsgame_config.reconnaissance_actions:
@@ -365,7 +366,7 @@ class GameFrame(pyglet.window.Window):
                 elif self.idsgame_config.game_config.manual_defender:
                     if self.idsgame_config.game_config.num_attack_types > 8:
                         self.game_state.attack_defense_type = 8
-            elif symbol == pyglet.window.key._9:
+            elif symbol == pyglet.window.key._9 or int(symbol) == 57:
                 if self.idsgame_config.game_config.manual_attacker:
                     cond = self.idsgame_config.game_config.num_attack_types  > 9
                     if self.idsgame_config.reconnaissance_actions:
@@ -375,7 +376,7 @@ class GameFrame(pyglet.window.Window):
                 elif self.idsgame_config.game_config.manual_defender:
                     if self.idsgame_config.game_config.num_attack_types > 9:
                         self.game_state.attack_defense_type = 9
-            elif symbol == pyglet.window.key._0:
+            elif symbol == pyglet.window.key._0 or symbol == 48:
                 if self.idsgame_config.game_config.manual_attacker:
                     cond = self.idsgame_config.game_config.num_attack_types  > 0
                     if self.idsgame_config.reconnaissance_actions:
@@ -387,11 +388,11 @@ class GameFrame(pyglet.window.Window):
                         self.game_state.attack_defense_type = 0
             elif symbol == pyglet.window.key.SPACE:
                 self.reset(update_stats=True)
-            elif symbol == pyglet.window.key.A:
+            elif symbol == pyglet.window.key.A or symbol == 97:
                 self.toggle_attacker_view()
-            elif symbol == pyglet.window.key.D:
+            elif symbol == pyglet.window.key.D or symbol == 100:
                 self.toggle_defender_view()
-            elif symbol == pyglet.window.key.F:
+            elif symbol == pyglet.window.key.F or symbol == 102:
                 self.toggle_full_view()
 
     def toggle_attacker_view(self):

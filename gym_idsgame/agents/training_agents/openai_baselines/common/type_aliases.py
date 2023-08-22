@@ -5,7 +5,7 @@ from typing import Union, Dict, Any, NamedTuple, List, Callable, Tuple
 
 import numpy as np
 import torch as th
-import gym
+import gymnasium as gym
 
 from gym_idsgame.agents.training_agents.openai_baselines.common.vec_env import VecEnv
 from gym_idsgame.agents.training_agents.openai_baselines.common.callbacks import BaseCallback

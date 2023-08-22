@@ -1,9 +1,10 @@
 import os
 import sys
-import gym
+import gymnasium as gym
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
 from gym_idsgame.agents.training_agents.openai_baselines.ppo.ppo import OpenAiPPOAgent
 from gym_idsgame.agents.training_agents.openai_baselines.common.baseline_env_wrapper import BaselineEnvWrapper
+import gym_idsgame
 from experiments.util import util
 
 def get_script_path():
@@ -27,7 +28,7 @@ if __name__ == '__main__':
                                                 alpha_defender=0.0001,
                                                 eval_sleep=0.9,
                                                 min_epsilon=0.01, eval_episodes=1000, train_log_frequency=1,
-                                                epsilon_decay=0.9999, video=True, eval_log_frequency=500,
+                                                epsilon_decay=0.9999, video=False, eval_log_frequency=500,
                                                 video_fps=5, video_dir=default_output_dir() + "/results/videos",
                                                 num_episodes=100000000,
                                                 eval_render=False, gifs=True,

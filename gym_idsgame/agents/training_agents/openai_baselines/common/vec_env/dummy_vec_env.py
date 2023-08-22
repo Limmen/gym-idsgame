@@ -36,7 +36,7 @@ class DummyVecEnv(VecEnv):
         self.buf_d_obs = OrderedDict([
             (k, np.zeros((self.num_envs,) + tuple(defender_shapes[k]), dtype=defender_dtypes[k]))
             for k in self.defender_keys])
-        self.buf_dones = np.zeros((self.num_envs,), dtype=np.bool)
+        self.buf_dones = np.zeros((self.num_envs,), dtype=np.bool_)
         self.buf_a_rews = np.zeros((self.num_envs,), dtype=np.float32)
         self.buf_d_rews = np.zeros((self.num_envs,), dtype=np.float32)
         self.buf_infos = [{} for _ in range(self.num_envs)]
@@ -48,14 +48,14 @@ class DummyVecEnv(VecEnv):
 
     def step_wait(self, update_stats : bool = False):
         for env_idx in range(self.num_envs):
-            obs, rew, self.buf_dones[env_idx], self.buf_infos[env_idx] =\
+            obs, rew, self.buf_dones[env_idx], _, self.buf_infos[env_idx] =\
                 self.envs[env_idx].step(self.actions[env_idx])
             self.buf_a_rews[env_idx] = rew[0]
             self.buf_d_rews[env_idx] = rew[1]
             if self.buf_dones[env_idx]:
                 # save final observation where user can get it, then reset
                 self.buf_infos[env_idx]['terminal_observation'] = obs
-                r_obs = self.envs[env_idx].reset(update_stats=update_stats)
+                r_obs, _ = self.envs[env_idx].reset(update_stats=update_stats)
                 if r_obs is not None:
                     obs = r_obs
             a_obs = obs[0]
@@ -67,12 +67,12 @@ class DummyVecEnv(VecEnv):
     def seed(self, seed=None):
         seeds = list()
         for idx, env in enumerate(self.envs):
-            seeds.append(env.seed(seed + idx))
+            seeds.append(seed + idx)
         return seeds
 
     def reset(self, update_stats : bool = False):
         for env_idx in range(self.num_envs):
-            obs = self.envs[env_idx].reset(update_stats=update_stats)
+            obs, _ = self.envs[env_idx].reset(update_stats=update_stats)
             # self._save_obs(env_idx, a_obs, d_obs)
         return np.copy(obs)
         #return self._obs_from_buf()

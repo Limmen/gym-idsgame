@@ -2,7 +2,7 @@
 Generic runner for running experiments with idsgame environments
 """
 from typing import Union
-import gym
+import gymnasium as gym
 
 # In case running on server without screen
 try:

@@ -1,7 +1,7 @@
 import time
 from typing import List, Tuple, Type, Union, Callable, Optional, Dict, Any
 
-import gym
+import gymnasium as gym
 from gym import spaces
 import torch as th
 import torch.nn.functional as F

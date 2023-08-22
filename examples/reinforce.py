@@ -1,5 +1,5 @@
 import os
-import gym
+import gymnasium as gym
 import sys
 from gym_idsgame.agents.training_agents.policy_gradient.pg_agent_config import PolicyGradientAgentConfig
 from gym_idsgame.agents.training_agents.policy_gradient.reinforce.reinforce import ReinforceAgent

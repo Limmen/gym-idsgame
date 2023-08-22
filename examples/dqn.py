@@ -1,5 +1,5 @@
 import os
-import gym
+import gymnasium as gym
 import sys
 from gym_idsgame.agents.training_agents.q_learning.q_agent_config import QAgentConfig
 from gym_idsgame.agents.training_agents.q_learning.dqn.dqn import DQNAgent

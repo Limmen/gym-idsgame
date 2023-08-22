@@ -1,7 +1,7 @@
 """
 Register OpenAI Envs
 """
-from gym.envs.registration import register
+from gymnasium.envs.registration import register
 
 # -------- Version 0 ------------
 

@@ -2,7 +2,7 @@ from typing import Union, Type, Dict, List, Tuple, Optional, Any
 
 from itertools import zip_longest
 
-import gym
+import gymnasium as gym
 import torch as th
 import torch.nn as nn
 import numpy as np

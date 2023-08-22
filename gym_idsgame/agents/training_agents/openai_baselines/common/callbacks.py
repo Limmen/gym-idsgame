@@ -4,7 +4,7 @@ import warnings
 import typing
 from typing import Union, List, Dict, Any, Optional
 
-import gym
+import gymnasium as gym
 import numpy as np
 
 from gym_idsgame.agents.training_agents.openai_baselines.common.evaluation import evaluate_policy

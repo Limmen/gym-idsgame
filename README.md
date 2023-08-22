@@ -245,15 +245,16 @@ Registered configurations:
 ```bash
 # install from pip
 pip install gym-idsgame==1.0.12
-# local install from source
-$ pip install -e gym-idsgame
-# force upgrade deps
-$ pip install -e gym-idsgame --upgrade
 
 # git clone and install from source
 git clone https://github.com/Limmen/gym-idsgame
 cd gym-idsgame
 pip3 install -e .
+
+# local install from source
+$ pip install -e gym-idsgame
+# force upgrade deps
+$ pip install -e gym-idsgame --upgrade
 
 # run unit tests
 pytest
@@ -269,7 +270,7 @@ Once the environment has been created, the API functions
 `step()`, `reset()`, `render()`, and `close()` can be used to train any RL algorithm of
 your preference.
 ```python
-import gym
+import gymnasium as gym
 from gym_idsgame.envs import IdsGameEnv
 env_name = "idsgame-maximal_attack-v3"
 env = gym.make(env_name)
@@ -278,7 +279,7 @@ env = gym.make(env_name)
 The environment ships with implementation of several baseline algorithms, e.g. the tabular Q(0) algorithm, see the example code below.
 
 ```python
-import gym
+import gymnasium as gym
 from gym_idsgame.agents.training_agents.q_learning.q_agent_config import QAgentConfig
 from gym_idsgame.agents.training_agents.q_learning.tabular_q_learning.tabular_q_agent import TabularQAgent
 random_seed = 0

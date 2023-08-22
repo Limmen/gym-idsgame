@@ -7,7 +7,7 @@ from typing import Union, Type, Optional, Dict, Any, List, Tuple, Callable
 from abc import ABC, abstractmethod
 from collections import deque
 
-import gym
+import gymnasium as gym
 import torch as th
 import numpy as np
 
@@ -720,7 +720,10 @@ class BaseRLModel(ABC):
         # Avoid resetting the environment when calling ``.learn()`` consecutive times
         if not self.pg_agent_config.multi_channel_obs:
             if reset_num_timesteps or self._last_obs_a is None:
-                obs = self.env.reset()
+                try:
+                    obs, _ = self.env.reset()
+                except:
+                    obs = self.env.reset()
                 a_obs = obs[0]
                 d_obs = obs[1]
                 self._last_obs_a = a_obs
@@ -730,7 +733,7 @@ class BaseRLModel(ABC):
                     self._last_original_obs = self._vec_normalize_env.get_original_obs()
         else:
             if reset_num_timesteps or self._last_obs_a_a is None:
-                obs = self.env.reset()
+                obs, _ = self.env.reset()
                 a_obs = obs[0]
                 a_obs_a = a_obs[0]
                 a_obs_d = a_obs[1]

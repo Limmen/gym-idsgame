@@ -1,7 +1,6 @@
 from gym import Wrapper
 from gym import error, version, logger
 import os, json, numpy as np, six
-from gym.wrappers.monitoring import stats_recorder
 from gym.utils import atomic_write, closer
 from gym.utils.json_utils import json_encode_np
 import imageio
